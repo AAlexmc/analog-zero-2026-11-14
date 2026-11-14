@@ -10,6 +10,8 @@ import { sha256Hex } from './sha256.js';
 import { alturaBilineal } from './calculo.js';
 import { crearRutas } from './panel_rutas.js';
 import { crearObra } from './panel_obra.js';
+import { crearVolatiles } from './panel_volatiles.js';
+import { crearBase } from './panel_base.js';
 import { crearCerca, capaModelos } from './modelo3d.js';
 
 const qs = new URLSearchParams(location.search);
@@ -232,6 +234,8 @@ function leyenda(p) {
         <div class="ext num"><span>${fmt(r.min, 2)}</span><span>${fmt(r.max, 2)}</span></div>${src}`);
     }
   }
+  const vol = p.volatiles?.leyenda();
+  if (vol) partes.push(vol);
   p.el.querySelector('.leyenda').innerHTML = partes.join('');
 }
 
@@ -273,6 +277,8 @@ function trasDibujar(p) {
   posicionarMarcas(p);
   p.rutas?.dibujar();
   p.obra?.dibujar();
+  p.volatiles?.dibujar();
+  p.base?.dibujar();
 }
 
 function leerCursor(p, ev) {
@@ -717,6 +723,7 @@ function pintarHoja(p) {
     <div class="et">REQUIREMENTS · value here vs design limit</div>
     ${evs.length ? evs.map((r) => filaRequisito(r, e.meta)).join('') : '<div class="tenue">The catalogue has no public design limit for this system.</div>'}
     <div class="obra-pad"></div>
+    <div class="vol-hoja"></div>
     ${comparacion(p, item, eq, evs)}
     <details class="cifras-eq"><summary class="et">FIGURES (${cifras.length})</summary>${cifras.map((c) => `
       <div class="cifra"><span>${esc(c.nombre)}</span> <span class="num">${c.valor === null || c.valor === undefined ? 'not public' : esc(Array.isArray(c.valor) ? c.valor.join(' – ') : c.valor)} ${esc(c.unidad ?? '')}</span>
@@ -725,6 +732,7 @@ function pintarHoja(p) {
   hoja.querySelector('[data-a=quitar]').addEventListener('click', () => quitarPlantado(p, item.uid));
   (p.cerca ??= crearCerca()).montar(hoja.querySelector('.cerca'), { eq, pendiente: med.pendiente_deg, huella: h });
   p.obra?.hoja(hoja.querySelector('.obra-pad'), item, eq);
+  p.volatiles?.hoja(hoja.querySelector('.vol-hoja'), item, eq);
 }
 
 function comparacion(p, item, eq, evs) {
@@ -925,6 +933,8 @@ async function iniciar() {
       crearEquipo(p);
       p.rutas = crearRutas(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, elegirHerramienta, modoPlantar, refrescarPlantado });
       p.obra = crearObra(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, trasCambio, refrescarPlantado });
+      p.volatiles = crearVolatiles(p, { catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, refrescarPlantado, modoPlantar, elegirHerramienta, leyenda, paneles: estado.paneles });
+      p.base = crearBase(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, quitarPlantado, refrescarPlantado, evaluar, LECTURA, VARIABLE, OP, paneles: estado.paneles, alternarAmpliado, modoPlantar, elegirHerramienta });
       p.el.querySelector('.ampliar').disabled = false;
     } catch (e) {
       console.error(e);

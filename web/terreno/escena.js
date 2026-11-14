@@ -22,6 +22,7 @@ uniform float uN, uM, uGain, uAmb, uZmin, uZmax, uCurva, uRkm;
 uniform vec3 uSol;
 uniform int uModo, uCapaModo, uHayAgua;
 uniform vec2 uCapaRango;
+uniform vec3 uCapaColor;
 uniform vec3 uPincel;
 varying vec2 vTc;
 varying vec2 vXZ;
@@ -64,7 +65,9 @@ void main() {
   if (uCapaModo > 0) {
     vec2 c = texture(uCapa, vTc).rg;
     if (c.g > 0.5) {
-      if (uCapaModo == 2) {
+      if (uCapaModo == 3) {
+        if (c.r > 0.5) col = mix(col, uCapaColor * (0.7 + 0.3 * sombreado), 0.85);
+      } else if (uCapaModo == 2) {
         if (c.r > 0.5) {
           col = mix(col, OSC, 0.45);
           if (mod(gl_FragCoord.x + gl_FragCoord.y, 7.0) < 1.6) col = BLA;
@@ -140,7 +143,7 @@ export class Escena {
       uN: { value: n }, uM: { value: this.m }, uGain: { value: 1 }, uAmb: { value: 0.03 },
       uZmin: { value: r.min }, uZmax: { value: r.max }, uCurva: { value: intervaloBonito(Math.max(r.max - r.min, 1) / 20) }, uRkm: { value: meta.georef.radio_m / 1000 },
       uSol: { value: new THREE.Vector3(0, 1, 0) }, uModo: { value: 0 }, uCapaModo: { value: 0 },
-      uCapaRango: { value: new THREE.Vector2(0, 1) }, uPincel: { value: new THREE.Vector3(0, 0, -1) },
+      uCapaRango: { value: new THREE.Vector2(0, 1) }, uCapaColor: { value: new THREE.Vector3(1, 1, 1) }, uPincel: { value: new THREE.Vector3(0, 0, -1) },
     };
     const seg = Math.min(n - 1, 1023);
     const geo = new THREE.PlaneGeometry(L, L, seg, seg);
@@ -210,8 +213,8 @@ export class Escena {
     this.sucio = true;
   }
 
-  // capa: {nombre, binaria} o null
-  setCapa(nombre, binaria) {
+  // capa: {nombre, binaria} o null; color [r, g, b] (0-1): máscara de un solo color, celdas con valor > 0.5.
+  setCapa(nombre, binaria, color = null) {
     if (!nombre) { this.uniforms.uCapaModo.value = 0; this.sucio = true; return null; }
     const v = this.capas[nombre], n = this.n;
     const d = new Float32Array(n * n * 2);
@@ -223,7 +226,8 @@ export class Escena {
     this.uniforms.uCapa.value = this.tCapa;
     const r = rango(v);
     this.uniforms.uCapaRango.value.set(r.min, r.max);
-    this.uniforms.uCapaModo.value = binaria ? 2 : 1;
+    if (color) this.uniforms.uCapaColor.value.set(...color);
+    this.uniforms.uCapaModo.value = color ? 3 : binaria ? 2 : 1;
     this.sucio = true;
     return r;
   }

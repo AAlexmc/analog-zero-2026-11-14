@@ -451,3 +451,35 @@ test('water is not a shortcut: the only dry crossing is over a steep ridge, so t
   assert.ok(Array.from(c.traza).every((i) => agua[i] === 0), 'path over water');
   assert.ok(Array.from(c.traza).includes(2 * n + 10), 'path does not use the ford');
 });
+
+test('an assumed separation between two pieces (opc.separacionesExtra) is kept, reported as assumed, and an empty list changes nothing', () => {
+  const opc = { k: 6, pesos: PESOS, anchoCarretera_m: ANCHO, separacionHuellas_m: SEP_H, separacionCandidatos_m: 60 };
+  const libre = generarBase(terrenoMesetas(1), piezasMesetas(), VEH, opc);
+  assert.equal(libre.factible, true);
+  assert.equal(json(generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { ...opc, separacionesExtra: [] })), json(libre));
+  const d0 = (r) => { const h = r.piezas.find((p) => p.id === 'hab'), q = r.piezas.find((p) => p.id === 'pista'); return Math.hypot(h.fila - q.fila, h.col - q.col) * 30; };
+  const lim = Math.ceil(d0(libre)) + 150;
+  const extra = [{ pieza: 'pista', con: 'hab', op: '>=', valor: lim }];
+  const r = generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { ...opc, separacionesExtra: extra });
+  assert.equal(r.factible, true, r.motivo);
+  assert.ok(d0(r) >= lim, `pista ${d0(r)} m from the habitat < ${lim} m`);
+  const q = r.restricciones.find((x) => x.tipo === 'separacion' && x.pieza === 'pista' && x.con === 'hab');
+  assert.ok(q, 'no separation constraint reported for the pair');
+  assert.equal(q.origen, 'supuesto');
+  assert.equal(q.limite, lim);
+  assert.equal(q.respecto_a, 'habitat_superficie');
+  assert.ok(q.holgura >= 0);
+  assert.equal(json(generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { ...opc, separacionesExtra: extra })), json(r));
+  assert.throws(() => generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { ...opc, separacionesExtra: [{ pieza: 'nadie', con: 'hab', op: '>=', valor: 1 }] }), /nadie/);
+  assert.throws(() => generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { ...opc, separacionesExtra: [{ pieza: 'pista', con: 'hab', op: '>=', valor: NaN }] }), /separation/);
+});
+
+test('an assumed separation larger than the terrain: infeasible, the assumed separation is named as the reason', () => {
+  const r = generarBase(terrenoMesetas(1), piezasMesetas(), VEH, { k: 6, anchoCarretera_m: ANCHO, separacionHuellas_m: SEP_H, separacionesExtra: [{ pieza: 'pista', con: 'hab', op: '>=', valor: 5000 }] });
+  assert.equal(r.factible, false);
+  assert.equal(r.restriccion.tipo, 'separacion');
+  assert.equal(r.restriccion.pieza, 'pista');
+  assert.equal(r.restriccion.limite, 5000);
+  assert.equal(r.restriccion.origen, 'supuesto');
+  assert.match(r.motivo, /5000/);
+});

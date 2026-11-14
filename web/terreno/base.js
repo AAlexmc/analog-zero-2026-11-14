@@ -109,7 +109,8 @@ function limitePendiente(reqs) {
 // t = {n, m | m_por_px, alturas, pend?, capas: {iluminacion, sombra_permanente, temp_max, agua}}
 // piezas = [{id, equipo: {id, requisitos}, diametro_m, criterios: [{id, beneficio, peso, umbral_k?}], pendiente_max_deg?, enSombra?}]
 // vehiculo = {limite (°), equipo?}; opc = {k, pesos, anchoCarretera_m, talud, separacionHuellas_m, separacionCandidatos_m,
-//   pesoCercania, presupuestoRutas, presupuestoNodos, nMaxRutas, semilla, hub}
+//   pesoCercania, presupuestoRutas, presupuestoNodos, nMaxRutas, semilla, hub,
+//   separacionesExtra: [{pieza, con, op, valor}] (separaciones supuestas entre dos piezas, centro a centro, en m)}
 export function generarBase(t, piezas, vehiculo, opc = {}) {
   const n = t.n, m = t.m ?? t.m_por_px, alturas = t.alturas, capas = t.capas ?? {}, N = n * n;
   const o = { ...DEFECTO, ...Object.fromEntries(Object.entries(opc).filter(([, v]) => v !== undefined)) };
@@ -128,6 +129,12 @@ export function generarBase(t, piezas, vehiculo, opc = {}) {
   const H = piezas.findIndex((p) => p.id === hubId);
   if (H < 0) throw new Error('no hub piece: pass opc.hub or include a habitat_superficie piece');
   const otros = piezas.map((_, j) => j).filter((j) => j !== H);
+  const extras = (opc.separacionesExtra ?? []).map((x) => {
+    const a = piezas.findIndex((p) => p.id === x?.pieza), b = piezas.findIndex((p) => p.id === x?.con);
+    if (a < 0 || b < 0 || a === b) throw new Error(`assumed separation ${x?.pieza} – ${x?.con}: both must be different pieces of this base`);
+    if (!CUMPLE[x.op] || !(Number.isFinite(x.valor) && x.valor >= 0)) throw new Error(`assumed separation ${x.pieza} – ${x.con}: needs an operator and a finite value ≥ 0 m`);
+    return { a, b, x };
+  });
 
   const porMedir = [];
   const nota = (s) => { if (!porMedir.includes(s)) porMedir.push(s); };
@@ -172,8 +179,15 @@ export function generarBase(t, piezas, vehiculo, opc = {}) {
       pares[a][b].push(c); pares[b][a].push(c);
     }
   }
+  for (const { a, b, x } of extras) {
+    const c = { tipo: 'separacion', pieza: piezas[a].id, con: piezas[b].id, respecto_a: piezas[b].equipo?.id ?? piezas[b].id, op: x.op, limite: x.valor, unidad: 'm', fuente: null, origen: 'supuesto', huella: false };
+    pares[a][b].push(c); pares[b][a].push(c);
+    nota(`${piezas[a].id}: separation from ${piezas[b].id} ${x.op} ${x.valor} m is an assumed parameter, not from a source`);
+  }
+  const cubierta = (p, r) => extras.some(({ a, b }) => (piezas[a] === p && piezas[b].equipo?.id === r.respecto_a) || (piezas[b] === p && piezas[a].equipo?.id === r.respecto_a));
   for (const p of piezas) for (const r of p.equipo?.requisitos ?? []) {
     if (r.variable !== 'separacion_m') continue;
+    if (!Number.isFinite(r.valor) && cubierta(p, r)) continue;
     if (!Number.isFinite(r.valor)) nota(`${p.id}: separation from ${r.respecto_a} not applied (no public limit)`);
     else if (!piezas.some((q) => q.equipo?.id === r.respecto_a)) nota(`${p.id}: separation from ${r.respecto_a} not applied (no ${r.respecto_a} in this base)`);
   }
@@ -392,7 +406,7 @@ export function generarBase(t, piezas, vehiculo, opc = {}) {
           { tipo: 'huella', pieza: piezas[a].id, con, op: '>=', limite: o.separacionHuellas_m, unidad: 'm' });
       }
       return infactible(`${piezas[a].id}: no apt cell is ${peor.op} ${peor.limite} m from the ${peor.respecto_a} ${de} (the terrain is too small or the apt zones too close)`,
-        { tipo: 'separacion', pieza: piezas[a].id, respecto_a: peor.respecto_a, op: peor.op, limite: peor.limite, unidad: 'm', fuente: peor.fuente });
+        { tipo: 'separacion', pieza: piezas[a].id, respecto_a: peor.respecto_a, op: peor.op, limite: peor.limite, unidad: 'm', fuente: peor.fuente, ...(peor.origen ? { origen: peor.origen } : {}) });
     }
   }
   porHub.sort((p, q) => p.lb - q.lb || p.h - q.h);
