@@ -248,7 +248,15 @@
           "anos": null,
           "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
           "cita": "University Valley, Antarctica (approximate coordinates: -77.866427, 160.725585).",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            1
+          ],
+          "meses_fuente": {
+            "fuente": "https://blogs.nasa.gov/mission-ames/tag/dry-valleys",
+            "cita": "deploying to University Valley, one of the Dry Valleys of Antarctica, from 22-31 January",
+            "verificado": false
+          }
         },
         {
           "nombre": "Icebreaker drill field tests, Haughton Crater",
@@ -383,7 +391,26 @@
           "anos": "2008–2009",
           "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
           "cita": "All three organizations will share data from the 13-month test, which runs from January 2008 to February 2009.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "meses_fuente": {
+            "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
+            "cita": "which runs from January 2008 to February 2009",
+            "verificado": false
+          }
         },
         {
           "nombre": "Antarctic inflatable lunar habitat",
@@ -869,7 +896,15 @@
           "anos": "2007",
           "fuente": "https://ntrs.nasa.gov/api/citations/20090026331/downloads/20090026331.pdf?attachment=true",
           "cita": "K10 Black was equipped with the JPL CRUX ground-penetrating radar (GPR)",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            7
+          ],
+          "meses_fuente": {
+            "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+            "cita": "on July 12 and will operate the machines until July 31",
+            "verificado": false
+          }
         },
         {
           "nombre": "Ground-penetrating radar surveys of ice buried by tephra",
@@ -886,7 +921,15 @@
           "anos": "2019",
           "fuente": "https://ntrs.nasa.gov/citations/20240009232",
           "cita": "We conducted ground-penetrating radar surveys at center frequencies of 200, 400, and 900 MHz to map the thickness and extent of tephra deposits and underlying massive ice at three caldera sites.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            8
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+            "cita": "conducted over 66 GPR surveys inside and surrounding the Askja caldera in August 2019",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -970,7 +1013,16 @@
           "anos": "2010",
           "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
           "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            7,
+            8
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+            "cita": "From 19 July to 8 August 2010",
+            "verificado": false
+          }
         },
         {
           "nombre": "Desert RATS: Lunar Electric Rover field test",
@@ -1089,7 +1141,15 @@
           "anos": "2018",
           "fuente": "https://ntrs.nasa.gov/citations/20190029009",
           "cita": "The NASA Ames testbed rover, CaveR, was deployed in Valentine Cave in Lava Beds National Monument (N. CA, USA) during August of 2018.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            8
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/citations/20190029009",
+            "cita": "in Lava Beds National Monument (N. CA, USA) during August of 2018",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1253,7 +1313,15 @@
           "anos": "2016",
           "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
           "cita": "BASALT’s second field test, on the lava flows of Mauna Ulu, on the Big Island of Hawaii.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            11
+          ],
+          "meses_fuente": {
+            "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238",
+            "cita": "BASALT-2 took place in the Mauna Ulu region on the Big Island of Hawai'i in November 2016",
+            "verificado": false
+          }
         },
         {
           "nombre": "BASALT first field test",
@@ -1266,7 +1334,16 @@
           "anos": "2016",
           "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
           "cita": "The first round of BASALT field tests, at Craters of the Moon National Monument and Preserve, in Idaho.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            6,
+            7
+          ],
+          "meses_fuente": {
+            "fuente": "https://www.nasa.gov/general/basalt-news/",
+            "cita": "June 13-July 1, 2016 Deployment to Craters of the Moon, Idaho",
+            "verificado": false
+          }
         },
         {
           "nombre": "BASALT third field test",
@@ -1279,7 +1356,15 @@
           "anos": "2017",
           "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
           "cita": "The third and final season of testing for BASALT was held at Kilauea Iki and Kilauea Caldera Region, Hawaii Volcanoes National Park",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            11
+          ],
+          "meses_fuente": {
+            "fuente": "https://www.nasa.gov/general/basalt-research-program-hawaii-2017-field-deployment/",
+            "cita": "took place from November 1-21, 2017",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1348,7 +1433,15 @@
           "anos": "2010",
           "fuente": "https://ntrs.nasa.gov/citations/20100033667",
           "cita": "The RESOLVE chemical processing system was mounted on a Canadian Space Agency mobility chasis and successfully demonstrated on Hawaii's Mauna Kea volcano in February 2010.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            2
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+            "cita": "demonstrated on Hawaii's Mauna Kea volcano in February 2010",
+            "verificado": false
+          }
         },
         {
           "nombre": "ISRU analogue field tests",
@@ -1429,7 +1522,15 @@
           "anos": "2007",
           "fuente": "https://ri.cmu.edu/?p=9836",
           "cita": "two NASA Ames K10 rovers operated at Haughton Crater on Devon Island, Nunavut, Canada, autonomously surveying multiple lunar analog sites",
-          "verificado": false
+          "verificado": false,
+          "meses": [
+            7
+          ],
+          "meses_fuente": {
+            "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+            "cita": "on July 12 and will operate the machines until July 31",
+            "verificado": false
+          }
         },
         {
           "nombre": "Simulated robotic follow-up mission with K10 rovers",
@@ -1442,7 +1543,16 @@
           "anos": "2010",
           "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
           "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            7,
+            8
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+            "cita": "From 19 July to 8 August 2010",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1512,7 +1622,15 @@
           "anos": "2007",
           "fuente": "https://ri.cmu.edu/?p=9892",
           "cita": "The rovers carried a 3D scanning lidar for topographic mapping and ground penetrating radar to map subsurface structure.",
-          "verificado": false
+          "verificado": false,
+          "meses": [
+            7
+          ],
+          "meses_fuente": {
+            "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+            "cita": "on July 12 and will operate the machines until July 31",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1567,7 +1685,15 @@
           "anos": "2022",
           "fuente": "https://www.nasa.gov/centers-and-facilities/johnson/moonwalking-test-mission-daily-field-log/",
           "cita": "The team headed north to the base of S P Crater while wearing mockup spacesuits.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            10
+          ],
+          "meses_fuente": {
+            "fuente": "https://www.nasa.gov/centers-and-facilities/johnson/moonwalking-test-mission-daily-field-log/",
+            "cita": "Field Test 3 wrapped up on October 12",
+            "verificado": false
+          }
         },
         {
           "nombre": "JETT5 simulated moonwalks",
@@ -1580,7 +1706,15 @@
           "anos": "2024",
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-tests-technology-practices-artemis-moonwalks-in-arizona-desert/",
           "cita": "NASA astronaut Andre Douglas collects soil samples during the first in a series of four simulated moonwalks in Arizona.",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            5
+          ],
+          "meses_fuente": {
+            "fuente": "https://www.usgs.gov/centers/astrogeology-science-center/news/artemis-iii-mission-tests-san-francisco-volcanic-field",
+            "cita": "JETT5 conducted mission simulations for Artemis III from May 13 to 17, 2024.",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1710,7 +1844,16 @@
           "anos": "2025",
           "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
           "cita": "Called Extended Robust Aerial Autonomy, the work is just one of 25 projects funded by the",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            4,
+            9
+          ],
+          "meses_fuente": {
+            "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
+            "cita": "Mesquite Flats Sand Dunes in late April and early September",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1771,7 +1914,15 @@
           "anos": "2012",
           "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
           "cita": "Engineers ran rover-mobility tests on California sand dunes this week",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            5
+          ],
+          "meses_fuente": {
+            "fuente": "https://photojournal.jpl.nasa.gov/catalog/PIA15683",
+            "cita": "ran these mobility tests in early May 2012 in preparation for operating the Curiosity rover",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1842,7 +1993,15 @@
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
           "cita": "Multiple teams successfully worked to establish and manage field-test base camp",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            10
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/citations/20230007175",
+            "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [
@@ -1930,7 +2089,15 @@
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
           "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
-          "verificado": true
+          "verificado": true,
+          "meses": [
+            10
+          ],
+          "meses_fuente": {
+            "fuente": "https://ntrs.nasa.gov/citations/20230007175",
+            "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
+            "verificado": false
+          }
         }
       ],
       "caracteristicas": [

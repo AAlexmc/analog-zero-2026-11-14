@@ -101,3 +101,24 @@ test('each trait has a quoted source, parameters from the contract list and a co
   }
 });
 
+
+test('campaign months, when given, are whole numbers 1–12 without repeats and carry their own quoted source', () => {
+  let con = 0;
+  for (const m of MISIONES) {
+    m.campanas.forEach((c, i) => {
+      const donde = `${m.id}.campanas[${i}]`;
+      if (!('meses' in c)) {
+        assert.ok(!('meses_fuente' in c), `${donde}: meses_fuente sin meses`);
+        return;
+      }
+      con++;
+      assert.ok(Array.isArray(c.meses) && c.meses.length > 0, `${donde}: meses vacío`);
+      for (const n of c.meses) assert.ok(Number.isInteger(n) && n >= 1 && n <= 12, `${donde}: mes ${n}`);
+      assert.equal(new Set(c.meses).size, c.meses.length, `${donde}: mes repetido`);
+      assert.deepEqual([...c.meses].sort((a, b) => a - b), c.meses, `${donde}: meses sin ordenar`);
+      assert.ok(c.meses_fuente && typeof c.meses_fuente === 'object', `${donde}: falta meses_fuente`);
+      comprobarCita(c.meses_fuente, `${donde}.meses_fuente`);
+    });
+  }
+  assert.ok(con > 0, 'ninguna campaña con meses');
+});
