@@ -42,11 +42,14 @@ test('option text: missions for the other world stay selectable with "— Moon o
   assert.equal(textoOpcion(mision('energia_soporte_vital'), 'moon', INDICE), 'Autonomous power and life support');
 });
 
+// Una misión del catálogo a la que se le quitan las coordenadas: el catálogo real puede no tener ninguna así.
+const sinSitio = (id) => ({ ...mision(id), campanas: mision(id).campanas.map((c) => ({ ...c, sitio: null, lat: null, lon: null, coordenadas_fuente: null })) });
+
 test('reference site = first campaign with lat and lon; name from the site catalogue when the campaign points to it', () => {
   assert.deepEqual(referenciaDe(mision('biomarcadores'), SITIOS), { lat: -24.0883, lon: -69.9946, nombre: 'Yungay Station, hyperarid core of the Atacama Desert, Chile', sitio: 'yungay' });
   assert.equal(referenciaDe(mision('biomarcadores')).nombre, mision('biomarcadores').campanas[0].sitio_texto);
-  assert.equal(referenciaDe(mision('habitats_inflables'), SITIOS), null);
-  assert.equal(referenciaDe(mision('psicologia_tripulacion'), SITIOS), null);
+  assert.equal(referenciaDe(sinSitio('habitats_inflables'), SITIOS), null);
+  assert.equal(referenciaDe(sinSitio('psicologia_tripulacion'), SITIOS), null);
   // lat 0 / lon 0 is a real coordinate; a campaign with only one of the two is skipped.
   const m = sintetica({ campanas: [campana(null, 5), campana(0, 0, { sitio_texto: 'Null Island' })] });
   assert.deepEqual(referenciaDe(m, SITIOS), { lat: 0, lon: 0, nombre: 'Null Island', sitio: null });
@@ -95,7 +98,7 @@ test('test sites offered for a new mission: only the ones with coordinates', () 
 
 test('search options: catalogue mission with and without a test site; no mission = engine defaults', () => {
   assert.deepEqual(opcionesBusqueda(activaDeCatalogo(mision('biomarcadores'), INDICE, SITIOS)), { parametros: ['t_max_k', 'precip_mm_ano', 'aridez_ai', 'viento_medio_m_s', 'tiempo_ciudad_h', 'litologia_glim'], referencia: { lat: -24.0883, lon: -69.9946 } });
-  assert.deepEqual(opcionesBusqueda(activaDeCatalogo(mision('habitats_inflables'), INDICE, SITIOS)), { parametros: parametrosDe(mision('habitats_inflables'), INDICE) });
+  assert.deepEqual(opcionesBusqueda(activaDeCatalogo(sinSitio('habitats_inflables'), INDICE, SITIOS)), { parametros: parametrosDe(mision('habitats_inflables'), INDICE) });
   assert.deepEqual(opcionesBusqueda(null), {});
   const n = activaNueva({ titulo: 'Wind', parametros: ['viento_p95_m_s', 'relieve_m'], ref: 'mdrs_utah' }, INDICE, SITIOS);
   assert.deepEqual(opcionesBusqueda(n), { parametros: ['relieve_m', 'viento_p95_m_s'], referencia: { lat: 38.42, lon: -110.84 } });
@@ -149,7 +152,7 @@ test('links between the world view and the results carry the mission; no mission
 test('parameters left out of the search are named with the reason', () => {
   const a = activaDeCatalogo(mision('biomarcadores'), INDICE, SITIOS);
   assert.deepEqual(frasesNoUsados({ sin_referencia: ['permafrost_frac', 'elev_m'], sin_dato: ['ndvi_max'] }, a, corto), ['Not used, no data at the test site: permafrost, elevation.', 'Not used, no data at your point: vegetation.']);
-  assert.deepEqual(frasesNoUsados({ sin_referencia: ['viento_medio_m_s'], sin_dato: [] }, activaDeCatalogo(mision('habitats_inflables'), INDICE, SITIOS), corto), ['Not used, no test site with coordinates: mean wind.']);
+  assert.deepEqual(frasesNoUsados({ sin_referencia: ['viento_medio_m_s'], sin_dato: [] }, activaDeCatalogo(sinSitio('habitats_inflables'), INDICE, SITIOS), corto), ['Not used, no test site with coordinates: mean wind.']);
   assert.deepEqual(frasesNoUsados({ sin_referencia: ['elev_m'], sin_dato: [] }, activaNueva({ titulo: 'X', parametros: ['elev_m'] }, INDICE, SITIOS), corto), ['Not used, no test site picked: elevation.']);
   assert.deepEqual(frasesNoUsados({ sin_referencia: [], sin_dato: [] }, a, corto), []);
 });

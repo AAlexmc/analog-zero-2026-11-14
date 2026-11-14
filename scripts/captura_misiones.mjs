@@ -273,22 +273,24 @@ try {
   else ok(`Portfolio repainted: "${cartB.titular}" ${cartB.lugares.map((l) => `${l.letra} ${l.pct} [${l.chips.join(', ')}]`).join(' | ')}; uncovered: ${cartB.sinCubrir.join(', ') || 'none'}; globe letters ${cartB.letras.join('')}`);
   await pag.screenshot({ path: join(SALIDA, '05-biomarcadores-portfolio.png') });
 
-  // ---------- b. Misión sin sitio de referencia ----------
+  // ---------- b. Otra misión del catálogo: con o sin sitio de referencia, según el catálogo ----------
   await elegirMision(pag, 'habitats_inflables');
   await quieta(pag);
   const aH = activaDeCatalogo(mision('habitats_inflables'), M.indice, SITIOS);
   const { r: rH } = nodo(aH);
   const fH = await leerFicha(pag);
   const estH = await pag.evaluate(() => ({ sinRef: window.__az.analogos.r.sin_referencia, pestana: document.getElementById('panel').dataset.pestana, sel: window.__az.analogos.sel, opcion: document.getElementById('mision').selectedOptions[0].textContent }));
-  if (fH.ref !== 'No test site with coordinates: Earth-only parameters are not used.' || JSON.stringify(fH.avisos) !== JSON.stringify(frasesNoUsados(rH, aH, corto)) || !fH.avisos.length || JSON.stringify(estH.sinRef) !== JSON.stringify(rH.sin_referencia) || estH.opcion !== 'Inflatable habitat testing — Moon only') falla(`habitats_inflables: ${JSON.stringify({ ref: fH.ref, avisos: fH.avisos, estH })}`);
-  else ok(`habitats_inflables (no coordinates): "${fH.ref}" · "${fH.avisos.join(' ')}" · option "${estH.opcion}"`);
+  const refH = aH.referencia;
+  const quieroRefH = refH ? `Earth-only parameters are compared with NASA's test site: ${refH.nombre} (${formatoLatLon(refH.lat, refH.lon).texto})` : 'No test site with coordinates: Earth-only parameters are not used.';
+  if (fH.ref !== quieroRefH || JSON.stringify(fH.avisos) !== JSON.stringify(frasesNoUsados(rH, aH, corto)) || JSON.stringify(estH.sinRef) !== JSON.stringify(rH.sin_referencia) || estH.opcion !== 'Inflatable habitat testing — Moon only') falla(`habitats_inflables: ${JSON.stringify({ ref: fH.ref, avisos: fH.avisos, estH })}`);
+  else ok(`habitats_inflables (${refH ? 'with a test site' : 'no coordinates'}): "${fH.ref}" · "${fH.avisos.join(' ')}" · option "${estH.opcion}"`);
   if (estH.pestana !== 'cartera' || estH.sel?.lista !== 'cartera') falla(`after switching on Portfolio the globe should show place A: ${JSON.stringify(estH)}`);
   await ver(pag, 'lugares');
   compararLugares('habitats_inflables places', await leerLugares(pag), rH.resultados, true);
   await ver(pag, 'metricas');
   const metH = await leerMetricas(pag);
   compararMetricas('habitats_inflables Metrics place 1', metH, rH.resultados[0], 'NASA test site');
-  if (metH.some((f) => P[f.id].solo_tierra)) falla(`habitats_inflables: Earth-only row in Metrics ${metH.map((f) => f.id)}`);
+  if (!refH && metH.some((f) => P[f.id].solo_tierra)) falla(`habitats_inflables: Earth-only row in Metrics ${metH.map((f) => f.id)}`);
   await ver(pag, 'lugares');
   await pag.screenshot({ path: join(SALIDA, '06-habitats-sin-referencia.png') });
 
