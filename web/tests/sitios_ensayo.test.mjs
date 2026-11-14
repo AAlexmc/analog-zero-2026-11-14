@@ -45,6 +45,19 @@ test('each site has a name, a known type and lat/lon both null or both valid fin
   }
 });
 
+test('each site has cuerpo (null or non-empty unique moon/mars list) and clase (terreno/operaciones for campo, null for laboratorio)', () => {
+  for (const s of SITIOS) {
+    for (const k of ['cuerpo', 'clase']) assert.ok(k in s, `${s.id}: missing ${k}`);
+    if (s.cuerpo !== null) {
+      assert.ok(Array.isArray(s.cuerpo) && s.cuerpo.length > 0, `${s.id}: cuerpo ${JSON.stringify(s.cuerpo)}`);
+      for (const c of s.cuerpo) assert.ok(['moon', 'mars'].includes(c), `${s.id}: cuerpo ${c}`);
+      assert.equal(new Set(s.cuerpo).size, s.cuerpo.length, `${s.id}: duplicate in cuerpo`);
+    }
+    if (s.tipo === 'campo') assert.ok(['terreno', 'operaciones'].includes(s.clase), `${s.id}: clase ${s.clase}`);
+    else assert.equal(s.clase, null, `${s.id}: clase ${s.clase} on a laboratory`);
+  }
+});
+
 test('each site has a coordenadas block; numeric coordinates carry a source and a quote, laboratories may have none', () => {
   for (const s of SITIOS) {
     const c = s.coordenadas;
