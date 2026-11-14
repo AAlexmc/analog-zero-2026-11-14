@@ -95,7 +95,17 @@ export function enlaceWorldview(lat, lon, margen = 2) {
 
 export const sitiosConCoordenadas = (sitios) => (sitios ?? []).filter((s) => finito(s?.lat) && finito(s?.lon)).length;
 
-export const lineaContexto = (c, nSitios) => (c ? `near ${c.item.nombre} — a known analog site (${Math.round(c.km)} km)` : `not near any of the ${nSitios} analog sites in our catalogue`);
+// Para qué cuerpo es análogo el sitio, según su campo `cuerpo` del catálogo; null = no lo dice la fuente.
+export function tipoAnalogo(cuerpo) {
+  const luna = Array.isArray(cuerpo) && cuerpo.includes('moon');
+  const marte = Array.isArray(cuerpo) && cuerpo.includes('mars');
+  if (luna && marte) return 'Moon and Mars analog site';
+  if (luna) return 'Moon analog site';
+  if (marte) return 'Mars analog site';
+  return 'analog site';
+}
+
+export const lineaContexto = (c, nSitios) => (c ? `near ${c.item.nombre} — a known ${tipoAnalogo(c.item.cuerpo)} (${Math.round(c.km)} km)` : `not near any of the ${nSitios} analog sites in our catalogue`);
 
 // Cuántos lugares no tienen un sitio del catálogo a menos de RADIO_CONTEXTO_KM («unlisted»: solo fuera de NUESTRO catálogo).
 export function fraseUnlisted(sinSitio, total, nSitios) {
