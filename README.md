@@ -16,7 +16,8 @@ Then open http://localhost:8080. The site is static: no build step, no account a
 
 1. **Pick a world.** The Moon or Mars, on the home page.
 2. **Pick a mission objective.** A kind of test NASA runs at Earth analog sites (21 in `web/data/misiones.json`), or «New mission» with a title and parameters of your own.
-   - **Month of the year:** the engine already compares Earth month by month (`docs/metrica-analogos.md`, «Meses»); the screen for it is being added.
+   - **When:** next to the mission, a month or the whole year. With a month, or with «Show how these places change through the year», each place shows its match in each of the 12 months (`docs/metrica-analogos.md`, «Meses»).
+   - **Calendar** tab: for the chosen place, its match each month, the best place on Earth that month, and the mission's equipment against its published limits. «Repeat a test later» takes a first month and a gap, and says «Stay» or «Move the test», and where to.
 3. **Place a point.**
    - Moon: NASA looks within 6° of the south pole, and the tool searches that area on real terrain.
    - Mars: there is no chosen site yet, so the tool uses NASA's published limits for a human landing zone (`web/data/sitio/indice.json`).
