@@ -1407,6 +1407,631 @@
           "motivo": null
         }
       ]
+    },
+    {
+      "id": "flota_rovers",
+      "nombre": "Rover teams surveying together",
+      "que_se_prueba": "Several rovers mapping an area together with little human input.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 5,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "Two K10 rovers autonomously surveying lunar analog sites",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2007",
+          "fuente": "https://ri.cmu.edu/?p=9836",
+          "cita": "two NASA Ames K10 rovers operated at Haughton Crater on Devon Island, Nunavut, Canada, autonomously surveying multiple lunar analog sites",
+          "verificado": false
+        },
+        {
+          "nombre": "Simulated robotic follow-up mission with K10 rovers",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2010",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+          "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_desnudo",
+          "nombre": "Barren ground",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "frio_intenso",
+          "nombre": "Freezing temperatures",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "t_media_k",
+            "t_min_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "lejania",
+          "nombre": "Isolated and remote",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "lidar_estereo",
+      "nombre": "Laser and camera 3D mapping",
+      "que_se_prueba": "Mapping terrain in 3D from a rover with a scanning laser and cameras.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 5,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "K10 rovers with 3D scanning lidar",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2007",
+          "fuente": "https://ri.cmu.edu/?p=9892",
+          "cita": "The rovers carried a 3D scanning lidar for topographic mapping and ground penetrating radar to map subsurface structure.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "crater_impacto",
+          "nombre": "Impact crater",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "located at the Haughton meteorite impact crater",
+          "verificado": false,
+          "parametros": [
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "terreno_desnudo",
+          "nombre": "Barren ground",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "muestreo_con_traje",
+      "nombre": "Geology sampling in spacesuits",
+      "que_se_prueba": "Astronauts in mock spacesuits collecting rock and soil samples with a science team on Earth.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 5,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "JETT3 simulated moonwalks",
+          "organismo": "NASA Johnson",
+          "sitio": "sp_crater",
+          "sitio_texto": null,
+          "lat": 35.5822254,
+          "lon": -111.6318207,
+          "coordenadas_fuente": null,
+          "anos": "2022",
+          "fuente": "https://www.nasa.gov/centers-and-facilities/johnson/moonwalking-test-mission-daily-field-log/",
+          "cita": "The team headed north to the base of S P Crater while wearing mockup spacesuits.",
+          "verificado": false
+        },
+        {
+          "nombre": "JETT5 simulated moonwalks",
+          "organismo": "NASA Johnson",
+          "sitio": null,
+          "sitio_texto": "San Francisco Volcanic Field, north of Flagstaff, Arizona",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2024",
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-tests-technology-practices-artemis-moonwalks-in-arizona-desert/",
+          "cita": "NASA astronaut Andre Douglas collects soil samples during the first in a series of four simulated moonwalks in Arizona.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_lunar",
+          "nombre": "Lunar-like volcanic terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.usgs.gov/centers/astrogeology-science-center/news/artemis-iii-mission-tests-san-francisco-volcanic-field",
+          "cita": "The San Francisco Volcanic Field was chosen for these activities for its lunar-like terrain",
+          "verificado": false,
+          "parametros": [
+            "litologia_glim",
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "terreno_dificil",
+          "nombre": "Challenging terrain",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
+          "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
+          "verificado": false,
+          "parametros": [
+            "rugosidad_tan",
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "pocas_comunicaciones",
+          "nombre": "Little communications infrastructure",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
+          "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
+          "verificado": false,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "navegacion_aterrizaje",
+      "nombre": "Landing guided by terrain images",
+      "que_se_prueba": "A landing camera system that matches what it sees to a map to steer away from hazards.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 6,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "Mars 2020 Lander Vision System helicopter flights",
+          "organismo": "NASA JPL",
+          "sitio": "death_valley_badwater",
+          "sitio_texto": null,
+          "lat": 36.3,
+          "lon": -116.8,
+          "coordenadas_fuente": null,
+          "anos": "2019",
+          "fuente": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-mars-2020-mission-drops-in-on-death-valley",
+          "cita": "an Airbus helicopter carried an engineering model of the Lander Vision System",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_montanoso",
+          "nombre": "Barren, mountainous terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-mars-2020-mission-drops-in-on-death-valley",
+          "cita": "LVS collected and analyzed imagery of the barren, mountainous terrain below",
+          "verificado": false,
+          "parametros": [
+            "relieve_m",
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "drones_sobre_arena",
+      "nombre": "Drone flights over sand dunes",
+      "que_se_prueba": "Navigation software that lets drones fly and land over bland sand and rocky slopes.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 6,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "Extended Robust Aerial Autonomy drone tests (Dumont Dunes)",
+          "organismo": "NASA JPL",
+          "sitio": null,
+          "sitio_texto": "Dumont Dunes, Mojave Desert, California",
+          "lat": 35.68333,
+          "lon": -116.21944,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/Dumont_Dunes",
+            "cita": "35°41′00″N 116°13′10″W / 35.68333°N 116.21944°W",
+            "verificado": false
+          },
+          "anos": "2025",
+          "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
+          "cita": "For additional testing during the three-day excursion, the team ventured to the Mojave Desert",
+          "verificado": false
+        },
+        {
+          "nombre": "Extended Robust Aerial Autonomy drone tests (Mars Hill, Mesquite Flats Sand Dunes)",
+          "organismo": "NASA JPL",
+          "sitio": null,
+          "sitio_texto": "Mars Hill and Mesquite Flats Sand Dunes, Death Valley National Park",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2025",
+          "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
+          "cita": "Called Extended Robust Aerial Autonomy, the work is just one of 25 projects funded by the",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "dunas_sin_rasgos",
+          "nombre": "Featureless sand dunes",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
+          "cita": "barren, featureless desert dunes to hone navigation software",
+          "verificado": false,
+          "parametros": [
+            "ndvi_max",
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "laderas_rocosas",
+          "nombre": "Rubbly volcanic slopes",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
+          "cita": "Rubbly volcanic boulders on barren slopes earned one area the name Mars Hill",
+          "verificado": false,
+          "parametros": [
+            "rugosidad_tan",
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "ruedas_en_arena",
+      "nombre": "Rover wheels on sand",
+      "que_se_prueba": "How a rover's wheels climb and slip on sandy dune slopes.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 6,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "Scarecrow mobility tests for Curiosity",
+          "organismo": "NASA JPL",
+          "sitio": null,
+          "sitio_texto": "Dumont Dunes, Mojave Desert, California",
+          "lat": 35.68333,
+          "lon": -116.21944,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/Dumont_Dunes",
+            "cita": "35°41′00″N 116°13′10″W / 35.68333°N 116.21944°W",
+            "verificado": false
+          },
+          "anos": "2012",
+          "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
+          "cita": "Engineers ran rover-mobility tests on California sand dunes this week",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "laderas_arenosas",
+          "nombre": "Sandy slopes",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
+          "cita": "put through paces on various sandy slopes",
+          "verificado": false,
+          "parametros": [
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "dunas_viento",
+          "nombre": "Windward and downwind dune sides",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
+          "cita": "Information collected in these tests on windward and downwind portions of dunes",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of sand dunes."
+        }
+      ]
+    },
+    {
+      "id": "campamento_base",
+      "nombre": "Base camp and field logistics",
+      "que_se_prueba": "Running a remote base camp that supports crews, rovers and communications.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 7,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "Haughton-Mars Project base camp",
+          "organismo": null,
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "A K10 robot operates near the Haughton Mars Project base camp on Devon Island, Canada.",
+          "verificado": false
+        },
+        {
+          "nombre": "D-RATS field-test base camp",
+          "organismo": "NASA Johnson with JAXA",
+          "sitio": null,
+          "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
+          "lat": 35.6835172,
+          "lon": -111.478647,
+          "coordenadas_fuente": {
+            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
+            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "verificado": false
+          },
+          "anos": "2022",
+          "fuente": "https://ntrs.nasa.gov/citations/20230007175",
+          "cita": "Multiple teams successfully worked to establish and manage field-test base camp",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "crater_impacto",
+          "nombre": "Impact crater",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "located at the Haughton meteorite impact crater",
+          "verificado": false,
+          "parametros": [
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "lejania",
+          "nombre": "Isolated and remote",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "frio_intenso",
+          "nombre": "Freezing temperatures",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
+          "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
+          "verificado": false,
+          "parametros": [
+            "t_media_k",
+            "t_min_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "pocas_comunicaciones",
+          "nombre": "Little communications infrastructure",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
+          "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
+          "verificado": false,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "rover_presurizado",
+      "nombre": "Pressurized rover missions",
+      "que_se_prueba": "Crews living and driving for days in a pressurized rover and leaving it for moonwalks.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 7,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "D-RATS pressurized rover test with JAXA",
+          "organismo": "NASA Johnson with JAXA",
+          "sitio": null,
+          "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
+          "lat": 35.6835172,
+          "lon": -111.478647,
+          "coordenadas_fuente": {
+            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
+            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "verificado": false
+          },
+          "anos": "2022",
+          "fuente": "https://ntrs.nasa.gov/citations/20230007175",
+          "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_rocoso",
+          "nombre": "Rocky lava terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "Forty miles north of Flagstaff, Arizona, lies a remote lava field called Black Point Lava Flow consisting of rocky terrain,",
+          "verificado": true,
+          "parametros": [
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "vegetacion_escasa",
+          "nombre": "Sparse plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "sparse vegetation and, at night, very limited light pollution.",
+          "verificado": true,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "terreno_dificil",
+          "nombre": "Challenging terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
+          "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
+          "verificado": false,
+          "parametros": [
+            "rugosidad_tan",
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "perforacion_hielo",
+      "nombre": "Automated drilling in frozen ground",
+      "que_se_prueba": "A drill that runs on its own and copes with faults while boring into icy ground.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 7,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "DAME (Drilling Automation for Mars Exploration)",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2004",
+          "fuente": "https://ntrs.nasa.gov/citations/20060019185",
+          "cita": "is developing and testing standalone automation at a lunar/martian impact crater analog site in Arctic Canada",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "permafrost",
+          "nombre": "Drilling into permafrost",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20060019185",
+          "cita": "cuttings-removal issues with low-power drilling into permafrost",
+          "verificado": false,
+          "parametros": [
+            "permafrost_frac"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "brecha_con_hielo",
+          "nombre": "Ice-laden impact breccia",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://jpt.spe.org/twa/advances-space-drilling-technologies",
+          "cita": "provided the DAME project field tests with crater landforms and ice-laden fallback impact breccia",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of impact breccia or ice inside rock."
+        }
+      ]
     }
   ]
 }
