@@ -175,9 +175,11 @@ try {
 
   // ---------- 02: LTV del borde a un destino con rodeo; allanar el tramo bloqueado ----------
   const ent = { f: Math.round((p0.f + dst.f) / 2), c: Math.round((p0.c + dst.c) / 2) };
-  const [sDst] = await vista(1, ent, 9, [dst]);
+  // El clic del destino se hace con el destino en el centro de la vista: fuera de las tarjetas y mandos superpuestos.
+  const [sDst] = await vista(1, dst, 9, [dst]);
   await pag.click(R('clic-hasta'));
   await pag.mouse.click(sDst.x, sDst.y);
+  await vista(1, ent, 9, [dst]);
   await marcarRuta();
   await pag.click(R('calcular'));
   await esperarRuta();
