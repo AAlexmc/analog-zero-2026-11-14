@@ -9,7 +9,7 @@
 .obra dl, .obra-pad dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 4px 0; }
 .obra dt, .obra-pad dt { font-size: 10px; letter-spacing: .12em; color: var(--tenue); }
 .obra dd, .obra-pad dd { margin: 0; text-align: right; }
-.obra .pide { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(255, 179, 64, .08); }
+.obra .pide { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(234, 254, 7, .08); }
 .obra dl.primera dd { color: var(--blanco); font-weight: 600; }
 .no-medido { font-size: 10px; border: 1px dashed var(--tenue); padding: 3px 5px; color: var(--tenue); }
 .obra .aplicada, .obra-pad .aplicada { border-top: 1px solid var(--linea); padding-top: 4px; }
@@ -17,19 +17,19 @@
 .obra-pad:empty { display: none; }
 .obra-pad .botones { display: flex; gap: 6px; }
 .obra-pad .aviso-obs { color: var(--fondo); background: var(--blanco); padding: 2px 5px; }
-.perfil-obra { display: block; width: 100%; height: 90px; border: 1px solid var(--linea); background: rgba(2, 18, 38, .6); }
+.perfil-obra { display: block; width: 100%; height: 90px; border: 1px solid var(--linea); background: rgba(7, 23, 63, .6); }
 .perfil-obra polyline { fill: none; vector-effect: non-scaling-stroke; }
 .perfil-obra .terreno { stroke: var(--tenue); stroke-width: 1; }
 .perfil-obra .rasante { stroke: var(--blanco); stroke-width: 1.5; }
 .perfil-obra .corte { fill: var(--ambar); opacity: .75; }
-.perfil-obra .relleno { fill: #9ef2ff; opacity: .6; }
+.perfil-obra .relleno { fill: var(--blue-yonder); opacity: .6; }
 .m-corte, .m-relleno { display: inline-block; width: 9px; height: 9px; margin: 0 3px -1px 0; }
 .m-corte { background: var(--ambar); }
-.m-relleno { background: #9ef2ff; margin-left: 6px; }
+.m-relleno { background: var(--blue-yonder); margin-left: 6px; }
 
 .obra-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: visible; }
 .obra-svg polyline { fill: none; stroke-linejoin: round; stroke-linecap: round; }
 .obra-svg .traza-fondo { stroke: var(--fondo); stroke-width: 5; opacity: .8; }
 .obra-svg .traza { stroke: var(--ambar); stroke-width: 2.5; stroke-dasharray: 8 4; }
 .obra-svg .obsoleta { opacity: .35; }
-.obra-svg .pad { fill: rgba(255, 179, 64, .18); stroke: var(--ambar); stroke-width: 1.5; }
+.obra-svg .pad { fill: rgba(234, 254, 7, .18); stroke: var(--ambar); stroke-width: 1.5; }

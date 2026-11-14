@@ -15,7 +15,7 @@ a.boton[aria-disabled=true] { opacity: .35; pointer-events: none; }
 .nota-cond .rotulo-cond { color: var(--tenue); }
 #cond-resumen { font-size: 12px; }
 #cond-acc { width: 64px; font: 11px var(--mono); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); padding: 3px 4px; }
-.sim.contorno { height: 0; border-top: 2px solid rgb(230, 159, 0); width: 14px; vertical-align: 3px; }
+.sim.contorno { height: 0; border-top: 2px solid var(--neon-yellow); width: 14px; vertical-align: 3px; }
 .leyenda-mapa .cita, .hoja-mapa .cita { color: var(--tenue); font-size: 10px; }
 .hoja-mapa .req-cond { border-left: 2px solid var(--linea); padding: 2px 0 4px 7px; margin-bottom: 4px; display: flex; flex-direction: column; gap: 1px; }
 .hoja-mapa .req-cond .ver { font-weight: bold; letter-spacing: .06em; }
@@ -38,7 +38,7 @@ ol.json { margin: 0; padding-left: 18px; }
 .lienzo-mapa { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
 .lienzo-mapa canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 .leyenda-mapa { position: absolute; left: 10px; bottom: 10px; z-index: 2; display: flex; flex-direction: column; gap: 3px; max-width: 360px;
-  background: rgba(2, 18, 38, .86); padding: 6px 8px; border: 1px solid var(--linea); font-size: 11px; }
+  background: rgba(7, 23, 63, .86); padding: 6px 8px; border: 1px solid var(--linea); font-size: 11px; }
 .leyenda-mapa:empty { display: none; }
 .leyenda-mapa .bar { height: 9px; width: 240px; border: 1px solid var(--linea); }
 .leyenda-mapa .ext { display: flex; justify-content: space-between; width: 240px; }
@@ -52,7 +52,7 @@ ol.json { margin: 0; padding-left: 18px; }
 .sim.t3d { background: var(--blanco); transform: rotate(45deg) scale(.8); }
 .sim.costa { height: 0; border-top: 1px solid var(--blanco); width: 14px; vertical-align: 3px; }
 .zoom { position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; gap: 4px; }
-.zoom button { background: rgba(2, 18, 38, .86); min-width: 26px; }
+.zoom button { background: rgba(7, 23, 63, .86); min-width: 26px; }
 .aviso-mapa { position: absolute; z-index: 4; padding: 4px 8px; background: var(--blanco); color: var(--fondo); pointer-events: none; white-space: nowrap; }
 .aviso-mapa[hidden] { display: none; }
 
@@ -78,14 +78,14 @@ ol.json { margin: 0; padding-left: 18px; }
 
 svg.flor { width: 100%; max-width: 356px; height: auto; display: block; margin: 0 auto; overflow: visible; }
 svg.flor .anillo { fill: none; stroke: var(--linea); stroke-width: .8; }
-svg.flor .relleno { fill: rgba(233, 240, 245, .32); stroke: none; }
+svg.flor .relleno { fill: rgba(255, 255, 255, .32); stroke: none; }
 svg.flor .valor { fill: none; stroke: var(--blanco); stroke-width: 3; }
-svg.flor .rompe .relleno { fill: rgba(255, 59, 48, .45); }
+svg.flor .rompe .relleno { fill: rgba(228, 55, 0, .45); }
 svg.flor .rompe .valor { stroke: var(--rojo); }
 svg.flor .rompe text { fill: var(--rojo); }
-svg.flor .banda { fill: rgba(233, 240, 245, .7); }
+svg.flor .banda { fill: rgba(255, 255, 255, .7); }
 svg.flor .fantasma { fill: url(#rayado-nd); stroke: var(--tenue); stroke-width: 1; stroke-dasharray: 3 3; }
-svg.flor .raya { stroke: rgba(143, 169, 192, .55); stroke-width: 1.2; }
+svg.flor .raya { stroke: rgba(255, 255, 255, .4); stroke-width: 1.2; }
 svg.flor .nd text, svg.flor .na text { fill: var(--tenue); }
 svg.flor text { fill: var(--blanco); font: 10px var(--mono); }
 svg.flor text .id { fill: var(--tenue); letter-spacing: .08em; }

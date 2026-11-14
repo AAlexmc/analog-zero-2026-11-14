@@ -3,7 +3,7 @@
 .muestra-hielo { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; background: var(--hielo); border: 1px solid var(--linea); }
 
 .perforacion { position: absolute; top: 40px; right: 10px; z-index: 3; width: 330px; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px;
-  background: rgba(2, 18, 38, .94); border: 1px solid var(--linea); height: max-content; max-height: calc(100% - 50px); font-size: 11px; }
+  background: rgba(7, 23, 63, .94); border: 1px solid var(--linea); height: max-content; max-height: calc(100% - 50px); font-size: 11px; }
 .perforacion[hidden] { display: none; }
 .perforacion .cab-hoja { display: flex; justify-content: space-between; align-items: center; }
 .perforacion .cab-hoja button { padding: 2px 6px; font-size: 13px; }
@@ -24,12 +24,12 @@
 .perf-marca { position: absolute; pointer-events: auto; cursor: pointer; white-space: nowrap; transform: translate(-7px, -7px); }
 .perf-marca[hidden] { display: none; }
 .perf-marca .pin { display: inline-block; width: 14px; height: 14px; vertical-align: middle; border: 2px solid var(--hielo); border-radius: 50%;
-  background: radial-gradient(circle, var(--hielo) 0 2px, rgba(2, 18, 38, .6) 3px); }
-.perf-marca .rot { margin-left: 5px; font-size: 10px; letter-spacing: .1em; padding: 1px 4px; background: rgba(2, 18, 38, .82); border: 1px solid var(--hielo); vertical-align: middle; }
+  background: radial-gradient(circle, var(--hielo) 0 2px, rgba(7, 23, 63, .6) 3px); }
+.perf-marca .rot { margin-left: 5px; font-size: 10px; letter-spacing: .1em; padding: 1px 4px; background: rgba(7, 23, 63, .82); border: 1px solid var(--hielo); vertical-align: middle; }
 
 .vol-hoja { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--linea); padding-top: 5px; font-size: 11px; }
 .vol-hoja:empty { display: none; }
 .vol-hoja .hielo-celda { padding: 3px 6px; border-left: 3px solid var(--tenue); }
 .vol-hoja .hielo-celda.si { border-left-color: var(--hielo); }
 .vol-hoja .hielo-celda.no { border-left: 3px dashed var(--ambar); }
-.vol-hoja .aviso-o2 { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(255, 179, 64, .08); }
+.vol-hoja .aviso-o2 { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(234, 254, 7, .08); }

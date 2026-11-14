@@ -34,13 +34,13 @@
 .rutas-svg path { fill: none; stroke-linejoin: round; stroke-linecap: round; }
 .rutas-svg .ruta-fondo { stroke: var(--fondo); stroke-width: 5; opacity: .8; }
 .rutas-svg .ruta { stroke: var(--blanco); stroke-width: 2.5; }
-.rutas-svg .tour { stroke: #9ef2ff; stroke-width: 2; stroke-dasharray: 7 4; }
+.rutas-svg .tour { stroke: var(--blue-yonder); stroke-width: 2; stroke-dasharray: 7 4; }
 .rutas-svg .obsoleta { opacity: .35; }
 .rutas-svg g circle, .rutas-svg g rect { fill: var(--fondo); stroke: var(--blanco); stroke-width: 1.5; }
 .rutas-svg g text { fill: var(--blanco); font: bold 9px var(--mono); text-anchor: middle; }
-.rutas-svg .sug-m rect { fill: #9ef2ff; stroke: var(--fondo); }
+.rutas-svg .sug-m rect { fill: var(--blue-yonder); stroke: var(--fondo); }
 .rutas-svg .sug-m text { fill: var(--fondo); }
-.rutas-svg .parada-m circle { stroke: #9ef2ff; }
+.rutas-svg .parada-m circle { stroke: var(--blue-yonder); }
 .aviso-ruta { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; padding: 5px 10px; background: var(--blanco); color: var(--fondo); }
 .aviso-ruta .et { color: var(--prusia); }
 .aviso-ruta[hidden] { display: none; }
