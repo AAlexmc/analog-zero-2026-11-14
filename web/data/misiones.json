@@ -1,0 +1,1400 @@
+{
+  "descripcion": "Mission objectives: kinds of tests NASA runs at Earth analog sites, the campaigns that back each one and the environment traits the sources name as the reason for the site. Format: docs/contrato-misiones.md. The mapping of each trait to this tool's parameters is our own.",
+  "misiones": [
+    {
+      "id": "biomarcadores",
+      "nombre": "Life-detection instruments",
+      "que_se_prueba": "Field-testing of life-detection instruments (fluorescence immunoassay, wet chemistry, spectrometers) on real hyperarid soils, rock and salt that are hard on microbial life.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 1,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "ARADS (Atacama Rover Astrobiology Drilling Studies)",
+          "organismo": "NASA Ames (PI Brian Glass; PSTAR, NASA Astrobiology Program)",
+          "sitio": "yungay",
+          "sitio_texto": "Yungay (also Salar Grande and Maria Elena evaluated), Atacama Desert, Chile",
+          "lat": -24.0883,
+          "lon": -69.9946,
+          "coordenadas_fuente": null,
+          "anos": "2017-2019 (first deployment April 2017)",
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "to be considered along with Yungay as the host location for the future ARADS tests in 2017-19.",
+          "verificado": true
+        },
+        {
+          "nombre": "LITA (Life in the Atacama)",
+          "organismo": "NASA Ames (N. Cabrol) with Carnegie Mellon, Univ. Tennessee, Univ. Catolica del Norte",
+          "sitio": null,
+          "sitio_texto": "Atacama Desert, Chile (sites called \"Site B\" and \"Site C\" in the abstract; no coordinates)",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2004 field season (project also ran 2003 and 2005: SIN VERIFICAR en fuente NASA abierta)",
+          "fuente": "https://ntrs.nasa.gov/citations/20050167792",
+          "cita": "Zoe has onboard autonomous navigation for long-range roving, a plow to overturn rocks and expose near-surface rock materials, and high-resolution imaging, spectral, and fluorescence sampling capabilities.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "hiperaridez",
+          "nombre": "Hyper-aridity and Mars-like soil chemistry",
+          "en_lista_de_partida": true,
+          "valor_texto": "Source: \"very little water\"; no number on the NASA page. Open review gives mean annual rain as low as 0.15 mm at some places.",
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "Despite being considerably warmer than Mars, the extreme dryness the soil chemistry in this region are remarkably similar to that of the Red Planet.",
+          "verificado": true,
+          "parametros": [
+            "precip_mm_ano",
+            "aridez_ai"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "precipitacion_minima",
+          "nombre": "Near-zero rainfall (number)",
+          "en_lista_de_partida": false,
+          "valor_texto": "0.15 mm/yr mean annual precipitation at the driest places (open review, citing Houston 2006)",
+          "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
+          "cita": "with places with mean annual precipitations of only 0.15 mm",
+          "verificado": true,
+          "parametros": [
+            "precip_mm_ano",
+            "aridez_ai"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "uv_extrema",
+          "nombre": "Extreme UV radiation",
+          "en_lista_de_partida": true,
+          "valor_texto": "Annual UVB dose 3.5-5 kWh/m2 on the Coastal Range (open review, citing Cordero et al. 2018); NASA page only says \"intense ultraviolet radiation\"",
+          "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
+          "cita": "the Atacama is known for having the highest UV radiation on Earth, with annual UVB doses ranging from 3.5 to 5 kWh/m 2 on the Coastal Range of the Atacama",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global UV layer in our set (insolacion_kwh_m2_dia is total shortwave, not UV); UV exposure only roughly tracks insolation and altitude"
+        },
+        {
+          "id": "uv_vida_subsuperficial",
+          "nombre": "UV pushes life underground",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "In a harsh environment with very little water and intense ultraviolet radiation, most life in the extreme Atacama Desert in Chile exists as microbial colonies underground or inside rocks.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "Not a surface parameter: it is the reason to search below the surface"
+        },
+        {
+          "id": "suelos_salinos_oxidantes",
+          "nombre": "Saline, oxidizing soils",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
+          "cita": "the highest UV radiation levels on Earth, and highly saline and oxidizing soils",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "no global layer for soil salts or oxidants"
+        },
+        {
+          "id": "percloratos",
+          "nombre": "Soluble perchlorate in soil",
+          "en_lista_de_partida": true,
+          "valor_texto": "0.5-0.6 % Atacama vs 0.4-0.6 % Mars (soluble perchlorate, PMC article); see contradiction with next item",
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384830",
+          "cita": "Another similarity between Martian and Atacama soils is the nearly equivalent concentrations of highly soluble perchlorate",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer for perchlorate"
+        },
+        {
+          "id": "perclorato_nucleo_hiperarido_menor",
+          "nombre": "Less perchlorate than Mars",
+          "en_lista_de_partida": false,
+          "valor_texto": "\"almost three orders of magnitude\" lower than Mars in hyperarid core soils (open review) - contradicts the PMC 0.5-0.6 % figure",
+          "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
+          "cita": "perchlorates are present almost three orders of magnitude higher than those of hyperarid core soil samples",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer for perchlorate; sources disagree on the Atacama value"
+        },
+        {
+          "id": "oxidantes_superficie",
+          "nombre": "Oxidant reservoirs in surface soil",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384830",
+          "cita": "its hyperaridity, absence of water weathering, high ultraviolet (UV) radiation, low levels of organic carbon, and large reservoirs of oxidants",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer for soil oxidants"
+        },
+        {
+          "id": "materia_organica_baja",
+          "nombre": "Very low organic carbon",
+          "en_lista_de_partida": false,
+          "valor_texto": "32 ppm organic carbon in Yungay samples (open review, citing Navarro-Gonzalez et al.)",
+          "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
+          "cita": "when Yungay samples containing small amounts (32 ppm) of organic carbon were mixed with 1% of magnesium perchlorate and then heated",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "no soil organic carbon layer in this version"
+        },
+        {
+          "id": "mas_calido_que_marte",
+          "nombre": "Warmer than Mars",
+          "en_lista_de_partida": false,
+          "valor_texto": "Source gives no number; page says \"considerably warmer than Mars\" and \"100+ degree heat\" in the field (unit not stated, presumably Fahrenheit)",
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "Despite being considerably warmer than Mars, the extreme dryness the soil chemistry in this region are remarkably similar to that of the Red Planet.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "named by the source as a difference from Mars, not as a reason for the site"
+        },
+        {
+          "id": "lejania_viento",
+          "nombre": "Remote site, hot and windy",
+          "en_lista_de_partida": false,
+          "valor_texto": "\"100+ degree heat\" (unit not stated) and \"high winds\" (no speed)",
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "camped together miles from civilization and worked in extremely dry, 100+ degree heat with high winds",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h",
+            "viento_medio_m_s",
+            "t_max_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "salares_halita",
+          "nombre": "Halite salt flats",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "Salar Grande, an ancient dried-up lake composed of thick beds of salt, and Maria Elena, a similarly extremely dry region",
+          "verificado": true,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "taladros",
+      "nombre": "Subsurface drill performance",
+      "que_se_prueba": "Drilling to meters depth, handing samples to instruments, and keeping the drill and samples free of contamination, in dry soil and in ice-cemented ground.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 1,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "ARADS (Atacama Rover Astrobiology Drilling Studies)",
+          "organismo": "NASA Ames (PI Brian Glass; PSTAR, NASA Astrobiology Program)",
+          "sitio": "yungay",
+          "sitio_texto": "Yungay (also Salar Grande and Maria Elena evaluated), Atacama Desert, Chile",
+          "lat": -24.0883,
+          "lon": -69.9946,
+          "coordenadas_fuente": null,
+          "anos": "2017-2019 (first deployment April 2017)",
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "to be considered along with Yungay as the host location for the future ARADS tests in 2017-19.",
+          "verificado": true
+        },
+        {
+          "nombre": "ARADS 2019 field season (drill + contamination control, 6-sol Icebreaker simulation)",
+          "organismo": "NASA Ames / SETI Institute / Centro de Astrobiologia",
+          "sitio": null,
+          "sitio_texto": "Atacama Desert, Chile",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2019",
+          "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:38133823%20AND%20SRC:MED&resultType=core&format=json",
+          "cita": "In 2019, the Atacama Rover Astrobiology Drilling Studies (ARADS) project field-tested an autonomous rover-mounted robotic drill prototype for a 6-Sol life detection mission to Mars (Icebreaker).",
+          "verificado": true
+        },
+        {
+          "nombre": "Icebreaker drill field tests, University Valley",
+          "organismo": "NASA Ames (C. McKay) with Honeybee Robotics",
+          "sitio": null,
+          "sitio_texto": "University Valley, Dry Valleys, Antarctica",
+          "lat": -77.866427,
+          "lon": 160.725585,
+          "coordenadas_fuente": {
+            "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+            "cita": "University Valley, Antarctica (approximate coordinates: -77.866427, 160.725585).",
+            "verificado": true
+          },
+          "anos": "SIN VERIFICAR (year not in this page)",
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "University Valley, Antarctica (approximate coordinates: -77.866427, 160.725585).",
+          "verificado": true
+        },
+        {
+          "nombre": "Icebreaker drill field tests, Haughton Crater (Arctic, not in table)",
+          "organismo": "NASA Ames with Honeybee Robotics",
+          "sitio": "haughton",
+          "sitio_texto": "Haughton Crater, Canadian Arctic",
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "SIN VERIFICAR (year not in this page)",
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "The drill proved capable of breaking through the varied, ice-cemented ground in Haughton Crater in the Canadian Arctic.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "biomasa_minima",
+          "nombre": "Life-diminished terrain (contamination test bed)",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:38133823%20AND%20SRC:MED&resultType=core&format=json",
+          "cita": "ARADS drilled Mars-like materials in the Atacama Desert (Chile), one of the most life-diminished regions on Earth, where mitigating contamination transfer into life-detection instruments becomes critical.",
+          "verificado": true,
+          "parametros": [
+            "aridez_ai",
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "hiperaridez_sitio",
+          "nombre": "Hyper-arid site chosen for drilling",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://astrobiology.nasa.gov/news/nasa-tests-life-detection-drill-in-the-atacama-desert/",
+          "cita": "has just completed its first deployment after one month of fieldwork in the hyperarid core of the Atacama Desert",
+          "verificado": true,
+          "parametros": [
+            "precip_mm_ano",
+            "aridez_ai"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "suelo_cementado_hielo",
+          "nombre": "Ice-cemented ground",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "Firstly, it’s possible that during periods of recent high obliquity the ice was warmed and became as habitable as the soils in the Antarctic dry valleys.",
+          "verificado": true,
+          "parametros": [
+            "permafrost_frac"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "frio_suelo_helado",
+          "nombre": "Ground −20 °C or colder",
+          "en_lista_de_partida": false,
+          "valor_texto": "-20 C or less (drilling in ice-bound soil)",
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "they are unable to penetrate ice-bound soils, especially at temperatures of -20ºC or less.",
+          "verificado": true,
+          "parametros": [
+            "t_min_k",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "sustrato_mixto_rocas",
+          "nombre": "Mixed ice, soil and rock",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "there are really several differences between drilling in ice, ice bound soils, and dry soils (that are) mixed with rocks of various sizes.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global rock-abundance layer; litologia_glim gives rock class only"
+        },
+        {
+          "id": "perclorato_profundidad",
+          "nombre": "Radiation-driven perchlorate destruction sets depth",
+          "en_lista_de_partida": false,
+          "valor_texto": "~5 m depth needed in ancient sediments (McKay, opinion)",
+          "fuente": "https://astrobiology.nasa.gov/news/icebreaking-mars/",
+          "cita": "My current thought is that, in the ancient sediments, we would need to be 5 meters deep. This is set by radiation activated perchlorate destruction.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer for perchlorate or subsurface radiation"
+        }
+      ]
+    },
+    {
+      "id": "polimeros_sellos",
+      "nombre": "Polymer and seal degradation",
+      "que_se_prueba": "Aging of polymers and mechanical seals exposed to corrosive, UV-rich Mars-like conditions.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 1,
+      "respaldo": "no_encontrado",
+      "campanas": [],
+      "caracteristicas": []
+    },
+    {
+      "id": "habitats_inflables",
+      "nombre": "Inflatable habitat testing",
+      "que_se_prueba": "Packing, setting up and living in an inflatable habitat for a year in extreme cold, with temperature, power and structural monitoring.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 2,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "IPP Inflatable Habitat Field Demonstration (ILC Dover / NSF / NASA)",
+          "organismo": "NASA Johnson Space Center (instrumentation), NASA Innovative Partnerships Program",
+          "sitio": null,
+          "sitio_texto": "McMurdo Station, Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "Jan 2008 - Feb 2009 (13 months)",
+          "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
+          "cita": "All three organizations will share data from the 13-month test, which runs from January 2008 to February 2009.",
+          "verificado": true
+        },
+        {
+          "nombre": "NASA Facts: Antarctic Inflatable Lunar Habitat (analog mission)",
+          "organismo": "NASA (Exploration Systems Mission Directorate)",
+          "sitio": null,
+          "sitio_texto": "McMurdo Station, Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2008",
+          "fuente": "https://www.lpi.usra.edu/lunar/analogs/blackpoint/pdf/marsmoon_analogs_nasafactsheet.pdf",
+          "cita": "NASA conducted an analog mission to test the inflatable habitat concept. The site selected was the cold, isolated landscape of Antarctica.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "frio_extremo",
+          "nombre": "Cold, harsh landscape",
+          "en_lista_de_partida": true,
+          "valor_texto": "Test inflate/deflate cycles at about -18 to -1.6 C (cycles, not the site range)",
+          "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
+          "cita": "NASA will use the cold, harsh, isolated landscape of Antarctica to test one of its concepts for astronaut housing on the moon.",
+          "verificado": true,
+          "parametros": [
+            "t_min_k",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "aislamiento_lejania",
+          "nombre": "Very remote site",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
+          "cita": "Testing the inflatable habitat in one of the harshest, most remote sites on Earth gives us the opportunity to see what it would be like to use for lunar exploration",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "ciclos_frio_medido",
+          "nombre": "Cold inflate and deflate cycles",
+          "en_lista_de_partida": true,
+          "valor_texto": "-18 C to -1.6 C (as printed, \"deg C\")",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110015491/downloads/20110015491.pdf",
+          "cita": "The structure was inflated and deflated multiple time in cold conditions (~ -18 deg C to -1.6 deg C) without damage",
+          "verificado": true,
+          "parametros": [
+            "t_min_k",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "viento_diseno",
+          "nombre": "Wind: design load 100 mph",
+          "en_lista_de_partida": true,
+          "valor_texto": "Designed for winds up to 100 mph (about 45 m/s); erection done with gusts to 32 km/h. The source does not say \"katabatic\".",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+          "cita": "These segments were inflated to one pound per square inch and the entire structure was designed to withstand winds up to 100 miles per hour.",
+          "verificado": true,
+          "parametros": [
+            "viento_medio_m_s",
+            "viento_p95_m_s"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "viento_montaje",
+          "nombre": "Erection in gusting wind",
+          "en_lista_de_partida": false,
+          "valor_texto": "Gusts to 32 km/h (about 8.9 m/s) during 50-minute set-up",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110015491/downloads/20110015491.pdf",
+          "cita": "The system was erected (unpacked, integrated, and inflated) in 50 minutes by three people wearing cold weather gear and with winds gusting to 32 km/hr",
+          "verificado": true,
+          "parametros": [
+            "viento_medio_m_s",
+            "viento_p95_m_s"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "entorno_termico_extremo",
+          "nombre": "Extreme thermal environment",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+          "cita": "protect the habitat from the extreme thermal exterior environment",
+          "verificado": true,
+          "parametros": [
+            "t_min_k",
+            "amplitud_diurna_k",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "superficie_ondulada",
+          "nombre": "Slightly undulating ground",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110015491/downloads/20110015491.pdf",
+          "cita": "The structure adapted well to a slightly undulating surface but the need for compliant structures and attachments was evident",
+          "verificado": true,
+          "parametros": [
+            "rugosidad_tan",
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "nieve_en_techo",
+          "nombre": "Snow load on the roof",
+          "en_lista_de_partida": false,
+          "valor_texto": "Snow fell on the roof and sensors needed clearing; no depth given",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+          "cita": "was a significant amount of snow that fell on the habitat roof, the external sensors would not necessarily be able to collect the necessary data.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "no snow load layer"
+        },
+        {
+          "id": "consumo_energia_termico",
+          "nombre": "Thermal and power use measured",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110015491/downloads/20110015491.pdf",
+          "cita": "Measured thermal and power usage data were correlated and modeled",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "a measurement of the test, not a trait of the site"
+        }
+      ]
+    },
+    {
+      "id": "energia_soporte_vital",
+      "nombre": "Autonomous power and life support",
+      "que_se_prueba": "Running power generation and closed-loop life support with little resupply in a remote, cold site.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 2,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "CELSS Antarctic Analog Project (CAAP) - planned testbed, NOT confirmed as built",
+          "organismo": "NASA Ames (Bubenheim, Flynn) with NSF",
+          "sitio": null,
+          "sitio_texto": "Amundsen-Scott South Pole Station, Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "1994 (paper)",
+          "fuente": "https://ntrs.nasa.gov/citations/19970031746",
+          "cita": "This project goes beyond, as it must, the generally accepted scope of CELSS and life support systems including the issues of power generation, human dynamics, community systems, and training.",
+          "verificado": true
+        },
+        {
+          "nombre": "NASA/NSF study: Use of Antarctic Analogs to Support the Space Exploration Initiative (study, not field test)",
+          "organismo": "NASA HQ and NSF",
+          "sitio": "mcmurdo_dry_valleys",
+          "sitio_texto": "Antarctic dry valleys and polar plateau",
+          "lat": -77.467,
+          "lon": 162.517,
+          "coordenadas_fuente": null,
+          "anos": "1990 (report)",
+          "fuente": "https://ntrs.nasa.gov/citations/19930004138",
+          "cita": "Antarctica is the most appropriate earth analog for the environments of the the Moon and Mars.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "tipos_de_sitio",
+          "nombre": "Polar plateau and dry valleys",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/19920037962",
+          "cita": "There are two types of locations on the continent of Antarctica suitable for the placement of simulation facilities: the polar plateau and the ice-free dry valleys.",
+          "verificado": true,
+          "parametros": [
+            "elev_m",
+            "permafrost_frac",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "logistica_limitada",
+          "nombre": "Constrained logistics and resupply",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "Logistics and resupply conditions are constrained, and a philosophy must be developed to efficiently use and conserve limited resources.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "energia_solar_eolica",
+          "nombre": "Solar and wind power",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "Improve electrical power capability, particularly at inland stations, by using alternative energy sources (solar, wind, nuclear, etc.)",
+          "verificado": true,
+          "parametros": [
+            "insolacion_kwh_m2_dia",
+            "viento_medio_m_s"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "meseta_polar_frio",
+          "nombre": "Polar plateau cold and dry",
+          "en_lista_de_partida": true,
+          "valor_texto": "Source text (OCR layer) prints -60'C: read as -60 C average on the plateau; precipitation < 5 cm water equivalent per year",
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "Temperatures on the polar plateau average -60'C, with annual precipitation less than 5 cm (water equivalent) as snow.",
+          "verificado": true,
+          "parametros": [
+            "t_media_k",
+            "t_min_k",
+            "precip_mm_ano",
+            "elev_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "valles_secos_temperatura",
+          "nombre": "Dry valleys temperature range",
+          "en_lista_de_partida": true,
+          "valor_texto": "Mean annual about -20 C; range -50 to 10 C (OCR prints 'C); box 76.5-78.5 S, 160-164 E per same report",
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "The mean annual temperature is about -20'C, but temperatures range from -50'C to 10'C.",
+          "verificado": true,
+          "parametros": [
+            "t_media_k",
+            "t_min_k",
+            "t_max_k"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "valles_secos_viento",
+          "nombre": "Strong winds from the plateau",
+          "en_lista_de_partida": true,
+          "valor_texto": "No speed given; source does not use the word katabatic",
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "During the winter months, strong winds from the polar plateau buffet the valleys.",
+          "verificado": true,
+          "parametros": [
+            "viento_medio_m_s",
+            "viento_p95_m_s"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "aislamiento_ambiente_hostil",
+          "nombre": "Isolation and harsh environment",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/19930004138/downloads/19930004138.pdf",
+          "cita": "Some of Antarctica's physical attributes - the harsh, cold environment, geologic processes, and isolation from populated areas - are particularly applicable to testing and developing SET systems.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h",
+            "t_media_k"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "psicologia_tripulacion",
+      "nombre": "Crew behavior in isolation",
+      "que_se_prueba": "How small crews cope, get along and perform during months of isolation, confinement and danger.",
+      "cuerpo": [
+        "mars",
+        "moon"
+      ],
+      "grupo": 2,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "HRP Flight Analogs studies at NSF Antarctic stations",
+          "organismo": "NASA Human Research Program (Flight Analogs)",
+          "sitio": null,
+          "sitio_texto": "McMurdo, Palmer and Amundsen-Scott South Pole stations, Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2016 onward (document dated June 2023)",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "HRP studies conducted under this agreement began in 2016 with 1 to 3 HRP studies deployed each year to the NSF Antarctic stations including McMurdo, Palmer, and Amundsen-Scott South Pole Stations.",
+          "verificado": true
+        },
+        {
+          "nombre": "SCALE and CREWS team-dynamics studies",
+          "organismo": "NASA HRP (Northwestern University investigators)",
+          "sitio": null,
+          "sitio_texto": "Antarctic winter-over teams (station not named in the article)",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2019 article (SIN VERIFICAR: study years)",
+          "fuente": "https://www.nasa.gov/humans-in-space/clowning-around-lightens-the-load-nasa-studies-team-dynamics-in-antarctica/",
+          "cita": "Two studies currently underway are investigating team dynamics in the isolated environment of such a remote outpost.",
+          "verificado": true
+        },
+        {
+          "nombre": "Antarctic Space Analog Program",
+          "organismo": "NASA-funded (grant NAG5-4571), Univ. California San Diego and NASA JSC co-author",
+          "sitio": null,
+          "sitio_texto": "Small isolated research stations in Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "1963-present data; report 1998",
+          "fuente": "https://ntrs.nasa.gov/citations/20000068454",
+          "cita": "The primary aim of this project was to examine group dynamics and individual performance in extreme, isolated environments",
+          "verificado": true
+        },
+        {
+          "nombre": "CHOICE immunology study at Concordia (analog use; immunology, not psychology)",
+          "organismo": "NASA Johnson Space Center",
+          "sitio": null,
+          "sitio_texto": "Concordia Station, Dome C, Antarctica",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2012 (presentation)",
+          "fuente": "https://ntrs.nasa.gov/citations/20120007706",
+          "cita": "Concordia Station, Dome C, Antarctica as a Ground-Based Analog for Spaceflight/Planetary Exploration: The CHOICE* Immunology Study",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "confinamiento_aislamiento_peligro",
+          "nombre": "Confinement, social isolation, environmental danger",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "These stations serve as an analog to the spaceflight conditions of physical confinement, social isolation, and environmental danger.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "invernada",
+          "nombre": "Winter-over season is the target",
+          "en_lista_de_partida": false,
+          "valor_texto": "8-9 month winter-over",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "typically targeted the 8 to 9 month winter-over season during which the stations are more isolated and support a smaller population.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "length of the winter-over season is not a map layer"
+        },
+        {
+          "id": "mcmurdo_aislamiento",
+          "nombre": "McMurdo winter isolation",
+          "en_lista_de_partida": false,
+          "valor_texto": "150-250 people; 6-8 weeks isolation between flights; 24 h darkness",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "during the austral winter period McMurdo Station houses between 150 and 250 people at any given time, with typical periods of 6 to 8 weeks of isolation (between flights) and 24-hour darkness.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h",
+            "insolacion_kwh_m2_dia"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "polo_sur_aislamiento_altitud",
+          "nombre": "Months without transport",
+          "en_lista_de_partida": false,
+          "valor_texto": "8-9 months; elevation over 9000 ft (about 2740 m)",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "with the typical winter period of isolation (no scheduled transportation in or out of the station) lasting 8 to 9 months.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "polo_sur_elevacion",
+          "nombre": "High elevation",
+          "en_lista_de_partida": false,
+          "valor_texto": "over 9000 ft (about 2740 m)",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
+          "cita": "Amundsen-Scott South Pole Station is located at the geographic South Pole at over 9000 feet of elevation atop the Antarctic ice sheet.",
+          "verificado": true,
+          "parametros": [
+            "elev_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "frio_oscuridad",
+          "nombre": "Cold and months of darkness",
+          "en_lista_de_partida": true,
+          "valor_texto": "Temperatures rarely above 0 F (about -18 C); sun gone four months a year. Not cryogenic.",
+          "fuente": "https://www.nasa.gov/humans-in-space/clowning-around-lightens-the-load-nasa-studies-team-dynamics-in-antarctica/",
+          "cita": "Antarctica is sometime called “White Mars” because of its desolation and extreme environment where temperatures rarely get over zero-degrees Fahrenheit and the sun disappears for four months of every year.",
+          "verificado": true,
+          "parametros": [
+            "t_max_k",
+            "t_media_k",
+            "insolacion_kwh_m2_dia"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "concordia_incomunicado",
+          "nombre": "Concordia cut off in winter",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration/Research/Mission_to_Mars_via_Antarctica",
+          "cita": "During the winter the base is completely cut off with no visitors and no chance for rescue.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h",
+            "elev_m"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "georradar_hielo",
+      "nombre": "Radar search for buried ice",
+      "que_se_prueba": "Ground-penetrating radar methods to find and map ice buried under loose ground.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 3,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "K10 robotic site survey with CRUX ground-penetrating radar",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2007",
+          "fuente": "https://webarchive.library.unt.edu/eot2008/20090117104120/http:/ti.arc.nasa.gov/projects/haughton_field/details.php",
+          "cita": "For the Haughton Crater surveys, K10 will carry two non-contact survey instruments: (1) the CRUX ground-penetrating radar (to characterize subsurface structure)",
+          "verificado": false
+        },
+        {
+          "nombre": "Ground-penetrating radar surveys of ice buried by tephra",
+          "organismo": "NASA Goddard",
+          "sitio": null,
+          "sitio_texto": "Askja caldera, northern Iceland",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20240009232",
+          "cita": "We conducted ground-penetrating radar surveys at center frequencies of 200, 400, and 900 MHz to map the thickness and extent of tephra deposits and underlying massive ice at three caldera sites.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "hielo_bajo_tefra",
+          "nombre": "Ice buried under volcanic tephra",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of measured buried ice."
+        },
+        {
+          "id": "piroclastos_sueltos",
+          "nombre": "Loose volcanic pyroclasts",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": true,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "sin_vegetacion",
+          "nombre": "Bare ground without plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": true,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "desierto_polar_rocoso",
+          "nombre": "Rocky, isolated polar desert",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+          "cita": "Two NASA robots are surveying a rocky, isolated polar desert within a crater in the Arctic Circle.",
+          "verificado": true,
+          "parametros": [
+            "t_media_k",
+            "precip_mm_ano",
+            "rugosidad_tan",
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "movilidad_rovers",
+      "nombre": "Rover driving on rough ground",
+      "que_se_prueba": "How robotic and crewed rovers move, survey and navigate across rough, rocky terrain.",
+      "cuerpo": [
+        "moon"
+      ],
+      "grupo": 3,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "Simulated robotic follow-up mission with K10 rovers",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2010",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+          "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
+          "verificado": true
+        },
+        {
+          "nombre": "Desert RATS: Lunar Electric Rover field test",
+          "organismo": "NASA",
+          "sitio": null,
+          "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2009",
+          "fuente": "https://phys.org/news/2009-09-nasa-lunar-robotics-arizona.html",
+          "cita": "The crew also docked to a simulated habitat, drove the rover across difficult terrain, performed a rescue mission and made a four-day traverse across the lava.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_rocoso",
+          "nombre": "Rocky lava terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "Forty miles north of Flagstaff, Arizona, lies a remote lava field called Black Point Lava Flow consisting of rocky terrain,",
+          "verificado": true,
+          "parametros": [
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "vegetacion_escasa",
+          "nombre": "Sparse plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "sparse vegetation and, at night, very limited light pollution.",
+          "verificado": true,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "cielo_oscuro",
+          "nombre": "Little light at night",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "sparse vegetation and, at night, very limited light pollution.",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "This tool has no night-light layer."
+        },
+        {
+          "id": "variedad_y_aislamiento",
+          "nombre": "Varied surface features, remote",
+          "en_lista_de_partida": false,
+          "valor_texto": "nearly 10 miles wide",
+          "fuente": "https://spacenews.com/?p=54891",
+          "cita": "Black Point Lava Flow’s wide variety of surface features, size (nearly 10 miles wide) and relative remoteness make it ideal for simulated lunar missions, according to project team scientists.",
+          "verificado": true,
+          "parametros": [
+            "rugosidad_tan",
+            "relieve_m",
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "colada_basaltica",
+          "nombre": "Basaltic lava flow",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://appel.nasa.gov/?p=365689",
+          "cita": "The Black Point Lava Flow, north of Flagstaff, Arizona, stretches approximately two miles wide, a thick trail of black basaltic lava that flowed east for miles",
+          "verificado": false,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "tubos_lava",
+      "nombre": "Lava tube exploration",
+      "que_se_prueba": "Rovers and science instruments that explore and map dark lava tube caves.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 3,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "BRAILLE: CaveR rover survey of Valentine Cave",
+          "organismo": "NASA Ames",
+          "sitio": null,
+          "sitio_texto": "Valentine Cave, Lava Beds National Monument, northern California",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2018",
+          "fuente": "https://ntrs.nasa.gov/citations/20190029009",
+          "cita": "The NASA Ames testbed rover, CaveR, was deployed in Valentine Cave in Lava Beds National Monument (N. CA, USA) during August of 2018.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "muchos_tubos",
+          "nombre": "Many lava caves",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://nasa-braille.org/?p=227",
+          "cita": "The park was chosen by the BRAILLE team because of its many lava caves.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of lava tubes."
+        },
+        {
+          "id": "poca_luz",
+          "nombre": "Little sunlight inside caves",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://nasa-braille.org/?p=227",
+          "cita": "The lava tubes are considered LLEs because microbes within them have minimal access to sunlight.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "Surface sunlight layers say nothing about light inside caves."
+        },
+        {
+          "id": "paredes_lisas",
+          "nombre": "Smooth walls, wide walkways",
+          "en_lista_de_partida": false,
+          "valor_texto": "Smooth walls around 15 feet high and walkways up to 70 feet wide",
+          "fuente": "https://www.nasa.gov/universe/using-a-cave-rover-nasa-learns-to-search-for-life-underground/",
+          "cita": "Smooth walls around 15 feet high and walkways up to 70 feet wide make it a practical place to drive a rover",
+          "verificado": true,
+          "parametros": [],
+          "medido": false,
+          "motivo": "Cave shape is not in any global layer."
+        },
+        {
+          "id": "rasgos_de_colada",
+          "nombre": "Preserved lava flow features",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/universe/using-a-cave-rover-nasa-learns-to-search-for-life-underground/",
+          "cita": "its well preserved lava flow features are similar to what we expect to find inside a Martian lava cave",
+          "verificado": true,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "simulacion_larga",
+      "nombre": "Long crewed habitat stay",
+      "que_se_prueba": "A crew living for months in an isolated habitat with limited water and power.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "HI-SEAS third mission (eight months)",
+          "organismo": null,
+          "sitio": null,
+          "sitio_texto": "HI-SEAS habitat, Mauna Loa, Hawaii",
+          "lat": 19.602378,
+          "lon": -155.487192,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/HI-SEAS",
+            "cita": "19°36′09″N 155°29′14″W / 19.602378°N 155.487192°W",
+            "verificado": true
+          },
+          "anos": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "HI-SEAS, short for Hawaii Space Exploration Analog and Simulation, took place atop the Mauna Loa volcano in Hawaii.",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "poca_huella_humana",
+          "nombre": "Few signs of people",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The site was chosen because it shows little signs of human existence and even plants are scarce at that altitude.",
+          "verificado": true,
+          "parametros": [
+            "tiempo_ciudad_h"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "plantas_escasas",
+          "nombre": "Scarce plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The site was chosen because it shows little signs of human existence and even plants are scarce at that altitude.",
+          "verificado": true,
+          "parametros": [
+            "ndvi_max"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "gran_altitud",
+          "nombre": "High altitude",
+          "en_lista_de_partida": true,
+          "valor_texto": "8,000 feet above sea level",
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The dome the team used was erected 8,000 feet above sea level and was basically a small, two-story house.",
+          "verificado": true,
+          "parametros": [
+            "elev_m"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "suelo_volcanico",
+          "nombre": "Volcanic ground like Mars soil",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "the volcanic surface is akin to the Martian soil",
+          "verificado": true,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "eva_con_retardo",
+      "nombre": "Spacewalks with signal delay",
+      "que_se_prueba": "Field science spacewalks run with a Mars-like delay in talks with Earth.",
+      "cuerpo": [
+        "mars"
+      ],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "BASALT second field test",
+          "organismo": "NASA Ames",
+          "sitio": "kilauea",
+          "sitio_texto": null,
+          "lat": 19.41194,
+          "lon": -155.27583,
+          "coordenadas_fuente": null,
+          "anos": "2016",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "BASALT’s second field test, on the lava flows of Mauna Ulu, on the Big Island of Hawaii.",
+          "verificado": true
+        },
+        {
+          "nombre": "BASALT first field test",
+          "organismo": "NASA Ames",
+          "sitio": "craters_of_the_moon",
+          "sitio_texto": null,
+          "lat": 43.46167,
+          "lon": -113.56271,
+          "coordenadas_fuente": null,
+          "anos": "2016",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "The first round of BASALT field tests, at Craters of the Moon National Monument and Preserve, in Idaho.",
+          "verificado": true
+        },
+        {
+          "nombre": "BASALT third field test",
+          "organismo": "NASA Ames",
+          "sitio": "kilauea",
+          "sitio_texto": null,
+          "lat": 19.41194,
+          "lon": -155.27583,
+          "coordenadas_fuente": null,
+          "anos": "2017",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "The third and final season of testing for BASALT was held at Kilauea Iki and Kilauea Caldera Region, Hawaii Volcanoes National Park",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "retardo_comunicaciones",
+          "nombre": "Mars-like signal delay",
+          "en_lista_de_partida": false,
+          "valor_texto": "5- to 15-min OWLT",
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
+          "cita": "Do these capabilities remain enabling and enhancing as communication latency increases from 5- to 15-min OWLT?",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "The delay is set by the test, not by the place."
+        },
+        {
+          "id": "basalto_alterado",
+          "nombre": "Chemically altered basalt",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238",
+          "cita": "how microbial communities and habitability correlate with physical and geochemical characteristics of chemically altered basalt environments in Mars-analog terrestrial sites",
+          "verificado": false,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "coladas_recientes",
+          "nombre": "Young lava flows",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
+          "cita": "the Kilauea Volcano 1969–1974 flows on the Big Island of Hawai‘i (early Mars analog)",
+          "verificado": false,
+          "parametros": [
+            "litologia_glim",
+            "rugosidad_tan"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "recursos_basalto",
+      "nombre": "Resources from volcanic soil",
+      "que_se_prueba": "Drilling volcanic soil and heating it to find water and make oxygen.",
+      "cuerpo": [
+        "moon",
+        "mars"
+      ],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "RESOLVE field demonstration (ILSO-ISRU analog test)",
+          "organismo": "NASA Kennedy",
+          "sitio": "mauna_kea",
+          "sitio_texto": null,
+          "lat": 19.82056,
+          "lon": -155.46806,
+          "coordenadas_fuente": null,
+          "anos": "2010",
+          "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+          "cita": "The RESOLVE chemical processing system was mounted on a Canadian Space Agency mobility chasis and successfully demonstrated on Hawaii's Mauna Kea volcano in February 2010.",
+          "verificado": true
+        },
+        {
+          "nombre": "ISRU analog mission",
+          "organismo": "NASA with the Canadian Space Agency",
+          "sitio": "mauna_kea",
+          "sitio_texto": null,
+          "lat": 19.82056,
+          "lon": -155.46806,
+          "coordenadas_fuente": null,
+          "anos": "2012",
+          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
+          "cita": "The 2012 ISRU analog mission is a collaboration between NASA and its partners, primarily the Canadian Space Agency (CSA) with help from the University of Hawaii",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "ceniza_volcanica",
+          "nombre": "Volcanic ash deposits",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
+          "cita": "Demonstrations will be conducted on the side of Mauna Kea, in some of Hawaii’s volcanic ash deposits, which provide geologic terrain and composition similar to what scientists expect to find on the moon, an asteroid, or Mars.",
+          "verificado": false,
+          "parametros": [
+            "litologia_glim"
+          ],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "mineralogia_basaltica",
+          "nombre": "Basalt, iron oxides and clays",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://core.ac.uk/works/15260970",
+          "cita": "Preliminary results show that the sediments change from dry, organic-poor, poorly-sorted volcaniclastic sand on the surface, containing basalt, iron oxides and clays",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global mineralogy layer."
+        },
+        {
+          "id": "terreno_tipo_apolo",
+          "nombre": "Terrain Apollo crews found realistic",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20100033667/downloads/20100033667.pdf",
+          "cita": "In the 1960s, Apollo astronauts prepared for their missions on Mauna Kea and declared those sites to be the most realistic in terms of the terrain in the lunar environment they encountered.",
+          "verificado": true,
+          "parametros": [
+            "rugosidad_tan",
+            "relieve_m"
+          ],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    }
+  ]
+}
