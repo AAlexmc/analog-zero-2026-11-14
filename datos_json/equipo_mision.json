@@ -1,0 +1,563 @@
+{
+  "descripcion": "Equipment NASA used in the field campaigns of each mission in datos_json/misiones.json, with the size and operating limits its sources publish. Not published: null, or an empty list of limits. Values keep the units of their source. modelo3d lists a public 3D model; it is copied to web/data/modelos/mision/ only if it is a .glb of 8 MB or less, with quoted terms of use and no NASA insignia.",
+  "misiones": [
+    {
+      "mision": "biomarcadores",
+      "equipos": [
+        {
+          "id": "zoe",
+          "nombre": "Zoë rover",
+          "tipo": "rover",
+          "campana": "LITA (Life in the Atacama)",
+          "dimensiones": {
+            "largo": {
+              "valor": 2.9,
+              "unidad": "m",
+              "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
+              "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
+              "verificado": false
+            },
+            "ancho": {
+              "valor": 1.9,
+              "unidad": "m",
+              "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
+              "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
+              "verificado": false
+            },
+            "alto": {
+              "valor": 2,
+              "unidad": "m",
+              "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
+              "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
+              "verificado": false
+            },
+            "masa": {
+              "valor": 220,
+              "unidad": "kg",
+              "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
+              "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
+              "verificado": false
+            }
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "taladros",
+      "equipos": [
+        {
+          "id": "taladro_arads",
+          "nombre": "ARADS rover-mounted drill prototype",
+          "tipo": "taladro",
+          "campana": "ARADS 2019 field season",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        },
+        {
+          "id": "icebreaker_1",
+          "nombre": "Icebreaker-1 drill",
+          "tipo": "taladro",
+          "campana": "Icebreaker drill field tests, University Valley",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": {
+              "valor": 32,
+              "unidad": "kg",
+              "fuente": "https://blogs.nasa.gov/mission-ames/?p=655",
+              "cita": "uses a lighter frame with smaller motors to reduce fielded mass from 32kg (Icebreaker-1) to 9.6kg (Icebreaker-2/LITA)",
+              "verificado": false
+            }
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "polimeros_sellos",
+      "equipos": []
+    },
+    {
+      "mision": "habitats_inflables",
+      "equipos": [
+        {
+          "id": "habitat_inflable",
+          "nombre": "ILC Dover inflatable habitat",
+          "tipo": "habitat",
+          "campana": "Inflatable habitat field demonstration",
+          "dimensiones": {
+            "largo": {
+              "valor": 24,
+              "unidad": "ft",
+              "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+              "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
+              "verificado": false,
+              "nota": "Internal size of the main habitation area."
+            },
+            "ancho": {
+              "valor": 16,
+              "unidad": "ft",
+              "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+              "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
+              "verificado": false,
+              "nota": "Internal size of the main habitation area."
+            },
+            "alto": {
+              "valor": 8,
+              "unidad": "ft",
+              "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
+              "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
+              "verificado": false,
+              "nota": "Internal size of the main habitation area."
+            },
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "energia_soporte_vital",
+      "equipos": []
+    },
+    {
+      "mision": "psicologia_tripulacion",
+      "equipos": []
+    },
+    {
+      "mision": "georradar_hielo",
+      "equipos": [
+        {
+          "id": "k10_black",
+          "nombre": "K10 Black rover",
+          "tipo": "rover",
+          "campana": "K10 robotic site survey with CRUX ground-penetrating radar",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": {
+              "valor": 165,
+              "unidad": "lb",
+              "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
+              "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
+              "verificado": false,
+              "nota": "Mass of the 2007 K10 rovers, without payload."
+            }
+          },
+          "limites": [],
+          "modelo3d": null
+        },
+        {
+          "id": "georradar_crux",
+          "nombre": "CRUX ground-penetrating radar",
+          "tipo": "instrumento",
+          "campana": "K10 robotic site survey with CRUX ground-penetrating radar",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        },
+        {
+          "id": "georradar_askja",
+          "nombre": "Ground-penetrating radar (200, 400 and 900 MHz)",
+          "tipo": "instrumento",
+          "campana": "Ground-penetrating radar surveys of ice buried by tephra",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "movilidad_rovers",
+      "equipos": [
+        {
+          "id": "k10",
+          "nombre": "K10 rover",
+          "tipo": "rover",
+          "campana": "Simulated robotic follow-up mission with K10 rovers",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        },
+        {
+          "id": "lunar_electric_rover",
+          "nombre": "Lunar Electric Rover",
+          "tipo": "rover",
+          "campana": "Desert RATS: Lunar Electric Rover field test",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "tubos_lava",
+      "equipos": [
+        {
+          "id": "caver",
+          "nombre": "CaveR rover",
+          "tipo": "rover",
+          "campana": "BRAILLE: CaveR rover survey of Valentine Cave",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "simulacion_larga",
+      "equipos": [
+        {
+          "id": "domo_hi_seas",
+          "nombre": "HI-SEAS habitat dome",
+          "tipo": "habitat",
+          "campana": "HI-SEAS third mission (eight months)",
+          "dimensiones": {
+            "largo": {
+              "valor": 36,
+              "unidad": "ft",
+              "fuente": "https://science.nasa.gov/earth/earth-observatory/living-the-mars-life-on-mauna-loa-92630/",
+              "cita": "With a diameter of 36 feet (10 meters), the ground floor has just 878 square feet",
+              "verificado": false,
+              "nota": "Diameter of the round dome."
+            },
+            "ancho": {
+              "valor": 36,
+              "unidad": "ft",
+              "fuente": "https://science.nasa.gov/earth/earth-observatory/living-the-mars-life-on-mauna-loa-92630/",
+              "cita": "With a diameter of 36 feet (10 meters), the ground floor has just 878 square feet",
+              "verificado": false,
+              "nota": "Diameter of the round dome."
+            },
+            "alto": null,
+            "masa": null
+          },
+          "limites": [
+            {
+              "parametro": "viento_p95_m_s",
+              "tipo": "max",
+              "valor": 70,
+              "unidad": "mph",
+              "fuente": "https://intentsmag.com/2015/06/01/life-on-mars/",
+              "cita": "The structural limit of the habitat is in the range of 70 mph",
+              "verificado": false,
+              "nota": "Own criterion: a structural wind limit, compared with the 95th percentile wind of a place. The source gives a rough figure."
+            }
+          ],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "eva_con_retardo",
+      "equipos": []
+    },
+    {
+      "mision": "recursos_basalto",
+      "equipos": [
+        {
+          "id": "resolve",
+          "nombre": "RESOLVE regolith and volatile extraction system",
+          "tipo": "instrumento",
+          "campana": "RESOLVE field demonstration (ILSO-ISRU analog test)",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "flota_rovers",
+      "equipos": [
+        {
+          "id": "k10",
+          "nombre": "K10 Black and K10 Red rovers",
+          "tipo": "rover",
+          "campana": "Two K10 rovers autonomously surveying lunar analog sites",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": {
+              "valor": 165,
+              "unidad": "lb",
+              "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
+              "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
+              "verificado": false,
+              "nota": "Mass of the 2007 K10 rovers, without payload."
+            }
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "lidar_estereo",
+      "equipos": [
+        {
+          "id": "k10_red",
+          "nombre": "K10 Red rover",
+          "tipo": "rover",
+          "campana": "K10 rovers with 3D scanning lidar",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": {
+              "valor": 165,
+              "unidad": "lb",
+              "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
+              "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
+              "verificado": false,
+              "nota": "Mass of the 2007 K10 rovers, without payload."
+            }
+          },
+          "limites": [],
+          "modelo3d": null
+        },
+        {
+          "id": "lidar_ilris3d",
+          "nombre": "Optech ILRIS-3D scanning lidar",
+          "tipo": "instrumento",
+          "campana": "K10 rovers with 3D scanning lidar",
+          "dimensiones": {
+            "largo": {
+              "valor": 320,
+              "unidad": "mm",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Size (L x W x H) 320 x 320 x 220 mm",
+              "verificado": false
+            },
+            "ancho": {
+              "valor": 320,
+              "unidad": "mm",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Size (L x W x H) 320 x 320 x 220 mm",
+              "verificado": false
+            },
+            "alto": {
+              "valor": 220,
+              "unidad": "mm",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Size (L x W x H) 320 x 320 x 220 mm",
+              "verificado": false
+            },
+            "masa": {
+              "valor": 13,
+              "unidad": "kg",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Weight 13 kg 14 kg 14 kg",
+              "verificado": false,
+              "nota": "First value of the row, the ILRIS-3D column of the sheet."
+            }
+          },
+          "limites": [
+            {
+              "parametro": "t_min_k",
+              "tipo": "min",
+              "valor": 0,
+              "unidad": "°C",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Operating temperature 0 to 40°C",
+              "verificado": false
+            },
+            {
+              "parametro": "t_max_k",
+              "tipo": "max",
+              "valor": 40,
+              "unidad": "°C",
+              "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
+              "cita": "Operating temperature 0 to 40°C",
+              "verificado": false
+            }
+          ],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "muestreo_con_traje",
+      "equipos": []
+    },
+    {
+      "mision": "navegacion_aterrizaje",
+      "equipos": [
+        {
+          "id": "lander_vision_system",
+          "nombre": "Lander Vision System (engineering model)",
+          "tipo": "instrumento",
+          "campana": "Mars 2020 Lander Vision System helicopter flights",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "drones_sobre_arena",
+      "equipos": [
+        {
+          "id": "drones_jpl",
+          "nombre": "JPL research drones",
+          "tipo": "dron",
+          "campana": "Extended Robust Aerial Autonomy drone tests (Dumont Dunes)",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "ruedas_en_arena",
+      "equipos": [
+        {
+          "id": "scarecrow",
+          "nombre": "Scarecrow test rover",
+          "tipo": "rover",
+          "campana": "Scarecrow mobility tests for Curiosity",
+          "dimensiones": {
+            "largo": {
+              "valor": 10,
+              "unidad": "ft",
+              "fuente": "https://www.pbssocal.org/socal-focus/a-walk-in-the-mojave-nasa-tests-mars-rover-on-desert-dunes",
+              "cita": "Curiosity (and Scarecrow, for that matter) is about ten feet long",
+              "verificado": false
+            },
+            "ancho": null,
+            "alto": null,
+            "masa": {
+              "valor": 750,
+              "unidad": "lb",
+              "fuente": "https://www.pbssocal.org/socal-focus/a-walk-in-the-mojave-nasa-tests-mars-rover-on-desert-dunes",
+              "cita": "Scarecrow's handlers pared its weight down to around 750 pounds",
+              "verificado": false
+            }
+          },
+          "limites": [
+            {
+              "parametro": "pendiente_grados",
+              "tipo": "max",
+              "valor": 15,
+              "unidad": "deg",
+              "fuente": "https://www.jpl.nasa.gov/videos/martian-dune-buggy/",
+              "cita": "We can climb in soft sand up to about 15 degrees or so.",
+              "verificado": false,
+              "nota": "Slope in soft sand, said by a rover driver during the Scarecrow dune tests."
+            }
+          ],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "campamento_base",
+      "equipos": [
+        {
+          "id": "k10",
+          "nombre": "K10 rover",
+          "tipo": "rover",
+          "campana": "Haughton-Mars Project base camp",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "rover_presurizado",
+      "equipos": [
+        {
+          "id": "rover_presurizado_drats",
+          "nombre": "D-RATS pressurized rover",
+          "tipo": "rover",
+          "campana": "D-RATS pressurized rover test with JAXA",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    },
+    {
+      "mision": "perforacion_hielo",
+      "equipos": [
+        {
+          "id": "taladro_dame",
+          "nombre": "DAME prototype drill",
+          "tipo": "taladro",
+          "campana": "DAME (Drilling Automation for Mars Exploration)",
+          "dimensiones": {
+            "largo": null,
+            "ancho": null,
+            "alto": null,
+            "masa": null
+          },
+          "limites": [],
+          "modelo3d": null
+        }
+      ]
+    }
+  ]
+}
