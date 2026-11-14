@@ -6,7 +6,7 @@ import { cargar } from '../buscar/motor.js';
 import { PALETA, mezclar } from '../marca/contraste.js';
 import {
   letra, nombreCorto, NOMBRE_CORTO, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases,
-  tablaComparar, sitiosConCoordenadas, lineaContexto, fraseUnlisted, masCercano, fmtPct, lineaDistancia, textoComponentes,
+  tablaComparar, sitiosConCoordenadas, lineaContexto, tipoAnalogo, fraseUnlisted, masCercano, fmtPct, lineaDistancia, textoComponentes,
 } from '../analogos/metricas.js';
 
 const DATOS = new URL('../data/', import.meta.url);
@@ -125,6 +125,10 @@ test('unlisted: only catalogue sites with coordinates count; the count sentence 
   assert.equal(sin, esperado);
   assert.ok(sin >= 1 && sin < r.resultados.length);
   assert.equal(lineaContexto(null, N), `not near any of the ${N} analog sites in our catalogue`);
+  for (const x of r.resultados) {
+    const c = masCercano(x.lat, x.lon, SITIOS);
+    if (c) assert.equal(lineaContexto(c, N), `near ${c.item.nombre} — a known ${tipoAnalogo(c.item.cuerpo)} (${Math.round(c.km)} km)`);
+  }
 });
 
 test('side-by-side table from the real Jezero search: one row per parameter, 5 places, best cell = smallest deviation', () => {

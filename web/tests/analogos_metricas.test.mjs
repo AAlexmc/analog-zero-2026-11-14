@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { CORTES, grupoDe, ordenar, agrupar, fmtPct, formatoValor, celsius, distanciaKm, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, RAMPA, colorRampa, minMax, pintarMapa } from '../analogos/metricas.js';
+import { CORTES, grupoDe, ordenar, agrupar, fmtPct, formatoValor, celsius, distanciaKm, masCercano, lineaContexto, tipoAnalogo, fraseParcial, terrenoDelPunto, RAMPA, colorRampa, minMax, pintarMapa } from '../analogos/metricas.js';
 import { PALETA } from '../marca/contraste.js';
 
 const p = (id, d) => ({ id, desviacion_pct: d });
@@ -73,13 +73,30 @@ test('nearest known analog site: real catalogue, sites without coordinates skipp
   const c = masCercano(75.25, -84.25, SITIOS);
   assert.equal(c.item.id, 'haughton');
   assert.ok(Math.abs(c.km - distanciaKm(75.25, -84.25, h.lat, h.lon)) < 1e-9);
-  assert.equal(lineaContexto(c, 15), `near ${h.nombre} — a known analog site (${Math.round(c.km)} km)`);
+  assert.deepEqual(h.cuerpo, ['moon']);
+  assert.equal(lineaContexto(c, 15), `near ${h.nombre} — a known Moon analog site (${Math.round(c.km)} km)`);
   assert.equal(masCercano(0, -150, SITIOS), null);
   assert.equal(lineaContexto(null, 15), 'not near any of the 15 analog sites in our catalogue');
   const lejos = { nombre: 'X', lat: 0, lon: 0 };
   assert.equal(masCercano(0, 300.01 / 111.195, [lejos]), null);
   assert.equal(masCercano(0, 299.9 / 111.195, [lejos]).item, lejos);
   assert.equal(masCercano(0, 0, [{ nombre: 'sin coordenadas', lat: null, lon: null }]), null);
+});
+
+test('the context line says which body the site is an analog for, from the catalogue field cuerpo', () => {
+  assert.equal(tipoAnalogo(['moon']), 'Moon analog site');
+  assert.equal(tipoAnalogo(['mars']), 'Mars analog site');
+  assert.equal(tipoAnalogo(['moon', 'mars']), 'Moon and Mars analog site');
+  assert.equal(tipoAnalogo(['mars', 'moon']), 'Moon and Mars analog site');
+  assert.equal(tipoAnalogo(null), 'analog site');
+  assert.equal(tipoAnalogo(undefined), 'analog site');
+  const linea = (id) => {
+    const s = SITIOS.find((x) => x.id === id);
+    return lineaContexto(masCercano(s.lat, s.lon, SITIOS), 15);
+  };
+  assert.equal(linea('yungay'), `near ${SITIOS.find((x) => x.id === 'yungay').nombre} — a known Mars analog site (0 km)`);
+  assert.equal(linea('lanzarote'), `near ${SITIOS.find((x) => x.id === 'lanzarote').nombre} — a known Moon and Mars analog site (0 km)`);
+  assert.equal(linea('mistastin'), `near ${SITIOS.find((x) => x.id === 'mistastin').nombre} — a known analog site (0 km)`);
 });
 
 test('partly compared sentence and the lunar terrain that holds the point', () => {
