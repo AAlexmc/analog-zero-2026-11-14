@@ -151,6 +151,12 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 .item-eq .est { color: var(--tenue); font-weight: 400; }
 .item-eq[aria-pressed=true] .est { color: var(--blanco); }
 .sello-propio { font: 700 11px var(--sans); border: 1px solid currentColor; border-radius: 999px; padding: 1px 6px; }
+.mision-eq { display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 2px solid var(--blanco); }
+.item-eq.sin-dim { border: 1px dashed var(--linea); }
+.limites-mision { display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
+.pend-mision { font-weight: 700; }
+.pend-mision.fuera, .rotulo-volumen, .supuesto-mision { color: var(--ambar); }
+.rotulo-volumen { font-weight: 700; font-size: 13px; }
 .aviso-plantar { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; padding: 7px 14px; border-radius: 999px; background: var(--blanco); color: var(--fondo); }
 .aviso-plantar .et { color: var(--prusia); }
 .aviso-plantar[hidden] { display: none; }

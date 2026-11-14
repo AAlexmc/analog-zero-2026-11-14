@@ -30,12 +30,12 @@ void main() { gl_FragColor = vec4(mix(uHorizonte, uArriba, smoothstep(0.0, 0.55,
 
 // Colores de web/marca/marca.css: blue yonder, blanco y deep blue.
 const AZUL_YONDER = 0x2e96f5, BLANCO = 0xffffff, AZUL_PROFUNDO = 0x07173f;
-const OJO_M = 2;
+export const OJO_M = 2;
 // Los sombreadores propios escriben el color tal cual: sin pasar el hex a espacio lineal.
 const colorTal = (hex) => new THREE.Color().setHex(hex, THREE.LinearSRGBColorSpace);
 
 const FS = /* glsl */`
-uniform sampler2D uAlt, uSombra, uCapa, uAgua;
+uniform sampler2D uAlt, uSombra, uCapa, uAgua, uImg;
 uniform float uN, uM, uGain, uAmb, uZmin, uZmax, uCurva, uRkm;
 uniform vec3 uSol;
 uniform int uModo, uCapaModo, uHayAgua;
@@ -73,6 +73,9 @@ void main() {
     float q = hv.r / uCurva;
     float w = fwidth(q);
     col = mix(col, BLA, 0.55 * (1.0 - smoothstep(0.0, 1.2 * w, abs(fract(q + 0.5) - 0.5))));
+  } else if (uModo == 3) {
+    // Imagen × luz del sol, con la misma ganancia que Relief: laderas al sol más claras, en sombra más oscuras pero no negras.
+    col = min(texture(uImg, vTc).rgb * (0.35 + 0.65 * luz * uGain), vec3(1.0));
   } else {
     float s = degrees(atan(length(vec2(gx, gz))));
     col = rampa(floor(min(s, 45.0) / 5.0) / 9.0) * (0.6 + 0.4 * sombreado);
@@ -108,7 +111,7 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-const MODOS = { relieve: 0, cota: 1, pendiente: 2 };
+const MODOS = { relieve: 0, cota: 1, pendiente: 2, satelite: 3 };
 
 function intervaloBonito(x) {
   const p = 10 ** Math.floor(Math.log10(x)), r = x / p;
@@ -157,11 +160,17 @@ export class Escena {
     this.tAgua.minFilter = this.tAgua.magFilter = THREE.LinearFilter;
     this.tAgua.unpackAlignment = 1;
     this.tAgua.needsUpdate = true;
+    // Imagen de la Tierra (GIBS) en los mismos nodos que la altura; sin ella, el modo Satellite no se ofrece.
+    this.imagen = datos.imagen ?? null;
+    const img = this.imagen;
+    this.tImg = new THREE.DataTexture(img ? new Uint8Array(img.buffer, img.byteOffset, img.length) : new Uint8Array(4), img ? n : 1, img ? n : 1, THREE.RGBAFormat, THREE.UnsignedByteType);
+    this.tImg.minFilter = this.tImg.magFilter = THREE.LinearFilter;
+    this.tImg.needsUpdate = true;
 
     const L = n * this.mkm;
     this.ladoKm = L;
     this.uniforms = {
-      uAlt: { value: this.tAlt }, uSombra: { value: this.tSombra }, uCapa: { value: this.tCapa }, uAgua: { value: this.tAgua }, uHayAgua: { value: agua ? 1 : 0 },
+      uAlt: { value: this.tAlt }, uSombra: { value: this.tSombra }, uCapa: { value: this.tCapa }, uAgua: { value: this.tAgua }, uHayAgua: { value: agua ? 1 : 0 }, uImg: { value: this.tImg },
       uLado: { value: L }, uZc: { value: this.zc }, uExag: { value: 1 },
       uN: { value: n }, uM: { value: this.m }, uGain: { value: 1 }, uAmb: { value: 0.03 },
       uZmin: { value: r.min }, uZmax: { value: r.max }, uCurva: { value: intervaloBonito(Math.max(r.max - r.min, 1) / 20) }, uRkm: { value: meta.georef.radio_m / 1000 },
@@ -351,8 +360,8 @@ export class Escena {
     return ((h - this.zc) / 1000) * this.exag;
   }
 
-  // Ojo a OJO_M sobre el suelo en (fila, col), mirando a `mirar` (fila, col) o al norte de la rejilla.
-  entrarSuelo({ fila, col, mirar = null }) {
+  // Ojo a OJO_M sobre el suelo en (fila, col), mirando a `mirar` (fila, col), al `rumbo` (grados) o al norte de la rejilla.
+  entrarSuelo({ fila, col, mirar = null, rumbo = null }) {
     const k = (this.n - 1) / 2;
     let x = (col - k) * this.mkm, z = (fila - k) * this.mkm;
     if (!Number.isFinite(this.alturaSuelo(x, z))) { x = 0; z = 0; }
@@ -372,7 +381,7 @@ export class Escena {
       if (this.conBruma) this.uniforms.uNieblaD.value.set(0.3, 12, 0.6);
     }
     const s = this.suelo;
-    s.x = x; s.z = z; s.yaw = 0; s.pitch = -0.05;
+    s.x = x; s.z = z; s.yaw = Number.isFinite(rumbo) ? rumbo * Math.PI / 180 : 0; s.pitch = -0.05;
     if (mirar) {
       const mx = (mirar.col - k) * this.mkm, mz = (mirar.fila - k) * this.mkm, d = Math.hypot(mx - x, mz - z);
       if (d > 1e-9) {

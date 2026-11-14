@@ -106,6 +106,25 @@ test('adapter: same shape as a catalogue terrain, local_aeqd georef, real source
   assert.match(s.meta.nombre, /24\.09° S.*69\.99° W/);
 });
 
+test('adapter keeps the GIBS image on the same nodes, with its credit and a plain note on its resolution', () => {
+  const n = 11, r = relieveDe(75.25, -84.25, n, 10, () => 50);
+  r.imagen = new Uint8ClampedArray(n * n * 4).map((_, i) => i % 251);
+  const t = terrenoDeRelieve(r, { lat: 75.25, lon: -84.25, nombre: null });
+  assert.equal(t.imagen.length, n * n * 4);
+  assert.deepEqual([...t.imagen], [...r.imagen]);
+  assert.notEqual(t.imagen, r.imagen, 'a copy, not the loader buffer');
+  assert.equal(t.meta.imagen.texto, 'Image: NASA Blue Marble (GIBS), low resolution: colours are real, detail is not');
+  assert.equal(t.meta.imagen.zoom, 8);
+  assert.ok(t.meta.creditos.some((c) => /^Imagery: NASA GIBS, Blue Marble/.test(c)));
+  assert.ok(t.meta.creditos.every((c) => CREDITOS_TIERRA.includes(c)));
+  assert.equal(Object.keys(t.meta.capas).join(), 'altura', 'the image is not a layer');
+  // Sin imagen (p. ej. un relieve sin ella): nada de imagen ni su crédito.
+  const s = terrenoDeRelieve({ ...r, imagen: null }, { lat: 75.25, lon: -84.25, nombre: null });
+  assert.equal(s.imagen, null);
+  assert.equal(s.meta.imagen, null);
+  assert.ok(!s.meta.creditos.some((c) => /^Imagery:/.test(c)));
+});
+
 test('adapter: row 0 is north, column 0 is west, the centre pixel is the place', () => {
   const n = 101, paso = 20, lat = 75.25, lon = -84.25;
   const r = relieveDe(lat, lon, n, paso, (x, y) => 100 + 0.1 * y);

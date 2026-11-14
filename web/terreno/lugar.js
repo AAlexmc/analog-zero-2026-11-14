@@ -55,6 +55,8 @@ function fuenteAltura(creditos) {
   return { linea, fuente: linea.replace(/^Elevation:\s*/, '').split(/,\s*https?:/)[0] || null, url: url || null };
 }
 
+export const TEXTO_IMAGEN = 'Image: NASA Blue Marble (GIBS), low resolution: colours are real, detail is not';
+
 // relieve: lo que devuelve cargarRelieve({ mundo: 'earth', … }). Mismos nodos: centro del píxel (f, c) = nodo (f, c).
 export function terrenoDeRelieve(relieve, { lat, lon, nombre }) {
   const { n, paso: m } = relieve;
@@ -65,6 +67,7 @@ export function terrenoDeRelieve(relieve, { lat, lon, nombre }) {
   const f = fuenteAltura(relieve.creditos);
   const zoom = relieve.teselas?.elevacion?.z ?? null;
   const fuentes = fuentesDeTeselas(relieve.teselas?.elevacion?.origenes);
+  const lineaImagen = relieve.imagen ? (relieve.creditos ?? []).find((t) => /^Imagery:/.test(t)) ?? null : null;
   const unica = fuentes.fuentes.length === 1 && !fuentes.sin_dato ? fuentes.fuentes[0].m : null;
   const meta = {
     id: idLugar({ lat, lon, lado_km }),
@@ -76,14 +79,16 @@ export function terrenoDeRelieve(relieve, { lat, lon, nombre }) {
     z_referencia: 'metres above sea level',
     georef: { tipo: 'local_aeqd', radio_m: relieve.R, x0_m: -k, y0_m: k },
     capas: { altura: { fichero: null, tipo: 'float32', unidad: 'm', fuente: f.fuente, url: f.url, resolucion_origen_m: unica } },
-    creditos: f.linea ? [f.linea] : [],
+    creditos: [lineaImagen, f.linea].filter(Boolean),
+    // web/relieve/ no declara la resolución de Blue Marble: sin cifra.
+    imagen: relieve.imagen ? { texto: TEXTO_IMAGEN, zoom: relieve.teselas?.imagen?.z ?? null, credito: lineaImagen } : null,
     muestreo: {
       m, zoom, pixel_tesela_m: zoom === null ? null : pixelTesela(lat, zoom),
       teselas: relieve.teselas?.elevacion?.n ?? null, descarga_bytes: relieve.descarga_bytes ?? null, fuentes,
     },
     dinamico: true,
   };
-  return { meta, altura, bytesAltura: new Uint8Array(altura.buffer), capas: {}, notas: [] };
+  return { meta, altura, bytesAltura: new Uint8Array(altura.buffer), capas: {}, notas: [], imagen: relieve.imagen ? Uint8ClampedArray.from(relieve.imagen) : null };
 }
 
 // Fuente de cada tesela: cabecera x-amz-meta-x-imagery-sources del servidor de teselas. Solo prefijos vistos en teselas

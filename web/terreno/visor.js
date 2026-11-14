@@ -7,18 +7,22 @@ import { aplicarToque, pasoMetros } from './pincel.js';
 import { Historial } from './historial.js';
 import { estadisticas, exportarRetoque, importarRetoque } from './retoque.js';
 import { sha256Hex } from './sha256.js';
-import { alturaBilineal } from './calculo.js';
+import { alturaBilineal, rumboHorizonte } from './calculo.js';
 import { crearRutas } from './panel_rutas.js';
 import { crearObra } from './panel_obra.js';
 import { crearVolatiles } from './panel_volatiles.js';
 import { crearBase } from './panel_base.js';
-import { crearCerca, capaModelos } from './modelo3d.js';
+import { crearCerca, capaModelos, catalogoModelos, medidaTexto } from './modelo3d.js';
+import { volumenPublicado } from './modelos_generados.js';
+import { PREFIJO, equiposDeMision, formaPublicada, medidaForma, sustitutoDe, limitesDe, textoPendiente } from './equipo_mision.js';
 import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM } from './lugar.js';
 
 const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
 const LUGAR = EJEMPLO ? null : leerLugar(location.search);
 const ID_LUGAR = LUGAR ? idLugar(LUGAR) : null;
+const MISION = qs.get('mision');
+const MES = qs.get('mes');
 const CLAVE = (id) => `analog-zero.retouch.${id}`;
 const CLAVE_PLANTADO = (id) => `analog-zero.planted.${id}`;
 const CUERPO = { luna: 'Moon', tierra: 'Earth', marte: 'Mars' };
@@ -150,6 +154,7 @@ function rellenarTarjeta(p, datos) {
       <div><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
     </div>
     ${m.dinamico ? `<div class="muestreo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
+    ${m.imagen ? `<div class="fuente" data-imagen>${esc(m.imagen.texto)}</div>` : ''}
     <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico ? ' · built live in your browser, not stored' : ''}</div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
     ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
@@ -182,10 +187,16 @@ function selectorVentana(p) {
 function puntoSuelo(p) {
   const e = p.escena, k = (e.n - 1) / 2;
   const it = p.plantados?.buscar(p.sel) ?? p.plantados?.lista.at(-1) ?? null;
-  if (!it) return { fila: k, col: k, mirar: null };
+  // Lugar de la Tierra sin nada plantado: mirando hacia donde más sube el terreno en la ventana.
+  if (!it) return { fila: k, col: k, mirar: null, rumbo: e.meta.dinamico ? rumboHorizonte(e.mostradas, e.n, e.m, k, k)?.rumbo_deg ?? null : null };
   const tam = p.modelos?.instancias().find((x) => x.uid === it.uid)?.tam;
   const d_m = Math.min(60, Math.max(10, 3 * Math.max(...(tam ?? [5]))));
   const sur = it.fila + d_m / e.m;
+  // Volumen de una misión: desde el suroeste, para ver una cara al sol (por defecto del noroeste) y otra en sombra.
+  if (equipoMisionDe(it.equipo)) {
+    const q = d_m / e.m / Math.SQRT2;
+    return { fila: Math.min(e.n - 1, it.fila + q), col: Math.max(0, it.col - q), mirar: { fila: it.fila, col: it.col } };
+  }
   return { fila: sur <= e.n - 1 ? sur : it.fila - d_m / e.m, col: it.col, mirar: { fila: it.fila, col: it.col } };
 }
 
@@ -193,9 +204,11 @@ function alternarSuelo(p, forzar) {
   const e = p.escena;
   if (!e) return;
   const si = forzar ?? !e.suelo;
+  let pt = null;
   if (si) {
     elegirHerramienta(p, 'navegar');
-    if (!e.entrarSuelo(puntoSuelo(p))) { nota(p, 'ground view: no elevation data at this point'); return; }
+    pt = puntoSuelo(p);
+    if (!e.entrarSuelo(pt)) { nota(p, 'ground view: no elevation data at this point'); return; }
     estado.sueloActivo = p;
     // La hoja del equipo taparía la vista: se cierra (se reabre pulsando su marca).
     if (p.sel !== null) { p.sel = null; refrescarPlantado(); }
@@ -208,7 +221,7 @@ function alternarSuelo(p, forzar) {
   pild.hidden = !si;
   if (si) {
     const s = e.estadoSuelo();
-    pild.textContent = `Ground view · eye ${s.ojo_m.toFixed(1)} m above the ground · vertical 1× (true scale) · ${e.conBruma ? 'light haze added for depth (own choice)' : 'no haze: no air'}`;
+    pild.textContent = `Ground view · eye ${s.ojo_m.toFixed(1)} m above the ground · vertical 1× (true scale) · ${e.conBruma ? 'light haze added for depth (own choice)' : 'no haze: no air'}${Number.isFinite(pt?.rumbo) ? ` · facing ${Math.round(pt.rumbo)}°, where the land rises most in this window` : ''}`;
   }
 }
 
@@ -235,7 +248,7 @@ function crearMandos(p) {
     <div class="fila"><span class="et">Colour</span>
       <button type="button" data-modo="relieve" aria-pressed="true">Relief</button>
       <button type="button" data-modo="cota" aria-pressed="false">Elevation</button>
-      <button type="button" data-modo="pendiente" aria-pressed="false">Slope</button></div>
+      <button type="button" data-modo="pendiente" aria-pressed="false">Slope</button>${p.escena.imagen ? '<button type="button" data-modo="satelite" aria-pressed="false">Satellite</button>' : ''}</div>
     ${capas.length ? `<div class="fila"><span class="et">Layer</span>
       <button type="button" data-capa="" aria-pressed="true">None</button>
       ${capas.map((k) => `<button type="button" data-capa="${esc(k)}" aria-pressed="false">${esc(NOMBRE_CAPA[k] ?? k)}</button>`).join('')}</div>` : ''}
@@ -244,6 +257,12 @@ function crearMandos(p) {
       ${polar && luna ? '<button type="button" data-a="dia" aria-pressed="false" title="Sweeps the subsolar longitude through 360° in 20 s at the current elevation">Lunar day ▶</button>' : ''}</div>
     <div class="leyenda"></div>`;
   p.modo = 'relieve'; p.capa = null; p.rangoCapa = null;
+  // «Generate simulation» (&vista=suelo) entra con el color real de la imagen.
+  if (p.escena.imagen && qs.get('vista') === 'suelo') {
+    p.modo = 'satelite';
+    p.escena.setModo('satelite');
+    el.querySelectorAll('[data-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.modo === 'satelite')));
+  }
   el.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => {
     p.modo = b.dataset.modo;
     el.querySelectorAll('[data-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
@@ -288,7 +307,9 @@ const esBinaria = (nombre, c) => nombre === 'sombra_permanente' || (c.tipo === '
 
 function leyenda(p) {
   const e = p.escena, partes = [];
-  if (p.modo === 'relieve') {
+  if (p.modo === 'satelite') {
+    partes.push(`<span class="et" data-leyenda="satelite">Satellite · NASA Blue Marble colour × light from the sun above, on the real elevation · cast shadows computed from the DEM · nothing added</span>`);
+  } else if (p.modo === 'relieve') {
     partes.push(`<span class="et">Relief · cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span>`);
   } else if (p.modo === 'cota') {
     partes.push(`<span class="et">Elevation · contours every ${e.uniforms.uCurva.value} m</span><div class="bar" style="background:${RAMPA_BASE}"></div>
@@ -582,13 +603,14 @@ const LECTURA = { reproducido: 'reproduced here', infra: 'under-tested here', so
 const FACTOR = { vacio: 'Vacuum', polvo: 'Dust', gravedad: 'Gravity' };
 
 const equipoDe = (id) => estado.catalogo?.equipos?.find((q) => q.id === id) ?? null;
-const nombreCorto = (id) => { const q = equipoDe(id); return q ? q.nombre.replace(/\s*\(.*\)\s*$/, '') : id; };
+const equipoMisionDe = (id) => (typeof id === 'string' && id.startsWith(PREFIJO) ? estado.mision?.equipos.find((q) => PREFIJO + q.id === id) ?? null : null);
+const nombreCorto = (id) => { const q = equipoDe(id) ?? equipoMisionDe(id); return q ? q.nombre.replace(/\s*\(.*\)\s*$/, '') : id; };
 const hostDe = (u) => { try { return new URL(u).hostname; } catch { return 'source'; } };
 
-function fuenteYCita(x) {
+function fuenteYCita(x, rotulo = null) {
   if (!x?.fuente) return '<span class="tenue">no source</span>';
   const u = urlSegura(x.fuente);
-  const enl = u ? `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(x.cita ? `“${x.cita}”` : x.fuente)}">${esc(hostDe(u))}</a>` : esc(x.fuente);
+  const enl = u ? `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(x.cita ? `“${x.cita}”` : x.fuente)}">${esc(rotulo ?? hostDe(u))}</a>` : esc(x.fuente);
   const sinVer = x.verificado === true ? '' : ' <span class="tenue">(quote not verified)</span>';
   return x.cita ? `<details class="cita"><summary>${enl} <span class="ver-cita">quote</span>${sinVer}</summary><q>${esc(x.cita)}</q></details>` : `${enl}${sinVer}`;
 }
@@ -596,7 +618,7 @@ function fuenteYCita(x) {
 function crearEquipo(p) {
   const e = p.escena;
   p.plantados = new Plantados(e.n);
-  p.modelos = capaModelos(e, p.el.querySelector('.lienzo'));
+  p.modelos = capaModelos(e, p.el.querySelector('.lienzo'), modeloMision);
   const btn = p.el.querySelector('.ver-paleta');
   btn.disabled = false;
   btn.addEventListener('click', () => {
@@ -605,6 +627,7 @@ function crearEquipo(p) {
     btn.setAttribute('aria-pressed', String(!pal.hidden));
   });
   pintarPaleta(p);
+  paletaMision(p);
   const cv = e.renderer.domElement;
   cv.addEventListener('pointerdown', (ev) => {
     if (!p.plantar || ev.button !== 0) return;
@@ -613,7 +636,14 @@ function crearEquipo(p) {
     if (!g) return;
     const id = p.plantar;
     modoPlantar(p, null);
-    plantarEn(p, id, g.fila, g.col);
+    const item = plantarEn(p, id, g.fila, g.col);
+    // Equipo de la misión plantado a ras de suelo: la cámara se pone a unos metros, mirándolo, con su ficha abierta.
+    if (e.suelo && equipoMisionDe(id)) {
+      p.modelos.sincronizar(p.plantados.lista);
+      alternarSuelo(p, true);
+      p.sel = item.uid;
+      refrescarPlantado();
+    }
   }, { capture: true });
   restaurarPlantado(p);
 }
@@ -648,7 +678,7 @@ function modoPlantar(p, id) {
   p.plantar = id;
   if (id) elegirHerramienta(p, 'navegar');
   p.el.classList.toggle('plantando', !!id);
-  p.el.querySelectorAll('[data-eq]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.eq === id)));
+  p.el.querySelectorAll('[data-eq], [data-eqm]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.eq ?? PREFIJO + b.dataset.eqm) === id)));
   const av = p.el.querySelector('.aviso-plantar');
   av.hidden = !id;
   if (id) {
@@ -790,7 +820,12 @@ function pintarHoja(p) {
   const item = p.plantados.buscar(p.sel);
   if (!item) { hoja.hidden = true; hoja.innerHTML = ''; return; }
   const e = p.escena, eq = equipoDe(item.equipo);
-  if (!eq) { hoja.hidden = true; return; }
+  if (!eq) {
+    const q = equipoMisionDe(item.equipo);
+    hoja.hidden = !q;
+    if (q) pintarHojaMision(p, hoja, item, q);
+    return;
+  }
   const l = e.leer(item.fila, item.col), cota = e.mostradas[item.fila * e.n + item.col], retocada = e.delta[item.fila * e.n + item.col] !== 0;
   const med = medidasDe(p, item), evs = evaluarEquipo(eq, med);
   const h = p.marcas.get(item.uid)?.h;
@@ -818,6 +853,88 @@ function pintarHoja(p) {
   (p.cerca ??= crearCerca()).montar(hoja.querySelector('.cerca'), { eq, pendiente: med.pendiente_deg, huella: h });
   p.obra?.hoja(hoja.querySelector('.obra-pad'), item, eq);
   p.volatiles?.hoja(hoja.querySelector('.vol-hoja'), item, eq);
+}
+
+// ---------- Equipo de la misión (&mision=) ----------
+// Catálogo web/data/equipo_mision.json; si falta, está roto o la misión no tiene equipos, la paleta queda como siempre.
+async function cargarMision() {
+  if (!MISION) return null;
+  try {
+    const [cat, mod] = await Promise.all([cargarCatalogo('equipo_mision.json'), catalogoModelos()]);
+    const equipos = equiposDeMision(cat, MISION).map((q) => ({ ...q, forma: formaPublicada(q), sustituto: sustitutoDe(q, mod.lista) }));
+    return equipos.length ? { id: MISION, equipos } : null;
+  } catch { return null; }
+}
+
+const volumenes = new Map();
+function modeloMision(id) {
+  const q = equipoMisionDe(id);
+  if (!q) return null;
+  if (q.sustituto) return { fichero: q.sustituto.modelo.fichero };
+  if (!q.forma.forma) return null;
+  if (!volumenes.has(id)) volumenes.set(id, { generado: { ...volumenPublicado(q.forma), clase: 'volumen' } });
+  return volumenes.get(id);
+}
+
+const enPanelMision = (p) => !!estado.mision && p.escena?.meta.cuerpo === 'tierra';
+const motivoSinForma = (f) => `${f.motivo}${f.citas.length && f.falta?.length ? ` (no ${f.falta.join(' or ')})` : ''}`;
+
+// Límites publicados con su cita; la pendiente se compara con la de la celda (sin veredictos por mes: eso va en Calendar).
+function fichaLimites(q, pend, m, donde) {
+  const lim = limitesDe(q);
+  if (!lim.length) return '';
+  return `<div class="limites-mision" data-limites="${esc(q.id)}"><div class="et">Published limits</div>${lim.map((l) => {
+    const t = l.parametro === 'pendiente_grados' && l.unidad === 'deg' ? textoPendiente(pend, l, m) : null;
+    return `<div class="lim"><span class="num">${esc(l.texto)}</span> · ${fuenteYCita(l, 'source')}${l.nota ? `<div class="tenue">${esc(l.nota)}</div>` : ''}
+      ${t ? `<div class="pend-mision ${t.estado}" data-pendiente="${t.estado}">${esc(t.texto)}${donde ? ` · ${esc(donde)}` : ''}</div>` : ''}</div>`;
+  }).join('')}${MES ? '<div class="tenue">Month-by-month verdicts are in the Calendar tab of the results, not here.</div>' : ''}</div>`;
+}
+
+function seccionMision(p) {
+  if (!enPanelMision(p)) return '';
+  const e = p.escena, k = (e.n - 1) / 2, pendCentro = e.leer(k, k).pendiente;
+  return `<section class="mision-eq" data-mision="${esc(estado.mision.id)}"><div class="et clase">Equipment of this mission</div>
+    ${estado.mision.equipos.some((q) => q.sustituto || q.forma.forma) ? '<div class="et">Pick one, then click the terrain</div>' : ''}
+    ${estado.mision.equipos.map((q) => {
+      const f = q.forma, s = q.sustituto;
+      if (s || f.forma) {
+        const est = s ? `${s.modelo.nombre_real} model in its place` : `${f.forma === 'domo' ? 'dome' : 'box'} ${medidaTexto(medidaForma(f))} · published size`;
+        return `<button type="button" class="item-eq" data-eqm="${esc(q.id)}" aria-pressed="false"><span class="nom">${esc(q.nombre)}</span><span class="est">${esc(est)}</span></button>`;
+      }
+      return `<div class="item-eq sin-dim" data-eqm-sin="${esc(q.id)}"><span class="nom">${esc(q.nombre)}</span><span class="est">${esc(motivoSinForma(f))}</span>
+        ${fichaLimites(q, pendCentro, e.m, 'at the centre of the window (your place)')}</div>`;
+    }).join('')}</section>`;
+}
+
+// Primero en la paleta, antes del equipo lunar.
+function paletaMision(p) {
+  const sec = seccionMision(p);
+  if (!sec) return;
+  const pal = p.el.querySelector('.paleta');
+  pal.insertAdjacentHTML('afterbegin', sec);
+  pal.querySelectorAll('[data-eqm]').forEach((b) => b.addEventListener('click', () => { const id = PREFIJO + b.dataset.eqm; modoPlantar(p, p.plantar === id ? null : id); }));
+}
+
+function pintarHojaMision(p, hoja, item, q) {
+  const e = p.escena, l = e.leer(item.fila, item.col), f = q.forma, s = q.sustituto;
+  const forma = s
+    ? `<div class="rotulo-volumen" data-volumen="sustituto">${esc(s.rotulo)} · ${fuenteYCita(s.cita, 'source')}</div>
+      <div><span class="num">${esc(medidaTexto(s.modelo.medida_m))}</span> <span class="tenue">(length × width × height of the 3D model) · Credit: NASA${urlSegura(s.modelo.fuente_url) ? ` · <a href="${esc(s.modelo.fuente_url)}" target="_blank" rel="noopener">model source</a>` : ''}</span></div>
+      ${f.forma ? '' : `<div class="tenue">${esc(q.nombre)}: ${esc(motivoSinForma(f))}</div>`}`
+    : `<div class="rotulo-volumen" data-volumen="${esc(f.forma)}">${esc(f.rotulo)}</div>
+      <div><span class="num">${esc(medidaTexto(medidaForma(f)))}</span> <span class="tenue">(${f.forma === 'domo' ? 'diameter × diameter × height' : 'length × width × height'})</span></div>
+      ${f.citas.map((c) => `<div class="dim">${esc(c.etiqueta)} <span class="num">${esc(c.valor)} ${esc(c.unidad)}${c.unidad === 'm' ? '' : ` (${c.m.toFixed(2)} m)`}</span> · ${fuenteYCita(c, 'source')}${c.nota ? ` <span class="tenue">${esc(c.nota)}</span>` : ''}</div>`).join('')}
+      ${f.supuesto ? `<div class="supuesto-mision">${esc(f.supuesto)}</div>` : ''}`;
+  hoja.innerHTML = `
+    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
+    <h3>${esc(q.nombre)}</h3>
+    <div class="tenue">Equipment of this mission${q.campana ? ` · ${esc(q.campana)}` : ''}</div>
+    <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(l.cota, 1)} m · cell ${item.fila},${item.col}</div>
+    ${forma}
+    <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
+    ${fichaLimites(q, l.pendiente, e.m, null) || '<div class="tenue">No published operating limits in the catalogue.</div>'}`;
+  hoja.querySelector('[data-a=cerrar]').addEventListener('click', () => { p.sel = null; refrescarPlantado(); });
+  hoja.querySelector('[data-a=quitar]').addEventListener('click', () => quitarPlantado(p, item.uid));
 }
 
 function comparacion(p, item, eq, evs) {
@@ -860,7 +977,7 @@ function guardarPlantado(p) {
 }
 
 function leerPlantado(p, arr) {
-  const ids = new Set((estado.catalogo?.equipos ?? []).map((q) => q.id));
+  const ids = new Set([...(estado.catalogo?.equipos ?? []).map((q) => q.id), ...(estado.mision?.equipos ?? []).map((q) => PREFIJO + q.id)]);
   const r = deJSON(arr, { n: p.escena.n, ids });
   for (const m of p.marcas.values()) { m.d.remove(); m.poli.remove(); }
   p.marcas.clear();
@@ -1004,6 +1121,7 @@ async function iniciar() {
   try {
     [estado.catalogo, estado.constantes] = await Promise.all([cargarCatalogo('equipo.json'), cargarCatalogo('constantes.json')]);
   } catch (e) { estado.errCatalogo = e.message; }
+  estado.mision = await cargarMision();
   const pa = crearPanel('a'), pb = crearPanel('b');
   estado.paneles.push(pa, pb);
   pa.id = sel.a; pb.id = sel.b;

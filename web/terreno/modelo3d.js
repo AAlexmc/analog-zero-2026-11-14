@@ -273,7 +273,8 @@ export function crearCerca() {
 }
 
 // ---------- Capa sobre el terreno ----------
-export function capaModelos(escena, lienzo) {
+// extra(equipo) (opcional) → {fichero} o {generado: {base, tam, clase}} para equipo que no está en el catálogo (misiones).
+export function capaModelos(escena, lienzo, extra = null) {
   const grupo = new THREE.Group();
   const sol = new THREE.DirectionalLight(0xffffff, 2.2);
   escena.escena.add(grupo, new THREE.HemisphereLight(0xdfe8f0, 0x30363d, 2), sol, sol.target);
@@ -293,9 +294,10 @@ export function capaModelos(escena, lienzo) {
     const fallos = new Set(), clases = new Set();
     let hay = 0, cargando = 0, cambio = false, topados = 0;
     for (const it of lista) {
-      const m = modeloDe(cat.lista, it.equipo);
-      const eq = cat.lista && !m ? cat.equipos?.find((q) => q.id === it.equipo) : null;
-      const g = eq ? generadoDe(eq, cat.conceptos) : null;
+      const ex = extra?.(it.equipo) ?? null;
+      const m = ex ? (ex.fichero ? { fichero: ex.fichero } : null) : modeloDe(cat.lista, it.equipo);
+      const eq = !ex && cat.lista && !m ? cat.equipos?.find((q) => q.id === it.equipo) : null;
+      const g = ex ? ex.generado ?? null : eq ? generadoDe(eq, cat.conceptos) : null;
       if (!m && !g?.base) continue;
       hay++;
       if (g) clases.add(g.clase);
@@ -334,6 +336,7 @@ export function capaModelos(escena, lienzo) {
     if (hay) partes.push(factor === 1 ? '3D models ×1, true scale' : `3D models ×${factor}${topados ? ' (items over 4 m enlarged less)' : ''}, not to scale · outlines are true size`);
     if (clases.has('esquematico')) partes.push('schematics: built from published dimensions');
     if (clases.has('concepto')) partes.push('concepts: own design');
+    if (clases.has('volumen')) partes.push('boxes and domes: published size, not the real shape');
     if (cargando) partes.push('loading 3D model…');
     for (const f of fallos) partes.push(`3D model failed to load: ${f}`);
     if (lista.length && cat.error) partes.push(cat.error);

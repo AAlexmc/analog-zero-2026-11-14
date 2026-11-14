@@ -39,6 +39,26 @@ export function pendienteGrados(a, n, m, f, c) {
   return Math.atan(Math.hypot(gx, gy)) / RAD;
 }
 
+// Rumbo (grados desde arriba de la rejilla, horario) en el que el terreno sube más sobre el suelo de (f, c), en ángulo
+// visto desde ahí hasta el borde de la rejilla. Empate → el primero (norte). null sin dato bajo el punto.
+export function rumboHorizonte(a, n, m, f, c, pasos = 72) {
+  const h0 = alturaBilineal(a, n, f, c);
+  if (!Number.isFinite(h0)) return null;
+  let mejor = null;
+  for (let k = 0; k < pasos; k++) {
+    const az = (360 * k) / pasos, dc = Math.sin(az * RAD), df = -Math.cos(az * RAD);
+    let ang = -Infinity;
+    for (let d = 1; ; d++) {
+      const ff = f + df * d, cc = c + dc * d;
+      if (ff < 0 || cc < 0 || ff > n - 1 || cc > n - 1) break;
+      const h = alturaBilineal(a, n, ff, cc);
+      if (Number.isFinite(h)) ang = Math.max(ang, Math.atan2(h - h0, d * m));
+    }
+    if (ang > -Infinity && (!mejor || ang > mejor.a + 1e-12)) mejor = { a: ang, rumbo_deg: az };
+  }
+  return mejor && { rumbo_deg: mejor.rumbo_deg, angulo_deg: mejor.a / RAD };
+}
+
 // Alturas sobre el plano tangente en el centro del recorte: h − r²/(2R). Ahí un rayo de sol es una recta.
 export function sobrePlanoTangente(a, n, m, R) {
   const out = new Float32Array(n * n), k = (n - 1) / 2, q = (m * m) / (2 * R);

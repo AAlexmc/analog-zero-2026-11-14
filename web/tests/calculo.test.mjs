@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { rango, pendienteGrados, alturaBilineal, sombras, sobrePlanoTangente, intersectarRayo, pixelAMundo } from '../terreno/calculo.js';
+import { rango, pendienteGrados, alturaBilineal, sombras, sobrePlanoTangente, intersectarRayo, pixelAMundo, rumboHorizonte } from '../terreno/calculo.js';
 
 const RAD = Math.PI / 180;
 const cerca = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg ?? ''} ${a} vs ${b}`);
@@ -171,4 +171,25 @@ test('bilinear height on an exact valid cell next to a NaN row is that cell, not
   assert.equal(alturaBilineal(a, n, 9, 20.5), 100);
   assert.ok(Number.isNaN(alturaBilineal(a, n, 9.4, 20)), 'a NaN neighbour with weight > 0 still gives NaN');
   assert.ok(Number.isNaN(alturaBilineal(a, n, 10, 20)));
+});
+
+test('ground view heading: the bearing where the terrain rises most above the ground under the eye', () => {
+  const n = 101, m = 10, k = 50;
+  // Llano con una loma al este (columnas altas): el horizonte más alto está a 90°.
+  const a = new Float32Array(n * n).fill(100);
+  for (let f = 0; f < n; f++) for (let c = 80; c < n; c++) a[f * n + c] = 160;
+  const r = rumboHorizonte(a, n, m, k, k, 72);
+  assert.equal(r.rumbo_deg, 90);
+  cerca(r.angulo_deg, Math.atan2(60, 30 * m) / RAD, 1e-6, 'angle to the near edge of the hill');
+  // La misma loma al suroeste: 225°.
+  const b = new Float32Array(n * n).fill(100);
+  for (let f = 0; f < n; f++) for (let c = 0; c < n; c++) if (f - k > 20 && k - c > 20) b[f * n + c] = 160;
+  assert.equal(rumboHorizonte(b, n, m, k, k, 72).rumbo_deg, 225);
+  // Llano: todos iguales (también los rayos más largos de las diagonales) → el primero (norte); sin dato bajo el ojo → null; NaN en el camino no cuenta.
+  assert.equal(rumboHorizonte(new Float32Array(n * n).fill(5), n, m, k, k).rumbo_deg, 0);
+  const c = Float32Array.from(a); c[k * n + k] = NaN;
+  assert.equal(rumboHorizonte(c, n, m, k, k), null);
+  const d = Float32Array.from(a);
+  for (let f = 0; f < n; f++) d[f * n + 90] = NaN;
+  assert.equal(rumboHorizonte(d, n, m, k, k).rumbo_deg, 90);
 });

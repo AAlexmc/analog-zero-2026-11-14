@@ -343,6 +343,24 @@ function asentar(g) {
   return { base, tam, medida: [tam.x, tam.z, tam.y] };
 }
 
+// Volumen del equipo de una misión a su tamaño publicado (equipo_mision.js, formaPublicada): caja o domo (casquete de esfera).
+// Colores de web/marca/marca.css: blue yonder y blanco.
+export function volumenPublicado(f) {
+  let geo;
+  if (f.forma === 'domo') {
+    const r = f.diametro_m / 2, h = f.alto_m, R = (r * r + h * h) / (2 * h);
+    // Más alto que media esfera: un casquete se saldría del diámetro publicado; media esfera estirada en vertical.
+    geo = h <= r ? new THREE.SphereGeometry(R, 48, 24, 0, 2 * Math.PI, 0, Math.acos((R - h) / R)).translate(0, h - R, 0)
+      : new THREE.SphereGeometry(r, 48, 24, 0, 2 * Math.PI, 0, Math.PI / 2).scale(1, h / r, 1);
+  } else geo = new THREE.BoxGeometry(f.largo_m, f.alto_m, f.ancho_m).translate(0, f.alto_m / 2, 0);
+  const malla = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x2e96f5, roughness: 0.8, metalness: 0.05 }));
+  malla.name = f.forma;
+  malla.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), new THREE.LineBasicMaterial({ color: 0xffffff })));
+  const g = new THREE.Group();
+  g.add(malla);
+  return asentar(g);
+}
+
 const sinModelo = (id, clase, linea) => ({ id, clase, aEscala: false, base: null, tam: null, medida: null, titulo: ROTULO[clase], linea, citadas: [], ilustrativas: [], supuestas: [] });
 
 export function validarConceptos(obj) {

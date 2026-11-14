@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
-import { ESQUEMAS, CONSTRUCTORES_CONCEPTO, ROTULO, SIN_ESCALA, construirEsquematico, construirConcepto, validarConceptos, generadoDe } from '../terreno/modelos_generados.js';
+import { ESQUEMAS, CONSTRUCTORES_CONCEPTO, ROTULO, SIN_ESCALA, construirEsquematico, construirConcepto, validarConceptos, generadoDe, volumenPublicado } from '../terreno/modelos_generados.js';
 
 const DATA = fileURLToPath(new URL('../data/', import.meta.url));
 const conceptos = JSON.parse(readFileSync(`${DATA}conceptos.json`, 'utf8'));
@@ -239,5 +239,18 @@ test('in-progress catalogue source (datos_json/equipo.json), if it parses: same 
     if (!r.aEscala) continue;
     comprobarCitadas(eq, r);
     comprobarCoherencia(eq, r);
+  }
+});
+
+test('mission volumes: the box and the dome measure exactly the published sizes, standing on y = 0', () => {
+  const caja = volumenPublicado({ forma: 'caja', largo_m: 2.9, ancho_m: 1.9, alto_m: 2 });
+  caja.medida.forEach((v, i) => assert.ok(Math.abs(v - [2.9, 1.9, 2][i]) < 1e-6, `box ${caja.medida}`));
+  const b = new THREE.Box3().setFromObject(caja.base);
+  assert.ok(Math.abs(b.min.y) < 1e-9);
+  const D = 36 * 0.3048;
+  for (const h of [D / 2, 3, 8]) {
+    const d = volumenPublicado({ forma: 'domo', diametro_m: D, alto_m: h });
+    assert.ok(Math.abs(d.tam.x - D) < 1e-6 && Math.abs(d.tam.z - D) < 1e-6 && Math.abs(d.tam.y - h) < 1e-6, `dome ${h}: ${d.tam.toArray()}`);
+    assert.equal(d.base.children[0].children[0].name, 'domo');
   }
 });
