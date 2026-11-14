@@ -124,8 +124,11 @@ test('map painting: sea transparent, land not compared → deep blue, min → el
 
 // Formato elegido: como mucho 4 decimales (≈ 11 m), sin ceros de cola ni ruido de coma flotante; −0 sale «0».
 test('NASA Worldview link: ±2° box lonMin,latMin,lonMax,latMax, clipped to ±180/±90, at most 4 decimals', async () => {
-  const { enlaceWorldview } = await import('../analogos/metricas.js');
+  const { enlaceWorldview: enlace, CAPAS_WORLDVIEW } = await import('../analogos/metricas.js');
   const W = 'https://worldview.earthdata.nasa.gov/?v=';
+  const L = `&l=${CAPAS_WORLDVIEW}`;
+  assert.equal(CAPAS_WORLDVIEW, 'Reference_Labels_15m,Coastlines_15m,BlueMarble_NextGeneration');
+  const enlaceWorldview = (la, lo) => { const u = enlace(la, lo); if (u === null) return null; assert.ok(u.endsWith(L), u); return u.slice(0, -L.length); };
   assert.equal(enlaceWorldview(18.38, 77.58), `${W}75.58,16.38,79.58,20.38`);
   assert.equal(enlaceWorldview(1.1, 4.35), `${W}2.35,-0.9,6.35,3.1`);
   assert.equal(enlaceWorldview(-4.35, 0), `${W}-2,-6.35,2,-2.35`);
@@ -137,7 +140,9 @@ test('NASA Worldview link: ±2° box lonMin,latMin,lonMax,latMax, clipped to ±1
   assert.equal(enlaceWorldview(0, -179), `${W}-180,-2,-177,2`);
   for (const [la, lo] of [[NaN, 0], [0, NaN], [Infinity, 0], [0, -Infinity], [null, 0], [0, undefined], ['10', 0]]) assert.equal(enlaceWorldview(la, lo), null, `${la},${lo}`);
   for (const [la, lo] of [[18.38, 77.58], [-89.68643, -162.9371], [89.9, -179.9], [-33.33, 151.2]]) {
-    const u = new URL(enlaceWorldview(la, lo));
+    const u = new URL(enlace(la, lo));
+    assert.equal(u.searchParams.get('l'), CAPAS_WORLDVIEW);
+    assert.deepEqual([...u.searchParams.keys()], ['v', 'l']);
     assert.equal(u.protocol, 'https:');
     assert.equal(u.host, 'worldview.earthdata.nasa.gov');
     const v = u.searchParams.get('v').split(',').map(Number);

@@ -77,10 +77,12 @@ export function masCercano(lat, lon, lista, maxKm = RADIO_CONTEXTO_KM, R = RADIO
 }
 
 // NASA Worldview centrado en el lugar: v=lonMin,latMin,lonMax,latMax, ±2° recortado a ±180/±90, 4 decimales sin ceros de cola.
+// Capas fijas (Blue Marble, costas, nombres): con las de por defecto se abre la imagen del día, negra en noche polar o tapada de nubes.
+export const CAPAS_WORLDVIEW = 'Reference_Labels_15m,Coastlines_15m,BlueMarble_NextGeneration';
 export function enlaceWorldview(lat, lon, margen = 2) {
   if (!finito(lat) || !finito(lon)) return null;
   const c = (v, tope) => String(Number(Math.max(-tope, Math.min(tope, v)).toFixed(4)));
-  return `https://worldview.earthdata.nasa.gov/?v=${[c(lon - margen, 180), c(lat - margen, 90), c(lon + margen, 180), c(lat + margen, 90)].join(',')}`;
+  return `https://worldview.earthdata.nasa.gov/?v=${[c(lon - margen, 180), c(lat - margen, 90), c(lon + margen, 180), c(lat + margen, 90)].join(',')}&l=${CAPAS_WORLDVIEW}`;
 }
 
 export const sitiosConCoordenadas = (sitios) => (sitios ?? []).filter((s) => finito(s?.lat) && finito(s?.lon)).length;
