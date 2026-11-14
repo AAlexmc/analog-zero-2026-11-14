@@ -881,7 +881,7 @@
           "coordenadas_fuente": {
             "fuente": "https://en.wikipedia.org/wiki/Askja",
             "cita": "65°01′59″N 16°46′59″W / 65.033°N 16.783°W",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2019",
           "fuente": "https://ntrs.nasa.gov/citations/20240009232",
@@ -1084,7 +1084,7 @@
           "coordenadas_fuente": {
             "fuente": "https://en.wikipedia.org/wiki/Valentine_Cave",
             "cita": "41°42′33″N 121°28′40″W / 41.70925°N 121.47778°W",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2018",
           "fuente": "https://ntrs.nasa.gov/citations/20190029009",
@@ -1302,7 +1302,7 @@
           "valor_texto": null,
           "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6442238/fullTextXML",
           "cita": "how microbial communities and habitability correlate with physical and geochemical characteristics of chemically altered basalt environments in Mars-analog terrestrial sites",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "litologia_glim"
           ],
@@ -1453,7 +1453,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "ndvi_max"
           ],
@@ -1467,7 +1467,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "t_media_k",
             "t_min_k"
@@ -1482,7 +1482,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "tiempo_ciudad_h"
           ],
@@ -1523,7 +1523,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "located at the Haughton meteorite impact crater",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "relieve_m"
           ],
@@ -1537,7 +1537,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "ndvi_max"
           ],
@@ -1567,7 +1567,7 @@
           "anos": "2022",
           "fuente": "https://www.nasa.gov/centers-and-facilities/johnson/moonwalking-test-mission-daily-field-log/",
           "cita": "The team headed north to the base of S P Crater while wearing mockup spacesuits.",
-          "verificado": false
+          "verificado": true
         },
         {
           "nombre": "JETT5 simulated moonwalks",
@@ -1580,7 +1580,7 @@
           "anos": "2024",
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-tests-technology-practices-artemis-moonwalks-in-arizona-desert/",
           "cita": "NASA astronaut Andre Douglas collects soil samples during the first in a series of four simulated moonwalks in Arizona.",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1591,7 +1591,7 @@
           "valor_texto": null,
           "fuente": "https://www.usgs.gov/centers/astrogeology-science-center/news/artemis-iii-mission-tests-san-francisco-volcanic-field",
           "cita": "The San Francisco Volcanic Field was chosen for these activities for its lunar-like terrain",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "litologia_glim",
             "rugosidad_tan"
@@ -1606,7 +1606,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
           "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "rugosidad_tan",
             "relieve_m"
@@ -1621,7 +1621,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
           "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "tiempo_ciudad_h"
           ],
@@ -1651,7 +1651,7 @@
           "anos": "2019",
           "fuente": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-mars-2020-mission-drops-in-on-death-valley",
           "cita": "an Airbus helicopter carried an engineering model of the Lander Vision System",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1662,7 +1662,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-mars-2020-mission-drops-in-on-death-valley",
           "cita": "LVS collected and analyzed imagery of the barren, mountainous terrain below",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "relieve_m",
             "ndvi_max"
@@ -1692,12 +1692,12 @@
           "coordenadas_fuente": {
             "fuente": "https://en.wikipedia.org/wiki/Dumont_Dunes",
             "cita": "35°41′00″N 116°13′10″W / 35.68333°N 116.21944°W",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2025",
           "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
           "cita": "For additional testing during the three-day excursion, the team ventured to the Mojave Desert",
-          "verificado": false
+          "verificado": true
         },
         {
           "nombre": "Extended Robust Aerial Autonomy drone tests (Mars Hill, Mesquite Flats Sand Dunes)",
@@ -1710,7 +1710,7 @@
           "anos": "2025",
           "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
           "cita": "Called Extended Robust Aerial Autonomy, the work is just one of 25 projects funded by the",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1721,7 +1721,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
           "cita": "barren, featureless desert dunes to hone navigation software",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "ndvi_max",
             "rugosidad_tan"
@@ -1736,7 +1736,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
           "cita": "Rubbly volcanic boulders on barren slopes earned one area the name Mars Hill",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "rugosidad_tan",
             "litologia_glim"
@@ -1766,12 +1766,12 @@
           "coordenadas_fuente": {
             "fuente": "https://en.wikipedia.org/wiki/Dumont_Dunes",
             "cita": "35°41′00″N 116°13′10″W / 35.68333°N 116.21944°W",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2012",
           "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
           "cita": "Engineers ran rover-mobility tests on California sand dunes this week",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1782,7 +1782,7 @@
           "valor_texto": null,
           "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
           "cita": "put through paces on various sandy slopes",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "rugosidad_tan"
           ],
@@ -1796,7 +1796,7 @@
           "valor_texto": null,
           "fuente": "https://www.jpl.nasa.gov/news/mojave-desert-tests-prepare-for-nasa-mars-roving/",
           "cita": "Information collected in these tests on windward and downwind portions of dunes",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "No global layer of sand dunes."
@@ -1825,7 +1825,7 @@
           "anos": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "A K10 robot operates near the Haughton Mars Project base camp on Devon Island, Canada.",
-          "verificado": false
+          "verificado": true
         },
         {
           "nombre": "D-RATS field-test base camp",
@@ -1842,7 +1842,7 @@
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
           "cita": "Multiple teams successfully worked to establish and manage field-test base camp",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1853,7 +1853,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "located at the Haughton meteorite impact crater",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "relieve_m"
           ],
@@ -1867,7 +1867,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "tiempo_ciudad_h"
           ],
@@ -1881,7 +1881,7 @@
           "valor_texto": null,
           "fuente": "https://science.nasa.gov/solar-system/planetary-analogs/10-things-to-know-about-planetary-analogs/",
           "cita": "barren terrain, freezing temperatures, isolation, and remoteness mimic conditions on Mars",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "t_media_k",
             "t_min_k"
@@ -1896,7 +1896,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
           "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "tiempo_ciudad_h"
           ],
@@ -1930,7 +1930,7 @@
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
           "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -1969,7 +1969,7 @@
           "valor_texto": null,
           "fuente": "https://www.nasa.gov/humans-in-space/nasa-to-practice-artemis-moonwalking-roving-operations-in-arizona-desert",
           "cita": "analogous to a lunar environment including challenging terrain, interesting geology, and minimal communications infrastructure",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "rugosidad_tan",
             "relieve_m"
@@ -2001,7 +2001,7 @@
           "anos": "2004",
           "fuente": "https://ntrs.nasa.gov/citations/20060019185",
           "cita": "is developing and testing standalone automation at a lunar/martian impact crater analog site in Arctic Canada",
-          "verificado": false
+          "verificado": true
         }
       ],
       "caracteristicas": [
@@ -2012,7 +2012,7 @@
           "valor_texto": null,
           "fuente": "https://ntrs.nasa.gov/citations/20060019185",
           "cita": "cuttings-removal issues with low-power drilling into permafrost",
-          "verificado": false,
+          "verificado": true,
           "parametros": [
             "permafrost_frac"
           ],
@@ -2026,7 +2026,7 @@
           "valor_texto": null,
           "fuente": "https://jpt.spe.org/twa/advances-space-drilling-technologies",
           "cita": "provided the DAME project field tests with crater landforms and ice-laden fallback impact breccia",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "No global layer of impact breccia or ice inside rock."
