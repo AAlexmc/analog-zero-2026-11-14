@@ -92,8 +92,12 @@ def test_sitios_con_coordenadas_dan_su_celda_y_los_demas_lo_dicen(sitios):
     campo[330, 180] = 7.0
     tierra = np.zeros((360, 720), bool)
     tierra[330, 180] = True
-    out = {s["id"]: s for s in vd.sitios_en(sitios, {"oscuridad_max_h": campo}, tierra)}
+    sin_coord = {"id": "campo_sin_coordenadas", "nombre": "x", "tipo": "campo", "lat": None, "lon": None}
+    out = {s["id"]: s for s in vd.sitios_en([*sitios, sin_coord], {"oscuridad_max_h": campo}, tierra)}
     h = out["haughton"]
     assert (h["fila"], h["col"]) == (29, 180) and h["valores"]["oscuridad_max_h"] == 7.0 and h["tierra"]
-    assert out["mojave_soda"]["valores"] is None and "coordinates" in out["mojave_soda"]["motivo"]
+    assert out["campo_sin_coordenadas"]["valores"] is None and "coordinates" in out["campo_sin_coordenadas"]["motivo"]
     assert "glenn_slope_lab" not in out
+    for s in sitios:
+        if s["tipo"] == "campo" and s["lat"] is not None:
+            assert out[s["id"]]["valores"] is not None and 0 <= out[s["id"]]["fila"] < 360 and 0 <= out[s["id"]]["col"] < 720
