@@ -62,3 +62,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   .ambiente dl { grid-template-columns: auto auto auto auto; font-size: 13px; gap: 2px 10px; }
 }
 .ambiente sup { font-size: .7em; line-height: 0; }
+/* El botón del paso siguiente no se esconde: queda pegado al pie del panel aunque crezca lo de arriba. */
+.paso[data-paso="2"]:not([hidden]) { display: contents; }
+.explorar #buscar { position: sticky; bottom: 0; z-index: 2; box-shadow: 0 0 0 12px var(--deep-blue), 0 -22px 18px 6px var(--deep-blue), 0 26px 0 12px var(--deep-blue); }
