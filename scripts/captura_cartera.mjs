@@ -10,7 +10,7 @@ import { cargar } from '../web/buscar/motor.js';
 import { formatoLatLon } from '../web/explorar/geo.js';
 import {
   fmtPct, formatoValor as formatoValorSup, planoSup, masCercano, lineaContexto, fraseParcial, sitiosConCoordenadas, fraseUnlisted,
-  letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, tablaComparar, lineaDistancia, textoComponentes,
+  letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview,
 } from '../web/analogos/metricas.js';
 import { paisDe } from '../web/analogos/paises.js';
 
@@ -134,6 +134,7 @@ async function comprobarCartera(pag, que, o) {
       letra: t.querySelector('.num').textContent, pct: t.querySelector('.pct span').textContent, pais: t.querySelector('.pais')?.textContent ?? null, coords: t.querySelector('.coords').textContent,
       parcial: t.querySelector('.parcial')?.textContent ?? null, contexto: t.querySelector('.contexto').textContent, unlisted: !!t.querySelector('.marca-chip.unlisted'),
       chips: [...t.querySelectorAll('.chips li')].map((li) => ({ id: li.dataset.id, t: li.textContent, title: li.title })),
+      worldview: ((a) => a && `${a.textContent} ${a.getAttribute('href')} ${a.target} ${a.rel}`)(t.querySelector('a.worldview')),
     })),
     sinCubrir: [...document.querySelectorAll('#sin-cubrir li')].map((li) => ({ id: li.dataset.id, txt: li.textContent })),
     sinCubrirVacio: document.querySelector('#sin-cubrir > p')?.textContent ?? null,
@@ -147,6 +148,7 @@ async function comprobarCartera(pag, que, o) {
       letra: letra(k), pct: fmtPct(x.similitud_pct), pais: paisDe(x.lat, x.lon, PAISES), coords: formatoLatLon(x.lat, x.lon).texto,
       parcial: x.comparados < x.de ? fraseParcial(x) : null, contexto: lineaContexto(s, N_SITIOS), unlisted: !s,
       chips: x.cubre.map((id) => ({ id, t: nombreCorto(id, P), title: `${P[id].nombre}: ${fmtPct(x.parametros.find((p) => p.id === id).desviacion_pct)} off` })),
+      worldview: `Open in NASA Worldview ${enlaceWorldview(x.lat, x.lon)} _blank noopener`,
     };
   }));
   igual(`${que} "What no place on Earth covers"`, dom.sinCubrir, c.sin_cubrir.map((s) => ({ id: s.id, txt: `${P[s.id].nombre}. ${fraseSinCubrir(s, donde(s))} Test this in a lab or a chamber.` })));
