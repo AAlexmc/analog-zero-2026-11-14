@@ -876,10 +876,14 @@
           "organismo": "NASA Goddard",
           "sitio": null,
           "sitio_texto": "Askja caldera, northern Iceland",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
-          "anos": null,
+          "lat": 65.033,
+          "lon": -16.783,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/Askja",
+            "cita": "65°01′59″N 16°46′59″W / 65.033°N 16.783°W",
+            "verificado": false
+          },
+          "anos": "2019",
           "fuente": "https://ntrs.nasa.gov/citations/20240009232",
           "cita": "We conducted ground-penetrating radar surveys at center frequencies of 200, 400, and 900 MHz to map the thickness and extent of tephra deposits and underlying massive ice at three caldera sites.",
           "verificado": true
@@ -973,9 +977,13 @@
           "organismo": "NASA",
           "sitio": null,
           "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
+          "lat": 35.6835172,
+          "lon": -111.478647,
+          "coordenadas_fuente": {
+            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
+            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "verificado": false
+          },
           "anos": "2009",
           "fuente": "https://phys.org/news/2009-09-nasa-lunar-robotics-arizona.html",
           "cita": "The crew also docked to a simulated habitat, drove the rover across difficult terrain, performed a rescue mission and made a four-day traverse across the lava.",
@@ -1071,9 +1079,13 @@
           "organismo": "NASA Ames",
           "sitio": null,
           "sitio_texto": "Valentine Cave, Lava Beds National Monument, northern California",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
+          "lat": 41.70925,
+          "lon": -121.47778,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/Valentine_Cave",
+            "cita": "41°42′33″N 121°28′40″W / 41.70925°N 121.47778°W",
+            "verificado": false
+          },
           "anos": "2018",
           "fuente": "https://ntrs.nasa.gov/citations/20190029009",
           "cita": "The NASA Ames testbed rover, CaveR, was deployed in Valentine Cave in Lava Beds National Monument (N. CA, USA) during August of 2018.",
