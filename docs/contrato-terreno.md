@@ -65,6 +65,14 @@ Centro del píxel (fila f, col c): `x = x0_m + c · m_por_px`, `y = y0_m − f �
 ```
 `escala`: `"sitio"` o `"regional"`. Los dos terrenos de `pareja_inicial` tienen el mismo `lado_km`.
 
+## Terreno dinámico (lo hace la web, nunca se escribe a disco)
+`web/terreno/index.html?lugar=<lat>,<lon>[&nombre=<texto>][&lado=<km>]` (lado por defecto 10; selector 2 / 10 / 40). `web/terreno/lugar.js` pide las teselas de relieve abiertas con `cargarRelieve` de `web/relieve/` y las convierte con `terrenoDeRelieve` a la misma forma que `cargarTerreno` (`{meta, altura, bytesAltura, capas: {}, notas}`). Vive solo en memoria del navegador; no pasa por `index.json` ni por `web/data/`.
+- Rejilla: `n` impar ≤ 1023, `m_por_px = lado / n`, nunca más fino que el píxel de tesela del zoom máximo (15) en la latitud; el zoom es el más grueso cuyo píxel ≤ `m_por_px` (`zoomPara`). Fila 0 = norte, columna 0 = oeste; el píxel central es el lugar.
+- `meta` lleva: `id` (`lugar_<lat>_<lon>_<lado>km`), `cuerpo: "tierra"`, `nombre`, `centro`, `lado_km`, `n`, `m_por_px`, `z_min`, `z_max`, `z_referencia: "metres above sea level"`, `georef` `local_aeqd` (`radio_m` 6371008.8, `x0_m = −(n−1)/2·m`, `y0_m = +(n−1)/2·m`), `capas.altura` (`fichero: null`, `fuente` y `url` de la línea «Elevation» de los créditos de `web/relieve/`, `resolucion_origen_m` = metros de la fuente si todas las teselas dicen la misma, si no `null`), `creditos`, `muestreo` (`m`, `zoom`, `pixel_tesela_m`, `teselas`, `descarga_bytes`, `fuentes`) y `"dinamico": true`.
+- Fuente real de cada tesela: cabecera `x-amz-meta-x-imagery-sources`. Tabla propia (`FUENTES_TERRARIUM`, `origen: "mío"`, metros citados de https://github.com/tilezen/joerd/blob/master/docs/data-sources.md) solo con prefijos vistos en teselas reales: `pgdc_5m/` ArcticDEM ≈ 5 m, `ned13/` 3DEP 1/3″ ≈ 10 m, `srtm/` SRTM ≈ 30 m. Prefijo desconocido o sin cabecera: «source resolution not stated».
+- No lleva: `iluminacion`, `sombra_permanente`, `temp_max`, `temp_media`, `agua`, `rasgos`, `picos_luz`, `comando`. Lo que dependa de esas capas sale como no medido.
+- Sin red o con teselas cortadas: aviso y el terreno de la Tierra del catálogo (`a` o `pareja_inicial.tierra`).
+
 ## Retoques (los escribe la web, no el pipeline)
 Un retoque es un fichero JSON que el usuario exporta desde el visor:
 ```json

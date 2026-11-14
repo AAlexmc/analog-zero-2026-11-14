@@ -55,9 +55,12 @@ async function tierra(g) {
   const zd = zoomPara(g.lat0, g.paso, ZOOM_MAX_TERRARIUM), zi = Math.min(ZOOM_MAX_GIBS, zd);
   const vd = teselasVentana(g, zd), vi = teselasVentana(g, zi);
   let bytes = 0;
+  // Fuente de cada tesela de relieve según el servidor (cabecera expuesta por CORS); '' si no llega.
+  const origenes = [];
   const pedir = async (plantilla, z, t) => {
     const r = await fetch(urlTesela(plantilla, z, t.x, t.y), PEDIR_FUERA);
     if (!r.ok) throw new Error(`tile ${z}/${t.x}/${t.y}: HTTP ${r.status}`);
+    if (plantilla === URL_TERRARIUM) origenes.push(r.headers.get('x-amz-meta-x-imagery-sources') ?? '');
     const blob = await r.blob();
     bytes += blob.size;
     return [`${t.x}/${t.y}`, await pixeles(blob)];
@@ -74,7 +77,7 @@ async function tierra(g) {
     imagen[4 * i + 3] = 255;
   }
   return {
-    z, imagen, tono: null, descarga_bytes: bytes, teselas: { elevacion: { z: zd, n: vd.lista.length }, imagen: { z: zi, n: vi.lista.length } },
+    z, imagen, tono: null, descarga_bytes: bytes, teselas: { elevacion: { z: zd, n: vd.lista.length, origenes }, imagen: { z: zi, n: vi.lista.length } },
     rotulos: { altura: 'Terrain Tiles (Mapzen), metres above sea level', imagen: 'NASA Blue Marble Next Generation imagery (GIBS) on the elevation, shaded from it' },
     creditos: CREDITOS_TIERRA,
   };

@@ -9,12 +9,30 @@ uniform sampler2D uAlt;
 uniform float uLado, uZc, uExag;
 varying vec2 vTc;
 varying vec2 vXZ;
+varying float vDist;
 void main() {
   vec2 tc = position.xz / uLado + 0.5;
   float h = textureLod(uAlt, tc, 0.0).r;
   vTc = tc; vXZ = position.xz;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, (h - uZc) / 1000.0 * uExag, position.z, 1.0);
+  vec4 mv = modelViewMatrix * vec4(position.x, (h - uZc) / 1000.0 * uExag, position.z, 1.0);
+  vDist = length(mv.xyz);
+  gl_Position = projectionMatrix * mv;
 }`;
+
+// Cielo de la vista a ras de suelo: esfera centrada en la cámara, degradado del horizonte al cénit.
+const VS_CIELO = /* glsl */`
+varying vec3 vDir;
+void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+const FS_CIELO = /* glsl */`
+uniform vec3 uArriba, uHorizonte;
+varying vec3 vDir;
+void main() { gl_FragColor = vec4(mix(uHorizonte, uArriba, smoothstep(0.0, 0.55, vDir.y)), 1.0); }`;
+
+// Colores de web/marca/marca.css: blue yonder, blanco y deep blue.
+const AZUL_YONDER = 0x2e96f5, BLANCO = 0xffffff, AZUL_PROFUNDO = 0x07173f;
+const OJO_M = 2;
+// Los sombreadores propios escriben el color tal cual: sin pasar el hex a espacio lineal.
+const colorTal = (hex) => new THREE.Color().setHex(hex, THREE.LinearSRGBColorSpace);
 
 const FS = /* glsl */`
 uniform sampler2D uAlt, uSombra, uCapa, uAgua;
@@ -24,8 +42,11 @@ uniform int uModo, uCapaModo, uHayAgua;
 uniform vec2 uCapaRango;
 uniform vec3 uCapaColor;
 uniform vec3 uPincel;
+uniform vec3 uNiebla;
+uniform vec3 uNieblaD;
 varying vec2 vTc;
 varying vec2 vXZ;
+varying float vDist;
 const vec3 OSC = vec3(0.016, 0.075, 0.15);
 const vec3 PRU = vec3(0.0, 0.19, 0.33);
 const vec3 CIA = vec3(0.30, 0.58, 0.78);
@@ -83,6 +104,7 @@ void main() {
     float w = fwidth(length(vXZ - uPincel.xy));
     col = mix(col, BLA, 1.0 - smoothstep(0.0, 1.5 * w, r));
   }
+  if (uNieblaD.z > 0.0) col = mix(col, uNiebla, uNieblaD.z * smoothstep(uNieblaD.x, uNieblaD.y, vDist));
   gl_FragColor = vec4(col, 1.0);
 }`;
 
@@ -113,9 +135,10 @@ export class Escena {
     this.fraccionNaN = r.nan;
     this.relleno = Number.isFinite(r.min) ? r.min : 0;
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // Fondo transparente: alrededor del terreno se ve el degradado de la marca de la página.
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x021226);
+    this.renderer.setClearColor(0x000000, 0);
     contenedor.appendChild(this.renderer.domElement);
     const filtro = this.renderer.extensions.has('OES_texture_float_linear') ? THREE.LinearFilter : THREE.NearestFilter;
 
@@ -144,6 +167,7 @@ export class Escena {
       uZmin: { value: r.min }, uZmax: { value: r.max }, uCurva: { value: intervaloBonito(Math.max(r.max - r.min, 1) / 20) }, uRkm: { value: meta.georef.radio_m / 1000 },
       uSol: { value: new THREE.Vector3(0, 1, 0) }, uModo: { value: 0 }, uCapaModo: { value: 0 },
       uCapaRango: { value: new THREE.Vector2(0, 1) }, uCapaColor: { value: new THREE.Vector3(1, 1, 1) }, uPincel: { value: new THREE.Vector3(0, 0, -1) },
+      uNiebla: { value: colorTal(BLANCO) }, uNieblaD: { value: new THREE.Vector3(0, 1, 0) },
     };
     const seg = Math.min(n - 1, 1023);
     const geo = new THREE.PlaneGeometry(L, L, seg, seg);
@@ -162,6 +186,21 @@ export class Escena {
     this.controles.minDistance = 0.05;
     this.controles.maxDistance = ladoVistaKm * 6;
     this.controles.addEventListener('change', () => { this.sucio = true; this.alCambiarCamara?.(this); });
+
+    // Tierra: cielo claro (blue yonder → blanco) y bruma; sin aire (Luna, Marte aquí): cielo oscuro y sin bruma.
+    const aire = meta.cuerpo === 'tierra';
+    this.cielo = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16), new THREE.ShaderMaterial({
+      vertexShader: VS_CIELO, fragmentShader: FS_CIELO, side: THREE.BackSide, depthWrite: false, depthTest: false,
+      uniforms: { uArriba: { value: colorTal(aire ? AZUL_YONDER : AZUL_PROFUNDO) }, uHorizonte: { value: colorTal(aire ? BLANCO : AZUL_PROFUNDO) } },
+    }));
+    this.cielo.renderOrder = -1;
+    this.cielo.frustumCulled = false;
+    this.cielo.visible = false;
+    this.escena.add(this.cielo);
+    this.conBruma = aire;
+    this.suelo = null;
+    this.teclas = new Set();
+    this.#ratonSuelo();
 
     this.sol = { az: 315, el: 30 };
     this.exag = 1;
@@ -194,7 +233,13 @@ export class Escena {
 
   setVerOriginal(v) { this.verOriginal = v; this.#subirAlturas(); this.recalcularSombras(); }
 
-  setExag(e) { this.exag = e; this.uniforms.uExag.value = e; this.geoRayo = null; this.sucio = true; }
+  // A ras de suelo la exageración es siempre 1: la pedida se guarda para la vuelta.
+  setExag(e) {
+    if (this.suelo) { this.suelo.exagFuera = e; return; }
+    this.#ponerExag(e);
+  }
+
+  #ponerExag(e) { this.exag = e; this.uniforms.uExag.value = e; this.geoRayo = null; this.sucio = true; }
 
   setModo(m) { this.uniforms.uModo.value = MODOS[m]; this.sucio = true; }
 
@@ -297,10 +342,145 @@ export class Escena {
     this.sucio = true;
   }
 
+  // ---------- Vista a ras de suelo ----------
+  // Cota del suelo (y del mundo, km) en (x, z) del mundo; NaN fuera de la rejilla o sin dato.
+  alturaSuelo(x, z) {
+    const k = (this.n - 1) / 2, f = z / this.mkm + k, c = x / this.mkm + k;
+    if (!(f >= 0 && c >= 0 && f <= this.n - 1 && c <= this.n - 1)) return NaN;
+    const h = alturaBilineal(this.mostradas, this.n, f, c);
+    return ((h - this.zc) / 1000) * this.exag;
+  }
+
+  // Ojo a OJO_M sobre el suelo en (fila, col), mirando a `mirar` (fila, col) o al norte de la rejilla.
+  entrarSuelo({ fila, col, mirar = null }) {
+    const k = (this.n - 1) / 2;
+    let x = (col - k) * this.mkm, z = (fila - k) * this.mkm;
+    if (!Number.isFinite(this.alturaSuelo(x, z))) { x = 0; z = 0; }
+    if (!Number.isFinite(this.alturaSuelo(x, z))) return false;
+    if (!this.suelo) {
+      this.suelo = {
+        exagFuera: this.exag, ojo: OJO_M / 1000,
+        vuelta: { pos: this.camara.position.clone(), target: this.controles.target.clone(), near: this.camara.near, far: this.camara.far },
+      };
+      this.controles.enabled = false;
+      this.#ponerExag(1);
+      this.camara.near = 0.0003;
+      this.camara.far = this.ladoKm * 3;
+      this.camara.updateProjectionMatrix();
+      this.cielo.visible = true;
+      this.cielo.scale.setScalar(this.ladoKm * 2);
+      if (this.conBruma) this.uniforms.uNieblaD.value.set(0.3, 12, 0.6);
+    }
+    const s = this.suelo;
+    s.x = x; s.z = z; s.yaw = 0; s.pitch = -0.05;
+    if (mirar) {
+      const mx = (mirar.col - k) * this.mkm, mz = (mirar.fila - k) * this.mkm, d = Math.hypot(mx - x, mz - z);
+      if (d > 1e-9) {
+        s.yaw = Math.atan2(mx - x, -(mz - z));
+        const objetivo = this.alturaSuelo(mx, mz) + 0.001;
+        if (Number.isFinite(objetivo)) s.pitch = Math.atan2(objetivo - (this.alturaSuelo(x, z) + s.ojo), d);
+      }
+    }
+    this.#ponerCamaraSuelo();
+    return true;
+  }
+
+  salirSuelo() {
+    const s = this.suelo;
+    if (!s) return;
+    this.suelo = null;
+    this.teclas.clear();
+    this.camara.near = s.vuelta.near; this.camara.far = s.vuelta.far;
+    this.camara.updateProjectionMatrix();
+    this.camara.position.copy(s.vuelta.pos);
+    this.controles.target.copy(s.vuelta.target);
+    this.camara.lookAt(this.controles.target);
+    this.controles.enabled = true;
+    this.controles.update();
+    this.cielo.visible = false;
+    this.uniforms.uNieblaD.value.z = 0;
+    this.#ponerExag(s.exagFuera);
+  }
+
+  girarSuelo(dYaw, dPitch) {
+    const s = this.suelo;
+    if (!s) return;
+    s.yaw += dYaw;
+    s.pitch = Math.max(-1.4, Math.min(1.4, s.pitch + dPitch));
+    this.#ponerCamaraSuelo();
+  }
+
+  // Avanza en horizontal (metros; negativo = atrás). No sale de la rejilla ni entra en celdas sin dato.
+  andarSuelo(metros) {
+    const s = this.suelo;
+    if (!s) return;
+    const lim = ((this.n - 1) / 2) * this.mkm * 0.999;
+    const x = Math.max(-lim, Math.min(lim, s.x + (Math.sin(s.yaw) * metros) / 1000));
+    const z = Math.max(-lim, Math.min(lim, s.z - (Math.cos(s.yaw) * metros) / 1000));
+    if (!Number.isFinite(this.alturaSuelo(x, z))) return;
+    s.x = x; s.z = z;
+    this.#ponerCamaraSuelo();
+  }
+
+  // Para la interfaz y las capturas: altura del ojo sobre el suelo (m), exageración y rumbo.
+  estadoSuelo() {
+    const s = this.suelo;
+    if (!s) return null;
+    const p = this.camara.position;
+    return { ojo_m: (p.y - this.alturaSuelo(p.x, p.z)) * 1000, exag: this.exag, rumbo_deg: ((s.yaw * 180 / Math.PI) % 360 + 360) % 360, x_km: p.x, z_km: p.z };
+  }
+
+  #ponerCamaraSuelo() {
+    const s = this.suelo, y = this.alturaSuelo(s.x, s.z) + s.ojo;
+    const dir = new THREE.Vector3(Math.sin(s.yaw) * Math.cos(s.pitch), Math.sin(s.pitch), -Math.cos(s.yaw) * Math.cos(s.pitch));
+    this.camara.position.set(s.x, y, s.z);
+    this.camara.lookAt(this.camara.position.clone().add(dir));
+    // Objetivo a 50 m: la escala de los modelos (factorAmpliacion) se queda en ×1.
+    this.controles.target.copy(this.camara.position).addScaledVector(dir.setY(0).normalize(), 0.05);
+    this.sucio = true;
+  }
+
+  // Arrastrar mira alrededor; la rueda avanza o retrocede 2 m por paso.
+  #ratonSuelo() {
+    const cv = this.renderer.domElement;
+    let arr = null;
+    cv.addEventListener('pointerdown', (ev) => {
+      if (!this.suelo || ev.button !== 0) return;
+      arr = { x: ev.clientX, y: ev.clientY, id: ev.pointerId };
+      cv.setPointerCapture(ev.pointerId);
+    });
+    cv.addEventListener('pointermove', (ev) => {
+      if (!this.suelo || !arr || ev.pointerId !== arr.id) return;
+      const k = (this.camara.fov * Math.PI / 180) / Math.max(cv.clientHeight, 1);
+      this.girarSuelo(-(ev.clientX - arr.x) * k, (ev.clientY - arr.y) * k);
+      arr.x = ev.clientX; arr.y = ev.clientY;
+    });
+    const fin = () => { arr = null; };
+    cv.addEventListener('pointerup', fin);
+    cv.addEventListener('pointercancel', fin);
+    cv.addEventListener('wheel', (ev) => {
+      if (!this.suelo) return;
+      ev.preventDefault();
+      this.andarSuelo(ev.deltaY < 0 ? 2 : -2);
+    }, { passive: false });
+  }
+
+  // Teclas pulsadas (las pone el visor): flechas o W/S a 1,5 m/s, giro a 45°/s.
+  #moverConTeclas() {
+    const ahora = performance.now(), dt = Math.min((ahora - (this.tTeclas ?? ahora)) / 1000, 0.1);
+    this.tTeclas = ahora;
+    if (!this.suelo || !this.teclas.size || !dt) return;
+    const t = this.teclas, avance = (t.has('adelante') ? 1 : 0) - (t.has('atras') ? 1 : 0), giro = (t.has('derecha') ? 1 : 0) - (t.has('izquierda') ? 1 : 0);
+    if (giro) this.girarSuelo(giro * dt * Math.PI / 4, 0);
+    if (avance) this.andarSuelo(avance * 1.5 * dt);
+  }
+
   dibujar(forzar) {
+    this.#moverConTeclas();
     if (!this.sucio && !forzar) return false;
     if (!this.contenedor.clientWidth) return false;
     this.sucio = false;
+    if (this.suelo) this.cielo.position.copy(this.camara.position);
     this.camara.updateMatrixWorld();
     this.renderer.render(this.escena, this.camara);
     this.alDibujar?.(this);

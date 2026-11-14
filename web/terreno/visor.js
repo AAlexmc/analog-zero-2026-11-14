@@ -13,9 +13,12 @@ import { crearObra } from './panel_obra.js';
 import { crearVolatiles } from './panel_volatiles.js';
 import { crearBase } from './panel_base.js';
 import { crearCerca, capaModelos } from './modelo3d.js';
+import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM } from './lugar.js';
 
 const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
+const LUGAR = EJEMPLO ? null : leerLugar(location.search);
+const ID_LUGAR = LUGAR ? idLugar(LUGAR) : null;
 const CLAVE = (id) => `analog-zero.retouch.${id}`;
 const CLAVE_PLANTADO = (id) => `analog-zero.planted.${id}`;
 const CUERPO = { luna: 'Moon', tierra: 'Earth', marte: 'Mars' };
@@ -50,12 +53,15 @@ async function elegirIds() {
   try { indice = await cargarIndice(); } catch (e) { errIndice = e.message; }
   let a = qs.get('a') ?? indice?.pareja_inicial?.tierra ?? null;
   let b = qs.get('b') ?? indice?.pareja_inicial?.luna ?? null;
+  // Con ?lugar= el panel de la Tierra se hace en el momento; el del catálogo queda de reserva.
+  const reserva = a;
+  if (LUGAR) a = ID_LUGAR;
   const solo = qs.get('solo');
   if (solo && solo !== a && solo !== b) {
     const t = indice?.terrenos?.find((x) => x.id === solo);
     if (t?.cuerpo === 'tierra') a = solo; else b = solo;
   }
-  return { a, b, solo, indice, errIndice };
+  return { a, b, solo, indice, errIndice, reserva };
 }
 
 async function obtenerDatos(id) {
@@ -63,6 +69,7 @@ async function obtenerDatos(id) {
     const t = terrenoSintetico(id === 'ejemplo-luna' ? 'luna' : 'tierra');
     return { ...t, bytesAltura: new Uint8Array(t.altura.buffer), notas: [] };
   }
+  if (LUGAR && id === ID_LUGAR) return cargarLugar(LUGAR);
   return cargarTerreno(id);
 }
 
@@ -72,14 +79,24 @@ function crearPanel(lado) {
   el.className = 'panel';
   el.dataset.lado = lado;
   el.innerHTML = `
+    <aside class="lado marca-panel">
+      <p class="aviso-lugar" role="status" hidden></p>
+      <div class="tarjeta"><div class="et cab">Loading…</div></div>
+      <section class="seccion"><h3 class="marca-subtitulo">Explore</h3>
+        <div class="acciones"><button type="button" class="suelo marca-boton" aria-pressed="false" disabled>Ground view</button><button type="button" class="ver-paleta marca-boton secundario" aria-pressed="false" disabled>Equipment</button><button type="button" class="ampliar marca-boton secundario" disabled>Expand</button></div>
+        <div class="sec-suelo" hidden>
+          <p class="tenue">Drag to look around. Arrow keys or W/S walk, A/D turn, the mouse wheel steps 2 m.</p>
+          <div class="botones"><button type="button" data-s="izquierda" title="Turn left 15°">◀ Turn</button><button type="button" data-s="adelante">Forward 5 m</button><button type="button" data-s="atras">Back 5 m</button><button type="button" data-s="derecha" title="Turn right 15°">Turn ▶</button></div>
+        </div>
+      </section>
+      <div class="paleta" hidden></div>
+      <aside class="hoja" hidden></aside>
+      <details class="seccion pliegue" open><summary class="marca-subtitulo">Display</summary><div class="mandos"></div></details>
+    </aside>
     <div class="lienzo"><div class="rotulos"></div>
       <div class="marcas"><svg class="huellas"></svg></div>
-      <div class="tarjeta"><div class="et cab">Loading…</div></div>
-      <div class="acciones"><button type="button" class="ver-paleta marca-boton secundario" aria-pressed="false" disabled>Equipment</button><button type="button" class="ampliar marca-boton secundario" disabled>Expand</button></div>
-      <div class="paleta" hidden></div>
+      <div class="pildora-suelo" hidden></div>
       <div class="aviso-plantar" hidden></div>
-      <aside class="hoja" hidden></aside>
-      <div class="mandos"></div>
     </div>
     <aside class="retoque"></aside>
     <footer class="lectura">
@@ -96,6 +113,15 @@ function crearPanel(lado) {
   const p = { lado, el, id: null, escena: null, ampliado: false, herramienta: 'navegar', radio_m: 250, intensidad: 0.5, historial: new Historial(), trazo: null, sha: null,
     plantados: null, sel: null, plantar: null, arrastre: null, marcas: new Map() };
   el.querySelector('.ampliar').addEventListener('click', () => alternarAmpliado(p));
+  el.querySelector('.suelo').addEventListener('click', () => alternarSuelo(p));
+  const GIRO = Math.PI / 12;
+  el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => {
+    const e = p.escena, k = b.dataset.s;
+    if (!e?.suelo) return;
+    if (k === 'adelante' || k === 'atras') e.andarSuelo(k === 'adelante' ? 5 : -5);
+    else e.girarSuelo(k === 'izquierda' ? -GIRO : GIRO, 0);
+  }));
+  el.addEventListener('pointerdown', () => { if (p.escena?.suelo) estado.sueloActivo = p; });
   return p;
 }
 
@@ -113,19 +139,74 @@ function rellenarTarjeta(p, datos) {
   const notas = [...datos.notas];
   if (p.escena.fraccionNaN > 0) notas.push(`${(p.escena.fraccionNaN * 100).toFixed(2)} % no-data cells shown as gaps`);
   p.el.querySelector('.tarjeta').innerHTML = `
-    <div class="et">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)}${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}</div>
+    <div><span class="marca-chip cuerpo">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)}</span>${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}${m.dinamico ? '<span class="marca-chip vivo">Your place</span>' : ''}</div>
     <h2 class="marca-titulo">${esc(m.nombre)}</h2>
     <div class="cifras">
       <div><span class="et">Center</span><span class="num">${fmtLat(m.centro.lat, 2)} ${fmtLon(m.centro.lon, 2)}</span></div>
       <div><span class="et">Side</span><span class="num">${fmt(m.lado_km, 1)} <u>km</u></span></div>
       <div><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
     </div>
-    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}</div>
+    ${m.dinamico ? `<div class="muestreo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
+    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico ? ' · built live in your browser, not stored' : ''}</div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
-    ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}`;
+    ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
+    ${m.creditos?.length ? `<details class="notas-meta"><summary class="et">Credits</summary><div class="tenue" data-creditos>${m.creditos.map(esc).join(' · ')}</div></details>` : ''}`;
+  if (m.dinamico) selectorVentana(p);
   p.el.querySelector('[data-k=res]').textContent = `${fmt(m.m_por_px, 2)} m/px`;
   p.el.querySelector('.lect-agua').hidden = !p.escena.capas.agua;
   p.el.classList.toggle('con-agua', !!p.escena.capas.agua);
+}
+
+// Ventana del lugar: otra anchura recarga la página con &lado= (el terreno se vuelve a construir).
+function selectorVentana(p) {
+  const s = document.createElement('section');
+  s.className = 'seccion ventana';
+  s.innerHTML = `<h3 class="marca-subtitulo">Window</h3>
+    <div class="mandos-ventana">${LADOS_KM.map((k) => `<button type="button" data-lado-km="${k}" aria-pressed="${k === LUGAR.lado_km}">${k} km</button>`).join('')}</div>
+    <p class="tenue">A wider window is sampled more coarsely.</p>`;
+  s.querySelectorAll('[data-lado-km]').forEach((b) => b.addEventListener('click', () => {
+    if (+b.dataset.ladoKm === LUGAR.lado_km) return;
+    const u = new URL(location.href);
+    u.searchParams.set('lado', b.dataset.ladoKm);
+    u.searchParams.delete('solo');
+    location.assign(u);
+  }));
+  p.el.querySelector('.tarjeta').after(s);
+}
+
+// ---------- Vista a ras de suelo ----------
+// Junto al equipo seleccionado (o el último plantado), mirándolo desde el sur; si no hay, en el centro mirando al norte.
+function puntoSuelo(p) {
+  const e = p.escena, k = (e.n - 1) / 2;
+  const it = p.plantados?.buscar(p.sel) ?? p.plantados?.lista.at(-1) ?? null;
+  if (!it) return { fila: k, col: k, mirar: null };
+  const tam = p.modelos?.instancias().find((x) => x.uid === it.uid)?.tam;
+  const d_m = Math.min(60, Math.max(10, 3 * Math.max(...(tam ?? [5]))));
+  const sur = it.fila + d_m / e.m;
+  return { fila: sur <= e.n - 1 ? sur : it.fila - d_m / e.m, col: it.col, mirar: { fila: it.fila, col: it.col } };
+}
+
+function alternarSuelo(p, forzar) {
+  const e = p.escena;
+  if (!e) return;
+  const si = forzar ?? !e.suelo;
+  if (si) {
+    elegirHerramienta(p, 'navegar');
+    if (!e.entrarSuelo(puntoSuelo(p))) { nota(p, 'ground view: no elevation data at this point'); return; }
+    estado.sueloActivo = p;
+    // La hoja del equipo taparía la vista: se cierra (se reabre pulsando su marca).
+    if (p.sel !== null) { p.sel = null; refrescarPlantado(); }
+  } else e.salirSuelo();
+  const b = p.el.querySelector('.suelo');
+  b.textContent = si ? 'Overview' : 'Ground view';
+  b.setAttribute('aria-pressed', String(si));
+  p.el.querySelector('.sec-suelo').hidden = !si;
+  const pild = p.el.querySelector('.pildora-suelo');
+  pild.hidden = !si;
+  if (si) {
+    const s = e.estadoSuelo();
+    pild.textContent = `Ground view · eye ${s.ojo_m.toFixed(1)} m above the ground · vertical 1× (true scale) · ${e.conBruma ? 'light haze added for depth (own choice)' : 'no haze: no air'}`;
+  }
 }
 
 const claseAgua = (meta, v) => (Number.isFinite(v) ? meta.capas.agua?.clases?.[String(v)] ?? (v >= 1 ? 'water' : 'land') : 'no data');
@@ -272,6 +353,7 @@ function trasDibujar(p) {
     const objetivo = 120 / ppk, p10 = 10 ** Math.floor(Math.log10(objetivo));
     km = [1, 2, 5, 10].map((k) => k * p10).reduce((a, b) => (Math.abs(b - objetivo) < Math.abs(a - objetivo) ? b : a));
   }
+  p.el.querySelector('.escala').hidden = !!e.suelo;
   p.el.querySelector('.regla').style.width = `${Math.round(km * ppk)}px`;
   p.el.querySelector('.et-escala').textContent = km >= 1 ? `${km} km` : `${Math.round(km * 1000)} m`;
   posicionarMarcas(p);
@@ -831,7 +913,19 @@ function alternarAmpliado(p, forzar) {
   for (const q of estado.paneles) q.escena?.redimensionar();
 }
 
+// Andar a ras de suelo: el panel que se tocó por última vez en esa vista.
+const TECLAS = { arrowup: 'adelante', w: 'adelante', arrowdown: 'atras', s: 'atras', arrowleft: 'izquierda', a: 'izquierda', arrowright: 'derecha', d: 'derecha' };
+const teclaSuelo = (ev) => {
+  const t = TECLAS[ev.key.toLowerCase()], e = estado.sueloActivo?.escena;
+  if (!t || !e?.suelo || ev.ctrlKey || ev.metaKey || ev.altKey || ev.target.matches?.('input, select, textarea')) return null;
+  return { t, e };
+};
+document.addEventListener('keyup', (ev) => { const k = TECLAS[ev.key.toLowerCase()]; if (k) estado.paneles.forEach((q) => q.escena?.teclas.delete(k)); });
+window.addEventListener('blur', () => estado.paneles.forEach((q) => q.escena?.teclas.clear()));
+
 document.addEventListener('keydown', (ev) => {
+  const ts = teclaSuelo(ev);
+  if (ts) { ev.preventDefault(); ts.e.teclas.add(ts.t); return; }
   const enPlantar = estado.paneles.find((q) => q.plantar);
   if (ev.key === 'Escape' && enPlantar) { modoPlantar(enPlantar, null); return; }
   const p = estado.paneles.find((q) => q.ampliado);
@@ -848,9 +942,9 @@ function enlazarCamaras() {
   for (const p of estado.paneles) {
     if (!p.escena) continue;
     p.escena.alCambiarCamara = (e) => {
-      if (!estado.enlazar || copiando) return;
+      if (!estado.enlazar || copiando || e.suelo) return;
       copiando = true;
-      for (const q of estado.paneles) if (q.escena && q.escena !== e) q.escena.copiarCamara(e);
+      for (const q of estado.paneles) if (q.escena && q.escena !== e && !q.escena.suelo) q.escena.copiarCamara(e);
       copiando = false;
     };
   }
@@ -859,7 +953,7 @@ function enlazarCamaras() {
     estado.enlazar = !estado.enlazar;
     b.setAttribute('aria-pressed', String(estado.enlazar));
     const [a, c] = estado.paneles.map((p) => p.escena);
-    if (estado.enlazar && a && c) c.copiarCamara(a);
+    if (estado.enlazar && a && c && !a.suelo && !c.suelo) c.copiarCamara(a);
   });
   const ex = document.getElementById('exag');
   ex.addEventListener('input', () => {
@@ -910,12 +1004,25 @@ async function iniciar() {
   const pa = crearPanel('a'), pb = crearPanel('b');
   estado.paneles.push(pa, pb);
   pa.id = sel.a; pb.id = sel.b;
+  if (LUGAR && pa.id === ID_LUGAR) pa.el.querySelector('.tarjeta').innerHTML = '<div class="et cab">Building the terrain of your place from open elevation tiles…</div>';
   const res = await Promise.all([pa, pb].map(async (p) => {
     if (!p.id) { mostrarError(p, sel.errIndice ?? 'terrain data not found: no terrain pair in index.json'); return null; }
-    try { return await obtenerDatos(p.id); } catch (e) { mostrarError(p, e.message); return null; }
+    try { return await obtenerDatos(p.id); } catch (e) {
+      // Sin red o teselas cortadas: aviso llano y el terreno del catálogo de siempre.
+      if (p.id === ID_LUGAR && sel.reserva) {
+        const av = p.el.querySelector('.aviso-lugar');
+        av.hidden = false;
+        av.textContent = `${e.message} Your place could not be built, so this is the catalogue terrain instead.`;
+        estado.avisoLugar = av.textContent;
+        p.id = sel.reserva;
+        try { return await obtenerDatos(p.id); } catch (e2) { mostrarError(p, e2.message); return null; }
+      }
+      mostrarError(p, e.message); return null;
+    }
   }));
   const lados = res.filter(Boolean).map((d) => d.meta.lado_km);
-  const ladoVista = Math.max(...lados, 1);
+  // Con el lugar del usuario la vista inicial encuadra su ventana; la otra se ve a la misma escala (recortada al centro).
+  const ladoVista = res[0]?.meta.dinamico ? res[0].meta.lado_km : Math.max(...lados, 1);
   const notaEsc = document.getElementById('nota-escala');
   if (lados.length === 2 && Math.abs(lados[0] - lados[1]) > 1e-6) notaEsc.textContent = `extents differ (${lados[0]} km vs ${lados[1]} km) · shown at the same horizontal scale`;
   else if (lados.length === 2) notaEsc.textContent = `same horizontal scale · ${lados[0]} km each`;
@@ -936,6 +1043,12 @@ async function iniciar() {
       p.volatiles = crearVolatiles(p, { catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, refrescarPlantado, modoPlantar, elegirHerramienta, leyenda, paneles: estado.paneles });
       p.base = crearBase(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, quitarPlantado, refrescarPlantado, evaluar, LECTURA, VARIABLE, OP, paneles: estado.paneles, alternarAmpliado, modoPlantar, elegirHerramienta });
       p.el.querySelector('.ampliar').disabled = false;
+      // Las fichas (equipo, perforación) se abren en el panel lateral, bajo las acciones, no sobre el terreno.
+      const perf = p.el.querySelector('.lienzo > .perforacion');
+      if (perf) p.el.querySelector('.lado .hoja').after(perf);
+      const bs = p.el.querySelector('.suelo');
+      bs.disabled = false;
+      p.el.querySelector('.acciones').prepend(bs);
     } catch (e) {
       console.error(e);
       mostrarError(p, `terrain could not be shown: ${p.id} (${e.message})`);

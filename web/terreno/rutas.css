@@ -1,6 +1,5 @@
 /* Herramienta Route y Sites (panel_rutas.js). Usa las variables de estilo.css. */
-.panel.ampliado { grid-template-columns: 1fr auto auto; }
-.rutas { grid-column: 3; grid-row: 1; width: 300px; border-left: 1px solid var(--linea); padding: 10px; display: none; flex-direction: column; gap: 7px; overflow-y: auto; font-size: 11px; }
+.rutas { grid-area: rutas; width: 300px; border-left: 1px solid var(--linea); padding: 10px; display: none; flex-direction: column; gap: 7px; overflow-y: auto; font-size: 11px; }
 .panel.ampliado .rutas { display: flex; }
 .rutas .sub { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--linea); }
 .rutas label { display: flex; flex-direction: column; gap: 3px; }

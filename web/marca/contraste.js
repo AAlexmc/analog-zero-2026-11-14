@@ -59,4 +59,8 @@ export const PAREJAS = [
   { uso: 'terrain viewer: selected segment and pressed button', texto: 'white', fondo: 'electric-blue' },
   { uso: 'terrain viewer: card, controls and labels over bright terrain', texto: 'white', fondo: PANEL_PEOR },
   { uso: 'terrain viewer: "Plant" and "Drill here" hint label on its white pill', texto: 'electric-blue', fondo: 'white' },
+  { uso: 'terrain viewer: side panel text over the brand gradient (lightest corner)', texto: 'white', fondo: mezclar('deep-blue', 0.86, 'electric-blue') },
+  { uso: 'terrain viewer: side panel muted text over the brand gradient (lightest corner)', texto: TENUE(mezclar('deep-blue', 0.86, 'electric-blue')), fondo: mezclar('deep-blue', 0.86, 'electric-blue') },
+  { uso: 'terrain viewer: ground view note on its white pill', texto: 'deep-blue', fondo: 'white' },
+  { uso: 'terrain viewer: "your place could not be built" notice', texto: 'white', fondo: 'deep-blue' },
 ];
