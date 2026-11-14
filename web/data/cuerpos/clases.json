@@ -1,0 +1,385 @@
+{
+ "que_es": "Unsupervised grouping of Earth's land by these 8 parameters; not a prediction.",
+ "origen": "mío",
+ "metodo": "Principal components of the standardized parameters, then k-means on the whitened component scores. No labelled data and no trained model: it only groups Earth cells that look alike in these numbers.",
+ "doc": "docs/metrica-analogos.md",
+ "celdas": {
+  "regla": "Earth land cells with land fraction ≥ 0.5, not ice cap (GLiM class 16), with data for every parameter; values transformed with each parameter's transformacion and standardized with the area-weighted mean and standard deviation of those cells (weight = cos latitude)",
+  "n": 58833,
+  "pct_area_tierra_firme": 97.6598
+ },
+ "espacio": "Whitened principal components: score_j = (z · component_j) / √eigenvalue_j, keeping the first components that explain ≥ 95% of the variance. Each independent direction of variation on Earth counts once, so three strongly correlated temperatures do not weigh three times; the dropped components (the last few % of variance) are left out so that whitening does not blow up noise.",
+ "pca": {
+  "parametros": [
+   "rugosidad_tan",
+   "relieve_m",
+   "t_max_k",
+   "t_min_k",
+   "t_media_k",
+   "insolacion_kwh_m2_dia",
+   "ndvi_max",
+   "precip_mm_ano"
+  ],
+  "media": [
+   -2.304339631,
+   0.9695254528,
+   296.024377,
+   281.8260749,
+   287.6545628,
+   4.647610022,
+   0.6136033281,
+   2.697296595
+  ],
+  "desviacion": [
+   0.4971733129,
+   0.5712487068,
+   15.33260794,
+   11.75750323,
+   12.84943041,
+   1.268788462,
+   0.2747348694,
+   0.5251709021
+  ],
+  "componentes": [
+   [
+    -0.2435213654,
+    -0.2645876838,
+    0.4686189929,
+    0.4187296972,
+    0.4521046697,
+    0.4455601009,
+    -0.2027341495,
+    -0.1781258293
+   ],
+   [
+    0.3790622948,
+    0.3063248374,
+    0.1778369182,
+    0.3401847953,
+    0.2723428063,
+    0.04928661591,
+    0.5143567639,
+    0.5234143206
+   ],
+   [
+    0.542217297,
+    0.5784871405,
+    0.1153177871,
+    -0.07612176242,
+    0.01043950424,
+    0.2561532816,
+    -0.375669151,
+    -0.3813260002
+   ]
+  ],
+  "autovalores": [
+   4.113807775,
+   2.038835971,
+   1.48858551
+  ],
+  "varianza_explicada": [
+   0.514226,
+   0.254854,
+   0.186073,
+   0.0220423,
+   0.0149429,
+   0.00530986,
+   0.00254064,
+   1.06029e-05
+  ],
+  "retenidas": 3,
+  "varianza_retenida": 0.955154,
+  "residuo_z_p99": 1.65795,
+  "residuo_regla": "Residual = length of the part of the standardized vector z that the kept components do not describe, √(|z|² − Σ (z · component_j)²); residuo_z_p99 = its area-weighted 99th percentile over the Earth cells. A target with a larger residual differs from Earth in a way the kept components cannot see."
+ },
+ "criterio_k": {
+  "regla": "Chosen before looking at any map: for each k in 6…14, area-weighted k-means (k-means++ start, 10 starts with seed 7, lowest inertia kept); k = the one with the highest mean silhouette over a fixed sample of 5000 cells drawn with probability ∝ area (seed 8); a tie goes to the smaller k.",
+  "tabla": [
+   {
+    "k": 6,
+    "silueta_media": 0.321522,
+    "inercia": 34850.6
+   },
+   {
+    "k": 7,
+    "silueta_media": 0.310644,
+    "inercia": 30881.4
+   },
+   {
+    "k": 8,
+    "silueta_media": 0.303161,
+    "inercia": 27917.6
+   },
+   {
+    "k": 9,
+    "silueta_media": 0.296606,
+    "inercia": 25710.7
+   },
+   {
+    "k": 10,
+    "silueta_media": 0.297675,
+    "inercia": 23710.9
+   },
+   {
+    "k": 11,
+    "silueta_media": 0.311661,
+    "inercia": 21795.7
+   },
+   {
+    "k": 12,
+    "silueta_media": 0.303022,
+    "inercia": 20533.1
+   },
+   {
+    "k": 13,
+    "silueta_media": 0.303187,
+    "inercia": 19369.1
+   },
+   {
+    "k": 14,
+    "silueta_media": 0.290103,
+    "inercia": 18418.9
+   }
+  ],
+  "k": 6
+ },
+ "d_ref": {
+  "valor": 4.321700565,
+  "regla": "99th percentile of the distance between all pairs of the same fixed sample of 5000 cells, in the whitened component space",
+  "uso": "similitud_pct = 100 × (1 − d / d_ref), clipped to [0, 100]"
+ },
+ "radio": "Area-weighted 95th percentile of the distance from the class cells to the class centre",
+ "rotulo": {
+  "regla": "For each class, the area-weighted mean of every standardized parameter (z). Within each parameter group (terrain, temperature, …) only the parameter with the largest |z| is kept. Groups are ranked by |z|; the label joins up to 3 of them with |z| ≥ 0.5, at least one; the word is the 'low' or 'high' word of the parameter, with 'very ' in front when |z| ≥ 1.5. If two classes end with the same label, the next ranked group is added to both until they differ.",
+  "palabras": {
+   "rugosidad_tan": [
+    "smooth",
+    "rough"
+   ],
+   "relieve_m": [
+    "flat",
+    "steep"
+   ],
+   "t_max_k": [
+    "cool days",
+    "hot days"
+   ],
+   "t_min_k": [
+    "cold nights",
+    "warm nights"
+   ],
+   "t_media_k": [
+    "cold",
+    "warm"
+   ],
+   "insolacion_kwh_m2_dia": [
+    "dim",
+    "sunny"
+   ],
+   "ndvi_max": [
+    "bare",
+    "green"
+   ],
+   "precip_mm_ano": [
+    "dry",
+    "wet"
+   ]
+  }
+ },
+ "clases": [
+  {
+   "id": 0,
+   "rotulo": "warm nights · flat · wet",
+   "n_celdas": 10599,
+   "pct_area": 23.1843,
+   "radio": 1.203283705,
+   "centroide_componentes": [
+    0.701723397,
+    0.4948670608,
+    -0.8551126245
+   ],
+   "z_medio": {
+    "rugosidad_tan": -0.682517,
+    "relieve_m": -0.74067,
+    "t_max_k": 0.68171,
+    "t_min_k": 0.855327,
+    "t_media_k": 0.796104,
+    "insolacion_kwh_m2_dia": 0.493645,
+    "ndvi_max": 0.469717,
+    "precip_mm_ano": 0.567933
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.0022716,
+    "relieve_m": 3.51899,
+    "t_max_k": 306.477,
+    "t_min_k": 291.883,
+    "t_media_k": 297.884,
+    "insolacion_kwh_m2_dia": 5.27394,
+    "ndvi_max": 0.742651,
+    "precip_mm_ano": 988.825
+   }
+  },
+  {
+   "id": 1,
+   "rotulo": "rough · green · wet",
+   "n_celdas": 8926,
+   "pct_area": 19.2233,
+   "radio": 1.236224767,
+   "centroide_componentes": [
+    0.01181690176,
+    1.310597726,
+    0.350591138
+   ],
+   "z_medio": {
+    "rugosidad_tan": 0.956153,
+    "relieve_m": 0.803255,
+    "t_max_k": 0.375638,
+    "t_min_k": 0.66132,
+    "t_media_k": 0.542101,
+    "insolacion_kwh_m2_dia": 0.159827,
+    "ndvi_max": 0.806945,
+    "precip_mm_ano": 0.765225
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.0148264,
+    "relieve_m": 26.8154,
+    "t_max_k": 301.784,
+    "t_min_k": 289.602,
+    "t_media_k": 294.62,
+    "insolacion_kwh_m2_dia": 4.8504,
+    "ndvi_max": 0.835299,
+    "precip_mm_ano": 1255.52
+   }
+  },
+  {
+   "id": 2,
+   "rotulo": "very bare · very dry · sunny",
+   "n_celdas": 9019,
+   "pct_area": 18.3818,
+   "radio": 1.5235002,
+   "centroide_componentes": [
+    1.108896786,
+    -1.075759431,
+    0.6358038504
+   ],
+   "z_medio": {
+    "rugosidad_tan": -0.690239,
+    "relieve_m": -0.620586,
+    "t_max_k": 0.863395,
+    "t_min_k": 0.418156,
+    "t_media_k": 0.636122,
+    "insolacion_kwh_m2_dia": 1.03219,
+    "ndvi_max": -1.57825,
+    "precip_mm_ano": -1.51398
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.0022516,
+    "relieve_m": 4.12113,
+    "t_max_k": 309.262,
+    "t_min_k": 286.743,
+    "t_media_k": 295.828,
+    "insolacion_kwh_m2_dia": 5.95724,
+    "ndvi_max": 0.180004,
+    "precip_mm_ano": 78.8362
+   }
+  },
+  {
+   "id": 3,
+   "rotulo": "dim · cool days · smooth",
+   "n_celdas": 14483,
+   "pct_area": 17.4692,
+   "radio": 1.60273614,
+   "centroide_componentes": [
+    -0.8566910462,
+    -0.8105957211,
+    -1.007827022
+   ],
+   "z_medio": {
+    "rugosidad_tan": -0.661397,
+    "relieve_m": -0.619479,
+    "t_max_k": -1.16047,
+    "t_min_k": -0.997428,
+    "t_media_k": -1.09645,
+    "insolacion_kwh_m2_dia": -1.19933,
+    "ndvi_max": 0.272785,
+    "precip_mm_ano": 0.0881452
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.00232719,
+    "relieve_m": 4.12714,
+    "t_max_k": 278.231,
+    "t_min_k": 270.099,
+    "t_media_k": 273.566,
+    "insolacion_kwh_m2_dia": 3.12592,
+    "ndvi_max": 0.688547,
+    "precip_mm_ano": 553.1
+   }
+  },
+  {
+   "id": 4,
+   "rotulo": "cold · dim · steep",
+   "n_celdas": 11511,
+   "pct_area": 13.4736,
+   "radio": 1.450892315,
+   "centroide_componentes": [
+    -1.461125389,
+    -0.1324102955,
+    0.3572364748
+   ],
+   "z_medio": {
+    "rugosidad_tan": 0.871865,
+    "relieve_m": 0.995568,
+    "t_max_k": -1.37837,
+    "t_min_k": -1.32122,
+    "t_media_k": -1.38034,
+    "insolacion_kwh_m2_dia": -1.2342,
+    "ndvi_max": 0.370106,
+    "precip_mm_ano": 0.222481
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.0134626,
+    "relieve_m": 34.5336,
+    "t_max_k": 274.89,
+    "t_min_k": 266.292,
+    "t_media_k": 269.918,
+    "insolacion_kwh_m2_dia": 3.08167,
+    "ndvi_max": 0.715284,
+    "precip_mm_ano": 650.834
+   }
+  },
+  {
+   "id": 5,
+   "rotulo": "steep · bare · cold nights",
+   "n_celdas": 4295,
+   "pct_area": 8.26776,
+   "radio": 1.682009772,
+   "centroide_componentes": [
+    -0.2693950586,
+    -0.114705796,
+    1.716433992
+   ],
+   "z_medio": {
+    "rugosidad_tan": 1.20201,
+    "relieve_m": 1.27556,
+    "t_max_k": -0.00635588,
+    "t_min_k": -0.605184,
+    "t_media_k": -0.340956,
+    "insolacion_kwh_m2_dia": 0.494658,
+    "ndvi_max": -0.863991,
+    "precip_mm_ano": -0.554582
+   },
+   "centroide_fisico": {
+    "rugosidad_tan": 0.0196457,
+    "relieve_m": 49.9099,
+    "t_max_k": 295.927,
+    "t_min_k": 274.711,
+    "t_media_k": 283.273,
+    "insolacion_kwh_m2_dia": 5.27523,
+    "ndvi_max": 0.376235,
+    "precip_mm_ano": 253.71
+   }
+  }
+ ],
+ "capa": "earth/clase.f32",
+ "entrada_sha256": "c9725bdebd5f3f2e3832974161d763229fe0ea9fad9c591f589df49220acdcf4"
+}

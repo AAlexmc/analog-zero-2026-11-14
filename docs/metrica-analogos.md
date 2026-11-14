@@ -27,3 +27,30 @@ Las n mejores celdas (por defecto 5), separadas al menos `separacion_km` (por de
 - La Tierra no tiene rugosidad ni relieve al sur de 56° S (GMTED2010 7,5″) ni NDVI en hielo: en la Antártida la similitud se calcula con menos parámetros (p. ej. 5 de 8) y no paga la desviación de los que faltan: por eso esas celdas van en `parciales` y no en `resultados`. Cada una lista sus parámetros con `estado` (`sin_dato_tierra`).
 - El casquete sale de GLiM a 0,5°: hay celdas antárticas bajo hielo que GLiM rotula por la roca de debajo (o sin dato) y no se quitan.
 - Islas y costas con menos de la mitad de tierra en la celda (p. ej. Lanzarote) no entran.
+
+## Clases de entorno de la Tierra (aprendizaje no supervisado, `origen: "mío"`)
+Qué es: agrupar la tierra firme de la Tierra por sus propios números, sin etiquetas ni modelo entrenado; no es una predicción. Lo escribe `python -m pipeline.clases` (después de `pipeline.cuerpos`) en `web/data/cuerpos/clases.json` y `earth/clase.f32` (id de clase por celda, NaN fuera); `indice.json` lo apunta con `clases`.
+
+Regla:
+1. Celdas: `tierra_frac` ≥ 0,5, sin casquete, con dato en todos los parámetros `reproducible_en_tierra`. Valores con la misma f del motor, estandarizados con media y desviación pesadas por área (cos lat).
+2. Componentes principales de la covarianza pesada; se guardan las primeras que suman ≥ 95 % de la varianza. Espacio de trabajo: puntuaciones **blanqueadas** (cada componente dividida por la raíz de su autovalor).
+3. k-medias pesadas por área (arranque k-means++, 10 arranques con semilla fija, la de menor inercia). k entre 6 y 14 por la mayor silueta media sobre una muestra fija de 5000 celdas (probabilidad ∝ área); empate → k menor. El criterio se fijó antes de mirar ningún mapa; la tabla k → silueta va en `criterio_k`.
+4. Por clase: centro en componentes, centro físico (f⁻¹ de la media pesada de f(v)), nº de celdas, % del área clasificada, radio = percentil 95 (por área) de la distancia de sus celdas al centro, y un rótulo por regla (`rotulo.regla`): z medio de cada parámetro, uno por grupo, los de |z| ≥ 0,5 hasta 3, palabra «baja»/«alta» del parámetro y «very» si |z| ≥ 1,5.
+
+`M.claseDe(objetivo)` proyecta el punto y da la clase de centro más cercano, `dentro` = distancia ≤ radio, `faltan` (parámetros sin dato: se proyecta por mínimos cuadrados con los que hay; con menos parámetros que componentes no se proyecta) y `residuo_z`: la parte del punto que las componentes guardadas no ven, frente a `residuo_z_p99_tierra`.
+
+Límites: la estructura es débil (silueta ≈ 0,3 para todo k): la tierra es un continuo y las fronteras entre clases son convencionales. Las clases solo ven los parámetros que hay (sin geología, polvo, subsuelo). El 5 % de las celdas de cada clase queda fuera de su radio por construcción. NDVI y lluvia de la Luna y Marte son 0 por definición: eso solo ya los aleja de toda la Tierra. Proyectar un punto muy fuera del rango de la Tierra es extrapolar.
+
+## Métrica por componentes (`opc.metrica: 'componentes'`)
+Qué es: ordenar las celdas por distancia euclídea al objetivo en las componentes blanqueadas, para que parámetros redundantes (máxima, mínima y media de temperatura) no cuenten tres veces. Distancia blanqueada = distancia de Mahalanobis de la Tierra en las componentes guardadas.
+
+Regla: `similitud_pct = 100 × (1 − d / d_ref)` recortada a [0, 100]; `d_ref` = percentil 99 de la distancia entre todos los pares de la muestra fija de 5000 celdas (`clases.json`, `d_ref`). Cada resultado lleva además `distancia_componentes` y `similitud_parametros_pct` (la de siempre); las desviaciones por parámetro no cambian. Entran solo celdas con todos los parámetros (`parciales` vacío); sin `pesos` ni `parametros`.
+
+Límites: un punto de la Luna o de Marte suele quedar más lejos de toda la Tierra que `d_ref`, así que su similitud sale 0 % aunque el orden siga siendo útil. Lo que el objetivo tiene fuera de las componentes guardadas (`residuo_z`; p. ej. buena parte de la oscilación diaria de ~300 K de Mare Tranquillitatis, que la Tierra no tiene) no cuenta en la distancia.
+
+## Cartera de análogos (`M.cartera(objetivo, opc)`)
+Qué es: un análogo no tiene que coincidir en todo. La cartera es el conjunto más pequeño de lugares de la Tierra que entre todos cubren cada parámetro cubrible; lo que ningún lugar cubre es lo que hay que ensayar en laboratorio.
+
+Regla: un parámetro queda cubierto por una celda si su desviación es < `corte` (por defecto 15, el corte «close match» de la pantalla). Celdas: las mismas que `buscar` con `completos: false` (tierra ≥ 0,5, sin casquete salvo `incluir_casquete`, dato en al menos la mitad de los parámetros). Cada celda se reduce a su máscara de parámetros cubiertos; programación dinámica exacta por capas sobre la unión de máscaras: la primera capa que llega a la unión total da el mínimo nº de lugares, y dentro de ella se queda la combinación con mayor similitud media, usando para cada máscara su celda de mayor similitud (empate → índice menor). `sin_cubrir` da, por parámetro no cubierto, la menor desviación de toda la Tierra y dónde. `separacion_km` (por defecto 0): después de elegir las máscaras, cada lugar pasa a ser la mejor celda que cubra al menos lo mismo y esté a esa distancia de los anteriores; si no existe se dice (`separacion_cumplida: false`) y el óptimo de similitud deja de estar garantizado.
+
+Límites: depende del corte y del rango de referencia; un parámetro «cubierto» no dice nada de los demás de ese lugar (cada lugar lleva todas sus desviaciones). Celdas con menos parámetros (Antártida sin relieve ni NDVI) pueden entrar y cubrir solo los que tienen.

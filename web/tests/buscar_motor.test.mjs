@@ -227,3 +227,253 @@ test('real data: rainfall is compared on a log scale, log10(1 + mm/year)', { ski
   assert.equal(M.desviacion('precip_mm_ano', 0, 0), 0);
   assert.ok(M.desviacion('precip_mm_ano', 10, 0) < M.desviacion('precip_mm_ano', 300, 0));
 });
+
+// Clases de entorno, métrica por componentes y cartera.
+const RAIZ2 = Math.SQRT1_2;
+const clasesSinteticas = () => ({
+  que_es: 'Unsupervised grouping of Earth\'s land by these 3 parameters; not a prediction.',
+  origen: 'mío',
+  pca: {
+    parametros: ['a', 'b', 'c'], media: [180, 2, 180], desviacion: [50, 0.5, 50],
+    componentes: [[RAIZ2, 0, RAIZ2], [0, 1, 0]], autovalores: [1.9, 0.8],
+    varianza_explicada: [0.63, 0.27, 0.1], retenidas: 2, varianza_retenida: 0.9, residuo_z_p99: 0.1,
+  },
+  d_ref: { valor: 3, regla: 'r' },
+  clases: [
+    { id: 0, rotulo: 'x', n_celdas: 1, pct_area: 50, radio: 1, centroide_componentes: [0, 0] },
+    { id: 1, rotulo: 'y', n_celdas: 1, pct_area: 50, radio: 1, centroide_componentes: [2, 0] },
+  ],
+});
+const conClases = (leer, clases) => async (ruta, tipo) => {
+  if (ruta.endsWith('clases.json')) return JSON.parse(JSON.stringify(clases));
+  const r = await leer(ruta, tipo);
+  return tipo === 'json' ? { ...r, clases: 'clases.json' } : r;
+};
+
+test('without clases.json the engine still works: clases is null, claseDe gives null, the component metric refuses', async () => {
+  const M = await cargar('base/', sintetico());
+  assert.equal(M.clases, null);
+  assert.equal(M.claseDe(M.leerPunto('moon', 0.25, 10.25)), null);
+  assert.throws(() => M.buscar(M.leerPunto('moon', 0.25, 10.25), { metrica: 'componentes' }), /clases/);
+  const roto = await cargar('base/', conClases(sintetico(), null));
+  assert.equal(roto.clases, null);
+});
+
+test('default search output is byte-identical to the one pinned before classes existed, with or without clases.json', async () => {
+  for (const leer of [sintetico(), conClases(sintetico(), clasesSinteticas())]) {
+    const M = await cargar('base/', leer);
+    const o = M.leerPunto('moon', 0.25, 10.25);
+    const h = createHash('sha256');
+    for (const c of [{}, { n: 8, separacion_km: 0 }, { completos: false }, { pesos: { a: 3, b: 1 } }, { parametros: ['b'] }, { incluir_casquete: true }]) h.update(huella(M.buscar(o, c)));
+    h.update(huella(M.buscar(M.leerPunto('earth', -10.25, 20.25))));
+    assert.equal(h.digest('hex'), 'fd3a712065edfe5b60035595b17ba64d77d4fee3ce51af9138520dbc6ccf8733');
+  }
+});
+
+test('claseDe: an Earth cell near a class centre falls in that class, inside its radius; missing parameters are listed', async () => {
+  const M = await cargar('base/', conClases(sintetico(), clasesSinteticas()));
+  const t = M.leerPunto('earth', lat(180), lon(99));
+  const k = M.claseDe(t);
+  assert.equal(k.id, 0); assert.equal(k.dentro, true); assert.equal(k.componentes_usadas, 2);
+  assert.deepEqual(k.faltan, []);
+  assert.ok(k.residuo_z < 1e-12);
+  // b = 100 → segunda componente 0; a = c ≈ 180,099 → s1 = √2 · (a − 180)/50 / √1,9.
+  assert.equal(t.valores.b, 100);
+  assert.ok(Math.abs(k.distancia - (Math.SQRT2 * (t.valores.a - 180) / 50) / Math.sqrt(1.9)) < 1e-12);
+  const lejos = M.claseDe(M.leerPunto('earth', lat(259), lon(5)));
+  assert.equal(lejos.dentro, false);
+  // La Luna no tiene c: se proyecta con a y b por mínimos cuadrados (a sola fija la primera componente a la mitad).
+  const o = M.leerPunto('moon', 0.25, 10.25);
+  const km = M.claseDe(o);
+  assert.deepEqual(km.faltan, ['c']);
+  const s1 = ((o.valores.a - 180) / 50) * Math.SQRT2 / Math.sqrt(1.9), s2 = (Math.log10(50) - 2) / 0.5 / Math.sqrt(0.8);
+  const d0 = Math.hypot(s1, s2), d1 = Math.hypot(s1 - 2, s2);
+  assert.equal(km.id, d0 <= d1 ? 0 : 1);
+  assert.ok(Math.abs(km.distancia - Math.min(d0, d1)) < 1e-9);
+});
+
+test('component metric: the target cell itself is first at distance 0 and 100 %; per-parameter deviations are the usual ones', async () => {
+  const M = await cargar('base/', conClases(sintetico(), clasesSinteticas()));
+  const o = M.leerPunto('earth', lat(180), lon(400));
+  const r = M.buscar(o, { metrica: 'componentes' });
+  const p = r.resultados[0];
+  assert.deepEqual([p.fila, p.col], [180, 400]);
+  assert.equal(p.distancia_componentes, 0); assert.equal(p.similitud_pct, 100);
+  assert.equal(r.metrica, 'componentes'); assert.equal(r.parciales.length, 0);
+  const porDefecto = M.buscar(o);
+  const mismo = porDefecto.resultados[0];
+  assert.deepEqual(p.parametros, mismo.parametros);
+  for (let i = 1; i < r.resultados.length; i++) assert.ok(r.resultados[i].distancia_componentes >= r.resultados[i - 1].distancia_componentes);
+  for (const x of r.resultados) assert.ok(Math.abs(x.similitud_pct - Math.max(0, 100 * (1 - x.distancia_componentes / 3))) < 1e-9);
+  assert.throws(() => M.buscar(o, { metrica: 'componentes', pesos: { a: 2 } }), /pesos/);
+  assert.throws(() => M.buscar(o, { metrica: 'otra' }), /metrica/);
+});
+
+// Mundo pequeño para la cartera: 30 celdas de tierra, 4 parámetros lineales con valores pseudoaleatorios fijos.
+function mundoCartera() {
+  let x = 12345;
+  const azar = () => { x = (x * 1103515245 + 12345) % 2147483648; return x / 2147483648; };
+  const tierraI = new Set(Array.from({ length: 30 }, (_, k) => idx(150 + (k % 3), 10 + k * 7)));
+  const vals = [[], [], [], []];
+  for (let k = 0; k < 30; k++) for (let j = 0; j < 4; j++) vals[j].push(j === 3 ? azar() * 100 : azar() * 100);
+  vals[1][4] = NaN; vals[2][9] = NaN;
+  const orden = [...tierraI];
+  const capa = (j) => buf((i) => (tierraI.has(i) ? vals[j][orden.indexOf(i)] : NaN));
+  const ficheros = { 'earth/tierra.f32': buf((i) => (tierraI.has(i) ? 1 : 0)) };
+  for (let j = 0; j < 4; j++) ficheros[`earth/p${j}.f32`] = capa(j);
+  const fuente = { texto: 't', url: null };
+  const fuentes = { earth: fuente, moon: fuente, mars: fuente };
+  const indice = {
+    rejilla: { ancho: 720, alto: 360, paso_deg: 0.5, lat0: 89.75, lon0: -179.75, fila0: 'norte' },
+    cuerpos: { earth: { radio_km: 6371 }, moon: { radio_km: 1737.4 }, mars: { radio_km: 3389.5 } },
+    mascara_tierra: 'earth/tierra.f32', mascara_casquete: null,
+    parametros: [0, 1, 2, 3].map((j) => ({
+      id: `p${j}`, capas: { earth: `earth/p${j}.f32`, moon: null, mars: null }, constante: { earth: null, moon: [50, 30, 70, 500][j], mars: null },
+      fuentes, rango_ref: { min: 0, max: j === 3 ? 1000 : 100 }, transformacion: 'lineal', reproducible_en_tierra: true,
+    })),
+  };
+  const leer = async (ruta, tipo) => (tipo === 'json' ? JSON.parse(JSON.stringify(indice)) : ficheros[ruta.replace(/^base\//, '')].slice(0));
+  return { leer, celdas: orden };
+}
+
+function* combinaciones(a, k, desde = 0, pref = []) {
+  if (pref.length === k) { yield pref; return; }
+  for (let i = desde; i < a.length; i++) yield* combinaciones(a, k, i + 1, [...pref, a[i]]);
+}
+
+test('portfolio: smallest set of places is exact against brute force, each place covers what it says, uncovered is right', async () => {
+  const { leer, celdas } = mundoCartera();
+  const M = await cargar('base/', leer);
+  const o = M.leerPunto('moon', 0.25, 10.25);
+  const ids = ['p0', 'p1', 'p2', 'p3'];
+  const tamanos = [];
+  for (const corte of [10, 15, 25]) {
+    const c = M.cartera(o, { corte });
+    tamanos.push(c.lugares.length);
+    // Fuerza bruta sobre celdas: máscara y similitud media de cada una con la desviación del motor.
+    const info = celdas.map((i) => {
+      const v = M.leerPunto('earth', lat(Math.floor(i / 720)), lon(i % 720)).valores;
+      const d = ids.map((id) => M.desviacion(id, v[id], o.valores[id]));
+      const con = d.filter((x) => x !== null);
+      return { i, d, m: d.reduce((m, x, j) => (x !== null && x < corte ? m | (1 << j) : m), 0), sim: con.reduce((s, x) => s + 100 - x, 0) / con.length };
+    });
+    const todo = info.reduce((u, x) => u | x.m, 0);
+    let mejor = null;
+    for (let k = 1; k <= 4 && !mejor; k++) {
+      for (const comb of combinaciones(info, k)) {
+        if (comb.reduce((u, x) => u | x.m, 0) !== todo) continue;
+        const media = comb.reduce((s, x) => s + x.sim, 0) / k;
+        if (!mejor || media > mejor.media + 1e-12) mejor = { k, media };
+      }
+    }
+    assert.equal(c.lugares.length, mejor.k, `corte ${corte}`);
+    assert.ok(Math.abs(c.lugares.reduce((s, l) => s + l.similitud_pct, 0) / c.lugares.length - mejor.media) < 1e-9, `corte ${corte}`);
+    assert.deepEqual(c.cubiertos, ids.filter((_, j) => todo & (1 << j)));
+    for (const l of c.lugares) {
+      for (const p of l.parametros) {
+        if (l.cubre.includes(p.id)) assert.ok(p.desviacion_pct < corte, `${p.id} ${p.desviacion_pct}`);
+        else assert.ok(p.desviacion_pct === null || p.desviacion_pct >= corte);
+      }
+    }
+    assert.deepEqual(new Set(c.lugares.flatMap((l) => l.cubre)), new Set(c.cubiertos));
+    assert.ok(c.sin_cubrir.some((s) => s.id === 'p3'));
+    for (const s of c.sin_cubrir) {
+      const j = ids.indexOf(s.id);
+      const min = Math.min(...info.filter((x) => x.d[j] !== null).map((x) => x.d[j]));
+      assert.equal(s.mejor_desviacion_pct, min);
+      const donde = info.find((x) => x.d[j] === min).i;
+      assert.deepEqual([s.lat, s.lon], [lat(Math.floor(donde / 720)), lon(donde % 720)]);
+    }
+    assert.deepEqual(M.cartera(o, { corte }), c);
+  }
+  // El caso no es trivial: hacen falta varios lugares.
+  assert.ok(Math.max(...tamanos) >= 2, `${tamanos}`);
+});
+
+test('portfolio: with a separation every pair of places is at least that far apart, or it says it could not', async () => {
+  const { leer } = mundoCartera();
+  const M = await cargar('base/', leer);
+  const c = M.cartera(M.leerPunto('moon', 0.25, 10.25), { corte: 25, separacion_km: 300 });
+  assert.equal(c.separacion_km, 300);
+  if (c.separacion_cumplida) {
+    for (const a of c.lugares) for (const b of c.lugares) if (a !== b) {
+      const rad = Math.PI / 180;
+      const h = Math.sin(((b.lat - a.lat) * rad) / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(((b.lon - a.lon) * rad) / 2) ** 2;
+      assert.ok(2 * 6371 * Math.asin(Math.sqrt(h)) >= 300);
+    }
+  }
+  assert.deepEqual(new Set(c.lugares.flatMap((l) => l.cubre)), new Set(c.cubiertos));
+});
+
+async function entradaReal() {
+  const indice = JSON.parse(await readFile(new URL('indice.json', REAL), 'utf8'));
+  const rutas = new Set([indice.mascara_tierra, indice.mascara_casquete]);
+  for (const p of indice.parametros) for (const r of Object.values(p.capas ?? {})) if (r) rutas.add(r);
+  const h = createHash('sha256').update(JSON.stringify(indice.parametros));
+  for (const r of [...rutas].sort()) h.update(r).update(await readFile(new URL(r, REAL)));
+  return h.digest('hex');
+}
+
+test('real data: default search output is byte-identical to the one pinned before classes existed', { skip: !hayReal && 'sin web/data/cuerpos' }, async (t) => {
+  if (await entradaReal() !== '3a443cdd9d2d6c713f6f31ed63c7f423facfb1b1f3fc15939c0f7100df808fc9') {
+    t.skip('las capas cambiaron desde que se fijó la huella: rehacerla con el motor anterior');
+    return;
+  }
+  const M = await cargar(REAL.pathname, leerDisco);
+  const h = createHash('sha256');
+  for (const [c, la, lo] of [['moon', -89.68643, -162.9371], ['moon', 8.3355, 33.222], ['mars', 18.38, 77.58], ['mars', 47.2, -175.7], ['earth', -24.1, -70.01]]) {
+    h.update(huella(M.buscar(M.leerPunto(c, la, lo))));
+    h.update(huella(M.buscar(M.leerPunto(c, la, lo), { completos: false, n: 10, separacion_km: 100 })));
+  }
+  assert.equal(h.digest('hex'), 'dfbd0c50c125d2b1acce6bdef42a84d0b26af99e04c9e03bfdd8f01354e8ee4c');
+});
+
+const hayClases = existsSync(new URL('clases.json', REAL));
+
+test('real data: every classified Earth cell gets its own class from claseDe, and the cell nearest a centre is inside', { skip: !hayClases && 'sin clases.json' }, async () => {
+  const M = await cargar(REAL.pathname, leerDisco);
+  assert.ok(M.clases && M.clases.origen === 'mío');
+  const clase = new Float32Array(new Uint8Array(await readFile(new URL(M.clases.capa, REAL))).buffer);
+  let n = 0, distintas = 0;
+  const mejor = new Map();
+  for (let i = 0; i < N; i++) {
+    if (!Number.isFinite(clase[i])) continue;
+    n++;
+    const k = M.claseDe(M.leerPunto('earth', lat(Math.floor(i / 720)), lon(i % 720)));
+    assert.deepEqual(k.faltan, []);
+    if (k.id !== clase[i]) distintas++;
+    if (!mejor.has(k.id) || k.distancia < mejor.get(k.id).distancia) mejor.set(k.id, k);
+  }
+  assert.equal(n, M.clases.celdas.n);
+  assert.equal(distintas, 0);
+  for (const k of mejor.values()) assert.equal(k.dentro, true);
+});
+
+test('real data: the component metric finds an Earth cell itself first at distance 0', { skip: !hayClases && 'sin clases.json' }, async () => {
+  const M = await cargar(REAL.pathname, leerDisco);
+  const o = M.leerPunto('earth', -24.1, -70.01);
+  const r = M.buscar(o, { metrica: 'componentes' });
+  assert.deepEqual([r.resultados[0].fila, r.resultados[0].col], [o.fila, o.col]);
+  assert.ok(r.resultados[0].distancia_componentes < 1e-9);
+  assert.ok(r.resultados[0].similitud_pct > 99.99999);
+  assert.deepEqual(r.resultados[0].parametros, M.buscar(o).resultados[0].parametros);
+});
+
+test('real data: Shackleton rim portfolio — each place covers what it says, and no single place covers the whole union', { skip: !hayReal && 'sin web/data/cuerpos' }, async () => {
+  const M = await cargar(REAL.pathname, leerDisco);
+  const o = M.leerPunto('moon', -89.68643, -162.9371);
+  const c = M.cartera(o);
+  console.log(`Shackleton portfolio: ${c.lugares.map((l) => `${l.lat}, ${l.lon} covers ${l.cubre.join('+')}`).join(' | ')}; not covered: ${c.sin_cubrir.map((s) => `${s.id} best ${s.mejor_desviacion_pct.toFixed(1)} % at ${s.lat}, ${s.lon}`).join('; ')}`);
+  assert.deepEqual(c, M.cartera(o));
+  for (const l of c.lugares) for (const p of l.parametros) assert.equal(l.cubre.includes(p.id), p.desviacion_pct !== null && p.desviacion_pct < 15);
+  const union = new Set(c.lugares.flatMap((l) => l.cubre));
+  assert.deepEqual(union, new Set(c.cubiertos));
+  if (c.lugares.length > 1) {
+    const casquete = new Float32Array(new Uint8Array(await readFile(new URL(M.indice.mascara_casquete, REAL))).buffer);
+    for (let i = 0; i < N; i++) {
+      if (!(M.tierra[i] >= 0.5) || casquete[i] === 1) continue;
+      const v = M.leerPunto('earth', lat(Math.floor(i / 720)), lon(i % 720)).valores;
+      assert.ok(!c.cubiertos.every((id) => { const d = M.desviacion(id, v[id], o.valores[id]); return d !== null && d < 15; }), `cell ${i} covers everything`);
+    }
+  }
+});

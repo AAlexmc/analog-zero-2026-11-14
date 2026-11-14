@@ -337,6 +337,8 @@ def indice(params, k):
         "mascara_casquete": "earth/casquete_frac.f32",
         "mascaras_fuente": {"tierra_frac": {"texto": "GMTED2010 30″: share of pixels with elevation ≠ 0", "url": URL_GMTED30},
                             "casquete_frac": {"texto": "GLiM class 16 (ice and glaciers), 1 = ice cap", "url": URL_GLIM}},
+        # Lo escribe `python -m pipeline.clases` a partir de estas capas.
+        "clases": "clases.json",
     }
 
 

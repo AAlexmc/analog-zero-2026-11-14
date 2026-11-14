@@ -624,5 +624,6 @@
    "texto": "GLiM class 16 (ice and glaciers), 1 = ice cap",
    "url": "https://epic.awi.de/id/eprint/31092/1/hartmann-moosdorf_2012.zip"
   }
- }
+ },
+ "clases": "clases.json"
 }
