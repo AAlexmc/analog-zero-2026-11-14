@@ -364,6 +364,11 @@ def main(argv):
     from pipeline.cuerpos import tierra_extra
     idx = indice(params, k)
     idx["parametros_tierra"] = tierra_extra.fichas(t, SALIDA)
+    from pipeline.cuerpos import meses
+    if meses.fuentes_completas():
+        meses.anade(idx, meses.capas_cache(t, "--sin-cache" in argv), SALIDA)
+    else:
+        print("monthly layers not included: monthly sources missing", flush=True)
     escribe_indice(idx)
     for p in params:
         print(p["id"], p["rango_ref"]["min"], p["rango_ref"]["max"], p["rango_ref"]["por_cuerpo"], flush=True)

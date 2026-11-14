@@ -419,7 +419,8 @@ async function entradaReal() {
   const indice = JSON.parse(await readFile(new URL('indice.json', REAL), 'utf8'));
   const rutas = new Set([indice.mascara_tierra, indice.mascara_casquete]);
   for (const p of indice.parametros) for (const r of Object.values(p.capas ?? {})) if (r) rutas.add(r);
-  const h = createHash('sha256').update(JSON.stringify(indice.parametros));
+  // `meses` es un añadido: la huella fija las capas anuales y sus fichas.
+  const h = createHash('sha256').update(JSON.stringify(indice.parametros.map(({ meses, ...p }) => p)));
   for (const r of [...rutas].sort()) h.update(r).update(await readFile(new URL(r, REAL)));
   return h.digest('hex');
 }
@@ -655,4 +656,237 @@ test('real data: Earth-only parameters only, reference at Yungay (Atacama): Yung
   const r = M.buscar(M.leerPunto('mars', 18.38, 77.58), { parametros: ids, referencia: ref });
   assert.deepEqual(r.sin_referencia, ids.filter((id) => c.valores[id] === null));
   assert.deepEqual([r.resultados[0].fila, r.resultados[0].col, r.resultados[0].similitud_pct], [c.fila, c.col, 100]);
+});
+
+// Capas mensuales de la Tierra (indice[...].meses): solo se bajan con cargarMeses.
+function bufI16(fn) {
+  const dv = new DataView(new ArrayBuffer(12 * N * 2));
+  for (let m = 1; m <= 12; m++) for (let i = 0; i < N; i++) dv.setInt16(((m - 1) * N + i) * 2, fn(m, i), true);
+  return dv.buffer;
+}
+// a del mes m = fila + 10·(m − 1) (escala 0,5); sin dato en el océano y en la columna 5 de marzo. x del mes m = col + m − 1.
+function conMeses(leer, lecturas = []) {
+  const fila = (i) => Math.floor(i / 720), col = (i) => i % 720;
+  const ficheros = {
+    'earth/mes/a.i16': bufI16((m, i) => (fila(i) < 100 || (m === 3 && col(i) === 5) ? -32768 : 2 * (fila(i) + 10 * (m - 1)))),
+    'earth/mes/x.i16': bufI16((m, i) => (fila(i) >= 100 && fila(i) < 260 && !(fila(i) >= 200 && fila(i) < 210) ? col(i) + m - 1 : -32768)),
+  };
+  const fuente = { texto: 't', url: 'https://example.org' };
+  const meses = {
+    a: { earth: 'earth/mes/a.i16', escala: 0.5, desplazamiento: 0, sin_dato: -32768, fuente, aviso: 'a' },
+    x: { earth: 'earth/mes/x.i16', escala: 1, desplazamiento: 0, sin_dato: -32768, fuente, aviso: 'x' },
+  };
+  return async (ruta, tipo) => {
+    const r = ruta.replace(/^base\//, '');
+    lecturas.push(r);
+    if (ficheros[r]) return ficheros[r].slice(0);
+    const v = await leer(ruta, tipo);
+    if (tipo === 'json' && !ruta.endsWith('clases.json')) for (const p of [...v.parametros, ...(v.parametros_tierra ?? [])]) if (meses[p.id]) p.meses = meses[p.id];
+    return v;
+  };
+}
+const valorDe = (r, id) => r.parametros.find((p) => p.id === id);
+
+test('months: loading reads no monthly file, and without mes buscar and cartera give exactly what they gave', async () => {
+  const lecturas = [];
+  const M = await cargar('base/', conMeses(conTierra(sintetico()), lecturas));
+  const M0 = await cargar('base/', conTierra(sintetico()));
+  assert.ok(!lecturas.some((r) => r.includes('/mes/')), lecturas.join(' '));
+  assert.deepEqual(M.conMeses, ['a', 'x']);
+  assert.deepEqual(M0.conMeses, []);
+  const o = M.leerPunto('moon', ...LUNA);
+  const opcs = [{}, { completos: false }, { parametros: ['b'] }, { pesos: { a: 3, b: 1 } }, { parametros: ['a', 'x'], referencia: { lat: lat(150), lon: lon(300) } }];
+  const compara = () => {
+    for (const c of opcs) assert.deepEqual(M.buscar(o, c), M0.buscar(o, c));
+    assert.deepEqual(M.cartera(o), M0.cartera(o));
+  };
+  compara();
+  assert.deepEqual(await M.cargarMeses(), ['a', 'x']);
+  compara();
+  assert.ok(!('mes' in M.buscar(o)) && !('mensuales' in M.buscar(o)));
+});
+
+test('months: cargarMeses reads each monthly file once, even when called twice at the same time', async () => {
+  const lecturas = [];
+  const M = await cargar('base/', conMeses(conTierra(sintetico()), lecturas));
+  const [r1, r2] = await Promise.all([M.cargarMeses(['a']), M.cargarMeses()]);
+  assert.deepEqual([r1, r2], [['a'], ['a', 'x']]);
+  await M.cargarMeses();
+  assert.equal(lecturas.filter((r) => r === 'earth/mes/a.i16').length, 1);
+  assert.equal(lecturas.filter((r) => r === 'earth/mes/x.i16').length, 1);
+  await assert.rejects(M.cargarMeses(['nada']), /parámetro desconocido: nada/);
+  await assert.rejects(M.cargarMeses(['b']), /sin versión mensual: b/);
+});
+
+test('months: with mes only the parameters that have a monthly layer take that month\'s Earth value; the target stays the same', async () => {
+  const M = await cargar('base/', conMeses(conTierra(sintetico())));
+  await M.cargarMeses();
+  const o = M.leerPunto('moon', ...LUNA);
+  const r = M.buscar(o, { mes: 7, n: 8, separacion_km: 0 });
+  assert.equal(r.mes, 7);
+  assert.deepEqual(r.mensuales, ['a']);
+  for (const x of r.resultados) {
+    assert.equal(valorDe(x, 'a').valor_tierra, x.fila + 60);
+    assert.equal(valorDe(x, 'a').valor_objetivo, o.valores.a);
+    assert.equal(valorDe(x, 'b').valor_tierra, 1 + x.col);
+  }
+  const i = idx(150, 20);
+  const da = M.desviacion('a', 150 + 60, o.valores.a), db = M.desviacion('b', 21, 50);
+  cerca(r.mapa[i], (200 - da - db) / 2, 1e-3);
+  // Enero: a = fila → el mejor es la fila 150 (a de la Luna ≈ 150); julio: a = fila + 60 → la fila 100 (primera de tierra).
+  assert.equal(M.buscar(o, { mes: 1, parametros: ['a'] }).resultados[0].fila, 150);
+  assert.equal(M.buscar(o, { mes: 7, parametros: ['a'] }).resultados[0].fila, 100);
+  // Sin dato del mes: la celda no tiene a ese mes.
+  const marzo = M.buscar(o, { mes: 3, completos: false });
+  cerca(marzo.mapa[idx(150, 5)], 100 - M.desviacion('b', 6, 50), 1e-3);
+  assert.equal(marzo.cobertura[idx(150, 5)], 1);
+  // Cartera: el mismo valor del mes.
+  const c = M.cartera(o, { mes: 7 });
+  assert.equal(c.mes, 7); assert.deepEqual(c.mensuales, ['a']);
+  for (const l of c.lugares) assert.equal(valorDe(l, 'a').valor_tierra, l.fila + 60);
+});
+
+test('months: an Earth-only parameter with a monthly layer takes the month at the result cells and at the reference', async () => {
+  const M = await cargar('base/', conMeses(conTierra(sintetico())));
+  await M.cargarMeses();
+  const o = M.leerPunto('moon', ...LUNA);
+  const r = M.buscar(o, { mes: 4, parametros: ['a', 'x', 'y'], referencia: { lat: lat(150), lon: lon(300) } });
+  assert.deepEqual(r.mensuales, ['a', 'x']);
+  for (const x of r.resultados) {
+    const px = valorDe(x, 'x');
+    assert.equal(px.valor_objetivo, 303); assert.equal(px.valor_tierra, x.col + 3);
+    assert.equal(valorDe(x, 'y').valor_objetivo, 151);
+  }
+});
+
+test('months: errors — mes without cargarMeses, mes out of 1-12, mes with the component metric', async () => {
+  const M = await cargar('base/', conMeses(conTierra(conClases(sintetico(), clasesSinteticas()))));
+  const o = M.leerPunto('moon', ...LUNA);
+  assert.throws(() => M.buscar(o, { mes: 1 }), /cargarMeses/);
+  assert.throws(() => M.cartera(o, { mes: 1 }), /cargarMeses/);
+  assert.throws(() => M.perfilMensual(o, { lat: lat(150), lon: lon(20) }), /cargarMeses/);
+  assert.throws(() => M.calendario(o), /cargarMeses/);
+  // Sin parámetros con mes no hace falta cargar nada.
+  assert.deepEqual(M.buscar(o, { mes: 2, parametros: ['b'] }).mensuales, []);
+  await M.cargarMeses(['a']);
+  assert.throws(() => M.buscar(o, { mes: 1, parametros: ['a', 'x'], referencia: { lat: lat(150), lon: lon(300) } }), /cargarMeses/);
+  for (const mes of [0, 13, 1.5, '3', NaN]) {
+    assert.throws(() => M.buscar(o, { mes }), /mes/);
+    assert.throws(() => M.cartera(o, { mes }), /mes/);
+  }
+  assert.throws(() => M.buscar(o, { mes: 1, metrica: 'componentes' }), /componentes/);
+  assert.throws(() => M.perfilMensual(o, { lat: 95, lon: 0 }), /fuera de la rejilla/);
+  assert.throws(() => M.calendario(o, { lugar: { lat: NaN, lon: 0 } }), /fuera de la rejilla/);
+});
+
+test('months: perfilMensual of month m gives the same similarity and values as buscar with mes m at that cell', async () => {
+  const M = await cargar('base/', conMeses(conTierra(sintetico())));
+  await M.cargarMeses();
+  const o = M.leerPunto('moon', ...LUNA);
+  for (const opc of [{}, { pesos: { a: 3, b: 1 } }, { parametros: ['a', 'x'], referencia: { lat: lat(150), lon: lon(300) } }]) {
+    const celda = { lat: lat(150), lon: lon(5) };
+    const p = M.perfilMensual(o, celda, opc);
+    assert.deepEqual(p.map((x) => x.mes), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    for (const x of p) {
+      // La celda fija frente al mapa de buscar (Float32) y la mejor celda del mes frente a su ficha completa.
+      const r = M.buscar(o, { ...opc, mes: x.mes, completos: false });
+      assert.equal(Math.fround(x.similitud_pct), r.mapa[idx(150, 5)]);
+      assert.equal(x.comparados, r.cobertura[idx(150, 5)]);
+      const b = r.resultados[0];
+      const pb = M.perfilMensual(o, { lat: b.lat, lon: b.lon }, opc)[x.mes - 1];
+      assert.equal(pb.similitud_pct, b.similitud_pct);
+      assert.equal(pb.comparados, b.comparados);
+      assert.deepEqual(pb.parametros, r.usados.map((id) => ({ id, valor_tierra: valorDe(b, id).valor_tierra, desviacion_pct: valorDe(b, id).desviacion_pct })));
+    }
+  }
+  // Marzo en la columna 5: a sin dato → 1 de 2 comparados.
+  const marzo = M.perfilMensual(o, { lat: lat(150), lon: lon(5) })[2];
+  assert.equal(marzo.comparados, 1);
+  assert.equal(marzo.parametros.find((q) => q.id === 'a').valor_tierra, null);
+});
+
+test('months: calendario gives, month by month, the first place buscar gives, the similarity at a chosen place and whether it moves', async () => {
+  const M = await cargar('base/', conMeses(conTierra(sintetico())));
+  await M.cargarMeses();
+  const o = M.leerPunto('moon', ...LUNA);
+  const lugar = { lat: lat(150), lon: lon(10) };
+  for (const opc of [{ parametros: ['a'] }, {}, { incluir_casquete: true }]) {
+    const cal = M.calendario(o, { ...opc, lugar });
+    assert.equal(cal.length, 12);
+    for (const x of cal) {
+      const r = M.buscar(o, { ...opc, mes: x.mes });
+      const b = r.resultados[0];
+      assert.deepEqual([x.lat, x.lon, x.similitud_pct], [b.lat, b.lon, b.similitud_pct]);
+      assert.equal(x.en_lugar_pct, M.perfilMensual(o, lugar, opc)[x.mes - 1].similitud_pct);
+      assert.equal(x.relevo, !(b.lat === lugar.lat && b.lon === lugar.lon));
+    }
+    assert.ok(!('en_lugar_pct' in M.calendario(o, opc)[0]));
+  }
+  const cal = M.calendario(o, { parametros: ['a'], lugar: { lat: lat(150), lon: lon(10) } });
+  assert.deepEqual([cal[0].relevo, cal[6].relevo], [true, true]);
+  assert.equal(cal[0].lat, lat(150));
+});
+
+test('real data: monthly layers — January and July best places for Jezero differ; perfilMensual and calendario agree with buscar', { skip: !hayReal && 'sin web/data/cuerpos' }, async (t) => {
+  const lecturas = [];
+  const leer = async (r, tipo) => { lecturas.push(r); return leerDisco(r, tipo); };
+  const M = await cargar(REAL.pathname, leer);
+  if (!M.conMeses.length) { t.skip('índice sin capas mensuales'); return; }
+  assert.ok(!lecturas.some((r) => r.includes('/mes/')));
+  const t0 = performance.now();
+  await M.cargarMeses();
+  console.log(`cargarMeses: ${M.conMeses.length} files in ${(performance.now() - t0).toFixed(0)} ms`);
+  const o = M.leerPunto('mars', 18.38, 77.58);
+  const ene = M.buscar(o, { mes: 1 }), jul = M.buscar(o, { mes: 7 });
+  console.log(`Jezero best January ${ene.resultados[0].lat}, ${ene.resultados[0].lon} ${ene.resultados[0].similitud_pct.toFixed(1)} %; July ${jul.resultados[0].lat}, ${jul.resultados[0].lon} ${jul.resultados[0].similitud_pct.toFixed(1)} %`);
+  assert.notDeepEqual([ene.resultados[0].lat, ene.resultados[0].lon], [jul.resultados[0].lat, jul.resultados[0].lon]);
+  assert.deepEqual(ene.mensuales, M.conMeses.filter((id) => ene.usados.includes(id)));
+  const b = jul.resultados[0];
+  const p = M.perfilMensual(o, { lat: b.lat, lon: b.lon })[6];
+  assert.equal(p.similitud_pct, b.similitud_pct);
+  const t1 = performance.now();
+  const cal = M.calendario(o);
+  const ms = performance.now() - t1;
+  console.log(`calendario: ${ms.toFixed(0)} ms`);
+  assert.ok(ms < 5000, `${ms} ms`);
+  for (const m of [1, 7]) {
+    const r = m === 1 ? ene : jul;
+    assert.deepEqual([cal[m - 1].lat, cal[m - 1].lon, cal[m - 1].similitud_pct], [r.resultados[0].lat, r.resultados[0].lon, r.resultados[0].similitud_pct]);
+  }
+});
+
+// Las huellas fijadas arriba hashean indice.parametros; con `meses` en el índice esas dos pruebas se saltan. Esta repite
+// las dos comprobaciones con la entrada hasheada sin `meses`: lo único que añadieron las capas mensuales al índice.
+async function entradaRealSinMeses() {
+  const indice = JSON.parse(await readFile(new URL('indice.json', REAL), 'utf8'));
+  const rutas = new Set([indice.mascara_tierra, indice.mascara_casquete]);
+  for (const p of indice.parametros) for (const r of Object.values(p.capas ?? {})) if (r) rutas.add(r);
+  const h = createHash('sha256').update(JSON.stringify(indice.parametros.map(({ meses, ...p }) => p)));
+  for (const r of [...rutas].sort()) h.update(r).update(await readFile(new URL(r, REAL)));
+  return h.digest('hex');
+}
+
+test('real data: with monthly layers in the index, the default outputs keep both pinned fingerprints', { skip: !hayReal && 'sin web/data/cuerpos' }, async (t) => {
+  if (await entradaRealSinMeses() !== '3a443cdd9d2d6c713f6f31ed63c7f423facfb1b1f3fc15939c0f7100df808fc9') {
+    t.skip('las capas cambiaron desde que se fijó la huella');
+    return;
+  }
+  const M = await cargar(REAL.pathname, leerDisco);
+  const idsT = M.indice.parametros_tierra.map((p) => p.id);
+  const h1 = createHash('sha256');
+  for (const [c, la, lo] of [['moon', -89.68643, -162.9371], ['moon', 8.3355, 33.222], ['mars', 18.38, 77.58], ['mars', 47.2, -175.7], ['earth', -24.1, -70.01]]) {
+    h1.update(huella(sinNovedades(M.buscar(M.leerPunto(c, la, lo)), idsT)));
+    h1.update(huella(sinNovedades(M.buscar(M.leerPunto(c, la, lo), { completos: false, n: 10, separacion_km: 100 }), idsT)));
+  }
+  assert.equal(h1.digest('hex'), 'dfbd0c50c125d2b1acce6bdef42a84d0b26af99e04c9e03bfdd8f01354e8ee4c');
+  await M.cargarMeses();
+  const o = M.leerPunto('mars', 18.38, 77.58);
+  const h2 = createHash('sha256');
+  h2.update(huella(sinNovedades(M.buscar(o), idsT)));
+  h2.update(huella(sinNovedades(M.buscar(o, { completos: false, parametros: ['precip_mm_ano', 't_min_k'] }), idsT)));
+  h2.update(JSON.stringify(sinNovedades(M.cartera(o), idsT)));
+  h2.update(JSON.stringify(M.claseDe(o)));
+  const e = M.leerPunto('earth', -24.1, -70.01);
+  h2.update(JSON.stringify({ ...e, valores: Object.fromEntries(Object.entries(e.valores).filter(([k]) => !idsT.includes(k))) }));
+  assert.equal(h2.digest('hex'), '287c142cee58e60a34074cefa094e3c881297a9ccee7c33d177595fc063c89ec');
 });

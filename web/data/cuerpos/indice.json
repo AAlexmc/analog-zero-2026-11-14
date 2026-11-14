@@ -206,7 +206,18 @@
    },
    "transformacion": "lineal",
    "reproducible_en_tierra": true,
-   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak.",
+   "meses": {
+    "earth": "earth/mes/t_max_k.i16",
+    "escala": 0.00206,
+    "desplazamiento": 265.4050187792969,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23) of this calendar month, bilinear to 0.5°, + 273.15; hottest hour of the month's mean daily cycle",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year."
+   }
   },
   {
    "id": "t_min_k",
@@ -264,7 +275,18 @@
    },
    "transformacion": "lineal",
    "reproducible_en_tierra": true,
-   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak.",
+   "meses": {
+    "earth": "earth/mes/t_min_k.i16",
+    "escala": 0.00168,
+    "desplazamiento": 252.84357342773438,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23) of this calendar month, bilinear to 0.5°, + 273.15; coldest hour of the month's mean daily cycle",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year."
+   }
   },
   {
    "id": "t_media_k",
@@ -322,7 +344,18 @@
    },
    "transformacion": "lineal",
    "reproducible_en_tierra": true,
-   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak.",
+   "meses": {
+    "earth": "earth/mes/t_media_k.i16",
+    "escala": 0.00181,
+    "desplazamiento": 257.1634488330078,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23) of this calendar month, bilinear to 0.5°, + 273.15; mean of the month's mean daily cycle",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year."
+   }
   },
   {
    "id": "insolacion_kwh_m2_dia",
@@ -386,7 +419,18 @@
    },
    "transformacion": "lineal",
    "reproducible_en_tierra": true,
-   "aviso": "Not the same quantity on the three bodies: Earth is measured at the surface, under clouds and air; the Moon has no atmosphere, so its value is the surface value but without shadows from relief (polar craters get less); Mars is computed at the top of the atmosphere, without dust or air. Moon and Mars depend only on latitude."
+   "aviso": "Not the same quantity on the three bodies: Earth is measured at the surface, under clouds and air; the Moon has no atmosphere, so its value is the surface value but without shadows from relief (polar craters get less); Mars is computed at the top of the atmosphere, without dust or air. Moon and Mars depend only on latitude.",
+   "meses": {
+    "earth": "earth/mes/insolacion_kwh_m2_dia.i16",
+    "escala": 0.000171,
+    "desplazamiento": 5.603157,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER SYN1deg climatology, ALLSKY_SFC_SW_DWN (surface, all sky), mean of this calendar month × 24/1000",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year."
+   }
   },
   {
    "id": "ndvi_max",
@@ -498,7 +542,18 @@
    },
    "transformacion": "log1p",
    "reproducible_en_tierra": true,
-   "aviso": "Moon and Mars are set to 0 by definition. Frost, snowfall of CO₂ or water ice on Mars and ice in polar craters are not counted here. Compared on a log scale, log10(1 + mm/year), so that dryness counts by orders of magnitude (own criterion)."
+   "aviso": "Moon and Mars are set to 0 by definition. Frost, snowfall of CO₂ or water ice on Mars and ice in polar craters are not counted here. Compared on a log scale, log10(1 + mm/year), so that dryness counts by orders of magnitude (own criterion).",
+   "meses": {
+    "earth": "earth/mes/precip_mm_ano.i16",
+    "escala": 0.243,
+    "desplazamiento": 7962.380999999999,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 climatology, PRECTOTCORR, mean of this calendar month (mm/day) × 365",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year. The month's rate is written as mm/year (mm/day × 365) so that the unit and the comparison range are those of the yearly value: it is not the month's total."
+   }
   },
   {
    "id": "gravedad_m_s2",
@@ -688,6 +743,17 @@
       9.302
      ]
     }
+   },
+   "meses": {
+    "earth": "earth/mes/viento_medio_m_s.i16",
+    "escala": 0.000243,
+    "desplazamiento": 7.962381,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 climatology, WS2M, mean of this calendar month, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year."
    }
   },
   {
@@ -750,6 +816,17 @@
       16.391
      ]
     }
+   },
+   "meses": {
+    "earth": "earth/mes/amplitud_diurna_k.i16",
+    "escala": 0.000336,
+    "desplazamiento": 11.33471809755516,
+    "sin_dato": -32768,
+    "fuente": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, T2M_RANGE, mean of this calendar month, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "aviso": "Climatology: the mean of this calendar month over many years, not one particular year. Air at 2 m, not the ground surface."
    }
   },
   {

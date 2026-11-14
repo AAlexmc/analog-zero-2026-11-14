@@ -64,8 +64,8 @@ def diviner_gcp(carpeta):
     return t
 
 
-def power_ts(zarr):
-    """Ciclo de 24 horas UTC de la temperatura de la piel (TS_00…TS_23, climatología anual), K, en la malla 0,5° fila 0 = norte."""
+def power_ts(zarr, indice_tiempo=12):
+    """Ciclo de 24 horas UTC de la temperatura de la piel (TS_00…TS_23; indice_tiempo 0-11 = mes, 12 = anual), K, en la malla 0,5° fila 0 = norte."""
     import xarray as xr
 
     ds = xr.open_zarr(zarr, decode_times=False)
@@ -74,7 +74,7 @@ def power_ts(zarr):
         v = ds[f"TS_{h:02d}"]
         assert v.attrs["units"] == "C" and v.attrs["cell_methods"] == "time: mean"
         # Un chunk ausente en el Zarr se lee como NaN sin error.
-        a = v.isel(time=12).values
+        a = v.isel(time=indice_tiempo).values
         assert np.isfinite(a).all(), f"TS_{h:02d}: faltan datos"
         horas.append(rejilla.interp_a_malla(a, ds.lat.values, ds.lon.values)[::-1] + 273.15)
     return np.stack(horas, axis=-1).astype(np.float32)

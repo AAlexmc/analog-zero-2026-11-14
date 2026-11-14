@@ -26,6 +26,14 @@ function aF32(buf, n, ruta) {
   return a;
 }
 
+function aI16(buf, n, ruta) {
+  if (buf.byteLength !== n * 2) throw new Error(`${ruta}: ${buf.byteLength} bytes, se esperaban ${n * 2}`);
+  const dv = new DataView(buf);
+  const a = new Int16Array(n);
+  for (let i = 0; i < n; i++) a[i] = dv.getInt16(i * 2, true);
+  return a;
+}
+
 function distanciaKm(R, lat1, lon1, lat2, lon2) {
   const r = Math.PI / 180;
   const a = Math.sin(((lat2 - lat1) * r) / 2) ** 2 +
@@ -78,6 +86,43 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
   const casquete = indice.mascara_casquete ? capas.get(indice.mascara_casquete) : null;
   const radioTierra = indice.cuerpos.earth.radio_km;
 
+  // Capas mensuales de la Tierra (p.meses): 12 meses seguidos en Int16; solo se bajan con cargarMeses.
+  const conMeses = todos.filter((p) => p.meses?.earth).map((p) => p.id);
+  const meses = new Map();
+  const bajando = new Map();
+  async function cargarMeses(ids = conMeses) {
+    for (const id of ids) {
+      if (!params.has(id)) throw new Error(`parámetro desconocido: ${id}`);
+      if (!conMeses.includes(id)) throw new Error(`sin versión mensual: ${id}`);
+    }
+    await Promise.all(ids.map((id) => {
+      if (!bajando.has(id)) {
+        const m = params.get(id).p.meses;
+        bajando.set(id, leer(base + m.earth, 'i16').then((b) => { meses.set(id, aI16(b, 12 * N, m.earth)); })
+          .catch((e) => { bajando.delete(id); throw e; }));
+      }
+      return bajando.get(id);
+    }));
+    return [...ids];
+  }
+  function valorMes(id, i, mes) {
+    const m = params.get(id).p.meses;
+    const k = meses.get(id)[(mes - 1) * N + i];
+    return k === m.sin_dato ? null : k * m.escala + m.desplazamiento;
+  }
+  const usaMes = (id, mes) => mes !== null && meses.has(id);
+  const valorTierra = (id, i, mes = null) => (usaMes(id, mes) ? valorMes(id, i, mes) : valorEn(params.get(id).p, 'earth', i));
+  function mesDe(opc) {
+    if (opc.mes === undefined || opc.mes === null) return null;
+    if (!Number.isInteger(opc.mes) || opc.mes < 1 || opc.mes > 12) throw new Error(`mes fuera de 1-12: ${opc.mes}`);
+    if (opc.metrica === 'componentes') throw new Error('metrica componentes: no admite mes');
+    return opc.mes;
+  }
+  function exigeMeses(ids) {
+    const faltan = ids.filter((id) => conMeses.includes(id) && !meses.has(id));
+    if (faltan.length) throw new Error(`faltan las capas mensuales de ${faltan.join(', ')}: llama antes a cargarMeses`);
+  }
+
   // Clases de entorno (pipeline/clases). Sin el fichero, el motor sigue igual y clases = null.
   let clases = null;
   if (indice.clases) {
@@ -91,7 +136,22 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
 
   // Valores de la Tierra ya transformados, por parámetro (NaN = sin dato).
   const tierraF = new Map();
-  function tierraTransformada(id) {
+  // Del mes solo se guarda el último pedido: 12 meses × parámetros no caben en memoria como Float64.
+  let tierraFMes = { mes: null, capas: new Map() };
+  function tierraTransformada(id, mes = null) {
+    if (usaMes(id, mes)) {
+      if (tierraFMes.mes !== mes) tierraFMes = { mes, capas: new Map() };
+      if (!tierraFMes.capas.has(id)) {
+        const { f } = params.get(id);
+        const a = new Float64Array(N).fill(NaN);
+        for (let i = 0; i < N; i++) {
+          const v = valorMes(id, i, mes);
+          if (v !== null) a[i] = f(v);
+        }
+        tierraFMes.capas.set(id, a);
+      }
+      return tierraFMes.capas.get(id);
+    }
     if (!tierraF.has(id)) {
       const { p, f } = params.get(id);
       const a = new Float64Array(N).fill(NaN);
@@ -203,8 +263,8 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const vo = finito(valores[p.id]) ? valores[p.id] : null;
     return { id: p.id, valor_tierra: vt, valor_objetivo: vo, desviacion_pct: desviacion(p.id, vt, vo) };
   });
-  const parametrosEn = (objetivos, reproducibles, usados, i) => reproducibles.map((id) => {
-    const vt = valorEn(params.get(id).p, 'earth', i);
+  const parametrosEn = (objetivos, reproducibles, usados, i, mes = null) => reproducibles.map((id) => {
+    const vt = valorTierra(id, i, mes);
     const vo = objetivos[id];
     const ref = soloTierra(id);
     const d = usados.includes(id) ? desviacion(id, vt, vo) : null;
@@ -213,7 +273,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
   });
 
   // Valor objetivo de cada parámetro comparable: el del punto, o el de la Tierra en opc.referencia si es solo-Tierra.
-  function objetivosDe(valores, pedidos, referencia) {
+  function objetivosDe(valores, pedidos, referencia, mes = null) {
     for (const id of pedidos) if (!params.has(id)) throw new Error(`parámetro desconocido: ${id}`);
     let iRef = null;
     if (referencia != null) {
@@ -224,7 +284,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const comparables = pedidos.filter((id) => params.get(id).p.reproducible_en_tierra || soloTierra(id));
     const objetivos = {};
     for (const id of comparables) {
-      const v = !soloTierra(id) ? valores[id] : iRef === null ? null : valorEn(params.get(id).p, 'earth', iRef);
+      const v = !soloTierra(id) ? valores[id] : iRef === null ? null : valorTierra(id, iRef, mes);
       objetivos[id] = finito(v) ? v : null;
     }
     const sinValor = (ref) => comparables.filter((id) => soloTierra(id) === ref && objetivos[id] === null);
@@ -242,15 +302,17 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const porComp = metrica === 'componentes';
     if (porComp && !clases) throw new Error('metrica componentes: falta clases.json');
     if (porComp && (opc.pesos || opc.parametros)) throw new Error('metrica componentes: usa los parámetros de clases.json, sin pesos ni parametros');
+    const mes = mesDe(opc);
     const valores = objetivo.valores ?? leerPunto(objetivo.cuerpo, objetivo.lat, objetivo.lon).valores;
     const pedidos = opc.parametros ?? indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
-    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia);
+    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia, mes);
+    if (mes !== null) exigeMeses(reproducibles);
     const usados = reproducibles.filter((id) => objetivos[id] !== null && (pesos[id] ?? 1) > 0);
     const minimo = Math.ceil(usados.length / 2);
 
     const cols = usados.map((id) => {
       const { f, den, cat } = params.get(id);
-      return { id, a: tierraTransformada(id), fo: f(objetivos[id]), den, cat, w: pesos[id] ?? 1 };
+      return { id, a: tierraTransformada(id, mes), fo: f(objetivos[id]), den, cat, w: pesos[id] ?? 1 };
     });
     const mapa = new Float32Array(N).fill(NaN);
     const sim = new Float64Array(N).fill(NaN);
@@ -315,7 +377,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const ficha0 = ({ i, lat, lon }) => ({
       lat, lon, fila: Math.floor(i / g.ancho), col: i % g.ancho, similitud_pct: sim[i], comparados: cobertura[i], de: total,
       no_reproducibles: noReproEn(valores, i),
-      parametros: parametrosEn(objetivos, reproducibles, usados, i),
+      parametros: parametrosEn(objetivos, reproducibles, usados, i, mes),
     });
     const ficha = porComp ? (x) => ({ ...ficha0(x), similitud_parametros_pct: simParam[x.i], distancia_componentes: dist[x.i] }) : ficha0;
     const resultados = elegidos.map(ficha);
@@ -325,6 +387,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const no_reproducibles = noReproEn(valores, elegidos.length ? elegidos[0].i : null);
 
     const salida = { objetivo, usados, sin_dato, sin_referencia, resultados, parciales, no_reproducibles, mapa, cobertura };
+    if (mes !== null) Object.assign(salida, { mes, mensuales: usados.filter((id) => usaMes(id, mes)) });
     if (porComp) {
       salida.metrica = 'componentes';
       salida.componentes = { proyectado: proy !== null, faltan: proy ? proy.faltan : clases.pca.parametros.filter((id) => !finito(valores[id])), d_ref: clases.d_ref.valor, residuo_z: proy ? proy.residuo : null, residuo_z_p99_tierra: clases.pca.residuo_z_p99 };
@@ -337,15 +400,17 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const corte = opc.corte ?? 15;
     const sep = opc.separacion_km ?? 0;
     const conCasquete = opc.incluir_casquete === true;
+    const mes = mesDe(opc);
     const valores = valoresDe(objetivo);
     const pedidos = opc.parametros ?? indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
-    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia);
+    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia, mes);
+    if (mes !== null) exigeMeses(reproducibles);
     const usados = reproducibles.filter((id) => objetivos[id] !== null);
     if (usados.length > 16) throw new Error('cartera: más de 16 parámetros');
     const minimo = Math.ceil(usados.length / 2);
     const cols = usados.map((id) => {
       const { f, den, cat } = params.get(id);
-      return { a: tierraTransformada(id), fo: f(objetivos[id]), den, cat };
+      return { a: tierraTransformada(id, mes), fo: f(objetivos[id]), den, cat };
     });
 
     const mejorDesv = usados.map(() => ({ d: Infinity, i: -1 }));
@@ -418,7 +483,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const lugares = lugaresI.map((i) => ({
       ...latLon(i), fila: Math.floor(i / g.ancho), col: i % g.ancho, similitud_pct: sim[i], comparados: cobertura[i], de: usados.length,
       cubre: usados.filter((_, j) => mascara[i] & (1 << j)),
-      parametros: parametrosEn(objetivos, reproducibles, usados, i),
+      parametros: parametrosEn(objetivos, reproducibles, usados, i, mes),
     }));
     const sin_cubrir = usados.map((id, j) => ({ id, j })).filter(({ j }) => !(todo & (1 << j))).map(({ id, j }) => {
       const b = mejorDesv[j];
@@ -426,8 +491,90 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     });
     const out = { corte, usados, sin_dato, sin_referencia, lugares, cubiertos: usados.filter((_, j) => todo & (1 << j)), sin_cubrir };
     if (sep > 0) Object.assign(out, { separacion_km: sep, separacion_cumplida });
+    if (mes !== null) Object.assign(out, { mes, mensuales: usados.filter((id) => usaMes(id, mes)) });
     return out;
   }
 
-  return { indice, leerPunto, desviacion, buscar, tierra, clases, claseDe, cartera };
+  // Lo común de perfilMensual y calendario: los mismos usados, objetivos y pesos que buscar.
+  function prepararMeses(objetivo, opc) {
+    if (opc.metrica !== undefined && opc.metrica !== 'parametros') throw new Error(`metrica ${opc.metrica}: no admite mes`);
+    const pesos = opc.pesos ?? {};
+    const valores = valoresDe(objetivo);
+    const pedidos = opc.parametros ?? indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
+    const { comparables } = objetivosDe(valores, pedidos, opc.referencia);
+    exigeMeses(comparables);
+    // Con referencia, el valor objetivo de un solo-Tierra mensual cambia con el mes.
+    const objetivosMes = (mes) => objetivosDe(valores, pedidos, opc.referencia, mes).objetivos;
+    const usadosMes = (obj) => comparables.filter((id) => obj[id] !== null && (pesos[id] ?? 1) > 0);
+    return { pesos, objetivosMes, usadosMes };
+  }
+  function celdaI(c, que) {
+    const x = celdaDeLatLon(R, c?.lat, c?.lon);
+    if (!x) throw new Error(`${que} fuera de la rejilla: ${c?.lat}, ${c?.lon}`);
+    return x.fila * g.ancho + x.col;
+  }
+  // Similitud de la celda i como en buscar (misma suma en el mismo orden); NaN con menos de la mitad.
+  function puntuaCelda(usados, objetivos, pesos, i, mes) {
+    let sw = 0, ss = 0, k = 0;
+    const parametros = usados.map((id) => {
+      const vt = valorTierra(id, i, mes);
+      const d = desviacion(id, vt, objetivos[id]);
+      if (d !== null) { const w = pesos[id] ?? 1; sw += w; ss += w * (100 - d); k++; }
+      return { id, valor_tierra: vt, desviacion_pct: d };
+    });
+    const sim = k < Math.ceil(usados.length / 2) || !(sw > 0) ? null : ss / sw;
+    return { similitud_pct: sim, comparados: k, parametros };
+  }
+
+  function perfilMensual(objetivo, celda, opc = {}) {
+    const { pesos, objetivosMes, usadosMes } = prepararMeses(objetivo, opc);
+    const i = celdaI(celda, 'celda');
+    return Array.from({ length: 12 }, (_, k) => {
+      const obj = objetivosMes(k + 1);
+      return { mes: k + 1, ...puntuaCelda(usadosMes(obj), obj, pesos, i, k + 1) };
+    });
+  }
+
+  // Mejor celda de cada mes con las reglas de buscar (una pasada por mes, sin ordenar); con opc.lugar, su similitud y si hay relevo.
+  function calendario(objetivo, opc = {}) {
+    const { pesos, objetivosMes, usadosMes } = prepararMeses(objetivo, opc);
+    const iLugar = opc.lugar == null ? null : celdaI(opc.lugar, 'lugar');
+    const conCasquete = opc.incluir_casquete === true;
+    const soloCompletos = opc.completos !== false;
+    const out = [];
+    for (let mes = 1; mes <= 12; mes++) {
+      const objetivos = objetivosMes(mes);
+      const usados = usadosMes(objetivos);
+      const minimo = Math.ceil(usados.length / 2);
+      const cols = usados.map((id) => {
+        const { f, den, cat } = params.get(id);
+        return { a: tierraTransformada(id, mes), fo: f(objetivos[id]), den, cat, w: pesos[id] ?? 1 };
+      });
+      let mejor = -1, mejorSim = -Infinity;
+      for (let i = 0; i < N && cols.length; i++) {
+        if (!(tierra[i] >= 0.5)) continue;
+        if (!conCasquete && casquete && casquete[i] === 1) continue;
+        let sw = 0, ss = 0, k = 0;
+        for (const c of cols) {
+          const v = c.a[i];
+          if (v !== v) continue;
+          const d = c.cat ? (v === c.fo ? 0 : 100) : Math.min(100, (Math.abs(v - c.fo) / c.den) * 100);
+          sw += c.w; ss += c.w * (100 - d); k++;
+        }
+        if (k < minimo || !(sw > 0) || (soloCompletos && k !== cols.length)) continue;
+        const sim = ss / sw;
+        if (sim > mejorSim) { mejor = i; mejorSim = sim; }
+      }
+      const x = mejor < 0 ? { mes, lat: null, lon: null, similitud_pct: null }
+        : { mes, ...latLonDeCelda(R, Math.floor(mejor / g.ancho), mejor % g.ancho), similitud_pct: mejorSim };
+      if (iLugar !== null) {
+        x.en_lugar_pct = puntuaCelda(usados, objetivos, pesos, iLugar, mes).similitud_pct;
+        x.relevo = mejor < 0 ? null : mejor !== iLugar;
+      }
+      out.push(x);
+    }
+    return out;
+  }
+
+  return { indice, leerPunto, desviacion, buscar, tierra, clases, claseDe, cartera, conMeses, cargarMeses, perfilMensual, calendario };
 }
