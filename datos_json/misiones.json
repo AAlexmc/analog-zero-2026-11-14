@@ -1,4 +1,500 @@
 {
   "descripcion": "Mission objectives: kinds of tests NASA runs at Earth analog sites, the campaigns that back each one and the environment traits the sources name as the reason for the site. Format: docs/contrato-misiones.md. The mapping of each trait to this tool's parameters is our own.",
-  "misiones": []
+  "misiones": [
+    {
+      "id": "georradar_hielo",
+      "nombre": "Radar search for buried ice",
+      "que_se_prueba": "Ground-penetrating radar methods to find and map ice buried under loose ground.",
+      "cuerpo": ["moon", "mars"],
+      "grupo": 3,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "K10 robotic site survey with CRUX ground-penetrating radar",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2007",
+          "fuente": "https://webarchive.library.unt.edu/eot2008/20090117104120/http:/ti.arc.nasa.gov/projects/haughton_field/details.php",
+          "cita": "For the Haughton Crater surveys, K10 will carry two non-contact survey instruments: (1) the CRUX ground-penetrating radar (to characterize subsurface structure)",
+          "verificado": false
+        },
+        {
+          "nombre": "Ground-penetrating radar surveys of ice buried by tephra",
+          "organismo": "NASA Goddard",
+          "sitio": null,
+          "sitio_texto": "Askja caldera, northern Iceland",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20240009232",
+          "cita": "We conducted ground-penetrating radar surveys at center frequencies of 200, 400, and 900 MHz to map the thickness and extent of tephra deposits and underlying massive ice at three caldera sites.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "hielo_bajo_tefra",
+          "nombre": "Ice buried under volcanic tephra",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of measured buried ice."
+        },
+        {
+          "id": "piroclastos_sueltos",
+          "nombre": "Loose volcanic pyroclasts",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "sin_vegetacion",
+          "nombre": "Bare ground without plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/citations/20205010224",
+          "cita": "The largely unvegetated, unconsolidated nature of the pyroclasts and their stratigraphic relationships with shallow subsurface ice make them potentially analogous to some ice deposits within regolith and pyroclasts at the Moon and Mars.",
+          "verificado": false,
+          "parametros": ["ndvi_max"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "desierto_polar_rocoso",
+          "nombre": "Rocky, isolated polar desert",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+          "cita": "Two NASA robots are surveying a rocky, isolated polar desert within a crater in the Arctic Circle.",
+          "verificado": false,
+          "parametros": ["t_media_k", "precip_mm_ano", "rugosidad_tan", "tiempo_ciudad_h"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "movilidad_rovers",
+      "nombre": "Rover driving on rough ground",
+      "que_se_prueba": "How robotic and crewed rovers move, survey and navigate across rough, rocky terrain.",
+      "cuerpo": ["moon"],
+      "grupo": 3,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "Simulated robotic follow-up mission with K10 rovers",
+          "organismo": "NASA Ames",
+          "sitio": "haughton",
+          "sitio_texto": null,
+          "lat": 75.3667,
+          "lon": -89.6833,
+          "coordenadas_fuente": null,
+          "anos": "2010",
+          "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+          "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
+          "verificado": true
+        },
+        {
+          "nombre": "Desert RATS: Lunar Electric Rover field test",
+          "organismo": "NASA",
+          "sitio": null,
+          "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2009",
+          "fuente": "https://phys.org/news/2009-09-nasa-lunar-robotics-arizona.html",
+          "cita": "The crew also docked to a simulated habitat, drove the rover across difficult terrain, performed a rescue mission and made a four-day traverse across the lava.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "terreno_rocoso",
+          "nombre": "Rocky lava terrain",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "Forty miles north of Flagstaff, Arizona, lies a remote lava field called Black Point Lava Flow consisting of rocky terrain,",
+          "verificado": false,
+          "parametros": ["rugosidad_tan"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "vegetacion_escasa",
+          "nombre": "Sparse plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "sparse vegetation and, at night, very limited light pollution.",
+          "verificado": false,
+          "parametros": ["ndvi_max"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "cielo_oscuro",
+          "nombre": "Little light at night",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/humans-in-space/nasa-practices-rover-operations-in-simulated-lunar-environment/",
+          "cita": "sparse vegetation and, at night, very limited light pollution.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "This tool has no night-light layer."
+        },
+        {
+          "id": "variedad_y_aislamiento",
+          "nombre": "Varied surface features, remote",
+          "en_lista_de_partida": false,
+          "valor_texto": "nearly 10 miles wide",
+          "fuente": "https://spacenews.com/?p=54891",
+          "cita": "Black Point Lava Flow’s wide variety of surface features, size (nearly 10 miles wide) and relative remoteness make it ideal for simulated lunar missions, according to project team scientists.",
+          "verificado": false,
+          "parametros": ["rugosidad_tan", "relieve_m", "tiempo_ciudad_h"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "colada_basaltica",
+          "nombre": "Basaltic lava flow",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://appel.nasa.gov/?p=365689",
+          "cita": "The Black Point Lava Flow, north of Flagstaff, Arizona, stretches approximately two miles wide, a thick trail of black basaltic lava that flowed east for miles",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "tubos_lava",
+      "nombre": "Lava tube exploration",
+      "que_se_prueba": "Rovers and science instruments that explore and map dark lava tube caves.",
+      "cuerpo": ["moon", "mars"],
+      "grupo": 3,
+      "respaldo": "parcial",
+      "campanas": [
+        {
+          "nombre": "BRAILLE: CaveR rover survey of Valentine Cave",
+          "organismo": "NASA Ames",
+          "sitio": null,
+          "sitio_texto": "Valentine Cave, Lava Beds National Monument, northern California",
+          "lat": null,
+          "lon": null,
+          "coordenadas_fuente": null,
+          "anos": "2018",
+          "fuente": "https://ntrs.nasa.gov/citations/20190029009",
+          "cita": "The NASA Ames testbed rover, CaveR, was deployed in Valentine Cave in Lava Beds National Monument (N. CA, USA) during August of 2018.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "muchos_tubos",
+          "nombre": "Many lava caves",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://nasa-braille.org/?p=227",
+          "cita": "The park was chosen by the BRAILLE team because of its many lava caves.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global layer of lava tubes."
+        },
+        {
+          "id": "poca_luz",
+          "nombre": "Little sunlight inside caves",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://nasa-braille.org/?p=227",
+          "cita": "The lava tubes are considered LLEs because microbes within them have minimal access to sunlight.",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "Surface sunlight layers say nothing about light inside caves."
+        },
+        {
+          "id": "paredes_lisas",
+          "nombre": "Smooth walls, wide walkways",
+          "en_lista_de_partida": false,
+          "valor_texto": "Smooth walls around 15 feet high and walkways up to 70 feet wide",
+          "fuente": "https://www.nasa.gov/universe/using-a-cave-rover-nasa-learns-to-search-for-life-underground/",
+          "cita": "Smooth walls around 15 feet high and walkways up to 70 feet wide make it a practical place to drive a rover",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "Cave shape is not in any global layer."
+        },
+        {
+          "id": "rasgos_de_colada",
+          "nombre": "Preserved lava flow features",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/universe/using-a-cave-rover-nasa-learns-to-search-for-life-underground/",
+          "cita": "its well preserved lava flow features are similar to what we expect to find inside a Martian lava cave",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "simulacion_larga",
+      "nombre": "Long crewed habitat stay",
+      "que_se_prueba": "A crew living for months in an isolated habitat with limited water and power.",
+      "cuerpo": ["mars"],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "HI-SEAS third mission (eight months)",
+          "organismo": null,
+          "sitio": null,
+          "sitio_texto": "HI-SEAS habitat, Mauna Loa, Hawaii",
+          "lat": 19.602378,
+          "lon": -155.487192,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/HI-SEAS",
+            "cita": "19°36′09″N 155°29′14″W / 19.602378°N 155.487192°W",
+            "verificado": false
+          },
+          "anos": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "HI-SEAS, short for Hawaii Space Exploration Analog and Simulation, took place atop the Mauna Loa volcano in Hawaii.",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "poca_huella_humana",
+          "nombre": "Few signs of people",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The site was chosen because it shows little signs of human existence and even plants are scarce at that altitude.",
+          "verificado": false,
+          "parametros": ["tiempo_ciudad_h"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "plantas_escasas",
+          "nombre": "Scarce plants",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The site was chosen because it shows little signs of human existence and even plants are scarce at that altitude.",
+          "verificado": false,
+          "parametros": ["ndvi_max"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "gran_altitud",
+          "nombre": "High altitude",
+          "en_lista_de_partida": true,
+          "valor_texto": "8,000 feet above sea level",
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "The dome the team used was erected 8,000 feet above sea level and was basically a small, two-story house.",
+          "verificado": false,
+          "parametros": ["elev_m"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "suelo_volcanico",
+          "nombre": "Volcanic ground like Mars soil",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://www.nasa.gov/centers-and-facilities/kennedy/hi-seas-team-completes-8-month-isolation-mission/",
+          "cita": "the volcanic surface is akin to the Martian soil",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "eva_con_retardo",
+      "nombre": "Spacewalks with signal delay",
+      "que_se_prueba": "Field science spacewalks run with a Mars-like delay in talks with Earth.",
+      "cuerpo": ["mars"],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "BASALT second field test",
+          "organismo": "NASA Ames",
+          "sitio": "kilauea",
+          "sitio_texto": null,
+          "lat": 19.41194,
+          "lon": -155.27583,
+          "coordenadas_fuente": null,
+          "anos": "2016",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "BASALT’s second field test, on the lava flows of Mauna Ulu, on the Big Island of Hawaii.",
+          "verificado": true
+        },
+        {
+          "nombre": "BASALT first field test",
+          "organismo": "NASA Ames",
+          "sitio": "craters_of_the_moon",
+          "sitio_texto": null,
+          "lat": 43.46167,
+          "lon": -113.56271,
+          "coordenadas_fuente": null,
+          "anos": "2016",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "The first round of BASALT field tests, at Craters of the Moon National Monument and Preserve, in Idaho.",
+          "verificado": true
+        },
+        {
+          "nombre": "BASALT third field test",
+          "organismo": "NASA Ames",
+          "sitio": "kilauea",
+          "sitio_texto": null,
+          "lat": 19.41194,
+          "lon": -155.27583,
+          "coordenadas_fuente": null,
+          "anos": "2017",
+          "fuente": "https://www.nasa.gov/missions/analog-field-testing/what-is-basalt/",
+          "cita": "The third and final season of testing for BASALT was held at Kilauea Iki and Kilauea Caldera Region, Hawaii Volcanoes National Park",
+          "verificado": true
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "retardo_comunicaciones",
+          "nombre": "Mars-like signal delay",
+          "en_lista_de_partida": false,
+          "valor_texto": "5- to 15-min OWLT",
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
+          "cita": "Do these capabilities remain enabling and enhancing as communication latency increases from 5- to 15-min OWLT?",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "The delay is set by the test, not by the place."
+        },
+        {
+          "id": "basalto_alterado",
+          "nombre": "Chemically altered basalt",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238",
+          "cita": "how microbial communities and habitability correlate with physical and geochemical characteristics of chemically altered basalt environments in Mars-analog terrestrial sites",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "coladas_recientes",
+          "nombre": "Young lava flows",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
+          "cita": "the Kilauea Volcano 1969–1974 flows on the Big Island of Hawai‘i (early Mars analog)",
+          "verificado": false,
+          "parametros": ["litologia_glim", "rugosidad_tan"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    },
+    {
+      "id": "recursos_basalto",
+      "nombre": "Resources from volcanic soil",
+      "que_se_prueba": "Drilling volcanic soil and heating it to find water and make oxygen.",
+      "cuerpo": ["moon", "mars"],
+      "grupo": 4,
+      "respaldo": "confirmado",
+      "campanas": [
+        {
+          "nombre": "RESOLVE field demonstration (ILSO-ISRU analog test)",
+          "organismo": "NASA Kennedy",
+          "sitio": "mauna_kea",
+          "sitio_texto": null,
+          "lat": 19.82056,
+          "lon": -155.46806,
+          "coordenadas_fuente": null,
+          "anos": "2010",
+          "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+          "cita": "The RESOLVE chemical processing system was mounted on a Canadian Space Agency mobility chasis and successfully demonstrated on Hawaii's Mauna Kea volcano in February 2010.",
+          "verificado": true
+        },
+        {
+          "nombre": "ISRU analog mission",
+          "organismo": "NASA with the Canadian Space Agency",
+          "sitio": "mauna_kea",
+          "sitio_texto": null,
+          "lat": 19.82056,
+          "lon": -155.46806,
+          "coordenadas_fuente": null,
+          "anos": "2012",
+          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
+          "cita": "The 2012 ISRU analog mission is a collaboration between NASA and its partners, primarily the Canadian Space Agency (CSA) with help from the University of Hawaii",
+          "verificado": false
+        }
+      ],
+      "caracteristicas": [
+        {
+          "id": "ceniza_volcanica",
+          "nombre": "Volcanic ash deposits",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
+          "cita": "Demonstrations will be conducted on the side of Mauna Kea, in some of Hawaii’s volcanic ash deposits, which provide geologic terrain and composition similar to what scientists expect to find on the moon, an asteroid, or Mars.",
+          "verificado": false,
+          "parametros": ["litologia_glim"],
+          "medido": true,
+          "motivo": null
+        },
+        {
+          "id": "mineralogia_basaltica",
+          "nombre": "Basalt, iron oxides and clays",
+          "en_lista_de_partida": true,
+          "valor_texto": null,
+          "fuente": "https://core.ac.uk/works/15260970",
+          "cita": "Preliminary results show that the sediments change from dry, organic-poor, poorly-sorted volcaniclastic sand on the surface, containing basalt, iron oxides and clays",
+          "verificado": false,
+          "parametros": [],
+          "medido": false,
+          "motivo": "No global mineralogy layer."
+        },
+        {
+          "id": "terreno_tipo_apolo",
+          "nombre": "Terrain Apollo crews found realistic",
+          "en_lista_de_partida": false,
+          "valor_texto": null,
+          "fuente": "https://ntrs.nasa.gov/api/citations/20100033667/downloads/20100033667.pdf",
+          "cita": "In the 1960s, Apollo astronauts prepared for their missions on Mauna Kea and declared those sites to be the most realistic in terms of the terrain in the lunar environment they encountered.",
+          "verificado": false,
+          "parametros": ["rugosidad_tan", "relieve_m"],
+          "medido": true,
+          "motivo": null
+        }
+      ]
+    }
+  ]
 }
