@@ -7,6 +7,7 @@ export const SECCIONES = [
   { id: 'comparado', titulo: 'Compared with the Moon or Mars' },
   { id: 'no_reproducible', titulo: 'Shown but not compared: Earth cannot reproduce it' },
   { id: 'solo_tierra', titulo: 'Earth only: compared with the mission reference site' },
+  { id: 'por_mes', titulo: 'Earth month by month' },
   { id: 'sitio', titulo: 'Base-site criteria' },
 ];
 
@@ -40,11 +41,12 @@ export function gruposDe(fuente) {
   return ['otras'];
 }
 
-const entrada = (seccion, id, nombre, mundo, f) => ({
+const entrada = (seccion, id, nombre, mundo, f, aviso = null) => ({
   seccion, id, nombre, mundo,
   texto: f?.texto ?? null,
   url: f?.url ?? null,
   propio: f?.origen === 'mío',
+  aviso,
 });
 
 // Una fila por parámetro y mundo, en el orden de los índices.
@@ -56,6 +58,10 @@ export function entradas(indice, sitio) {
   }
   for (const p of indice?.parametros_tierra ?? []) {
     if (p.fuentes?.earth) out.push(entrada('solo_tierra', p.id, p.nombre, 'earth', p.fuentes.earth));
+  }
+  // Versión por mes del calendario: solo en la Tierra y solo en los parámetros que la traen en el índice.
+  for (const p of [...(indice?.parametros ?? []), ...(indice?.parametros_tierra ?? [])]) {
+    if (p.meses?.fuente) out.push(entrada('por_mes', p.id, p.nombre, 'earth', p.meses.fuente, p.meses.aviso ?? null));
   }
   for (const [m, w] of Object.entries(sitio?.mundos ?? {})) {
     for (const c of w.criterios ?? []) if (c.fuente_dato) out.push(entrada('sitio', c.id, c.nombre, m, c.fuente_dato));
@@ -71,7 +77,7 @@ export function porGrupo(lista) {
     const clave = `${e.url ?? ''}\n${e.texto ?? ''}`;
     if (!unicas.has(clave)) unicas.set(clave, { texto: e.texto, url: e.url, propio: e.propio, usos: [] });
     const u = unicas.get(clave);
-    const uso = `${e.nombre} (${MUNDOS[e.mundo]})`;
+    const uso = `${e.nombre} (${MUNDOS[e.mundo]}${e.seccion === 'por_mes' ? ', by month' : ''})`;
     if (!u.usos.includes(uso)) u.usos.push(uso);
   }
   const grupos = Object.fromEntries(GRUPOS.map((g) => [g.id, []]));

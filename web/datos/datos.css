@@ -26,6 +26,7 @@
 .datos .tabla-fuentes tbody th { font-weight: 700; min-width: 140px; }
 .datos .tabla-fuentes td { min-width: 200px; }
 .datos .tabla-fuentes td.vacia { color: var(--texto-tenue); }
+.datos .tabla-fuentes .aviso { display: block; margin-top: 4px; font-size: 13px; color: var(--texto-tenue); }
 .datos .error { color: var(--neon-yellow); }
 
 @media (max-width: 520px) {

@@ -12,6 +12,7 @@ test('every source in the indexes becomes one row, with its text and link as the
   let esperadas = 0;
   for (const p of INDICE.parametros) esperadas += Object.keys(MUNDOS).filter((m) => p.fuentes?.[m]).length;
   for (const p of INDICE.parametros_tierra) esperadas += p.fuentes?.earth ? 1 : 0;
+  for (const p of [...INDICE.parametros, ...INDICE.parametros_tierra]) esperadas += p.meses?.fuente ? 1 : 0;
   for (const w of Object.values(SITIO.mundos)) esperadas += (w.criterios ?? []).filter((c) => c.fuente_dato).length;
   assert.equal(LISTA.length, esperadas);
   const p = INDICE.parametros.find((x) => x.id === 'ndvi_max');
@@ -23,7 +24,9 @@ test('every source in the indexes becomes one row, with its text and link as the
     assert.ok(Object.keys(MUNDOS).includes(x.mundo), x.mundo);
     assert.ok(SECCIONES.some((s) => s.id === x.seccion), x.seccion);
     assert.ok(x.url === null || x.url.startsWith('https://'), x.url);
-    assert.equal(x.propio, x.seccion !== 'sitio' && [...INDICE.parametros, ...INDICE.parametros_tierra].find((p) => p.id === x.id)?.fuentes?.[x.mundo]?.origen === 'mío');
+    const p = [...INDICE.parametros, ...INDICE.parametros_tierra].find((q) => q.id === x.id);
+    const f = x.seccion === 'por_mes' ? p?.meses?.fuente : p?.fuentes?.[x.mundo];
+    assert.equal(x.propio, x.seccion !== 'sitio' && f?.origen === 'mío');
   }
 });
 
@@ -63,4 +66,22 @@ test('table by parameter: one row per parameter, one cell per world, empty where
   const tierra = porParametro(LISTA, 'solo_tierra');
   assert.equal(tierra.length, INDICE.parametros_tierra.length);
   for (const f of tierra) assert.equal(f.celdas.moon, null);
+});
+
+test('month by month: one Earth row per parameter that has a monthly version, with its own source and warning', () => {
+  const conMes = [...INDICE.parametros, ...INDICE.parametros_tierra].filter((p) => p.meses?.fuente);
+  assert.ok(conMes.length > 0);
+  const filas = porParametro(LISTA, 'por_mes');
+  assert.equal(filas.length, conMes.length);
+  for (const p of conMes) {
+    const e = LISTA.find((x) => x.seccion === 'por_mes' && x.id === p.id);
+    assert.equal(e.mundo, 'earth');
+    assert.equal(e.texto, p.meses.fuente.texto);
+    assert.equal(e.url, p.meses.fuente.url);
+    assert.equal(e.aviso, p.meses.aviso ?? null);
+  }
+  for (const f of filas) { assert.equal(f.celdas.moon, null); assert.equal(f.celdas.mars, null); }
+  const usos = porGrupo(LISTA).flatMap((g) => g.fuentes.flatMap((f) => f.usos));
+  assert.ok(usos.some((u) => u.endsWith('(Earth, by month)')));
+  for (const x of LISTA.filter((y) => y.seccion !== 'por_mes')) assert.equal(x.aviso, null);
 });
