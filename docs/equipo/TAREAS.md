@@ -28,6 +28,8 @@ Tus PR #10 a #15 están integrados; la revisión de cada uno está en su hilo. A
 - Todas las misiones del catálogo tienen ya sitio de referencia (gracias a B10d); 154 de 156 citas verificadas.
 - **«Generate simulation» ya está:** al pulsar un lugar se abre su terreno y ahí sale el botón; lleva al visor («Simulation») con ese lugar de la Tierra a ras de suelo. «Terrain viewer» ya no está en la barra.
 - **Tu catálogo de equipo (B13) está integrado**, 20 de 26 citas verificadas. Con él Ale va a enseñar, por lugar y por mes, si cada equipo aguanta (los que tienen límites publicados: domo de HI-SEAS, lidar ILRIS-3D, Scarecrow) y a plantar los equipos con dimensiones publicadas como volúmenes a tamaño real.
+- **El equipo, mes a mes, ya está en Calendar** («Mission equipment at this place, month by month»). Ejemplo real para los textos (misión «Laser and camera 3D mapping», punto del polo sur lunar, lugar 80,75° N 68,25° O): el lidar ILRIS-3D (0 a 40 °C publicados) solo queda dentro de su rango en julio; la campaña de NASA con ese lidar en Haughton fue en julio. Compara temperatura de la superficie, no del aire: dilo si lo usas.
+- **Hallazgo propio para el pitch:** `docs/meses-campanas.md` (lo genera `scripts/meses_campanas.mjs`). En los 11 casos en que el parecido cambia con el mes, el mes de la campaña de NASA nunca es el mejor del sitio; en los polares queda entre el 10.º y el 12.º de 12. No dice que NASA elija mal: va cuando se puede llegar y cuando el equipo funciona. Los límites están escritos en el propio documento: cópialos con la cifra.
 
 | Orden | Tarea | Qué se entrega | Tamaño |
 |---|---|---|---|
