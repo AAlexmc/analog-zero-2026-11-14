@@ -385,9 +385,13 @@
           "organismo": "NASA Johnson Space Center (instrumentation), NASA Innovative Partnerships Program",
           "sitio": null,
           "sitio_texto": "McMurdo Station, Antarctica",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
+          "lat": -77.85,
+          "lon": 166.6667,
+          "coordenadas_fuente": {
+            "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
+            "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
+            "verificado": false
+          },
           "anos": "2008–2009",
           "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
           "cita": "All three organizations will share data from the 13-month test, which runs from January 2008 to February 2009.",
@@ -417,9 +421,13 @@
           "organismo": "NASA (Exploration Systems Mission Directorate)",
           "sitio": null,
           "sitio_texto": "McMurdo Station, Antarctica",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
+          "lat": -77.85,
+          "lon": 166.6667,
+          "coordenadas_fuente": {
+            "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
+            "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
+            "verificado": false
+          },
           "anos": "2008",
           "fuente": "https://www.lpi.usra.edu/lunar/analogs/blackpoint/pdf/marsmoon_analogs_nasafactsheet.pdf",
           "cita": "NASA conducted an analog mission to test the inflatable habitat concept. The site selected was the cold, isolated landscape of Antarctica.",
@@ -723,9 +731,13 @@
           "organismo": "NASA Human Research Program (Flight Analogs)",
           "sitio": null,
           "sitio_texto": "McMurdo, Palmer and Amundsen-Scott South Pole stations, Antarctica",
-          "lat": null,
-          "lon": null,
-          "coordenadas_fuente": null,
+          "lat": -77.85,
+          "lon": 166.6667,
+          "coordenadas_fuente": {
+            "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
+            "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
+            "verificado": false
+          },
           "anos": "2016 onward",
           "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
           "cita": "HRP studies conducted under this agreement began in 2016 with 1 to 3 HRP studies deployed each year to the NSF Antarctic stations including McMurdo, Palmer, and Amundsen-Scott South Pole Stations.",
@@ -1029,11 +1041,11 @@
           "organismo": "NASA",
           "sitio": null,
           "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
-          "lat": 35.6835172,
-          "lon": -111.478647,
+          "lat": 35.687777,
+          "lon": -111.359868,
           "coordenadas_fuente": {
-            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
-            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
+            "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
             "verificado": false
           },
           "anos": "2009",
@@ -1520,8 +1532,8 @@
           "lon": -89.6833,
           "coordenadas_fuente": null,
           "anos": "2007",
-          "fuente": "https://ri.cmu.edu/?p=9836",
-          "cita": "two NASA Ames K10 rovers operated at Haughton Crater on Devon Island, Nunavut, Canada, autonomously surveying multiple lunar analog sites",
+          "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+          "cita": "The robots, K10 Black and K10 Red, carry 3-D laser scanners and ground-penetrating radar.",
           "verificado": false,
           "meses": [
             7
@@ -1620,8 +1632,8 @@
           "lon": -89.6833,
           "coordenadas_fuente": null,
           "anos": "2007",
-          "fuente": "https://ri.cmu.edu/?p=9892",
-          "cita": "The rovers carried a 3D scanning lidar for topographic mapping and ground penetrating radar to map subsurface structure.",
+          "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
+          "cita": "The robots, K10 Black and K10 Red, carry 3-D laser scanners and ground-penetrating radar.",
           "verificado": false,
           "meses": [
             7
@@ -1777,11 +1789,15 @@
         {
           "nombre": "Mars 2020 Lander Vision System helicopter flights",
           "organismo": "NASA JPL",
-          "sitio": "death_valley_badwater",
-          "sitio_texto": null,
-          "lat": 36.3,
-          "lon": -116.8,
-          "coordenadas_fuente": null,
+          "sitio": null,
+          "sitio_texto": "Death Valley, California",
+          "lat": 36.24194,
+          "lon": -116.82583,
+          "coordenadas_fuente": {
+            "fuente": "https://en.wikipedia.org/wiki/Death_Valley_National_Park",
+            "cita": "36°14′31″N 116°49′33″W / 36.24194°N 116.82583°W",
+            "verificado": false
+          },
           "anos": "2019",
           "fuente": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-mars-2020-mission-drops-in-on-death-valley",
           "cita": "an Airbus helicopter carried an engineering model of the Lander Vision System",
@@ -1983,11 +1999,11 @@
           "organismo": "NASA Johnson with JAXA",
           "sitio": null,
           "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
-          "lat": 35.6835172,
-          "lon": -111.478647,
+          "lat": 35.687777,
+          "lon": -111.359868,
           "coordenadas_fuente": {
-            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
-            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
+            "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
             "verificado": false
           },
           "anos": "2022",
@@ -2079,11 +2095,11 @@
           "organismo": "NASA Johnson with JAXA",
           "sitio": null,
           "sitio_texto": "Black Point Lava Flow, north of Flagstaff, Arizona",
-          "lat": 35.6835172,
-          "lon": -111.478647,
+          "lat": 35.687777,
+          "lon": -111.359868,
           "coordenadas_fuente": {
-            "fuente": "https://sega.nau.edu/sites/default/files//Black%20Point%20Safety%20Info_0.pdf",
-            "cita": "GPS Coordinates: Lat/Long: 35.6835172, -111.478647",
+            "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
+            "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
             "verificado": false
           },
           "anos": "2022",
