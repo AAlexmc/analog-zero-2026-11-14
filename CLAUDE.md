@@ -20,7 +20,7 @@ Lo que pide el enunciado y no se puede olvidar: ir más allá del parecido visua
 3. **Sin fechas ni horas** en código, comentarios, tests, datos ni textos del repo.
 4. **Marca del concurso** en todo lo visual: `web/marca/marca.css` (paleta, degradado, tipografías). Ningún color ni fuente fuera de ahí. Texto solo sobre deep blue, electric blue o blanco; contraste ≥ 4,5:1; neon yellow solo de acento; rocket red nunca de fondo de texto. Sin logotipos de NASA ni de Space Apps.
 5. **Textos de la web en inglés**, llanos y cortos. Identificadores y comentarios del código en español; comentarios solo los imprescindibles.
-6. **Licencias:** no subir datos de GVP, PZI, SWIM, HWSD ni teselas de Trek. Datos nuevos: solo de fuente pública, con su licencia o política anotada. Sin dependencias nuevas ni recursos cargados desde otros servidores (la web es estática y funciona sin red).
+6. **Licencias:** no subir datos de GVP, PZI, SWIM, HWSD ni teselas de Trek. Datos nuevos: solo de fuente pública, con su licencia o política anotada. Sin dependencias nuevas ni recursos cargados desde otros servidores (la web es estática y funciona sin red). Única excepción: la vista de terreno local de la Tierra (`web/relieve/`) pide teselas en línea solo a `elevation-tiles-prod.s3.amazonaws.com` (relieve abierto) y a `gibs.earthdata.nasa.gov` (imágenes de NASA GIBS); sin red muestra un aviso y deja el globo.
 7. **No tocar:** `umbrales.json` (congelado), `web/data/global/` (resultado publicado de una validación), ni reescribir desde cero un fichero que ya existe: cambios pequeños y localizados.
 8. Sin secretos, claves ni datos personales en el repo.
 
@@ -48,6 +48,8 @@ Lo que pide el enunciado y no se puede olvidar: ir más allá del parecido visua
 | `web/explorar/` | Mundo en 3D y colocación del punto |
 | `web/buscar/` | Motor de búsqueda de análogos (JS puro, con tests) |
 | `web/analogos/` | Resultados en la Tierra y pestaña de métricas |
+| `web/sitio/` | Criterios de NASA para sitio de base y cálculo del mejor punto |
+| `web/relieve/` | Vista de terreno local en 3D |
 | `web/mapa/` | Mapa global de condiciones de ensayo |
 | `web/terreno/` | Visor de terreno, equipo, rutas, obra, base, hielo y agua |
 | `web/marca/`, `web/lib/` | Marca del concurso; three.js y fuentes |

@@ -1,0 +1,55 @@
+{
+ "rejilla": "row 0 = north; column 0 = −180° (east positive); pixel centres at lat = 90 − (row + 0.5)/ppd, lon = −180 + (col + 0.5)/ppd; metres = value × factor_m",
+ "mundos": {
+  "moon": {
+   "fichero": "moon_16ppd.i16",
+   "tipo": "int16 little-endian",
+   "ancho": 5760,
+   "alto": 2880,
+   "ppd": 16,
+   "factor_m": 0.5,
+   "unidad": "m",
+   "referencia": "height above a sphere of radius 1737.4 km (label OFFSET)",
+   "radio_m": 1737400.0,
+   "m_por_px": 1895.21,
+   "min_m": -8981.5,
+   "max_m": 10685.5,
+   "fuente": {
+    "texto": "LRO LOLA LDEM_16 (NASA PDS Geosciences Node)",
+    "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+    "etiqueta": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.lbl"
+   },
+   "tono_medio_rgb": [
+    146,
+    145,
+    139
+   ],
+   "tono_fuente": "moon_4k.jpg: NASA SVS CGI Moon Kit (LRO camera colour mosaic, Arizona State University), https://svs.gsfc.nasa.gov/4720"
+  },
+  "mars": {
+   "fichero": "mars_16ppd.i16",
+   "tipo": "int16 little-endian",
+   "ancho": 5760,
+   "alto": 2880,
+   "ppd": 16,
+   "factor_m": 1.0,
+   "unidad": "m",
+   "referencia": "planetary radius minus the areoid radius (label: GMM3 areoid)",
+   "radio_m": 3396000.0,
+   "m_por_px": 3705.0,
+   "min_m": -8177.0,
+   "max_m": 21171.0,
+   "fuente": {
+    "texto": "MGS MOLA MEGDR 16 px/deg, MEGT90N000EB (NASA PDS Geosciences Node)",
+    "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+    "etiqueta": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.lbl"
+   },
+   "tono_medio_rgb": [
+    117,
+    76,
+    69
+   ],
+   "tono_fuente": "mars_4k.jpg: NASA/JPL/USGS Viking colour mosaic (USGS Astrogeology, Mars_Viking_ClrMosaic_global_925m)"
+  }
+ }
+}

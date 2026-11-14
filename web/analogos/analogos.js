@@ -6,6 +6,7 @@ import { formatoLatLon } from '../explorar/geo.js';
 import { cargar } from '../buscar/motor.js';
 import { enlaceTerreno } from '../mapa/estado.js';
 import { CORTES, NO_COMPARADO, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup } from './metricas.js';
+import { engancharRelieve } from '../relieve/enganche.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -74,6 +75,8 @@ async function montar() {
   const lunares = lunaresConCentro.map((t) => t.id);
   const tierraTerrenos = terrenos.filter((t) => t.cuerpo === 'tierra');
   const lugarSel = () => (A.sel ? r[A.sel.lista][A.sel.k] : null);
+  $('ver-relieve').hidden = !(r.resultados.length || r.parciales.length);
+  engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${A.sel.lista === 'resultados' ? `Place ${A.sel.k + 1}` : 'Partly compared place'} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
 
   function tarjeta(x, k, lista) {
     const c = masCercano(x.lat, x.lon, sitios);
@@ -145,7 +148,7 @@ async function montar() {
     A.sel = { lista, k };
     document.querySelectorAll('.tarjeta').forEach((t) => t.setAttribute('aria-current', String(t.dataset.lista === lista && Number(t.dataset.k) === k)));
     numeros.forEach((b, i) => b.setAttribute('aria-current', String(lista === 'resultados' && i === k)));
-    G?.mirar(lugarSel());
+    G?.mirar(lugarSel(), A.listo ? Math.min(G.camara.position.length(), 2) : undefined);
     pintarMetricas();
   }
 

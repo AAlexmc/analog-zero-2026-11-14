@@ -5,6 +5,7 @@ import { crearGlobo } from './globo.js';
 import { cargar } from '../buscar/motor.js';
 import { formatoValor, celsius, partesSup } from '../analogos/metricas.js';
 import { montarSitio, rotuloRango } from '../sitio/panel.js';
+import { engancharRelieve } from '../relieve/enganche.js';
 
 // Vista inicial (propia): la Luna algo desde el sur para que se vea el polo; Marte de cara a Syrtis–Jezero.
 const VISTA0 = { moon: { lat: -38, lon: 0 }, mars: { lat: 15, lon: 72 } };
@@ -68,6 +69,7 @@ if (!mundo) {
 }
 
 async function montar(m) {
+  engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: m.id, alCambiar: az.explorar.alCambiar, punto: () => punto && { lat: punto.lat, lon: punto.lon, titulo: `${punto.sug?.nombre ?? 'Your pin'} · ${formatoLatLon(punto.lat, punto.lon).texto}` } });
   const caja = $('sugerencias');
   for (const s of m.sugerencias) {
     const b = document.createElement('button');
