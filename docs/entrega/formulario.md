@@ -4,19 +4,25 @@ Every figure below is copied from a file in this repository, named next to it, o
 
 ## High-level summary (≤ 150 words)
 
-Analog Zero finds the places on Earth that are most like a chosen spot on the Moon or Mars, and says how alike they are, parameter by parameter. Pick a world, place a point (NASA's south-pole region on the Moon; any site on Mars), and the tool searches all of Earth's land on a 0.5° grid. It reports what matches, by how much, what does not, and what Earth cannot reproduce at all, such as gravity and air pressure. The search can follow a NASA mission objective: pick a kind of test NASA runs at Earth analog sites, and the tool uses the environment traits that NASA's own sources name for it. A portfolio shows the smallest set of places that together cover every parameter. A terrain viewer puts Moon and Earth ground side by side at the same scale: plant equipment and see which published limit breaks.
+Analog Zero finds the places on Earth that are most like a chosen spot on the Moon or Mars, and says how alike they are, parameter by parameter, month by month. Pick a world, a NASA mission objective and a month, then place a point: the tool searches all of Earth's land on a 0.5° grid. An analog is a place and a month. For Jezero crater on Mars, the best place on Earth is in Canada over the whole year, in Mongolia in January and in Namibia in July. A calendar says when a repeated test can stay and when it should move. Each place shows what matches, by how much, and what Earth cannot reproduce, such as gravity. A portfolio covers every parameter with the fewest places. A terrain viewer puts Moon and Earth ground side by side: plant equipment and see which published limit breaks.
 
 ## Project description
 
 What it does:
 - **Search the whole planet.** Every land cell of Earth is compared, not only the famous sites. The grid is 720 × 360 cells of 0.5° (`web/data/cuerpos/indice.json`, `rejilla`).
 - **Several dimensions, each one shown.** Eight parameters are compared with the target on the Moon or Mars: terrain roughness, local relief, daily maximum, minimum and mean surface temperature, sunlight on a flat surface, vegetation (NDVI), rain and snowfall. Two more are shown but cannot be reproduced on Earth: gravity and air pressure (`web/data/cuerpos/indice.json`, `parametros`, `reproducible_en_tierra`).
-- **Search by mission objective.** The user picks a kind of test that NASA runs at analog sites, or writes a «New mission» with a title and a list of parameters.
+- **Search by mission objective.** Step 1 on the world screen, before placing the point. The user picks a kind of test that NASA runs at analog sites, or writes a «New mission» with a title and a list of parameters.
   - Each objective lists the NASA campaigns behind it, with a literal quote from the source.
   - It also lists the environment traits the source names as the reason for the site.
   - Which of our layers stands for each trait is our own criterion, labelled «own mapping».
   - Traits we have no layer for are shown as «NOT MEASURED».
   - The published catalogue has 21 objectives (`web/data/misiones.json`); format in `docs/contrato-misiones.md`.
+- **Month of the year.** A place on Earth can be a good analog in January and not in July (`docs/metrica-analogos.md`, «Meses»).
+  - «When», next to the mission objective, takes a month or the whole year. Five of the parameters compared with the Moon or Mars (temperatures, sunlight, rain) and two Earth-only ones (wind, day-night swing) have a value for each month; the rest keep their yearly value.
+  - With a month chosen, or with «Show how these places change through the year», each place shows its match in each of the 12 months, with its best and worst month.
+  - The **Calendar** tab gives, for the chosen place, its match each month and the best place on Earth that month. «Repeat a test later» takes a first month and a gap, and says «Stay» or «Move the test», and where to. «Move» means more than 5 points below the best place that month (own threshold).
+  - Calendar also checks the mission's equipment month by month against its published limits (`web/data/equipo_mision.json`). Equipment without published limits is shown as NOT MEASURED.
+  - The Moon and Mars keep their yearly value: only Earth changes with the month. The months are a climatology (the mean month over many years), not a given year.
 - **Earth-only parameters.** Dryness, wind, day-night swing, permafrost, elevation, travel time to a city and rock type. These are compared with the Earth site where NASA runs that test (the mission's reference site), not with the Moon or Mars (`indice.json`, `parametros_tierra`; `docs/metrica-analogos.md`).
 - **Similarity, in plain numbers.** Each parameter gets a deviation in percent over a reference range; similarity is 100 minus the deviation, averaged over the parameters used (`docs/metrica-analogos.md`). No data on either side gives «no data», never 0.
 - **Portfolio.** The smallest set of Earth places that together cover each parameter (deviation under 15 %). Whatever no place covers is what has to be tested in a lab (`docs/metrica-analogos.md`, «Cartera de análogos»).
@@ -38,7 +44,7 @@ Wording of the considerations as summarised in `CLAUDE.md` (see «To confirm wit
 | Several dimensions: geology, terrain, temperature and light, water and ice, dust and wind, biology, subsurface, operations | Terrain, temperature, sunlight, vegetation and rain are compared with the Moon or Mars. Rock type, permafrost, wind, dryness and travel time are compared between Earth places. | No global layer for dust, subsurface, mineralogy, perchlorates or lava tubes. When a mission source names one of them, it is shown as NOT MEASURED. |
 | An analog does not have to match everything: say what matches, how much and what not | Every place shows each parameter's deviation in %, grouped as close, medium or far. The portfolio covers parameters with different places. | We do not merge the result into a single «best analog» verdict without showing the parts. |
 | Look at the whole Earth, not only famous sites | All land cells of the 0.5° grid are searched. A place with none of our catalogue sites within 300 km is labelled «unlisted». | «Unlisted» only means outside our own catalogue, not «never studied». |
-| Connect with exploration | Mission objectives come from NASA field campaigns, quoted. Base-site criteria come from NASA documents. Equipment limits come from published sources. | We do not plan missions or rank NASA's candidate regions. |
+| Connect with exploration | Mission objectives come from NASA field campaigns, quoted. Base-site criteria come from NASA documents. Equipment limits come from published sources. Calendar says whether the mission's equipment stays within its limits each month, and in which months NASA ran that mission within 300 km of the place. | We do not plan missions or rank NASA's candidate regions. |
 | Recognise the limits of Earth as an analog | Gravity and air pressure are shown for every place as «cannot reproduce». The environment-type check says when a target falls outside every type found on Earth. | We do not claim any Earth place reproduces the Moon or Mars. |
 
 ## What the reviewer asked, and what is really there
@@ -63,7 +69,7 @@ Wording of the considerations as summarised in `CLAUDE.md` (see «To confirm wit
   - Mars Odyssey Neutron Spectrometer (hydrogen near the surface).
 - **LRO:** LOLA elevation, LOLA average illumination and permanently shadowed regions (NASA GSFC PGDA), and Diviner.
 - **Other NASA:** NASA POWER (MERRA-2 and SYN1deg climatology for Earth) and NSSDC fact sheets (constants).
-- The new page `web/datos/` (pending review, PR #8) lists each source by archive and by parameter.
+- The page `web/datos/` («Data sources» in the top bar) lists each source by archive and by parameter, including the monthly layers.
 
 **An unexpected place.** With the engine's default parameters, for Jezero crater on Mars (18.38° N, 77.58° E):
 - The best Earth cell is at 80.75° N, 73.25° W, in Canada, with 81.7 % similarity. None of our catalogue sites is within 300 km.
@@ -72,13 +78,22 @@ Wording of the considerations as summarised in `CLAUDE.md` (see «To confirm wit
 
 For the Shackleton rim on the Moon, the best cell is at 82.25° N, 76.75° W, in Canada, with 70.1 %. Computed with `web/buscar/motor.js` on the data in `web/data/`; the same numbers appear in the capture scripts `scripts/captura_analogos.mjs` and `scripts/captura_cartera.mjs`.
 
-**A new way to compare.** Two ideas:
-1. **A portfolio instead of a single winner.** For Jezero, 2 places cover every parameter that can be covered. The daily minimum temperature is covered by no place: the best on Earth is 16.9 % off, in Antarctica at 79.75° S, 153.25° E. So that one goes to a lab.
-2. **Search by mission objective.** The question changes from «what looks like Jezero» to «where do I test this NASA objective». The traits behind it come from NASA's own campaign sources.
+**A new way to compare.** Three ideas:
+1. **The same test, two dates, two sites.** An Earth place can be a good analog in one month and not in another. For Jezero, with the engine's default parameters:
+   - whole year: 80.75° N, 73.25° W, Canada, 81.7 %;
+   - January: 42.75° N, 100.75° E, Mongolia, 85.8 %;
+   - July: 18.25° S, 12.25° E, Namibia, 83.3 %.
+
+   None of the three has one of our catalogue sites within 300 km. In Calendar, for the January place, a first test in January repeated 6 months later gives: «January here: 85.8 %. Six months later, in July, this place drops to 72.6 %; the best place then is 18.25° S, 12.25° E (Namibia), 83.3 %. Move the test.»
+   - **Equipment, month by month.** With the mission «Laser and camera 3D mapping» and the lunar south-pole point 89.45° S, 137.15° W, place 2 is at 80.75° N, 68.25° W. There the ILRIS-3D lidar (published range 0 to 40 °C) is within its limits only in July. NASA's campaign with that lidar, at Haughton, was in July. We compare the ground surface temperature, not the air (own comparison).
+   - **When NASA went** (`docs/meses-campanas.md`, own analysis). In the 11 campaign-and-world pairs whose match changes with the month, NASA's month is the site's best month in 0 of 11, and within 5 points of it in 5. In the 7 polar pairs it ranks 10th to 12th of 12: NASA went in local summer, and by temperature and light these sites are most like the Moon or Mars in local winter. This does not say NASA chose badly: the month of a campaign depends on access, daylight for the crews, budget and safety, none of which is measured here, and several of these tests do not need the coldest month.
+2. **A portfolio instead of a single winner.** For Jezero, 2 places cover every parameter that can be covered. The daily minimum temperature is covered by no place: the best on Earth is 16.9 % off, in Antarctica at 79.75° S, 153.25° E. So that one goes to a lab.
+3. **Search by mission objective.** The question changes from «what looks like Jezero» to «where do I test this NASA objective». The traits behind it come from NASA's own campaign sources.
 
 **What is weak, said plainly:**
 - **The validation failed.** The global similarity ranking had a pre-registered validation with thresholds frozen by hash. Known analog sites in the best 5 % of land for their key dimension: 1 of 11, where at least 8 were needed. Mission-profile predictions: 1 of 9, where at least 8 were needed (`docs/validacion-global.md`). The ranking is kept as exploratory.
 - **The environment types are weak and unsupervised** (silhouette about 0.3).
+- **The month only changes Earth.** The Moon and Mars keep their yearly value, so a season is not compared with a season. Snow on the ground is not measured (`docs/metrica-analogos.md`, «Meses»).
 - **Mars surface temperature is a reanalysis**, not a measurement: OpenMARS, Mars year 30, on a 5° grid copied to 0.5° (`indice.json`, `fuentes.mars` of the temperatures).
 - **The Moon and Mars are far from all of Earth.** NDVI and rain on the Moon and Mars are 0 by definition, which alone separates them from all of Earth. With the component ordering, a Moon or Mars point is usually farther from all of Earth than the reference distance, so its % shows 0 even if the order is still useful.
 
@@ -123,6 +138,4 @@ Also used, listed in `README.md` with their sources inside each generated file (
 - The exact wording of the challenge considerations: the table above follows the summary in `CLAUDE.md`, not the challenge page.
 - Whether the form wants the reviewer's questions answered in a separate field, and the exact questions.
 - The team's names and location for the form. `README.md` says «Barcelona»; the AI paragraph says «the team member's own» and I adapted it to «ours».
-- The number of mission objectives to quote. 12 are published; 9 more (groups 5 to 7) are in PR #5. If PR #5 is merged before submission, the count becomes 21.
-- The «unexpected place» numbers come from running the engine with its default parameters, not from a document. If the data are rebuilt, they must be recomputed. The command used is in the PR.
-- Whether the data page (`web/datos/`, PR #8) is merged before we mention it.
+- The «unexpected place» numbers and the month example (Jezero: whole year, January, July, and the Calendar sentence) come from running the engine with its default parameters, not from a document. If the data are rebuilt, they must be recomputed. The commands used are in the PRs.
