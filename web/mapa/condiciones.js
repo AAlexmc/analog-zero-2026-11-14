@@ -1,7 +1,7 @@
 // Modo «test conditions»: de condiciones.json y cond_*.png a selección, valores, veredictos y colores. Sin DOM.
 import { byteDe } from './png.js';
 import { valorByte } from './rejilla.js';
-import { colorRampa, COLOR } from './capas.js';
+import { colorRampa, COLOR, raya } from './capas.js';
 
 const ENTORNO = { oscuridad_max_h: 'continuous darkness', sol_rasante_h_ano: 'grazing sun (lunar polar elevations)', t_min_alcanzable_k: 'coldest air temperature' };
 const NOTA = { terreno: 'measured on the 3D terrain', no_evaluado: 'not evaluated' };
@@ -38,7 +38,7 @@ export function opcionesRequisito(man, eqId) {
   return {
     evaluables: reqs.filter((r) => r.tratamiento === 'condicion').map((r) => ({ valor: String(r.indice), texto: r.prueba ?? txt(r), req: r })),
     otros: reqs.filter((r) => r.tratamiento !== 'condicion').map((r) => ({ valor: String(r.indice), texto: txt(r), nota: NOTA[r.tratamiento] ?? 'not evaluated', req: r })),
-    entorno: Object.keys(ENTORNO).filter((id) => canalDe(man, id)).map((id) => ({ valor: `env:${id}`, texto: `Environment · ${ENTORNO[id]}` })),
+    entorno: Object.keys(ENTORNO).filter((id) => canalDe(man, id)).map((id) => ({ valor: `env:${id}`, texto: `Environment: ${ENTORNO[id]}` })),
   };
 }
 
@@ -132,7 +132,7 @@ export function colorearCond({ man, canal, imgs, req, acc }) {
     for (let k = 0; k < img.ancho; k++) {
       const i = f * img.ancho + k, o = i * 4;
       if (byteDe(imgs[tierra.fichero], f, k, tierra.indice) === 255) continue;
-      const v = vals[i], ajedrez = (f + k) & 1;
+      const v = vals[i], ajedrez = raya(f, k);
       let col;
       const tAcc = Number.isFinite(acc) && acceso ? valorCondicion(man, 'tiempo_ciudad_h', f, k, imgs) : undefined;
       if (Number.isNaN(v)) { col = COLOR.sinDato[ajedrez]; cuenta.sin_dato++; }

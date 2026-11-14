@@ -44,4 +44,8 @@ export const PAREJAS = [
   { uso: 'selected place marker and its card number', texto: 'deep-blue', fondo: 'neon-yellow' },
   { uso: 'similarity legend and partial-place note over a bright globe', texto: 'neon-yellow', fondo: PANEL_PEOR },
   { uso: 'top bar muted links over the gradient', texto: TENUE(BARRA), fondo: BARRA },
+  { uso: 'global map zoom buttons over the brightest map colour', texto: 'white', fondo: mezclar('deep-blue', 0.72, 'white') },
+  { uso: 'global map canvas labels on their deep blue halo', texto: 'white', fondo: mezclar('deep-blue', 0.9, 'white') },
+  { uso: 'synthetic-data banner, lighter stripe', texto: 'deep-blue', fondo: mezclar('white', 0.78, 'deep-blue') },
+  { uso: 'global map breaking value in the data flower (red petal beside it)', texto: 'neon-yellow', fondo: PANEL_PEOR },
 ];

@@ -1,11 +1,19 @@
 // Del manifiesto (capas.json) a la lista de capas de un par, y de bytes a colores. Sin DOM.
 import { byteDe } from './png.js';
 import { valorByte, estadoCelda, NA, SIN_DATO } from './rejilla.js';
+import { PALETA, mezclar } from '../marca/contraste.js';
 
-export const RAMPA = [[0, [0, 49, 83]], [0.45, [30, 98, 148]], [0.75, [96, 160, 205]], [1, [237, 242, 247]]];
-export const COLOR = { falla: [40, 44, 50], noEval: [[108, 116, 124], [86, 94, 102]], na: [150, 140, 112], sinDato: [[108, 116, 124], [86, 94, 102]] };
-// Okabe-Ito sin bermellón (el rojo es solo para «se rompe»).
-const CATEGORIAS = [[230, 159, 0], [86, 180, 233], [0, 158, 115], [240, 228, 66], [0, 114, 178], [204, 121, 167], [190, 190, 190], [120, 94, 60]];
+// Todo sale de la paleta de marca (mezclas con alfa incluidas). Sin rojos: el rojo es solo para «se rompe».
+const hex = (n) => [1, 3, 5].map((i) => parseInt(PALETA[n].slice(i, i + 2), 16));
+const mezcla = (c, a, f) => mezclar(c, a, f).map(Math.round);
+export const RAMPA = [[0, hex('electric-blue')], [0.5, hex('blue-yonder')], [1, hex('white')]];
+// Sin puntuar: deep blue translúcido (falla una puerta) o rayado (no evaluable, sin dato); n/a más claro. Ninguno cae en la rampa.
+const RAYADO = [hex('deep-blue'), mezcla('white', 0.4, 'deep-blue')];
+export const COLOR = { falla: mezcla('deep-blue', 0.8, 'white'), noEval: RAYADO, na: mezcla('deep-blue', 0.5, 'white'), sinDato: RAYADO };
+const CATEGORIAS = [hex('blue-yonder'), hex('neon-yellow'), hex('white'), hex('neon-blue'), mezcla('neon-yellow', 0.5, 'electric-blue'),
+  hex('electric-blue'), mezcla('blue-yonder', 0.5, 'white'), mezcla('neon-yellow', 0.5, 'deep-blue')];
+// Rayas diagonales de dos celdas.
+export const raya = (f, c) => ((f + c) >> 1) & 1;
 
 const numDim = (id) => Number(id.slice(1));
 
@@ -85,7 +93,7 @@ export function colorear(capa, img, imgS, imgC) {
       const est = estadoCelda(sR, cG);
       if (est === 'oceano') continue;
       const b = byteDe(img, f, c, capa.canal);
-      const ajedrez = (f + c) & 1;
+      const ajedrez = raya(f, c);
       let col;
       if (capa.grupo === 'puntuacion' && est === 'falla_puerta') { col = COLOR.falla; cuenta.falla++; }
       else if (capa.grupo === 'puntuacion' && est === 'no_evaluable') { col = COLOR.noEval[ajedrez]; cuenta.no_evaluable++; }

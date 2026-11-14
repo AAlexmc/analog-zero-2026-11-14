@@ -19,7 +19,8 @@ const estado = {
   listo: false, errores: [], manifiesto: null, rejilla: null, par: null, capa: 'S', capas: [], imgs: new Map(), candidatos: null,
   lugares: [], terrenos: [], lunares: [], lunaCond: null, informe: null, hoja: null, aviso: null, vista: null, leyenda: null, modo: 'ranking', cond: null,
 };
-const COLOR_CONTORNO = 'rgb(230, 159, 0)';
+const BLANCO = '#FFFFFF', AMARILLO = '#EAFE07', FONDO = '#07173F';
+const COLOR_CONTORNO = AMARILLO;
 window.__mapa = estado;
 
 const $ = (id) => document.getElementById(id);
@@ -109,7 +110,7 @@ estado.aPantalla = (fila, col) => {
 function dibujar() {
   const dpr = devicePixelRatio || 1;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = '#021226';
+  ctx.fillStyle = FONDO;
   ctx.fillRect(0, 0, cv.width, cv.height);
   const v = estado.vista;
   if (!v || !estado.leyenda) return;
@@ -121,12 +122,12 @@ function dibujar() {
   ctx.translate(v.ox, v.oy);
   ctx.scale(v.esc, v.esc);
   ctx.lineWidth = 1 / v.esc;
-  ctx.strokeStyle = 'rgba(233, 240, 245, .12)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, .12)';
   ctx.beginPath();
   for (let lon = -150; lon < 180; lon += 30) { const x = (lon + 180) / paso; ctx.moveTo(x, 0); ctx.lineTo(x, alto); }
   for (let lat = -60; lat <= 60; lat += 30) { const y = (90 - lat) / paso; ctx.moveTo(0, y); ctx.lineTo(ancho, y); }
   ctx.stroke();
-  ctx.strokeStyle = 'rgba(233, 240, 245, .75)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, .75)';
   if (costa) ctx.stroke(costa);
   if (estado.modo === 'cond' && estado.cond?.contorno) {
     ctx.lineWidth = 2 / v.esc;
@@ -135,7 +136,7 @@ function dibujar() {
   }
   if (estado.hoja) {
     ctx.lineWidth = 2 / v.esc;
-    ctx.strokeStyle = '#e9f0f5';
+    ctx.strokeStyle = AMARILLO;
     const m = Math.max(0.15, 3 / v.esc);
     ctx.strokeRect(estado.hoja.col - m, estado.hoja.fila - m, 1 + 2 * m, 1 + 2 * m);
   }
@@ -149,42 +150,44 @@ const aPx = (lat, lon) => {
 };
 
 function rotulo(x, y, txt) {
-  ctx.font = '10px "DejaVu Sans Mono", monospace';
+  ctx.font = '700 12px "Overpass", system-ui, sans-serif';
   ctx.lineWidth = 3;
-  ctx.strokeStyle = 'rgba(2, 18, 38, .9)';
+  ctx.strokeStyle = 'rgba(7, 23, 63, .9)';
   ctx.strokeText(txt, x, y);
-  ctx.fillStyle = '#e9f0f5';
+  ctx.fillStyle = BLANCO;
   ctx.fillText(txt, x, y);
 }
 
 function dibujarMarcas() {
+  // Mapa muy reducido (móvil): sin rótulos, se pisan entre sí.
+  const rotular = estado.vista.esc >= 0.9;
   ctx.lineWidth = 1.5;
   for (const s of estado.lugares) {
     const [x, y] = aPx(s.lat, s.lon);
-    ctx.strokeStyle = '#e9f0f5'; ctx.fillStyle = 'rgba(2, 18, 38, .6)';
+    ctx.strokeStyle = BLANCO; ctx.fillStyle = 'rgba(7, 23, 63, .6)';
     ctx.fillRect(x - 4, y - 4, 8, 8); ctx.strokeRect(x - 4, y - 4, 8, 8);
   }
   const top = estado.modo === 'cond' ? [] : (estado.candidatos ?? []).slice(0, N_MARCAS);
   top.slice(1).forEach((c) => {
     const [x, y] = aPx(c.lat, c.lon);
     ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#e9f0f5'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = BLANCO; ctx.lineWidth = 1.5; ctx.stroke();
   });
   for (const t of estado.terrenos) {
     const [x, y] = aPx(t.lat, t.lon);
     ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4);
-    ctx.fillStyle = '#e9f0f5'; ctx.fillRect(-5, -5, 10, 10);
-    ctx.strokeStyle = '#021226'; ctx.lineWidth = 1.5; ctx.strokeRect(-5, -5, 10, 10);
+    ctx.fillStyle = BLANCO; ctx.fillRect(-5, -5, 10, 10);
+    ctx.strokeStyle = FONDO; ctx.lineWidth = 1.5; ctx.strokeRect(-5, -5, 10, 10);
     ctx.restore();
-    rotulo(x + 10, y + 4, `3D ${t.id.toUpperCase()}`);
+    if (rotular) rotulo(x + 10, y + 4, `3D ${t.id.replace(/_/g, ' ')}`);
   }
   if (top[0]) {
     const [x, y] = aPx(top[0].lat, top[0].lon);
     ctx.beginPath(); ctx.arc(x, y, 8, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#021226'; ctx.lineWidth = 5; ctx.stroke();
-    ctx.strokeStyle = '#e9f0f5'; ctx.lineWidth = 2.5; ctx.stroke();
-    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 2 * Math.PI); ctx.fillStyle = '#e9f0f5'; ctx.fill();
-    rotulo(x + 12, y + 4, 'BEST #1');
+    ctx.strokeStyle = FONDO; ctx.lineWidth = 5; ctx.stroke();
+    ctx.strokeStyle = AMARILLO; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 2 * Math.PI); ctx.fillStyle = AMARILLO; ctx.fill();
+    if (rotular) rotulo(x + 12, y + 4, 'Best candidate');
   }
 }
 
@@ -207,10 +210,13 @@ function muestra(color, ajedrez) {
   return `<span class="muestra" style="background: repeating-linear-gradient(45deg, rgb(${c[0].join(',')}) 0 3px, rgb(${c[1].join(',')}) 3px 6px)"></span>`;
 }
 
+// Escala (título y rampa) | estados y notas | símbolos.
+const agruparLeyenda = (p) => `<div class="escala">${p.slice(0, 2).join('')}</div><div class="estados">${p.slice(2, -1).join('')}</div>${p.at(-1)}`;
+
 function pintarLeyenda(capa, res) {
   const par = estado.par, m = capa.meta, partes = [];
   const unidad = conUnidad(m) ? ` (${m.unidad})` : m.unidad === '0-1' ? ' (0–1)' : '';
-  partes.push(`<div class="et">${esc(capa.grupo === 'puntuacion' ? `${ROTULO_S[capa.id] ?? capa.id} · ${m.nombre ?? 'similarity score'}` : nombreCapa(capa))}${esc(res.clases.length ? '' : unidad)}</div>`);
+  partes.push(`<div class="et">${esc(capa.grupo === 'puntuacion' ? `${ROTULO_S[capa.id] ?? capa.id} — ${m.nombre ?? 'similarity score'}` : nombreCapa(capa))}${esc(res.clases.length ? '' : unidad)}</div>`);
   if (res.clases.length) {
     partes.push(`<div class="clases">${res.clases.map((k) => `<span>${muestra(colorCategoria(k))}${esc(estado.manifiesto.litologia_clases?.[k] ?? `class ${k}`)}</span>`).join('')}</div>`);
   } else {
@@ -220,12 +226,12 @@ function pintarLeyenda(capa, res) {
   const filas = estadosLeyenda(capa, res.cuenta, par);
   for (const f of filas) {
     const val = Number.isFinite(f.nValidacion) ? ` <span class="tenue">(<span class="num">${f.nValidacion}</span>)</span>` : '';
-    partes.push(`<div data-v="${f.id}">${muestra(f.color)}${esc(f.texto)} · <span class="num">${f.n}</span> cells${val}</div>`);
+    partes.push(`<div data-v="${f.id}">${muestra(f.color)}${esc(f.texto)}<span class="sep">·</span><span class="num">${f.n}</span> cells${val}</div>`);
   }
-  if (filas.some((f) => Number.isFinite(f.nValidacion))) partes.push('<div class="tenue">(in brackets: cells in the validation set, which leaves out land south of 60° S except McMurdo)</div>');
+  if (filas.some((f) => Number.isFinite(f.nValidacion))) partes.push('<div class="tenue cita">(in brackets: cells in the validation set, which leaves out land south of 60° S except McMurdo)</div>');
   partes.push(`<div class="simbolos"><span><i class="sim mejor"></i>best candidate</span><span><i class="sim cand"></i>top ${N_MARCAS} candidates</span>`
     + `<span><i class="sim sitio"></i>known test site</span><span><i class="sim t3d"></i>3D terrain</span><span><i class="sim costa"></i>coast (from data mask)</span></div>`);
-  $('leyenda').innerHTML = partes.join('');
+  $('leyenda').innerHTML = agruparLeyenda(partes);
 }
 
 // ---------- Modo «test conditions» ----------
@@ -265,31 +271,33 @@ async function repintarCond() {
 
 function pintarLeyendaCond(res) {
   const c = estado.cond, k = canalDe(c.man, c.canal), m = k.meta, r = c.req, partes = [];
-  partes.push(`<div class="et">${esc(m.nombre ?? m.id)} (${esc(m.unidad)})${res.log ? ' · log scale' : ''}</div>`);
+  partes.push(`<div class="et">${esc(m.nombre ?? m.id)} (${esc(m.unidad)})${res.log ? '<span class="sep">·</span>log scale' : ''}</div>`);
   const [a, b] = res.dominio;
   partes.push(`<div class="bar" style="background:${rampaCSS()}"></div><div class="ext num"><span>${res.log ? `≤ ${res.logMin}` : esc(fmtValor(a, ''))}</span><span>${esc(fmtValor(b, ''))}</span></div>`);
   if (r) {
-    partes.push(`<div>Limit: <b>${esc(r.prueba)}</b> · catalog: ${esc(r.texto ?? '')}</div><div class="cita">“${esc(r.cita)}” — ${enlace(r.fuente)}</div>`);
+    partes.push(`<div>Limit: <b>${esc(r.prueba)}</b></div>`);
     if (r.veredicto_global === 'reaches') partes.push(`<div><i class="sim contorno"></i>edge of the land that reaches the limit</div>`);
     else partes.push(`<div class="v-rompe">not reachable on Earth — chamber only</div>`);
   }
-  partes.push(`<div class="cita">${esc(m.metodo ?? '')} ${enlace(m.fuente)}${m.origen === 'mío' ? ' <span class="sello-propio">own computation</span>' : ''}</div>`);
+  const fuentes = (r ? `<div>Catalog: ${esc(r.texto ?? '')}</div><div class="cita">“${esc(r.cita)}” — ${enlace(r.fuente)}</div>` : '')
+    + `<div class="cita">${esc(m.metodo ?? '')} ${enlace(m.fuente)}${m.origen === 'mío' ? ' <span class="sello-propio">own computation</span>' : ''}</div>`;
   if (Number.isFinite(c.acc)) {
-    partes.push(`<div>${muestra(COLOR.falla)}more than ${esc(c.acc)} h from a city <span class="sello-propio">own threshold</span> · <span class="num">${res.cuenta.lejos}</span> cells</div>`);
-    if (res.cuenta.sin_acceso) partes.push(`<div>${muestra(COLOR.sinDato)}no travel-time data · <span class="num">${res.cuenta.sin_acceso}</span> cells</div>`);
+    partes.push(`<div>${muestra(COLOR.falla)}more than ${esc(c.acc)} h from a city <span class="sello-propio">own threshold</span><span class="sep">·</span><span class="num">${res.cuenta.lejos}</span> cells</div>`);
+    if (res.cuenta.sin_acceso) partes.push(`<div>${muestra(COLOR.sinDato)}no travel-time data<span class="sep">·</span><span class="num">${res.cuenta.sin_acceso}</span> cells</div>`);
   }
-  if (res.cuenta.sin_dato) partes.push(`<div>${muestra(COLOR.sinDato)}no data · <span class="num">${res.cuenta.sin_dato}</span> cells</div>`);
+  if (res.cuenta.sin_dato) partes.push(`<div>${muestra(COLOR.sinDato)}no data<span class="sep">·</span><span class="num">${res.cuenta.sin_dato}</span> cells</div>`);
+  partes.push(`<details class="fuentes"><summary>Source and method</summary>${fuentes}</details>`);
   partes.push(`<div class="simbolos"><span><i class="sim sitio"></i>known test site</span><span><i class="sim t3d"></i>3D terrain</span><span><i class="sim costa"></i>coast (from data mask)</span></div>`);
-  $('leyenda').innerHTML = partes.join('');
+  $('leyenda').innerHTML = agruparLeyenda(partes);
 }
 
 function puenteTerreno(terrenos, objetivo, nombreObjetivo) {
-  if (!terrenos.length) return '<span class="tenue" data-v="sin-terreno">no 3D terrain generated for this cell yet</span>';
+  if (!terrenos.length) return '<p class="tenue" data-v="sin-terreno">no 3D terrain generated for this cell yet</p>';
   return terrenos.map((t) => {
     const e = enlaceTerreno(t.id, objetivo, estado.lunares);
     const txt = e.solo ? `Open this Earth terrain alone — no 3D terrain of ${nombreObjetivo ?? objetivo ?? 'this base site'}` : 'Open terrain and plant equipment';
-    return `<a class="boton abrir-terreno" href="${esc(e.href)}">${esc(txt)}</a> <span class="tenue">${esc(t.nombre)}</span>`;
-  }).join('<br>');
+    return `<a class="marca-boton boton abrir-terreno" href="${esc(e.href)}">${esc(txt)}</a><p class="tenue">${esc(t.nombre)}</p>`;
+  }).join('');
 }
 
 async function abrirHojaCond(fila, col) {
@@ -314,7 +322,7 @@ async function abrirHojaCond(fila, col) {
     }
     return `<div class="req-cond" data-indice="${esc(q.indice)}"><div class="ver${f.rompe ? ' v-rompe' : ''}" data-v="veredicto">${ver}</div>${motivo}`
       + `<div>${esc(q.texto ?? q.variable)}</div>`
-      + `<div><span class="tenue">limit</span> <span class="num">${esc(limiteTxt(q))}</span> · <span class="tenue">here</span> <span class="num">${esc(aqui)}</span></div>`
+      + `<div><span class="tenue">limit</span> <span class="num">${esc(limiteTxt(q))}</span><span class="sep">·</span><span class="tenue">here</span> <span class="num">${esc(aqui)}</span></div>`
       + `<div class="cita">“${esc(q.cita)}” ${enlace(q.fuente, 'source')}</div>${sub}</div>`;
   }).join('');
   const entorno = ['oscuridad_max_h', 'sol_rasante_h_ano', 't_min_alcanzable_k', 'tiempo_ciudad_h'].map((id) => {
@@ -322,15 +330,15 @@ async function abrirHojaCond(fila, col) {
     return k ? `<tr><td>${esc(k.meta.nombre)}</td><td class="num">${esc(fmtValor(valorCondicion(c.man, id, fila, col, c.imgs), k.meta.unidad))}</td><td>${enlace(k.meta.fuente)}</td></tr>` : '';
   }).join('');
   $('hoja').innerHTML = `
-    <div class="cab-hoja"><div><div class="et">TEST CONDITIONS · ${esc(c.eq.nombre)}</div>
-      <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)">×</button></div>
-    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)} · row ${fila} col ${col}</div>
+    <div class="cab-hoja"><div><div class="et">Test conditions<span class="sep">·</span>${esc(c.eq.nombre)}</div>
+      <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
+    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
     <div class="tenue">${esc(c.man.rotulo ?? '')}</div>
-    <div class="bloque"><div class="et">DESIGN LIMITS VS THIS PLACE</div>${filas.length
+    <div class="bloque"><h4>Design limits vs this place</h4>${filas.length
       ? `<div class="cond">${html}</div>`
       : '<div class="tenue" data-v="sin-requisitos">no design limits in the catalog for this equipment</div>'}</div>
-    <details class="bloque tabla" open><summary class="et">CONDITIONS IN THIS CELL</summary><table class="comp"><tbody>${entorno}</tbody></table></details>
-    <div class="bloque puente"><div class="et">PLANT EQUIPMENT HERE</div>${puenteTerreno(terrenos, estado.lunaCond)}</div>`;
+    <details class="bloque tabla" open><summary>Conditions in this cell</summary><table class="comp"><tbody>${entorno}</tbody></table></details>
+    <div class="bloque puente"><h4>Plant equipment here</h4>${puenteTerreno(terrenos, estado.lunaCond)}</div>`;
   $('hoja').querySelector('[data-a=cerrar]').addEventListener('click', cerrarHoja);
   $('aviso').hidden = true;
   estado.aviso = null;
@@ -364,7 +372,7 @@ function pintarSelector() {
   $('nota-par').hidden = par.prerregistrado !== false;
   const grupos = [['puntuacion', 'Score'], ['dimension', 'Dimensions (weight in this mission)'], ['variable', 'Raw variables']];
   $('capa').innerHTML = grupos.map(([g, t]) => `<optgroup label="${esc(t)}">${estado.capas.filter((c) => c.grupo === g).map((c) => {
-    const txt = c.grupo === 'puntuacion' ? `${ROTULO_S[c.id] ?? c.id}${c.meta.nombre ? ` · ${c.meta.nombre}` : ''}` : c.grupo === 'dimension' ? `${nombreCapa(c)} · w ${c.peso}` : `${nombreCapa(c)}${conUnidad(c.meta) ? ` (${c.meta.unidad})` : ''}`;
+    const txt = c.grupo === 'puntuacion' ? `${ROTULO_S[c.id] ?? c.id}${c.meta.nombre ? ` — ${c.meta.nombre}` : ''}` : c.grupo === 'dimension' ? `${nombreCapa(c)} — weight ${c.peso}` : `${nombreCapa(c)}${conUnidad(c.meta) ? ` (${c.meta.unidad})` : ''}`;
     return `<option value="${esc(c.id)}"${c.id === estado.capa ? ' selected' : ''}>${esc(txt)}</option>`;
   }).join('')}</optgroup>`).join('');
   for (const [k, id] of [['csv', 'desc-csv'], ['geojson', 'desc-geojson']]) {
@@ -412,25 +420,26 @@ function pintarValidacion() {
   const r = resumenValidacion(estado.informe), par = estado.par;
   const b = (x) => `<b class="num">${x ?? '—'}</b>`;
   const frac = Number.isFinite(par?.fraccion_tierra_pasa_puertas) ? `${b((par.fraccion_tierra_pasa_puertas * 100).toFixed(1))} % of land passes this mission's gates` : '';
+  const boton = `<button type="button" class="marca-boton secundario ver-detalle" aria-controls="val-detalle" aria-expanded="${!$('val-detalle').hidden}">How this was validated</button>`;
   let linea;
-  if (!r) linea = `<span class="et">VALIDATION</span> <span>validation pending</span>${frac ? ` · ${frac}` : ''}`;
+  if (!r) linea = `<span class="val-titular"><b>Ranking:</b> validation pending</span>${frac ? `<span class="val-cifras">${frac}</span>` : ''}${boton}`;
   else {
     const fallo = r.h1.veredicto === 'fallo';
-    const ver = r.h1.veredicto ? `<span data-v="veredicto" class="${fallo ? 'v-rompe' : ''}">pre-registered test ${fallo ? 'FAILED — read this ranking as exploratory' : esc(r.h1.veredicto)}</span> · ` : '';
-    linea = `<span class="et">VALIDATION</span> ${ver}<span data-v="h1">recovers ${b(r.h1.k)} of ${b(r.h1.n)} known analogs; baseline k₀ ${b(r.h1.k0)}</span>`
-      + ` · <span data-v="h1s">H1-S ${b(r.h1s.k)} of ${b(r.h1s.n)}${r.h1s.noEval ? ` (${b(r.h1s.noEval)} not evaluable)` : ''}</span> · <span data-v="h3">H3 ${b(r.h3.aciertos)} of ${b(r.h3.de)} sign predictions</span>`
-      + `${frac ? ` · <span data-v="frac">${frac}</span>` : ''} · <button type="button" class="ver-detalle" aria-expanded="${!$('val-detalle').hidden}">how this was validated</button>`;
+    const ver = r.h1.veredicto ? `<span data-v="veredicto" class="val-titular${fallo ? ' v-rompe' : ''}">Pre-registered test ${fallo ? 'FAILED — read this ranking as exploratory' : esc(r.h1.veredicto)}</span>` : '';
+    linea = `${ver} <span class="val-cifras"><span data-v="h1">The ranking recovers ${b(r.h1.k)} of ${b(r.h1.n)} known analogs (baseline k₀ ${b(r.h1.k0)})</span>`
+      + `<span class="sep">·</span><span data-v="h1s">combined score (H1-S) ${b(r.h1s.k)} of ${b(r.h1s.n)}${r.h1s.noEval ? ` (${b(r.h1s.noEval)} not evaluable)` : ''}</span><span class="sep">·</span><span data-v="h3">sign predictions (H3) ${b(r.h3.aciertos)} of ${b(r.h3.de)}</span>`
+      + `${frac ? `<span class="sep">·</span><span data-v="frac">${frac}</span>` : ''}</span> ${boton}`;
   }
   const sombras = resumenSombras(estado.sombras);
   const ls = sombras.length
-    ? `<span class="et">SHADOWS</span> viewer shadow model vs official LOLA mean illumination: ${sombras.map((s) => `Pearson ${b(s.pearson.toFixed(3))} (${esc(s.id)}, ${esc(s.lado_km)} km)`).join(' · ')} · <a href="terreno/index.html">terrain viewer</a>`
-    : '<span class="et">SHADOWS</span> shadow validation not found';
+    ? `<h4>Shadows in the terrain viewer</h4><div>Viewer shadow model vs official LOLA mean illumination: ${sombras.map((s) => `Pearson ${b(s.pearson.toFixed(3))} (${esc(s.id)}, ${esc(s.lado_km)} km)`).join('<span class="sep">·</span>')}<span class="sep">·</span><a href="terreno/index.html">terrain viewer</a></div>`
+    : '<h4>Shadows in the terrain viewer</h4><div class="tenue">shadow validation not found</div>';
   $('val-linea').innerHTML = linea;
   $('val-sombras').innerHTML = ls;
-  const det = $('val-detalle');
+  const det = $('val-informe');
   if (r) {
     const polar = r.polar ? `<h4>Polar descriptive <span class="sello-propio">not pre-registered</span></h4>${jsonAHtml(r.polar)}` : '';
-    det.innerHTML = `<div class="tenue">Read from <code>${esc(RAIZ)}/informe_validacion.json</code>${r.fecha ? ` · run ${esc(r.fecha)}` : ''}</div>`
+    det.innerHTML = `<h4>Pre-registered test of the ranking</h4><div class="tenue">Read from <code>${esc(RAIZ)}/informe_validacion.json</code>${r.fecha ? `<span class="sep">·</span>run ${esc(r.fecha)}` : ''}</div>`
       + `<div>umbrales_sha256 <code class="num" data-v="sha">${esc(r.sha ?? '—')}</code></div>${polar}<h4>Full report</h4>${jsonAHtml(estado.informe)}`;
   }
 }
@@ -438,13 +447,13 @@ function pintarValidacion() {
 // ---------- Hoja ----------
 function pintarHojaVacia() {
   if (estado.modo === 'cond') {
-    $('hoja').innerHTML = `<div class="et">PLACE SHEET · TEST CONDITIONS</div><p>Click any land cell to compare it with every design limit of <b>${esc(estado.cond.eq.nombre)}</b>.</p>`
+    $('hoja').innerHTML = `<div><div class="et">Place sheet<span class="sep">·</span>test conditions</div><h3>Pick a place</h3></div><p>Click any land cell to compare it with every design limit of <b>${esc(estado.cond.eq.nombre)}</b>.</p>`
       + `<p class="tenue">${esc(estado.cond.man.rotulo ?? '')}</p>`;
     return;
   }
   const c = estado.candidatos?.[0];
-  $('hoja').innerHTML = `<div class="et">PLACE SHEET</div><p>Click any land cell to open its sheet.</p>`
-    + (c ? `<p class="tenue">Best candidate for this mission: <span class="num">${fmtLat(c.lat)} ${fmtLon(c.lon)}</span>, S <span class="num">${esc(c.S)}</span>.</p><button type="button" data-a="abrir-mejor">Open best candidate</button>` : '');
+  $('hoja').innerHTML = `<div><div class="et">Place sheet</div><h3>Pick a place</h3></div><p>Click any land cell to open its sheet.</p>`
+    + (c ? `<p class="tenue">Best candidate for this mission: <span class="num">${fmtLat(c.lat)} ${fmtLon(c.lon)}</span>, S <span class="num">${esc(c.S)}</span>.</p><button type="button" class="marca-boton" data-a="abrir-mejor">Open best candidate</button>` : '');
   const bt = $('hoja').querySelector('[data-a=abrir-mejor]');
   if (bt) bt.addEventListener('click', () => { const k = celdaDeLatLon(estado.rejilla, c.lat, c.lon); abrirHoja(k.fila, k.col); });
 }
@@ -468,14 +477,14 @@ async function abrirHoja(fila, col) {
   estado.hoja = { fila, col, lat, lon, estado: est, sByte: sR, S: est === 'evaluable' && sV.tipo === 'valor' ? sV.v : null, puesto: cand?.puesto ?? null, nombre: lugar?.nombre ?? null, terrenos: terrenos.map((t) => t.id) };
 
   let situacion;
-  if (est === 'evaluable') situacion = cand ? `Rank <b class="num">#${cand.puesto}</b> of the ${estado.candidatos.length} listed candidates` : `Evaluable · not among the ${estado.candidatos?.length ?? '—'} listed candidates`;
+  if (est === 'evaluable') situacion = cand ? `Rank <b class="num">#${cand.puesto}</b> of the ${estado.candidatos.length} listed candidates` : `Evaluable<span class="sep">·</span>not among the ${estado.candidatos?.length ?? '—'} listed candidates`;
   else if (est === 'falla_puerta') situacion = `<b>Fails a gate</b> — no rank: ${puertas.filter((p) => p.estado === 'falla').map((p) => esc(p.texto ?? p.id)).join('; ')}`;
   else {
     const sd = puertas.filter((p) => p.estado === 'sin_dato');
     situacion = `<b>Not evaluable</b> — no rank: ${sd.length ? `no data for gate ${sd.map((p) => esc(p.texto ?? p.id)).join('; ')}` : `data coverage too low to rank this place (C ${esc(textoValor(cob, canC[0]))})`}`;
   }
-  const sTxt = est === 'evaluable' ? `<span class="num grande" data-v="S">${esc(textoValor(sV, canS[0]))}</span> <span class="tenue">p5–p95</span> <span class="num">${esc(textoValor(p5, canS[1]))}–${esc(textoValor(p95, canS[2]))}</span>`
-    : '<span class="num grande">—</span> <span class="tenue">not scored</span>';
+  const sTxt = est === 'evaluable' ? `<span class="num grande" data-v="S">${esc(textoValor(sV, canS[0]))}</span><span class="tenue">p5–p95 range <span class="num">${esc(textoValor(p5, canS[1]))}–${esc(textoValor(p95, canS[2]))}</span></span>`
+    : '<span class="num grande">—</span><span class="tenue">not scored</span>';
 
   const ids = dimensionesConPeso(par);
   const capasDim = estado.capas.filter((c) => c.grupo === 'dimension');
@@ -498,22 +507,22 @@ async function abrirHoja(fila, col) {
     fila_(esc(c.nombre ?? c.id), vars[j] ? esc(textoValor(leer(vars[j], k, c), c)) : 'not loaded', fuente);
   }));
 
-  const ESTADO_P = { pasa: 'passes', falla: 'FAILS', sin_dato: 'NO DATA' };
+  const ESTADO_P = { pasa: 'passes', falla: 'fails', sin_dato: 'no data' };
   const puente = puenteTerreno(terrenos, par.objetivo, par.nombre_objetivo);
   const cerca = cand?.sitio_cercano && !lugar ? `<div class="tenue">near ${esc(cand.sitio_cercano)} (candidate list)</div>` : '';
 
   $('hoja').innerHTML = `
-    <div class="cab-hoja"><div><div class="et">${esc(par.nombre_objetivo)} · ${esc(par.mision)} ${esc(par.nombre_mision ?? '')}</div>
-      <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)">×</button></div>
-    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)} · row ${fila} col ${col}</div>
-    <div class="tenue">cell ${esc(r.paso)}° (~${Math.floor(r.paso * KM_GRADO_ECUADOR)} km at the equator)${lugar ? ` · known place within 1 cell` : ''}</div>${cerca}
+    <div class="cab-hoja"><div><div class="et">${esc(par.nombre_objetivo)}<span class="sep">·</span>${esc(par.mision)} ${esc(par.nombre_mision ?? '')}</div>
+      <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
+    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
+    <div class="tenue">cell ${esc(r.paso)}° (~${Math.floor(r.paso * KM_GRADO_ECUADOR)} km at the equator)${lugar ? `<span class="sep">·</span>known place within 1 cell` : ''}</div>${cerca}
     <div class="situacion">${situacion}</div>
-    <div class="cifras"><div><span class="et">S</span>${sTxt}</div><div><span class="et">COVERAGE C</span><span class="num" data-v="C">${esc(textoValor(cob, canC[0]))}</span></div></div>
-    <div class="bloque"><div class="et">SIMILARITY BY DIMENSION</div>${petalos.length ? florSVG(petalos) : '<div class="tenue">no weighted dimensions in this mission</div>'}
-      <div class="nota-flor">Petal length = similarity of that dimension (centre 0, outer ring 1; inner ring 0.5). <span class="v-rompe">Red split petal</span> = breaks (s &lt; ${ROMPE}). Hatched = no data. Only S carries a p5–p95 interval in the export.</div></div>
-    <div class="bloque"><div class="et">GATES</div>${puertas.map((p) => `<div class="puerta ${p.estado}"><span class="est">${ESTADO_P[p.estado]}</span> ${esc(p.texto ?? p.id)}</div>`).join('') || '<div class="tenue">no gates in manifest</div>'}</div>
-    <details class="bloque tabla"><summary class="et">ALL VALUES IN THIS CELL</summary><table class="comp"><thead><tr><th>Variable</th><th>Here</th><th>Unit note / source</th></tr></thead><tbody>${filas.join('')}</tbody></table></details>
-    <div class="bloque puente"><div class="et">PLANT EQUIPMENT HERE</div>${puente}</div>`;
+    <div class="cifras"><div><span class="et">Similarity S</span>${sTxt}</div><div><span class="et">Data coverage C</span><span class="num grande" data-v="C">${esc(textoValor(cob, canC[0]))}</span></div></div>
+    <div class="bloque"><h4>Similarity by dimension</h4>${petalos.length ? florSVG(petalos) : '<div class="tenue">no weighted dimensions in this mission</div>'}
+      <div class="nota-flor">Petal length = similarity of that dimension (centre 0, outer ring 1; inner ring 0.5). <span class="v-rompe">Split red petal</span> = breaks (s &lt; ${ROMPE}). Hatched = no data. Only S carries a p5–p95 interval in the export.</div></div>
+    <div class="bloque"><h4>Gates</h4>${puertas.map((p) => `<div class="puerta ${p.estado}"><span class="est">${ESTADO_P[p.estado]}</span> ${esc(p.texto ?? p.id)}</div>`).join('') || '<div class="tenue">no gates in manifest</div>'}</div>
+    <details class="bloque tabla"><summary>All values in this cell</summary><table class="comp"><thead><tr><th>Variable</th><th>Here</th><th>Unit note / source</th></tr></thead><tbody>${filas.join('')}</tbody></table></details>
+    <div class="bloque puente"><h4>Plant equipment here</h4>${puente}</div>`;
   $('hoja').querySelector('[data-a=cerrar]').addEventListener('click', cerrarHoja);
   $('aviso').hidden = true;
   estado.aviso = null;
@@ -630,10 +639,11 @@ $('cond-acc').addEventListener('change', (e) => {
   trasCambioCond();
 });
 $('validacion').addEventListener('click', (e) => {
-  if (!e.target.closest('.ver-detalle')) return;
+  const b = e.target.closest('.ver-detalle');
+  if (!b) return;
   const d = $('val-detalle');
   d.hidden = !d.hidden;
-  e.target.setAttribute('aria-expanded', String(!d.hidden));
+  b.setAttribute('aria-expanded', String(!d.hidden));
 });
 new ResizeObserver(ajustarTam).observe(lienzo);
 
@@ -664,7 +674,7 @@ async function iniciar() {
     $('val-linea').innerHTML = '';
     pintarValidacion();
     document.body.dataset.sinDatos = '';
-    lienzo.insertAdjacentHTML('beforeend', `<div class="error"><b>global layers not found</b><span class="pista">${EJEMPLO ? 'run node scripts/ejemplo_global.mjs' : 'expected in web/data/global/ · add ?ejemplo=1 for a synthetic example'}</span></div>`);
+    lienzo.insertAdjacentHTML('beforeend', `<div class="error"><b>global layers not found</b><span class="pista">${EJEMPLO ? 'run node scripts/ejemplo_global.mjs' : 'expected in web/data/global/<span class="sep">·</span>add ?ejemplo=1 for a synthetic example'}</span></div>`);
     $('hoja').innerHTML = '';
     $('modo-nota').textContent = cond ? 'test conditions need the global layers' : 'test conditions not generated';
     estado.errores.push('global layers not found');

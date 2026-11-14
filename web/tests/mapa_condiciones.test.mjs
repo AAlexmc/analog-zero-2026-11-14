@@ -5,6 +5,7 @@ import {
   leerCond, escribirCond, opcionesRequisito, seleccion, canalDe, valorCondicion, veredictoCelda, textoVeredicto, lineaResumen,
   fmtValor, colorearCond, filasHoja,
 } from '../mapa/condiciones.js';
+import { COLOR } from '../mapa/capas.js';
 
 // Imagen RGBA de 4 × 2 (fila 0 = norte). Canal R oscuridad (18 h/byte), G sol rasante, B frío (150 + 0,6·b K).
 const img = (pix) => ({ ancho: 4, alto: 2, canales: 4, datos: Uint8Array.from(pix.flatMap((p) => [...p, 255])) });
@@ -101,7 +102,7 @@ test('painting: ocean transparent, reach mask from exact values, access filter g
   const g = colorearCond({ man: M, canal: 'oscuridad_max_h', imgs: IMGS, req: LTV150, acc: 3 });
   assert.equal(g.cuenta.lejos, 2);
   assert.equal(g.cuenta.sin_acceso, 2);
-  assert.deepEqual([...g.rgba.slice(4, 7)], [40, 44, 50]);
+  assert.deepEqual([...g.rgba.slice(4, 7)], COLOR.falla);
   const t = colorearCond({ man: M, canal: 't_min_alcanzable_k', imgs: IMGS, req: FRIO, acc: null });
   assert.equal(t.log, false);
   assert.ok(t.alcanza.every((x) => x === 0));

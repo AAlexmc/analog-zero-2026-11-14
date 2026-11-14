@@ -54,6 +54,12 @@ test('the ramp is monotone in lightness and never red-dominant', () => {
   assert.deepEqual(colorRampa(1), RAMPA[RAMPA.length - 1][1]);
 });
 
+test('no-score colours differ from each other and from every ramp colour', () => {
+  const estados = [COLOR.falla, ...COLOR.noEval, COLOR.na].map((c) => c.join());
+  assert.equal(new Set(estados).size, estados.length);
+  for (let t = 0; t <= 1.0001; t += 0.001) assert.ok(!estados.includes(colorRampa(t).join()), `ramp at ${t}`);
+});
+
 // Imagen 4×1 RGB: océano, fallada, no evaluable, evaluable.
 const img = (bytes) => ({ ancho: 4, alto: 1, canales: 3, datos: new Uint8Array(bytes) });
 const S = img([255, 255, 255, 0, 0, 0, 255, 255, 255, 125, 100, 150]);
