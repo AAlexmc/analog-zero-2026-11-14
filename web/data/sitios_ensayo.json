@@ -637,9 +637,9 @@
    "lat": 38.3333,
    "lon": 91.6667,
    "coordenadas": {"texto": "centre of the box the source gives for the Dalangtan area (own calculation), not of a sampling point",
-    "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6205091",
+    "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6205091/fullTextXML",
     "cita": "DLT secondary basin (aka DLT area, 38°0′–38°40′N, 91°10′–92°10′E)",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "Dalangtan Playa Mars analog study", "ano": 2008,
      "sistema": "field study of saline deposits",
@@ -647,9 +647,9 @@
      "limitacion_reconocida": null,
      "equipo_relacionado": [],
      "nota": "academic study, not a space agency campaign",
-     "fuente": "https://www.pubmed.gov/29792755/",
+     "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:29792755%20AND%20SRC:MED&resultType=core&format=json",
      "cita": "Since 2008, we have been studying a saline lake, Dalangtan (DLT) Playa, and its surroundings in a hyperarid region of the Qaidam Basin on the Tibetan Plateau as a potential Mars analog site.",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {

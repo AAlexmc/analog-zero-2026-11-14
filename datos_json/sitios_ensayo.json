@@ -639,7 +639,7 @@
    "coordenadas": {"texto": "centre of the box the source gives for the Dalangtan area (own calculation), not of a sampling point",
     "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6205091/fullTextXML",
     "cita": "DLT secondary basin (aka DLT area, 38°0′–38°40′N, 91°10′–92°10′E)",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "Dalangtan Playa Mars analog study", "ano": 2008,
      "sistema": "field study of saline deposits",
@@ -649,7 +649,7 @@
      "nota": "academic study, not a space agency campaign",
      "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:29792755%20AND%20SRC:MED&resultType=core&format=json",
      "cita": "Since 2008, we have been studying a saline lake, Dalangtan (DLT) Playa, and its surroundings in a hyperarid region of the Qaidam Basin on the Tibetan Plateau as a potential Mars analog site.",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -772,7 +772,7 @@
     "cita": "29°09′40″N 13°26′20″W / 29.16111°N 13.43889°W",
     "verificado": true},
    "relevancia": {"texto": "Moon and Mars: lava tubes as candidate sites for human habitats",
-    "fuente": "https://m.esa.int/spaceinimages/Images/2018/08/Astronaut_and_rover_in_lava_tube",
+    "fuente": "https://www.esa.int/ESA_Multimedia/Images/2018/08/Astronaut_and_rover_in_lava_tube",
     "cita": "This type of settings are potential candidates to host human habitats in future missions to the Moon and Mars.",
     "verificado": false},
    "campanas": [
@@ -781,12 +781,12 @@
      "que_se_probo": "rover operations in a lava tube",
      "limitacion_reconocida": null,
      "equipo_relacionado": [],
-     "fuente": "https://m.esa.int/spaceinimages/Images/2018/08/Astronaut_and_rover_in_lava_tube",
+     "fuente": "https://www.esa.int/ESA_Multimedia/Images/2018/08/Astronaut_and_rover_in_lava_tube",
      "cita": "A prototype rover is commanded to drive in Cueva de Los Verdes lava tube in Spain’s Canary Island of Lanzarote",
      "verificado": false,
      "citas_extra": [
       {"apoya": "ano",
-       "fuente": "https://m.esa.int/spaceinimages/Images/2018/08/Astronaut_and_rover_in_lava_tube",
+       "fuente": "https://www.esa.int/ESA_Multimedia/Images/2018/08/Astronaut_and_rover_in_lava_tube",
        "cita": "For five days to 24 November 2017, Pangaea-X mobilised 50 people, four space agencies and 18 organisations in five different locations.",
        "verificado": false}
      ]}
