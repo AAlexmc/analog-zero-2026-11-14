@@ -1,0 +1,127 @@
+{
+ "id": "cresta_shackleton_gerlache",
+ "cuerpo": "luna",
+ "nombre": "Shackleton–de Gerlache connecting ridge",
+ "centro": {
+  "lat": -89.45683,
+  "lon": -100.3459
+ },
+ "lado_km": 40.0,
+ "n": 1024,
+ "m_por_px": 39.0625,
+ "z_min": -2408.48828125,
+ "z_max": 1962.118896484375,
+ "z_referencia": "sphere 1737400 m",
+ "georef": {
+  "tipo": "estereo_polar",
+  "polo": "sur",
+  "radio_m": 1737400.0,
+  "x0_m": -36183.53463275191,
+  "y0_m": 17022.46160197657
+ },
+ "capas": {
+  "altura": {
+   "fichero": "altura.f32",
+   "tipo": "float32",
+   "unidad": "m",
+   "fuente": "LRO LOLA LDEM_875S_5M (PDS Geosciences Node)",
+   "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/ldem_875s_5m.img",
+   "resolucion_origen_m": 5.0
+  },
+  "iluminacion": {
+   "fichero": "iluminacion.f32",
+   "tipo": "float32",
+   "unidad": "fraction 0-1",
+   "fuente": "LRO LOLA average solar illumination 85S-90S 60 m/px, AVGVISIB_85S_060M_201608 (fraction of hourly steps over 18.6 years with any part of the Sun visible); Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+   "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+   "pagina": "https://pgda.gsfc.nasa.gov/products/69",
+   "resolucion_origen_m": 60,
+   "remuestreo": "bilinear"
+  },
+  "sombra_permanente": {
+   "fichero": "sombra_permanente.u8",
+   "tipo": "uint8",
+   "unidad": "0/1",
+   "fuente": "LRO LOLA permanently shadowed regions 85S-90S 60 m/px, LPSR_85S_060M_201608; Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+   "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_85S_060M_201608.TIF",
+   "pagina": "https://pgda.gsfc.nasa.gov/products/69",
+   "resolucion_origen_m": 60,
+   "remuestreo": "nearest"
+  },
+  "temp_max": {
+   "fichero": "temp_max.f32",
+   "tipo": "float32",
+   "unidad": "K",
+   "fuente": "LRO Diviner Polar Resource Product DLRE_PRP_SOUTH (annual maximum surface temperature, thermal model fit to first mapping year, triangular mesh on Kaguya topography); Paige et al., LRO DLRE LEVEL 5 PRP V2.0, NASA Planetary Data System, LRO-L-DLRE-5-PRP-V2.0, 2018",
+   "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+   "resolucion_origen_m": 500,
+   "remuestreo": "linear (Delaunay) from triangle centres"
+  }
+ },
+ "rasgos": [
+  {
+   "nombre": "Spudis",
+   "tipo": "crater",
+   "lat": -89.51,
+   "lon": -84.61,
+   "diametro_km": 13.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16007"
+  },
+  {
+   "nombre": "Marvin",
+   "tipo": "crater",
+   "lat": -89.13,
+   "lon": -87.78,
+   "diametro_km": 4.6,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16008"
+  }
+ ],
+ "picos_luz": {
+  "n": 5,
+  "separacion_min_km": 1.0,
+  "origen": "mío",
+  "criterio": "5 pixels of AVGVISIB_85S_060M_201608 (60 m) with the highest mean solar illumination whose centre falls in the grid, greedy, each at least 1 km from the previous ones (polar stereographic plane); fila/col = grid cell containing the pixel centre; valor = pixel value",
+  "fuente": "LRO LOLA average solar illumination 85S-90S 60 m/px, AVGVISIB_85S_060M_201608 (fraction of hourly steps over 18.6 years with any part of the Sun visible); Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+  "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+  "puntos": [
+   {
+    "fila": 736,
+    "col": 651,
+    "lat": -89.47485,
+    "lon": -137.4431,
+    "valor": 0.8844
+   },
+   {
+    "fila": 668,
+    "col": 855,
+    "lat": -89.68643,
+    "lon": -162.9371,
+    "valor": 0.8706
+   },
+   {
+    "fila": 589,
+    "col": 858,
+    "lat": -89.78433,
+    "lon": -155.9041,
+    "valor": 0.8546
+   },
+   {
+    "fila": 653,
+    "col": 442,
+    "lat": -89.31583,
+    "lon": -114.156,
+    "valor": 0.7945
+   },
+   {
+    "fila": 624,
+    "col": 853,
+    "lat": -89.74003,
+    "lon": -158.8059,
+    "valor": 0.7862
+   }
+  ],
+  "comando": "python -m pipeline.terreno picos --id cresta_shackleton_gerlache"
+ },
+ "notas": "Centre (origen: mío) = midpoint between the IAU rim circles (IAU centre, IAU diameter / 2) of Shackleton (https://planetarynames.wr.usgs.gov/Feature/5450) and de Gerlache (https://planetarynames.wr.usgs.gov/Feature/1439), on the straight line joining both centres in the polar stereographic plane (centres 54.2 km apart, rims 27.4 km apart); reproduce with pipeline.terreno.generar.punto_medio_bordes('Shackleton', 'de Gerlache'). Side 40 km (origen: mío) takes in both rims and about 6 km of each crater wall. Plane = LOLA south polar stereographic: up = longitude 0°, right = 90° E.",
+ "comando": "python -m pipeline.terreno generar --id cresta_shackleton_gerlache --cuerpo luna --lat -89.45683 --lon -100.3459 --lado-km 40.0 --n 1024 --escala sitio --nombre 'Shackleton–de Gerlache connecting ridge' --capas iluminacion,sombra_permanente,temp_max --dem ldem_875s_5m --notas 'Centre (origen: mío) = midpoint between the IAU rim circles (IAU centre, IAU diameter / 2) of Shackleton (https://planetarynames.wr.usgs.gov/Feature/5450) and de Gerlache (https://planetarynames.wr.usgs.gov/Feature/1439), on the straight line joining both centres in the polar stereographic plane (centres 54.2 km apart, rims 27.4 km apart); reproduce with pipeline.terreno.generar.punto_medio_bordes('\"'\"'Shackleton'\"'\"', '\"'\"'de Gerlache'\"'\"'). Side 40 km (origen: mío) takes in both rims and about 6 km of each crater wall.'"
+}

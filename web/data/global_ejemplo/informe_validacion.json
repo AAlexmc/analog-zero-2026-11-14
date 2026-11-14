@@ -1,0 +1,79 @@
+{
+ "ejemplo": true,
+ "umbrales_sha256": "example — not a real run",
+ "h1": {
+  "k": 7,
+  "n_sitios": 11,
+  "k0": 3,
+  "exito": "k >= 8 of 11 and k >= k0 + 2",
+  "nota": "SYNTHETIC EXAMPLE — invented numbers"
+ },
+ "h1_s": {
+  "n_sitios": 11,
+  "n_dentro": 5,
+  "n_no_evaluables": 1,
+  "nota": "SYNTHETIC EXAMPLE — invented numbers"
+ },
+ "h3": {
+  "aciertos": 7,
+  "de": 9,
+  "nota": "SYNTHETIC EXAMPLE — invented numbers"
+ },
+ "denominadores": {
+  "jezero_P2": {
+   "n_tierra": 88766,
+   "n_no_evaluables": 0
+  },
+  "jezero_P4": {
+   "n_tierra": 88766,
+   "n_no_evaluables": 556
+  },
+  "arcadia_P1": {
+   "n_tierra": 88766,
+   "n_no_evaluables": 16879
+  },
+  "shackleton_P3": {
+   "n_tierra": 88766,
+   "n_no_evaluables": 556
+  },
+  "shackleton_P5": {
+   "n_tierra": 88766,
+   "n_no_evaluables": 556
+  }
+ },
+ "descriptivo_polar": {
+  "tipo": "descriptive, NOT pre-registered, no threshold",
+  "filas": [
+   {
+    "sitio": "haughton",
+    "par": "shackleton_P3",
+    "percentil_area": 92.1
+   },
+   {
+    "sitio": "sp_crater",
+    "par": "shackleton_P3",
+    "percentil_area": 66.3
+   },
+   {
+    "sitio": "mistastin",
+    "par": "shackleton_P3",
+    "percentil_area": 94.6
+   },
+   {
+    "sitio": "haughton",
+    "par": "shackleton_P5",
+    "percentil_area": 96.5
+   },
+   {
+    "sitio": "sp_crater",
+    "par": "shackleton_P5",
+    "percentil_area": 49.8
+   },
+   {
+    "sitio": "mistastin",
+    "par": "shackleton_P5",
+    "percentil_area": 92.8
+   }
+  ]
+ }
+}

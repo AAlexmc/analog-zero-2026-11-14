@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero</title>
+<link rel="stylesheet" href="terreno/estilo.css">
+<link rel="stylesheet" href="mapa/mapa.css">
+</head>
+<body>
+<header class="barra">
+  <a class="marca" href="index.html">ANALOG ZERO</a>
+  <span class="lema">Find where on Earth to test Moon-base equipment — then plant it there and see what breaks.</span>
+  <span class="hueco"></span>
+  <a class="et" href="terreno/index.html">Terrain viewer</a>
+</header>
+<div class="banda-sintetico" id="banda-sintetico" hidden>SYNTHETIC EXAMPLE — not real data</div>
+<div class="barra modo-mapa">
+  <span class="grupo"><span class="et">MODE</span><span class="botones" id="modos"><button type="button" data-modo="ranking" aria-pressed="true">Similarity ranking</button><button type="button" data-modo="cond" aria-pressed="false" disabled>Test conditions</button></span></span>
+  <span class="tenue" id="modo-nota"></span>
+</div>
+<div class="barra mandos-mapa" id="mandos-cond" hidden>
+  <label class="grupo"><span class="et">EQUIPMENT</span><select id="cond-eq"></select></label>
+  <label class="grupo"><span class="et">REQUIREMENT</span><select id="cond-req"></select></label>
+  <label class="grupo"><span class="et">MAX TRAVEL TIME TO A CITY</span><input type="number" id="cond-acc" min="0" max="100" step="1" placeholder="off"> h <span class="sello-propio">own threshold</span></label>
+</div>
+<div class="nota-cond" id="nota-cond" hidden><div class="rotulo-cond">Not part of the pre-registered validation — physical conditions computed from latitude and NASA POWER climate</div><div id="cond-resumen"></div></div>
+<div class="barra mandos-mapa" id="mandos-ranking">
+  <label class="grupo"><span class="et">BASE SITE</span><select id="objetivo"></select></label>
+  <span class="grupo"><span class="et">MISSION</span><span class="botones" id="misiones"></span></span>
+  <label class="grupo"><span class="et">LAYER</span><select id="capa"></select></label>
+  <span class="hueco"></span>
+  <span class="grupo"><span class="et">CANDIDATES</span><a class="boton" id="desc-csv" aria-disabled="true">CSV</a><a class="boton" id="desc-geojson" aria-disabled="true">GeoJSON</a></span>
+</div>
+<div class="nota-par" id="nota-par" hidden>added after the NASA briefing — not part of the pre-registered validation</div>
+<section class="validacion" id="validacion">
+  <div id="val-linea"></div>
+  <div id="val-sombras"></div>
+  <div class="val-detalle" id="val-detalle" hidden></div>
+</section>
+<main class="principal">
+  <div class="lienzo-mapa" id="lienzo">
+    <canvas id="mapa"></canvas>
+    <div class="leyenda-mapa" id="leyenda"></div>
+    <div class="zoom"><button type="button" data-zoom="mas" title="Zoom in">+</button><button type="button" data-zoom="menos" title="Zoom out">−</button><button type="button" data-zoom="ajustar">Fit</button></div>
+    <div class="aviso-mapa" id="aviso" hidden></div>
+  </div>
+  <aside class="hoja-mapa" id="hoja"><div class="et">LOADING…</div></aside>
+</main>
+<footer class="lectura" id="lectura">
+  <span><span class="et">LAT</span> <span class="num v corta" data-k="lat">—</span></span>
+  <span><span class="et">LON</span> <span class="num v corta" data-k="lon">—</span></span>
+  <span><span class="et">CELL</span> <span class="num v mini" data-k="celda">—</span></span>
+  <span><span class="et">VALUE</span> <span class="num" data-k="valor">—</span></span>
+  <span class="hueco"></span>
+  <span class="tenue">drag to pan · wheel to zoom · click a land cell</span>
+</footer>
+<script type="module" src="mapa/mapa.js"></script>
+</body>
+</html>

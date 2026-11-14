@@ -1,0 +1,391 @@
+{
+ "id": "polo_sur",
+ "cuerpo": "luna",
+ "nombre": "Lunar south pole region",
+ "centro": {
+  "lat": -90.0,
+  "lon": 0.0
+ },
+ "lado_km": 300.0,
+ "n": 2048,
+ "m_por_px": 146.484375,
+ "z_min": -5497.8056640625,
+ "z_max": 7025.255859375,
+ "z_referencia": "sphere 1737400 m",
+ "georef": {
+  "tipo": "estereo_polar",
+  "polo": "sur",
+  "radio_m": 1737400.0,
+  "x0_m": -149926.7578125,
+  "y0_m": 149926.7578125
+ },
+ "capas": {
+  "altura": {
+   "fichero": "altura.f32",
+   "tipo": "float32",
+   "unidad": "m",
+   "fuente": "LRO LOLA LDEM_85S_20M (PDS Geosciences Node)",
+   "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/ldem_85s_20m.img",
+   "resolucion_origen_m": 20.0
+  },
+  "iluminacion": {
+   "fichero": "iluminacion.f32",
+   "tipo": "float32",
+   "unidad": "fraction 0-1",
+   "fuente": "LRO LOLA average solar illumination 85S-90S 60 m/px, AVGVISIB_85S_060M_201608 (fraction of hourly steps over 18.6 years with any part of the Sun visible); Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+   "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+   "pagina": "https://pgda.gsfc.nasa.gov/products/69",
+   "resolucion_origen_m": 60,
+   "remuestreo": "bilinear"
+  },
+  "sombra_permanente": {
+   "fichero": "sombra_permanente.u8",
+   "tipo": "uint8",
+   "unidad": "0/1",
+   "fuente": "LRO LOLA permanently shadowed regions 85S-90S 60 m/px, LPSR_85S_060M_201608; Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+   "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_85S_060M_201608.TIF",
+   "pagina": "https://pgda.gsfc.nasa.gov/products/69",
+   "resolucion_origen_m": 60,
+   "remuestreo": "nearest"
+  },
+  "temp_max": {
+   "fichero": "temp_max.f32",
+   "tipo": "float32",
+   "unidad": "K",
+   "fuente": "LRO Diviner Polar Resource Product DLRE_PRP_SOUTH (annual maximum surface temperature, thermal model fit to first mapping year, triangular mesh on Kaguya topography); Paige et al., LRO DLRE LEVEL 5 PRP V2.0, NASA Planetary Data System, LRO-L-DLRE-5-PRP-V2.0, 2018",
+   "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+   "resolucion_origen_m": 500,
+   "remuestreo": "linear (Delaunay) from triangle centres"
+  }
+ },
+ "rasgos": [
+  {
+   "nombre": "Mons Mouton",
+   "tipo": "mons",
+   "lat": -84.6,
+   "lon": 31.0,
+   "diametro_km": 130.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16070"
+  },
+  {
+   "nombre": "Cabeus",
+   "tipo": "crater",
+   "lat": -85.3303,
+   "lon": -42.1327,
+   "diametro_km": 100.582,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/953"
+  },
+  {
+   "nombre": "Lacus Tenebrarum",
+   "tipo": "lacus",
+   "lat": -86.71,
+   "lon": -87.67,
+   "diametro_km": 85.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16415"
+  },
+  {
+   "nombre": "Nobile",
+   "tipo": "crater",
+   "lat": -85.2752,
+   "lon": 53.2725,
+   "diametro_km": 79.272,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/4321"
+  },
+  {
+   "nombre": "Malapert",
+   "tipo": "crater",
+   "lat": -84.9998,
+   "lon": 11.4031,
+   "diametro_km": 72.385,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/3603"
+  },
+  {
+   "nombre": "Mons Kocher",
+   "tipo": "mons",
+   "lat": -85.46,
+   "lon": -118.06,
+   "diametro_km": 67.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16394"
+  },
+  {
+   "nombre": "Mons Malapert",
+   "tipo": "mons",
+   "lat": -85.98,
+   "lon": -1.67,
+   "diametro_km": 67.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16338"
+  },
+  {
+   "nombre": "Shoemaker",
+   "tipo": "crater",
+   "lat": -88.137,
+   "lon": 45.911,
+   "diametro_km": 51.816,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/5494"
+  },
+  {
+   "nombre": "Haworth",
+   "tipo": "crater",
+   "lat": -87.45,
+   "lon": -5.17,
+   "diametro_km": 51.423,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/14502"
+  },
+  {
+   "nombre": "Henson",
+   "tipo": "crater",
+   "lat": -88.57,
+   "lon": -130.63,
+   "diametro_km": 43.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16004"
+  },
+  {
+   "nombre": "Faustini",
+   "tipo": "crater",
+   "lat": -87.1832,
+   "lon": 84.3099,
+   "diametro_km": 42.485,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/1919"
+  },
+  {
+   "nombre": "Wiechert P",
+   "tipo": "satellite feature",
+   "lat": -85.1276,
+   "lon": 151.7574,
+   "diametro_km": 38.623,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/13889"
+  },
+  {
+   "nombre": "Wiechert J",
+   "tipo": "satellite feature",
+   "lat": -85.2019,
+   "lon": -177.637,
+   "diametro_km": 34.887,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/13888"
+  },
+  {
+   "nombre": "Sverdrup",
+   "tipo": "crater",
+   "lat": -88.3209,
+   "lon": -153.3875,
+   "diametro_km": 32.827,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/5782"
+  },
+  {
+   "nombre": "de Gerlache",
+   "tipo": "crater",
+   "lat": -88.4849,
+   "lon": -88.3447,
+   "diametro_km": 32.705,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/1439"
+  },
+  {
+   "nombre": "Slater",
+   "tipo": "crater",
+   "lat": -88.0792,
+   "lon": 111.2881,
+   "diametro_km": 25.119,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/15325"
+  },
+  {
+   "nombre": "Kocher",
+   "tipo": "crater",
+   "lat": -84.4671,
+   "lon": -134.0244,
+   "diametro_km": 24.031,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/14535"
+  },
+  {
+   "nombre": "Burbidge",
+   "tipo": "crater",
+   "lat": -86.35,
+   "lon": 48.6,
+   "diametro_km": 21.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16250"
+  },
+  {
+   "nombre": "Shackleton",
+   "tipo": "crater",
+   "lat": -89.67,
+   "lon": 129.78,
+   "diametro_km": 20.925,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/5450"
+  },
+  {
+   "nombre": "Cartwright",
+   "tipo": "crater",
+   "lat": -87.65,
+   "lon": -46.95,
+   "diametro_km": 17.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16416"
+  },
+  {
+   "nombre": "Haynes",
+   "tipo": "crater",
+   "lat": -88.75,
+   "lon": 167.39,
+   "diametro_km": 17.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16418"
+  },
+  {
+   "nombre": "Brill",
+   "tipo": "crater",
+   "lat": -88.27,
+   "lon": -93.41,
+   "diametro_km": 17.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16195"
+  },
+  {
+   "nombre": "Stose",
+   "tipo": "crater",
+   "lat": -86.38,
+   "lon": 32.13,
+   "diametro_km": 16.7,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16011"
+  },
+  {
+   "nombre": "Kuhn",
+   "tipo": "crater",
+   "lat": -84.482,
+   "lon": -152.4779,
+   "diametro_km": 16.614,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/14536"
+  },
+  {
+   "nombre": "Spudis",
+   "tipo": "crater",
+   "lat": -89.51,
+   "lon": -84.61,
+   "diametro_km": 13.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16007"
+  },
+  {
+   "nombre": "Ibn Bajja",
+   "tipo": "crater",
+   "lat": -86.2964,
+   "lon": -75.0361,
+   "diametro_km": 11.977,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/14534"
+  },
+  {
+   "nombre": "Floss",
+   "tipo": "crater",
+   "lat": -84.28,
+   "lon": 42.27,
+   "diametro_km": 9.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16251"
+  },
+  {
+   "nombre": "Malinkin",
+   "tipo": "crater",
+   "lat": -87.2217,
+   "lon": 75.9366,
+   "diametro_km": 8.281,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/15242"
+  },
+  {
+   "nombre": "Tooley",
+   "tipo": "crater",
+   "lat": -88.04,
+   "lon": 51.31,
+   "diametro_km": 7.0,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/15938"
+  },
+  {
+   "nombre": "Marvin",
+   "tipo": "crater",
+   "lat": -89.13,
+   "lon": -87.78,
+   "diametro_km": 4.6,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16008"
+  },
+  {
+   "nombre": "Bay",
+   "tipo": "crater",
+   "lat": -88.76,
+   "lon": -36.85,
+   "diametro_km": 3.5,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16417"
+  },
+  {
+   "nombre": "Jaci",
+   "tipo": "crater",
+   "lat": -85.42,
+   "lon": 31.23,
+   "diametro_km": 1.8,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16268"
+  },
+  {
+   "nombre": "Lhamu",
+   "tipo": "crater",
+   "lat": -85.92,
+   "lon": -1.62,
+   "diametro_km": 1.4,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16317"
+  },
+  {
+   "nombre": "Masina",
+   "tipo": "crater",
+   "lat": -85.42,
+   "lon": 32.15,
+   "diametro_km": 1.4,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16269"
+  },
+  {
+   "nombre": "Dawa",
+   "tipo": "crater",
+   "lat": -85.45,
+   "lon": 31.66,
+   "diametro_km": 0.65,
+   "fuente": "https://planetarynames.wr.usgs.gov/Feature/16270"
+  }
+ ],
+ "notas": "Plane = LOLA south polar stereographic: up = longitude 0°, right = 90° E.",
+ "comando": "python -m pipeline.terreno generar --id polo_sur --cuerpo luna --lat -90.0 --lon 0.0 --lado-km 300.0 --n 2048 --escala regional --nombre 'Lunar south pole region' --capas iluminacion,sombra_permanente,temp_max",
+ "picos_luz": {
+  "n": 5,
+  "separacion_min_km": 1.0,
+  "origen": "mío",
+  "criterio": "5 pixels of AVGVISIB_85S_060M_201608 (60 m) with the highest mean solar illumination whose centre falls in the grid, greedy, each at least 1 km from the previous ones (polar stereographic plane); fila/col = grid cell containing the pixel centre; valor = pixel value",
+  "fuente": "LRO LOLA average solar illumination 85S-90S 60 m/px, AVGVISIB_85S_060M_201608 (fraction of hourly steps over 18.6 years with any part of the Sun visible); Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+  "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+  "puntos": [
+   {
+    "fila": 1104,
+    "col": 950,
+    "lat": -89.47485,
+    "lon": -137.4431,
+    "valor": 0.8844
+   },
+   {
+    "fila": 1086,
+    "col": 1004,
+    "lat": -89.68643,
+    "lon": -162.9371,
+    "valor": 0.8706
+   },
+   {
+    "fila": 1161,
+    "col": 1229,
+    "lat": -88.8089,
+    "lon": 123.7561,
+    "valor": 0.8596
+   },
+   {
+    "fila": 1064,
+    "col": 1005,
+    "lat": -89.78433,
+    "lon": -155.9041,
+    "valor": 0.8546
+   },
+   {
+    "fila": 247,
+    "col": 1611,
+    "lat": -85.30028,
+    "lon": 37.0989,
+    "valor": 0.8315
+   }
+  ],
+  "comando": "python -m pipeline.terreno picos --id polo_sur"
+ }
+}

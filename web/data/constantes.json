@@ -1,0 +1,22 @@
+{
+ "constantes": [
+  {
+   "id": "densidad_regolito_superficie_kg_m3",
+   "valor": 1300,
+   "unidad": "kg/m3",
+   "texto": "average bulk density of lunar regolith at the surface (1.30 g/cm3)",
+   "fuente": "https://ntrs.nasa.gov/api/citations/20220018853/downloads/LPSC%202023%20Abstract_Connolly_Carrier_v2.pdf",
+   "cita": "the bulk density of lunar regolith is approximately 1.30 g/cm3 at the surface, and increases asymptotically to 1.92 g/cm3 below a depth of 100 cm.",
+   "verificado": true
+  },
+  {
+   "id": "densidad_regolito_profunda_kg_m3",
+   "valor": 1920,
+   "unidad": "kg/m3",
+   "texto": "average bulk density of lunar regolith below 100 cm depth (1.92 g/cm3)",
+   "fuente": "https://ntrs.nasa.gov/api/citations/20220018853/downloads/LPSC%202023%20Abstract_Connolly_Carrier_v2.pdf",
+   "cita": "the bulk density of lunar regolith is approximately 1.30 g/cm3 at the surface, and increases asymptotically to 1.92 g/cm3 below a depth of 100 cm.",
+   "verificado": true
+  }
+ ]
+}

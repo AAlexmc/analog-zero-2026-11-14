@@ -1,0 +1,135 @@
+{
+ "pareja_inicial": {
+  "tierra": "haughton",
+  "luna": "shackleton"
+ },
+ "sitios": [
+  {
+   "id": "shackleton",
+   "cuerpo": "luna",
+   "nombre": "Shackleton crater, lunar south pole",
+   "lat": -89.67,
+   "lon": 129.78,
+   "lado_km": 40.0,
+   "n": 1024,
+   "escala": "sitio",
+   "centro_fuente": "https://planetarynames.wr.usgs.gov/Feature/5450",
+   "capas": [
+    "iluminacion",
+    "sombra_permanente",
+    "temp_max"
+   ]
+  },
+  {
+   "id": "haughton",
+   "cuerpo": "tierra",
+   "nombre": "Haughton impact crater, Devon Island, Canada",
+   "lat": 75.3833,
+   "lon": -89.6667,
+   "lado_km": 40.0,
+   "n": 1024,
+   "escala": "sitio",
+   "centro_fuente": "https://en.wikipedia.org/wiki/Haughton_impact_crater",
+   "capas": [
+    "agua"
+   ]
+  },
+  {
+   "id": "polo_sur",
+   "cuerpo": "luna",
+   "nombre": "Lunar south pole region",
+   "lat": -90.0,
+   "lon": 0.0,
+   "lado_km": 300.0,
+   "n": 2048,
+   "escala": "regional",
+   "capas": [
+    "iluminacion",
+    "sombra_permanente",
+    "temp_max"
+   ]
+  },
+  {
+   "id": "shackleton_borde",
+   "cuerpo": "luna",
+   "nombre": "Shackleton rim, most illuminated point",
+   "lat": -89.68643,
+   "lon": -162.9371,
+   "lado_km": 10.0,
+   "n": 1024,
+   "escala": "sitio",
+   "dem": "ldem_875s_5m",
+   "centro_fuente": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+   "notas": "Centre (origen: mío) = pixel with the highest mean solar illumination (0.8706) of AVGVISIB_85S_060M_201608 within 9-12 km of the IAU centre of Shackleton; reproduce with python -m pipeline.terreno borde.",
+   "capas": [
+    "iluminacion",
+    "sombra_permanente",
+    "temp_max"
+   ]
+  },
+  {
+   "id": "shoemaker",
+   "cuerpo": "luna",
+   "nombre": "Shoemaker crater, lunar south pole",
+   "lat": -88.137,
+   "lon": 45.911,
+   "lado_km": 70.0,
+   "n": 1024,
+   "escala": "sitio",
+   "centro_fuente": "https://planetarynames.wr.usgs.gov/Feature/5494",
+   "notas": "IAU centre and diameter (51.8 km); side 70 km = whole crater plus about 9 km beyond the IAU rim circle (origen: mío). The square reaches 106 km from the pole, outside LDEM_875S_5M (75.8 km): LDEM_85S_20M is used.",
+   "capas": [
+    "iluminacion",
+    "sombra_permanente",
+    "temp_max"
+   ]
+  },
+  {
+   "id": "cresta_shackleton_gerlache",
+   "cuerpo": "luna",
+   "nombre": "Shackleton–de Gerlache connecting ridge",
+   "lat": -89.45683,
+   "lon": -100.3459,
+   "lado_km": 40.0,
+   "n": 1024,
+   "escala": "sitio",
+   "dem": "ldem_875s_5m",
+   "notas": "Centre (origen: mío) = midpoint between the IAU rim circles (IAU centre, IAU diameter / 2) of Shackleton (https://planetarynames.wr.usgs.gov/Feature/5450) and de Gerlache (https://planetarynames.wr.usgs.gov/Feature/1439), on the straight line joining both centres in the polar stereographic plane (centres 54.2 km apart, rims 27.4 km apart); reproduce with pipeline.terreno.generar.punto_medio_bordes('Shackleton', 'de Gerlache'). Side 40 km (origen: mío) takes in both rims and about 6 km of each crater wall.",
+   "capas": [
+    "iluminacion",
+    "sombra_permanente",
+    "temp_max"
+   ]
+  },
+  {
+   "id": "sp_crater",
+   "cuerpo": "tierra",
+   "nombre": "S P Crater, San Francisco volcanic field, Arizona",
+   "lat": 35.5822254,
+   "lon": -111.6318207,
+   "lado_km": 40.0,
+   "n": 1024,
+   "escala": "sitio",
+   "centro_fuente": "https://en.wikipedia.org/wiki/S_P_Mountain",
+   "notas": "NASA JETT3 analog moonwalk site (2022); see datos_json/sitios_ensayo.json.",
+   "capas": [
+    "agua"
+   ]
+  },
+  {
+   "id": "mistastin",
+   "cuerpo": "tierra",
+   "nombre": "Mistastin Lake impact structure, Labrador, Canada",
+   "lat": 55.883,
+   "lon": -63.3,
+   "lado_km": 40.0,
+   "n": 1024,
+   "escala": "sitio",
+   "centro_fuente": "https://en.wikipedia.org/wiki/Mistastin_crater",
+   "notas": "Anorthosite impact structure used for lunar analog field campaigns; see datos_json/sitios_ensayo.json.",
+   "capas": [
+    "agua"
+   ]
+  }
+ ]
+}

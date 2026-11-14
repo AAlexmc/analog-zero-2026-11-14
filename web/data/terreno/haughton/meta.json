@@ -1,0 +1,63 @@
+{
+ "id": "haughton",
+ "cuerpo": "tierra",
+ "nombre": "Haughton impact crater, Devon Island, Canada",
+ "centro": {
+  "lat": 75.3833,
+  "lon": -89.6667
+ },
+ "lado_km": 40.0,
+ "n": 1024,
+ "m_por_px": 39.0625,
+ "centro_fuente": "https://en.wikipedia.org/wiki/Haughton_impact_crater",
+ "z_min": -0.46802499890327454,
+ "z_max": 412.97064208984375,
+ "z_referencia": "EGM2008 geoid (Copernicus DEM)",
+ "georef": {
+  "tipo": "local_aeqd",
+  "radio_m": 6396848.2,
+  "x0_m": -19980.46875,
+  "y0_m": 19980.46875
+ },
+ "capas": {
+  "altura": {
+   "fichero": "altura.f32",
+   "tipo": "float32",
+   "unidad": "m",
+   "fuente": "Copernicus DEM GLO-30, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved",
+   "url": "https://copernicus-dem-30m.s3.amazonaws.com/readme.html",
+   "licencia": "https://spacedata.copernicus.eu/en/web/guest/collections/copernicus-digital-elevation-model/#Licencing",
+   "teselas": [
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W091_00_DEM/Copernicus_DSM_COG_10_N75_00_W091_00_DEM.tif",
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W090_00_DEM/Copernicus_DSM_COG_10_N75_00_W090_00_DEM.tif",
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W089_00_DEM/Copernicus_DSM_COG_10_N75_00_W089_00_DEM.tif"
+   ],
+   "resolucion_origen_m": 30
+  },
+  "agua": {
+   "fichero": "agua.u8",
+   "tipo": "uint8",
+   "unidad": "class",
+   "clases": {
+    "0": "no water",
+    "1": "ocean",
+    "2": "lake",
+    "3": "river"
+   },
+   "fuente": "Copernicus DEM GLO-30 Water Body Mask (WBM, auxiliary file of each tile; class codes: Copernicus DEM Product Handbook v5.0, 2022, section 1.2.5.4, Table 8); Copernicus DEM GLO-30, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved",
+   "url": "https://copernicus-dem-30m.s3.amazonaws.com/readme.html",
+   "documentacion": "https://dataspace.copernicus.eu/sites/default/files/media/files/2024-06/geo1988-copernicusdem-spe-002_producthandbook_i5.0.pdf",
+   "licencia": "https://spacedata.copernicus.eu/en/web/guest/collections/copernicus-digital-elevation-model/#Licencing",
+   "resolucion_origen_m": 30,
+   "remuestreo": "majority of the WBM pixels whose centre falls in the cell (Copernicus also used majority resampling for its 8-bit masks, Handbook section 1.2.5); tie -> class of the nearest WBM pixel if tied, else the highest code; cell with no pixel -> nearest; pixel centres placed exactly as for altura.f32; missing WBM tile -> 255",
+   "teselas": [
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W091_00_DEM/AUXFILES/Copernicus_DSM_COG_10_N75_00_W091_00_WBM.tif",
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W090_00_DEM/AUXFILES/Copernicus_DSM_COG_10_N75_00_W090_00_WBM.tif",
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N75_00_W089_00_DEM/AUXFILES/Copernicus_DSM_COG_10_N75_00_W089_00_WBM.tif"
+   ],
+   "comando": "python -m pipeline.terreno capa --id haughton --capa agua"
+  }
+ },
+ "notas": "radio_m = WGS84 Gaussian mean radius at 75.3833° (sphere within ~6 m of the ellipsoid over 20 km). GLO-30 is a surface model (DSM). 3.6% of cells are exactly 0 m: sea surface in GLO-30, kept as 0 (not NaN).",
+ "comando": "python -m pipeline.terreno generar --id haughton --cuerpo tierra --lat 75.3833 --lon -89.6667 --lado-km 40.0 --n 1024 --escala sitio --nombre 'Haughton impact crater, Devon Island, Canada' --centro-fuente https://en.wikipedia.org/wiki/Haughton_impact_crater"
+}

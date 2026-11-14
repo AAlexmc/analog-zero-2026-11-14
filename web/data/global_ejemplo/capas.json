@@ -1,0 +1,976 @@
+{
+ "malla": "synthetic",
+ "umbrales_sha256": "example — not a real run",
+ "ejemplo": true,
+ "rejilla": {
+  "ancho": 720,
+  "alto": 360,
+  "fila0": "norte",
+  "lon0": -179.75,
+  "lat0": 89.75,
+  "paso": 0.5
+ },
+ "pares": [
+  {
+   "id": "jezero_P2",
+   "objetivo": "jezero",
+   "mision": "P2",
+   "prerregistrado": true,
+   "nombre_objetivo": "Jezero crater",
+   "nombre_mision": "Growing in local soil",
+   "pesos": {
+    "D1": 0.457,
+    "D6": 0.257,
+    "D4": 0.157,
+    "D3": 0.09,
+    "D8": 0.04
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "texto": "ice cap fraction <= 0.5"
+    },
+    {
+     "id": "ndvi",
+     "texto": "max NDVI <= 0.3"
+    }
+   ],
+   "n_tierra": 88766,
+   "n_no_evaluables": 0,
+   "n_fallan_puerta": 37241,
+   "fraccion_tierra_pasa_puertas": 0.5805,
+   "ficheros": {
+    "s": "s_jezero_P2.png",
+    "c": "c_jezero_P2.png",
+    "dim": [
+     "dim_jezero_P2_a.png",
+     "dim_jezero_P2_b.png",
+     "dim_jezero_P2_c.png"
+    ]
+   },
+   "candidatos": {
+    "csv": "candidatos_jezero_P2.csv",
+    "geojson": "candidatos_jezero_P2.geojson"
+   }
+  },
+  {
+   "id": "jezero_P4",
+   "objetivo": "jezero",
+   "mision": "P4",
+   "prerregistrado": true,
+   "nombre_objetivo": "Jezero crater",
+   "nombre_mision": "Mobility and landing",
+   "pesos": {
+    "D2": 0.611,
+    "D8": 0.278,
+    "D5": 0.111
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "texto": "ice cap fraction <= 0.5"
+    },
+    {
+     "id": "relieve",
+     "texto": "relief over 1 km <= 130 m"
+    }
+   ],
+   "n_tierra": 88766,
+   "n_no_evaluables": 556,
+   "n_fallan_puerta": 26047,
+   "fraccion_tierra_pasa_puertas": 0.7047,
+   "ficheros": {
+    "s": "s_jezero_P4.png",
+    "c": "c_jezero_P4.png",
+    "dim": [
+     "dim_jezero_P4_a.png",
+     "dim_jezero_P4_b.png",
+     "dim_jezero_P4_c.png"
+    ]
+   },
+   "candidatos": {
+    "csv": "candidatos_jezero_P4.csv",
+    "geojson": "candidatos_jezero_P4.geojson"
+   }
+  },
+  {
+   "id": "arcadia_P1",
+   "objetivo": "arcadia",
+   "mision": "P1",
+   "prerregistrado": true,
+   "nombre_objetivo": "Arcadia Planitia",
+   "nombre_mision": "Ice drilling",
+   "pesos": {
+    "D4": 0.457,
+    "D3": 0.257,
+    "D1": 0.157,
+    "D8": 0.09,
+    "D2": 0.04
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "texto": "ice cap fraction <= 0.5"
+    },
+    {
+     "id": "permafrost",
+     "texto": "permafrost fraction >= 0.5"
+    },
+    {
+     "id": "aridez",
+     "texto": "aridity index <= 0.20 or n/a from cold"
+    }
+   ],
+   "n_tierra": 88766,
+   "n_no_evaluables": 16879,
+   "n_fallan_puerta": 67019,
+   "fraccion_tierra_pasa_puertas": 0.0677,
+   "ficheros": {
+    "s": "s_arcadia_P1.png",
+    "c": "c_arcadia_P1.png",
+    "dim": [
+     "dim_arcadia_P1_a.png",
+     "dim_arcadia_P1_b.png",
+     "dim_arcadia_P1_c.png"
+    ]
+   },
+   "candidatos": {
+    "csv": "candidatos_arcadia_P1.csv",
+    "geojson": "candidatos_arcadia_P1.geojson"
+   }
+  },
+  {
+   "id": "shackleton_P3",
+   "objetivo": "shackleton",
+   "mision": "P3",
+   "prerregistrado": true,
+   "nombre_objetivo": "Shackleton rim",
+   "nombre_mision": "Polar base",
+   "pesos": {
+    "D3": 0.521,
+    "D8": 0.271,
+    "D2": 0.146,
+    "D1": 0.063
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "texto": "ice cap fraction <= 0.5"
+    },
+    {
+     "id": "relieve",
+     "texto": "relief over 1 km <= 130 m"
+    }
+   ],
+   "n_tierra": 88766,
+   "n_no_evaluables": 556,
+   "n_fallan_puerta": 26047,
+   "fraccion_tierra_pasa_puertas": 0.7047,
+   "ficheros": {
+    "s": "s_shackleton_P3.png",
+    "c": "c_shackleton_P3.png",
+    "dim": [
+     "dim_shackleton_P3_a.png",
+     "dim_shackleton_P3_b.png",
+     "dim_shackleton_P3_c.png"
+    ]
+   },
+   "candidatos": {
+    "csv": "candidatos_shackleton_P3.csv",
+    "geojson": "candidatos_shackleton_P3.geojson"
+   }
+  },
+  {
+   "id": "shackleton_P5",
+   "objetivo": "shackleton",
+   "mision": "P5",
+   "prerregistrado": false,
+   "nombre_objetivo": "Shackleton rim",
+   "nombre_mision": "Cold and grazing sun",
+   "pesos": {
+    "D9": 0.521,
+    "D3": 0.271,
+    "D8": 0.146,
+    "D2": 0.063
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "texto": "ice cap fraction <= 0.5"
+    },
+    {
+     "id": "relieve",
+     "texto": "relief over 1 km <= 130 m"
+    }
+   ],
+   "n_tierra": 88766,
+   "n_no_evaluables": 556,
+   "n_fallan_puerta": 26047,
+   "fraccion_tierra_pasa_puertas": 0.7047,
+   "ficheros": {
+    "s": "s_shackleton_P5.png",
+    "c": "c_shackleton_P5.png",
+    "dim": [
+     "dim_shackleton_P5_a.png",
+     "dim_shackleton_P5_b.png",
+     "dim_shackleton_P5_c.png"
+    ]
+   },
+   "candidatos": {
+    "csv": "candidatos_shackleton_P5.csv",
+    "geojson": "candidatos_shackleton_P5.geojson"
+   }
+  }
+ ],
+ "canales": {
+  "dim_jezero_P2_a.png": [
+   {
+    "id": "D1",
+    "nombre": "Geology and materials",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D2",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D3",
+    "nombre": "Temperature and light",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_jezero_P2_b.png": [
+   {
+    "id": "D4",
+    "nombre": "Water, ice, permafrost",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D5",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D6",
+    "nombre": "Biology and habitability",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_jezero_P2_c.png": [
+   {
+    "id": "D8",
+    "nombre": "Operations (feasibility)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D9",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "libre",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "s_jezero_P2.png": [
+   {
+    "id": "S",
+    "nombre": "similarity score",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p5",
+    "nombre": "similarity score, 5th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p95",
+    "nombre": "similarity score, 95th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "c_jezero_P2.png": [
+   {
+    "id": "C",
+    "nombre": "coverage",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "puertas",
+    "nombre": "gate bits",
+    "unidad": "bits",
+    "scale": 1,
+    "offset": 0
+   },
+   {
+    "id": "F",
+    "nombre": "feasibility (D8)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_jezero_P4_a.png": [
+   {
+    "id": "D1",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D2",
+    "nombre": "Terrain",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D3",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_jezero_P4_b.png": [
+   {
+    "id": "D4",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D5",
+    "nombre": "Dust and wind",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D6",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_jezero_P4_c.png": [
+   {
+    "id": "D8",
+    "nombre": "Operations (feasibility)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D9",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "libre",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "s_jezero_P4.png": [
+   {
+    "id": "S",
+    "nombre": "similarity score",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p5",
+    "nombre": "similarity score, 5th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p95",
+    "nombre": "similarity score, 95th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "c_jezero_P4.png": [
+   {
+    "id": "C",
+    "nombre": "coverage",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "puertas",
+    "nombre": "gate bits",
+    "unidad": "bits",
+    "scale": 1,
+    "offset": 0
+   },
+   {
+    "id": "F",
+    "nombre": "feasibility (D8)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_arcadia_P1_a.png": [
+   {
+    "id": "D1",
+    "nombre": "Geology and materials",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D2",
+    "nombre": "Terrain",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D3",
+    "nombre": "Temperature and light",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_arcadia_P1_b.png": [
+   {
+    "id": "D4",
+    "nombre": "Water, ice, permafrost",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D5",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D6",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_arcadia_P1_c.png": [
+   {
+    "id": "D8",
+    "nombre": "Operations (feasibility)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D9",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "libre",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "s_arcadia_P1.png": [
+   {
+    "id": "S",
+    "nombre": "similarity score",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p5",
+    "nombre": "similarity score, 5th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p95",
+    "nombre": "similarity score, 95th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "c_arcadia_P1.png": [
+   {
+    "id": "C",
+    "nombre": "coverage",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "puertas",
+    "nombre": "gate bits",
+    "unidad": "bits",
+    "scale": 1,
+    "offset": 0
+   },
+   {
+    "id": "F",
+    "nombre": "feasibility (D8)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P3_a.png": [
+   {
+    "id": "D1",
+    "nombre": "Geology and materials",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D2",
+    "nombre": "Terrain",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D3",
+    "nombre": "Temperature and light",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P3_b.png": [
+   {
+    "id": "D4",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D5",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D6",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P3_c.png": [
+   {
+    "id": "D8",
+    "nombre": "Operations (feasibility)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D9",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "libre",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "s_shackleton_P3.png": [
+   {
+    "id": "S",
+    "nombre": "similarity score",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p5",
+    "nombre": "similarity score, 5th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p95",
+    "nombre": "similarity score, 95th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "c_shackleton_P3.png": [
+   {
+    "id": "C",
+    "nombre": "coverage",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "puertas",
+    "nombre": "gate bits",
+    "unidad": "bits",
+    "scale": 1,
+    "offset": 0
+   },
+   {
+    "id": "F",
+    "nombre": "feasibility (D8)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P5_a.png": [
+   {
+    "id": "D1",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D2",
+    "nombre": "Terrain",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D3",
+    "nombre": "Temperature and light",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P5_b.png": [
+   {
+    "id": "D4",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D5",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D6",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "dim_shackleton_P5_c.png": [
+   {
+    "id": "D8",
+    "nombre": "Operations (feasibility)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "D9",
+    "nombre": "Operational cold",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "libre",
+    "vacio": true,
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "s_shackleton_P5.png": [
+   {
+    "id": "S",
+    "nombre": "similarity score",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p5",
+    "nombre": "similarity score, 5th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "S_p95",
+    "nombre": "similarity score, 95th percentile",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "c_shackleton_P5.png": [
+   {
+    "id": "C",
+    "nombre": "coverage",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   },
+   {
+    "id": "puertas",
+    "nombre": "gate bits",
+    "unidad": "bits",
+    "scale": 1,
+    "offset": 0
+   },
+   {
+    "id": "F",
+    "nombre": "feasibility (D8)",
+    "unidad": "0-1",
+    "scale": 0.004,
+    "offset": 0
+   }
+  ],
+  "var_a.png": [
+   {
+    "id": "radiacion_kwh_m2_dia",
+    "nombre": "solar radiation",
+    "unidad": "kWh/m²/day",
+    "scale": 0.04,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "t_media_c",
+    "nombre": "mean air temperature",
+    "unidad": "°C",
+    "scale": 0.4,
+    "offset": -60,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "aridez_ai",
+    "nombre": "aridity index",
+    "unidad": "index",
+    "scale": 0.02,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   }
+  ],
+  "var_b.png": [
+   {
+    "id": "ndvi_max",
+    "nombre": "max NDVI",
+    "unidad": "index",
+    "scale": 0.004,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "soc_g_kg",
+    "nombre": "soil organic carbon",
+    "unidad": "g/kg",
+    "scale": 1,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "ph_h2o",
+    "nombre": "soil pH (H₂O)",
+    "unidad": "pH",
+    "scale": 0.04,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   }
+  ],
+  "var_c.png": [
+   {
+    "id": "rugosidad_tan",
+    "nombre": "roughness",
+    "unidad": "tan",
+    "scale": 0.0004,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "relieve_m",
+    "nombre": "relief over 1 km",
+    "unidad": "m",
+    "scale": 10,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "tiempo_ciudad_h",
+    "nombre": "travel time to a city",
+    "unidad": "h",
+    "scale": 1,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   }
+  ],
+  "var_d.png": [
+   {
+    "id": "nv_dias_m23c",
+    "nombre": "days with max ≤ −23 °C",
+    "unidad": "days/yr",
+    "scale": 1.5,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "nv_dias_0c",
+    "nombre": "days with max ≤ 0 °C",
+    "unidad": "days/yr",
+    "scale": 1.5,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "amplitud_diurna_k",
+    "nombre": "diurnal range",
+    "unidad": "K",
+    "scale": 0.2,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   }
+  ],
+  "var_e.png": [
+   {
+    "id": "permafrost_frac",
+    "nombre": "permafrost fraction",
+    "unidad": "fraction",
+    "scale": 0.004,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "viento_p95_m_s",
+    "nombre": "wind P95",
+    "unidad": "m/s",
+    "scale": 0.1,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "litologia_glim",
+    "nombre": "lithology",
+    "unidad": "class",
+    "scale": 1,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   }
+  ],
+  "var_f.png": [
+   {
+    "id": "f_low",
+    "nombre": "low-sun fraction",
+    "unidad": "fraction",
+    "scale": 0.004,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "elev_solar_max_deg",
+    "nombre": "max solar elevation",
+    "unidad": "deg",
+    "scale": 0.4,
+    "offset": 0,
+    "fuente": "synthetic example — no source"
+   },
+   {
+    "id": "elev_m",
+    "nombre": "elevation",
+    "unidad": "m",
+    "scale": 25,
+    "offset": -500,
+    "fuente": "synthetic example — no source"
+   }
+  ]
+ },
+ "dimensiones": {
+  "D1": "Geology and materials",
+  "D2": "Terrain",
+  "D3": "Temperature and light",
+  "D4": "Water, ice, permafrost",
+  "D5": "Dust and wind",
+  "D6": "Biology and habitability",
+  "D8": "Operations (feasibility)",
+  "D9": "Operational cold"
+ },
+ "litologia_clases": {
+  "1": "unconsolidated sediments",
+  "2": "basic volcanic",
+  "3": "acid plutonic",
+  "4": "metamorphic",
+  "5": "carbonate sedimentary",
+  "6": "siliciclastic sedimentary"
+ }
+}

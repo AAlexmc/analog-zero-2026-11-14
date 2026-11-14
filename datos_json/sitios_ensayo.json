@@ -1,0 +1,266 @@
+{
+ "sitios": [
+  {
+   "id": "haughton",
+   "nombre": "Haughton impact structure, Devon Island",
+   "tipo": "campo",
+   "lat": 75.3667,
+   "lon": -89.6833,
+   "coordenadas": {"texto": "75°22'N 89°41'W converted to decimal degrees",
+    "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+    "cita": "It is one of the highest-latitude terrestrial impact craters known on land (75◦ 22'N, 89◦ 41'W).",
+    "verificado": true},
+   "relevancia": {"texto": "similar diameter to Shackleton crater (20 km vs 19 km in this source)",
+    "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+    "cita": "Haughton is similar in diameter (20 km) to Shackleton Crater (19 km) near the lunar south pole.",
+    "verificado": true},
+   "campanas": [
+    {"nombre": "Simulated lunar crew mission", "ano": 2009,
+     "sistema": "HMMWV as simulated pressurized crew rover",
+     "que_se_probo": "crew-planned vehicular traverses that set up later robotic follow-up work",
+     "limitacion_reconocida": "no single site on Earth is a perfect lunar analog",
+     "equipo_relacionado": ["ltv"],
+     "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+     "cita": "In July 2009, we conducted a simulated lunar crew mission at Haughton Crater. A geologist (M. Helper) and a geophysicist (E. Heggy) planned vehicular traverses using a HMMWV as a simulated pressurized crew rover.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "limitacion_reconocida",
+       "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+       "cita": "While no single site on Earth is a perfect analog for the Moon, the Haughton impact structure on Devon Island (Figure 1) is a high-fidelity lunar analog in many respects.",
+       "verificado": true}
+     ]},
+    {"nombre": "Simulated robotic follow-up mission (K10 rovers)", "ano": 2010,
+     "sistema": "two NASA Ames K10 planetary rovers",
+     "que_se_probo": "robotic follow-up with imagers, 3D scanning lidar, ground-penetrating radar and XRF; mapping of buried ground ice",
+     "limitacion_reconocida": "no single site on Earth is a perfect lunar analog",
+     "equipo_relacionado": ["viper", "rover_prospeccion_rtg"],
+     "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+     "cita": "From 19 July to 8 August 2010, we conducted a simulated robotic follow-up mission at Haughton Crater.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "que_se_probo",
+       "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
+       "cita": "we have equipped the K10 rovers with a suite of science instruments: panoramic and microscopic imagers, a 3D scanning lidar, a ground-penetrating radar and an XRF spectrometer.",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "sp_crater",
+   "nombre": "S P Crater, San Francisco volcanic field (near Flagstaff, Arizona)",
+   "tipo": "campo",
+   "lat": 35.5822254,
+   "lon": -111.6318207,
+   "coordenadas": {"texto": "summit coordinates of the cinder cone (Wikipedia), not of the JETT3 work area",
+    "fuente": "https://en.wikipedia.org/wiki/S_P_Mountain",
+    "cita": "Coordinates: 35°34′56″N 111°37′55″W / 35.5822254°N 111.6318207°W",
+    "verificado": true},
+   "campanas": [
+    {"nombre": "JETT3 (Joint Extravehicular Activity Test Team Field Test #3)", "ano": 2022,
+     "sistema": "Artemis moonwalk operations (crew, sample collection)",
+     "que_se_probo": "third simulated moonwalk preparing Artemis south-pole surface operations; sample collection on rocky high-desert terrain",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": [],
+     "fuente": "https://www.nasa.gov/image-article/practicing-our-moonwalk/",
+     "cita": "Joint Extravehicular Activity Test Team Field Test #3 (JETT3) mission members work on sample collection on the remote, rocky, high-desert terrain of the S P Crater near Flagstaff, Arizona on Oct. 5, 2022.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "que_se_probo",
+       "fuente": "https://www.nasa.gov/image-article/practicing-our-moonwalk/",
+       "cita": "JETT3 was the third simulated moonwalk in preparation for future Artemis missions; during Artemis III, astronauts will visit the lunar South Pole region",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "mojave_soda",
+   "nombre": "Alluvial fan east of the Soda Mountains, Mojave Desert, California",
+   "tipo": "campo",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "no coordinates in an opened source; the source only says 'just E of the Soda Mountains, SW of Baker'",
+    "fuente": "https://ntrs.nasa.gov/citations/20160000570",
+    "cita": "The test site was an alluvial fan just E of the Soda Mountains, SW of Baker, California.",
+    "verificado": true},
+   "campanas": [
+    {"nombre": "Mojave Volatiles Prospector (MVP)", "ano": 2014,
+     "sistema": "KREX-2 rover (NASA Ames) with near-IR and neutron spectrometers",
+     "que_se_probo": "real-time, short-duration robotic prospecting operations; hydration state of desert pavements",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": ["viper", "rover_prospeccion_rtg"],
+     "fuente": "https://ntrs.nasa.gov/citations/20160000570",
+     "cita": "Here we describe some results from the first such test, carried out in the Mojave Desert between 16 and 24 October, 2014.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "sistema",
+       "fuente": "https://ntrs.nasa.gov/citations/20160000570",
+       "cita": "The mobility element of the test was the KREX-2 rover, designed and operated by the Intelligent Robotics Group at NASA Ames Research Center.",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "mauna_kea",
+   "nombre": "Mauna Kea volcano, Hawaii",
+   "tipo": "campo",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "no coordinates of the test site in an opened source", "fuente": null, "cita": null, "verificado": false},
+   "campanas": [
+    {"nombre": "RESOLVE field demonstration", "ano": 2010,
+     "sistema": "RESOLVE (drill and volatile extraction) on a Canadian Space Agency rover chassis",
+     "que_se_probo": "four days of analog testing: gas chromatography of volatiles, drilling and chemistry remotely controlled via satellite, real-time water quantification",
+     "limitacion_reconocida": "initial prototype of a robotic prospecting mission",
+     "equipo_relacionado": ["viper", "rover_prospeccion_rtg"],
+     "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+     "cita": "The RESOLVE chemical processing system was mounted on a Canadian Space Agency mobility chasis and successfully demonstrated on Hawaii's Mauna Kea volcano in February 2010.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "que_se_probo",
+       "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+       "cita": "four days of lunar analog testing that included gas chromatograph analysis for volatile components, remote control of chemistry and drilling operations via satalite communications",
+       "verificado": true},
+      {"apoya": "limitacion_reconocida",
+       "fuente": "https://ntrs.nasa.gov/citations/20100033667",
+       "cita": "The RESOLVE unit is the initial prototype of a robotic prospecting mission to the Moon.",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "mistastin",
+   "nombre": "Mistastin (Kamestastin) Lake impact structure, Labrador",
+   "tipo": "campo",
+   "lat": 55.883,
+   "lon": -63.3,
+   "coordenadas": {"texto": "crater coordinates (Wikipedia)",
+    "fuente": "https://en.wikipedia.org/wiki/Mistastin_crater",
+    "cita": "Coordinates: 55°53′N 63°18′W / 55.883°N 63.300°W / 55.883; -63.300",
+    "verificado": true},
+   "campanas": [
+    {"nombre": "Impacts: Lunar Sample Return (ILSR), mission 1", "ano": 2010,
+     "sistema": "simulated robotic reconnaissance (lidar, panoramic imaging); mission control 1900 km away",
+     "que_se_probo": "robotic surveying of candidate landing sites on anorthosite and impact ejecta",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": [],
+     "fuente": "https://iafastro.directory/iac/archive/browse/IAC-12/A5/3-B3.6/15486/",
+     "cita": "The first analogue mission occurred in August and September 2010 and involved simulated robotic surveying of selected \"landing sites\" at the Mistastin Lake impact structure",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "sistema",
+       "fuente": "https://iafastro.directory/iac/archive/browse/IAC-12/A5/3-B3.6/15486/",
+       "cita": "A mission control team, based at the University of Western Ontario, 1900 km from the field site, oversaw operations.",
+       "verificado": true}
+     ]},
+    {"nombre": "Impacts: Lunar Sample Return (ILSR), mission 2", "ano": 2011,
+     "sistema": "simulated astronaut surface operations",
+     "que_se_probo": "astronaut surface operations at the same site",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": [],
+     "fuente": "https://iafastro.directory/iac/archive/browse/IAC-12/A5/3-B3.6/15486/",
+     "cita": "A second mission took place at the same location in 2011, which included simulated astronaut surface operations.",
+     "verificado": true}
+   ]
+  },
+  {
+   "id": "glenn_slope_lab",
+   "nombre": "SLOPE Lab, NASA Glenn Research Center",
+   "tipo": "laboratorio",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "laboratory; no coordinates in an opened source", "fuente": null, "cita": null, "verificado": false},
+   "campanas": [
+    {"nombre": "VIPER mobility testing", "ano": null,
+     "sistema": "VIPER wheels and mobility system",
+     "que_se_probo": "rock traversal, crater traversal and slip testing on a 30° slope",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": ["viper"],
+     "nota": "test list taken from the slides that follow the 'SLOPE Lab (NASA Glenn)' heading; year not stated",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20250009082/downloads/viper-2025-09-10.pdf",
+     "cita": "SLOPE Lab (NASA Glenn) 19 Rock Traversal Testing Rock with attached load cell 20 Crater Traversal Testing 21 22 Slip Testing (30° Slope)",
+     "verificado": true}
+   ]
+  },
+  {
+   "id": "ames_lunar_lab",
+   "nombre": "Lunar Lab regolith testbed, NASA Ames Research Center",
+   "tipo": "laboratorio",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "laboratory; no coordinates in an opened source", "fuente": null, "cita": null, "verificado": false},
+   "campanas": [
+    {"nombre": "VIPER camera and light testing", "ano": null,
+     "sistema": "VIPER cameras and lights",
+     "que_se_probo": "surface appearance under sun simulators for lunar polar lighting; 12 t of LHS-1 simulant in a 4 x 20 m sandbox",
+     "limitacion_reconocida": null,
+     "equipo_relacionado": ["viper"],
+     "fuente": "https://ntrs.nasa.gov/api/citations/20250009082/downloads/viper-2025-09-10.pdf",
+     "cita": "NASA Ames \"Lunar Lab\" • High-fidelity surface appearance testbed • Highlands: 12 tons of LHS-1 simulant in a 4x20 meter sandbox",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "que_se_probo",
+       "fuente": "https://ntrs.nasa.gov/api/citations/20250009082/downloads/viper-2025-09-10.pdf",
+       "cita": "Experimental setup • Sun simulators for lunar polar lighting • Sliding gantry provides non-contact data collection for optical sensors",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "glenn_camara_polar",
+   "nombre": "Thermal vacuum chamber with icy regolith bin, NASA Glenn Research Center",
+   "tipo": "laboratorio",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "laboratory; no coordinates in an opened source", "fuente": null, "cita": null, "verificado": false},
+   "campanas": [
+    {"nombre": "Drilling in frozen simulant at thermal vacuum (RESOLVE)", "ano": null,
+     "sistema": "RESOLVE drill and spectrometer",
+     "que_se_probo": "water-doped simulant chilled with liquid-nitrogen loops (100 K) to about 140 K at vacuum; augering in frozen soil",
+     "limitacion_reconocida": "hard to keep the prepared soil state during pump-down (consolidation, moisture retention); bed desiccation from vacuum was measured",
+     "equipo_relacionado": ["viper", "rover_prospeccion_rtg"],
+     "nota": "conference paper published January 2014; test year not stated",
+     "fuente": "https://ntrs.nasa.gov/citations/20140012567",
+     "cita": "The bin itself was wrapped with liquid nitrogen cooling loops (100K) so that the simulant bed reached an average temperature of 140K at vacuum.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "limitacion_reconocida",
+       "fuente": "https://ntrs.nasa.gov/citations/20140012567",
+       "cita": "difficulty maintaining a pre-prepared soil state during pump down (consolidation state, moisture retention)",
+       "verificado": true},
+      {"apoya": "limitacion_reconocida",
+       "fuente": "https://ntrs.nasa.gov/citations/20140012567",
+       "cita": "Post-test sampling was used to determine desiccation of the bed due to vacuum exposure.",
+       "verificado": true}
+     ]}
+   ]
+  },
+  {
+   "id": "ksc_ipex_testbed",
+   "nombre": "IPEx testbed, NASA Kennedy Space Center",
+   "tipo": "laboratorio",
+   "lat": null,
+   "lon": null,
+   "coordenadas": {"texto": "laboratory; no coordinates in an opened source", "fuente": null, "cita": null, "verificado": false},
+   "campanas": [
+    {"nombre": "IPEx simulated lunar mission", "ano": null,
+     "sistema": "IPEx excavator",
+     "que_se_probo": "autonomous excavation under harsh lighting with rock hazards",
+     "limitacion_reconocida": "dust in vacuum, low gravity and lunar electrostatics are hard to test in relevant environments",
+     "equipo_relacionado": ["ipex"],
+     "fuente": "https://www.nasa.gov/infrastructure-pilot-excavator/",
+     "cita": "Take a closer look as IPEx performs a simulated lunar mission in a testbed at Kennedy Space Center.",
+     "verificado": true,
+     "citas_extra": [
+      {"apoya": "que_se_probo",
+       "fuente": "https://www.nasa.gov/infrastructure-pilot-excavator/",
+       "cita": "The autonomous excavator demonstrates its ability to operate with lunar environmental challenges such as harsh lighting and rock hazards.",
+       "verificado": true},
+      {"apoya": "limitacion_reconocida",
+       "fuente": "https://ntrs.nasa.gov/api/citations/20240008162/downloads/ASCEND24_IPEx%20TRL%205%20Design%20Overview.pdf",
+       "cita": "difficulty of testing in relevant environments, such as dust in vacuum, low gravity, and lunar electrostatic effects",
+       "verificado": true}
+     ]}
+   ]
+  }
+ ]
+}

@@ -1,0 +1,111 @@
+{
+ "objetivos": [
+  {
+   "id": "jezero",
+   "nombre": "Jezero crater",
+   "cuerpo": "marte",
+   "lat": 18.38,
+   "lon": 77.58,
+   "coordenadas_fuente": "[WP-Mars] Wikipedia, Jezero (crater) (20 §1.2)",
+   "clase_litologia": "marte_basaltico",
+   "misiones": [
+    "P2",
+    "P4"
+   ],
+   "no_comparable": [
+    "gravedad",
+    "presion",
+    "radiacion",
+    "composicion_atmosferica"
+   ],
+   "radiacion_kwh_m2_dia": {
+    "min": 1.0,
+    "max": 3.9,
+    "nota": "other latitude; order of magnitude",
+    "fuente": "Viking 1, Appelbaum & Flood 1989, tabla IV, vía verif/P22 https://ntrs.nasa.gov/api/citations/19890018252/downloads/19890018252.pdf"
+   },
+   "fuentes": [
+    "https://geodynamicsprogram.whoi.edu/wp-content/uploads/sites/14/2018/10/Integrated_Mars_Crust_McSween_Taylor_Wyatt_Science_2009_58186.pdf\"",
+    "https://ntrs.nasa.gov/api/citations/19890018252/downloads/19890018252.pdf\"}",
+    "https://www.marsdaily.com/reports/Daily_records_of_atmospheric_temperature_with_Perseverance_999.html\"",
+    "https://www.space.com/perseverance-rover-mars-weather-report\""
+   ]
+  },
+  {
+   "id": "shackleton",
+   "nombre": "Shackleton rim",
+   "cuerpo": "luna",
+   "lat": -89.67,
+   "lon": 129.78,
+   "coordenadas_fuente": "[WP-Moon] Wikipedia, Shackleton (crater) (20 §1.2)",
+   "clase_litologia": "luna_polar",
+   "misiones": [
+    "P3"
+   ],
+   "no_comparable": [
+    "gravedad",
+    "vacio",
+    "radiacion"
+   ],
+   "energia": "No panel area is computed: vertical panels on masts, 10 kW per mast in NASA's programme.",
+   "fuentes": [
+    "https://cdn.shopify.com/s/files/1/0398/9268/0862/files/lhs-1-spec-sheet-Dec2023.pdf\"",
+    "https://lroc.im-ldi.com/visit/exhibits/1/gallery/57\"",
+    "https://ntrs.nasa.gov/api/citations/20110008071/downloads/20110008071.pdf",
+    "https://ntrs.nasa.gov/api/citations/20230012849/downloads/GCD%20Annual%20Review%20VSAT%20September%202023%20Final.pdf)\""
+   ]
+  },
+  {
+   "id": "arcadia",
+   "nombre": "Arcadia Planitia",
+   "cuerpo": "marte",
+   "lat": 47.2,
+   "lon": -175.7,
+   "coordenadas_fuente": "[WP-Mars] Wikipedia, Arcadia Planitia (20 §1.2); 184,3 E pasado a −180..180 (00-contrato.md §2)",
+   "clase_litologia": "marte_basaltico",
+   "misiones": [
+    "P1"
+   ],
+   "no_comparable": [
+    "gravedad",
+    "presion",
+    "radiacion",
+    "composicion_atmosferica"
+   ],
+   "radiacion_kwh_m2_dia": {
+    "min": 1.0,
+    "max": 3.9,
+    "nota": "other latitude; order of magnitude",
+    "fuente": "Viking 1, Appelbaum & Flood 1989, vía verif/P22 (27 §15)"
+   },
+   "fuentes": [
+    "https://pubs.usgs.gov/publication/70226786",
+    "https://www.technologyreview.com/2021/02/08/1017759/these-might-be-the-best-places-for-future-mars-colonists-to-look-for-ice/\"}"
+   ]
+  },
+  {
+   "id": "meridiani",
+   "nombre": "Meridiani",
+   "cuerpo": "marte",
+   "lat": null,
+   "lon": null,
+   "coordenadas_fuente": "ningún documento de diseño da coordenadas de Meridiani (buscado en 20, 27, piezas/, 13, 16)",
+   "clase_litologia": "marte_salino_sulfatos",
+   "misiones": [],
+   "no_comparable": [],
+   "fuentes": []
+  },
+  {
+   "id": "tranquillitatis",
+   "nombre": "Mare Tranquillitatis pit",
+   "cuerpo": "luna",
+   "lat": 8.3355,
+   "lon": 33.222,
+   "coordenadas_fuente": "[WP-Moon] Wikipedia, Mare Tranquillitatis pit (20 §5.2)",
+   "clase_litologia": "luna_mare",
+   "misiones": [],
+   "no_comparable": [],
+   "fuentes": []
+  }
+ ]
+}

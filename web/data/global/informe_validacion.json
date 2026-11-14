@@ -1,0 +1,1318 @@
+{
+ "malla": "malla_v7.nc",
+ "umbrales_sha256": "0b56320b848e1ebf62ed2771ae1dd32c1e1b485ef5941ef0ff795c2328ebd92f",
+ "mc_n": 500,
+ "corrida_oficial": "una sola, con la malla completa, el sábado a las 19:00 o cuando llegue el último paso de la malla, lo que ocurra antes; lo anterior es ensayo y no se publica; si falta una variable se corre igual y se dice (27 §13)",
+ "corridas": [
+  {
+   "n": 1,
+   "malla": "malla_v7.nc",
+   "umbrales_sha256": "0b56320b848e1ebf62ed2771ae1dd32c1e1b485ef5941ef0ff795c2328ebd92f",
+   "mc_n": 500,
+   "motivo": "corrida oficial 1: malla_v7 completa, umbrales congelados, n = 500",
+   "que_cambio": ""
+  }
+ ],
+ "cifra_del_video": "la de H1 (cada sitio conocido en su dimensión clave); la web enseña H1 y H1-S juntas; no se cambia después de ver resultados (27 §17)",
+ "h1": {
+  "medida": "k = sitios de la lista (n = 11) cuya s_d de la dimensión primaria queda en el 5 % mejor por área de la tierra firme para su objetivo",
+  "linea_base": "k₀ = misma cuenta ordenando solo por aridez (AI)",
+  "n_sitios": 11,
+  "n": 11,
+  "percentil_mejor": 0.05,
+  "k": 1,
+  "k0": 1,
+  "veredicto": "fallo",
+  "exito": "k ≥ 8 de 11 y k ≥ k₀ + 2; no se afloja al quitar Dhofar",
+  "sitios": [
+   {
+    "n": 1,
+    "id": "yungay",
+    "dim": "D4",
+    "objetivo": "jezero",
+    "celda": [
+     131,
+     219
+    ],
+    "s": 1.0,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.07997065463729204,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 2,
+    "id": "haughton",
+    "dim": "D4",
+    "objetivo": "arcadia",
+    "celda": [
+     330,
+     180
+    ],
+    "s": 0.0,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 1.0,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 3,
+    "id": "death_valley_badwater",
+    "dim": "D1",
+    "objetivo": "meridiani",
+    "celda": [
+     252,
+     126
+    ],
+    "s": null,
+    "estado_dim": "ok",
+    "dentro": null,
+    "fraccion_area_igual_o_mejor": null,
+    "cuenta": false,
+    "motivo": "no evaluable (cierres.sin_resolver): meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)",
+    "informativo_no_cuenta": {
+     "s": 0.3259968155308774,
+     "dentro": false,
+     "fraccion_area_igual_o_mejor": 0.15027865318349737
+    }
+   },
+   {
+    "n": 4,
+    "id": "mcmurdo_dry_valleys",
+    "dim": "D3",
+    "objetivo": "jezero",
+    "celda": [
+     25,
+     685
+    ],
+    "s": 1.0,
+    "estado_dim": "ok",
+    "dentro": true,
+    "fraccion_area_igual_o_mejor": 0.0342577343728887,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 6,
+    "id": "timanfaya",
+    "dim": "D1",
+    "objetivo": "jezero",
+    "celda": [
+     237,
+     332
+    ],
+    "s": null,
+    "estado_dim": "sin_dato",
+    "dentro": null,
+    "fraccion_area_igual_o_mejor": null,
+    "cuenta": false,
+    "motivo": "no evaluable: D1 sin_dato en la celda"
+   },
+   {
+    "n": 7,
+    "id": "svalbard_bockfjorden",
+    "dim": "D4",
+    "objetivo": "arcadia",
+    "celda": [
+     338,
+     386
+    ],
+    "s": 0.0,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 1.0,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 8,
+    "id": "mdrs_utah",
+    "dim": "D2",
+    "objetivo": "jezero",
+    "celda": [
+     256,
+     138
+    ],
+    "s": 0.1719218379352725,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.6705220576810287,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 9,
+    "id": "mojave_silver_lake",
+    "dim": "D2",
+    "objetivo": "jezero",
+    "celda": [
+     250,
+     127
+    ],
+    "s": 0.553772786209354,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.41067464731390485,
+    "cuenta": true,
+    "motivo": null
+   },
+   {
+    "n": 12,
+    "id": "dalangtan_qaidam",
+    "dim": "D1",
+    "objetivo": "meridiani",
+    "celda": [
+     257,
+     543
+    ],
+    "s": null,
+    "estado_dim": "ok",
+    "dentro": null,
+    "fraccion_area_igual_o_mejor": null,
+    "cuenta": false,
+    "motivo": "no evaluable (cierres.sin_resolver): meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)",
+    "informativo_no_cuenta": {
+     "s": 0.31521381578947366,
+     "dentro": false,
+     "fraccion_area_igual_o_mejor": 0.15507122426005643
+    }
+   },
+   {
+    "n": 13,
+    "id": "mauna_kea",
+    "dim": "D1",
+    "objetivo": "jezero",
+    "celda": [
+     219,
+     49
+    ],
+    "s": null,
+    "estado_dim": "sin_dato",
+    "dentro": null,
+    "fraccion_area_igual_o_mejor": null,
+    "cuenta": false,
+    "motivo": "no evaluable: D1 sin_dato en la celda"
+   },
+   {
+    "n": 14,
+    "id": "cinder_lake",
+    "dim": "D2",
+    "objetivo": "tranquillitatis",
+    "celda": [
+     250,
+     137
+    ],
+    "s": 0.17895967949565206,
+    "estado_dim": "ok",
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.4357675167672235,
+    "cuenta": true,
+    "motivo": null
+   }
+  ],
+  "k0_sitios": {
+   "yungay": {
+    "aridez_ai": 0.006055918056517839,
+    "dentro": true,
+    "fraccion_area_igual_o_mejor": 0.014670329361657648,
+    "motivo": null
+   },
+   "haughton": {
+    "aridez_ai": 1.985292911529541,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.8520655519776255,
+    "motivo": null
+   },
+   "death_valley_badwater": {
+    "aridez_ai": 0.08687650412321091,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.1067332797164222,
+    "motivo": null
+   },
+   "mcmurdo_dry_valleys": {
+    "aridez_ai": null,
+    "dentro": null,
+    "fraccion_area_igual_o_mejor": null,
+    "motivo": "no evaluable: aridez na por frío en la celda"
+   },
+   "timanfaya": {
+    "aridez_ai": 0.15608851611614227,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.1595879235838283,
+    "motivo": null
+   },
+   "svalbard_bockfjorden": {
+    "aridez_ai": 5.6730732917785645,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.9901742841725053,
+    "motivo": null
+   },
+   "mdrs_utah": {
+    "aridez_ai": 0.19401830434799194,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.18624492481517269,
+    "motivo": null
+   },
+   "mojave_silver_lake": {
+    "aridez_ai": 0.08205080032348633,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.10326723560176468,
+    "motivo": null
+   },
+   "dalangtan_qaidam": {
+    "aridez_ai": 0.052818916738033295,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.08205285574943637,
+    "motivo": null
+   },
+   "mauna_kea": {
+    "aridez_ai": 1.9478274583816528,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.8446058313306907,
+    "motivo": null
+   },
+   "cinder_lake": {
+    "aridez_ai": 0.2856612503528595,
+    "dentro": false,
+    "fraccion_area_igual_o_mejor": 0.24467055626820083,
+    "motivo": null
+   }
+  },
+  "denominador_k0_celdas": 67941,
+  "denominador_celdas": {
+   "D4_jezero": 67941,
+   "D4_arcadia": 24494,
+   "D1_meridiani": 32366,
+   "D3_jezero": 69966,
+   "D1_jezero": 32366,
+   "D2_jezero": 65991,
+   "D2_tranquillitatis": 65991
+  }
+ },
+ "h1_s": {
+  "medida": "cuántos de los 11 sitios quedan en el 5 % mejor de la puntuación combinada S, con la misión de su fila",
+  "tipo": "descriptiva, sin umbral; se publica el número sea cual sea",
+  "n_sitios": 11,
+  "n": 11,
+  "n_dentro": 0,
+  "k": 0,
+  "n_no_evaluables": 5,
+  "sitios": [
+   {
+    "n": 1,
+    "id": "yungay",
+    "par": "jezero_P2",
+    "dentro": null,
+    "motivo": "no evaluable: C = 0.544 < 0.7",
+    "estado": "cobertura_baja",
+    "S": null,
+    "S_p5": null,
+    "S_p95": null,
+    "C": 0.5440000295639038,
+    "fraccion_area_igual_o_mejor": null,
+    "estab_top5": null,
+    "puertas_falladas": [],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 2,
+    "id": "haughton",
+    "par": "arcadia_P1",
+    "dentro": false,
+    "motivo": null,
+    "estado": "puerta_fallada",
+    "S": 0.0,
+    "S_p5": 0.0,
+    "S_p95": 0.0,
+    "C": 0.843999981880188,
+    "fraccion_area_igual_o_mejor": 1.0,
+    "estab_top5": 0.0,
+    "puertas_falladas": [
+     "aridez"
+    ],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 3,
+    "id": "death_valley_badwater",
+    "par": "meridiani_P2",
+    "dentro": null,
+    "motivo": "par meridiani_P2 no calculado: meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+   },
+   {
+    "n": 4,
+    "id": "mcmurdo_dry_valleys",
+    "par": "jezero_P1",
+    "dentro": null,
+    "motivo": "no evaluable: C = 0.257 < 0.7",
+    "estado": "cobertura_baja",
+    "S": null,
+    "S_p5": null,
+    "S_p95": null,
+    "C": 0.25699999928474426,
+    "fraccion_area_igual_o_mejor": null,
+    "estab_top5": null,
+    "puertas_falladas": [],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 6,
+    "id": "timanfaya",
+    "par": "jezero_P2",
+    "dentro": null,
+    "motivo": "no evaluable: puerta sin dato (casquete)",
+    "estado": "puerta_sin_dato",
+    "S": null,
+    "S_p5": null,
+    "S_p95": null,
+    "C": 0.5440000295639038,
+    "fraccion_area_igual_o_mejor": null,
+    "estab_top5": null,
+    "puertas_falladas": [],
+    "puertas_sin_dato": [
+     "casquete"
+    ]
+   },
+   {
+    "n": 7,
+    "id": "svalbard_bockfjorden",
+    "par": "arcadia_P1",
+    "dentro": false,
+    "motivo": null,
+    "estado": "puerta_fallada",
+    "S": 0.0,
+    "S_p5": 0.0,
+    "S_p95": 0.0,
+    "C": 1.0010000467300415,
+    "fraccion_area_igual_o_mejor": 1.0,
+    "estab_top5": 0.0,
+    "puertas_falladas": [
+     "aridez"
+    ],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 8,
+    "id": "mdrs_utah",
+    "par": "jezero_P4",
+    "dentro": false,
+    "motivo": null,
+    "estado": "pasa",
+    "S": 0.280562162399292,
+    "S_p5": 0.0788596123456955,
+    "S_p95": 0.6470842361450195,
+    "C": 0.8889999985694885,
+    "fraccion_area_igual_o_mejor": 0.6089304177349315,
+    "estab_top5": 0.0,
+    "puertas_falladas": [],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 9,
+    "id": "mojave_silver_lake",
+    "par": "jezero_P4",
+    "dentro": false,
+    "motivo": null,
+    "estado": "pasa",
+    "S": 0.6592584252357483,
+    "S_p5": 0.2964114248752594,
+    "S_p95": 0.8368104100227356,
+    "C": 0.8889999985694885,
+    "fraccion_area_igual_o_mejor": 0.2810924125707483,
+    "estab_top5": 0.0,
+    "puertas_falladas": [],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 12,
+    "id": "dalangtan_qaidam",
+    "par": "meridiani_P2",
+    "dentro": null,
+    "motivo": "par meridiani_P2 no calculado: meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+   },
+   {
+    "n": 13,
+    "id": "mauna_kea",
+    "par": "jezero_P2",
+    "dentro": false,
+    "motivo": null,
+    "estado": "puerta_fallada",
+    "S": 0.0,
+    "S_p5": 0.0,
+    "S_p95": 0.0,
+    "C": 0.5440000295639038,
+    "fraccion_area_igual_o_mejor": 1.0,
+    "estab_top5": 0.0,
+    "puertas_falladas": [
+     "ndvi"
+    ],
+    "puertas_sin_dato": []
+   },
+   {
+    "n": 14,
+    "id": "cinder_lake",
+    "par": "tranquillitatis_P4",
+    "dentro": false,
+    "motivo": null,
+    "estado": "pasa",
+    "S": 0.29353097081184387,
+    "S_p5": 0.07107795029878616,
+    "S_p95": 0.6585130095481873,
+    "C": 0.8889999985694885,
+    "fraccion_area_igual_o_mejor": 0.3737349578181292,
+    "estab_top5": 0.0,
+    "puertas_falladas": [],
+    "puertas_sin_dato": []
+   }
+  ],
+  "fraccion_pasa_puertas": {
+   "jezero_P2": {
+    "n_base": 69966,
+    "n_pasan": 4714,
+    "n_fallan": 54510,
+    "n_puerta_sin_dato": 3498,
+    "n_cobertura_baja": 7244,
+    "fraccion_celdas": 0.06737558242574965,
+    "fraccion_area": 0.07349164008883895,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "ndvi": {
+      "fallan": 52358,
+      "sin_dato": 3985
+     }
+    }
+   },
+   "jezero_P4": {
+    "n_base": 69966,
+    "n_pasan": 57679,
+    "n_fallan": 3731,
+    "n_puerta_sin_dato": 8095,
+    "n_cobertura_baja": 461,
+    "fraccion_celdas": 0.8243861304061973,
+    "fraccion_area": 0.851564806745444,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "relieve": {
+      "fallan": 1518,
+      "sin_dato": 3450
+     }
+    }
+   },
+   "arcadia_P1": {
+    "n_base": 69966,
+    "n_pasan": 528,
+    "n_fallan": 58992,
+    "n_puerta_sin_dato": 10446,
+    "n_cobertura_baja": 0,
+    "fraccion_celdas": 0.007546522596689821,
+    "fraccion_area": 0.005001576767886386,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "permafrost": {
+      "fallan": 11575,
+      "sin_dato": 45472
+     },
+     "aridez": {
+      "fallan": 57293,
+      "sin_dato": 0
+     }
+    }
+   },
+   "shackleton_P3": {
+    "n_base": 69966,
+    "n_pasan": 58066,
+    "n_fallan": 3731,
+    "n_puerta_sin_dato": 8095,
+    "n_cobertura_baja": 74,
+    "fraccion_celdas": 0.8299173884458165,
+    "fraccion_area": 0.8566586350769978,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "relieve": {
+      "fallan": 1518,
+      "sin_dato": 3450
+     }
+    }
+   },
+   "shackleton_P5": {
+    "n_base": 69966,
+    "n_pasan": 58140,
+    "n_fallan": 3731,
+    "n_puerta_sin_dato": 8095,
+    "n_cobertura_baja": 0,
+    "fraccion_celdas": 0.8309750450218678,
+    "fraccion_area": 0.857750586261869,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "relieve": {
+      "fallan": 1518,
+      "sin_dato": 3450
+     }
+    }
+   },
+   "jezero_P1": {
+    "n_base": 69966,
+    "n_pasan": 258,
+    "n_fallan": 58992,
+    "n_puerta_sin_dato": 10446,
+    "n_cobertura_baja": 270,
+    "fraccion_celdas": 0.0036875053597461623,
+    "fraccion_area": 0.004141645331289208,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "permafrost": {
+      "fallan": 11575,
+      "sin_dato": 45472
+     },
+     "aridez": {
+      "fallan": 57293,
+      "sin_dato": 0
+     }
+    }
+   },
+   "tranquillitatis_P4": {
+    "n_base": 69966,
+    "n_pasan": 57679,
+    "n_fallan": 3731,
+    "n_puerta_sin_dato": 8095,
+    "n_cobertura_baja": 461,
+    "fraccion_celdas": 0.8243861304061973,
+    "fraccion_area": 0.851564806745444,
+    "por_puerta": {
+     "casquete": {
+      "fallan": 2232,
+      "sin_dato": 7634
+     },
+     "relieve": {
+      "fallan": 1518,
+      "sin_dato": 3450
+     }
+    }
+   }
+  }
+ },
+ "h3": {
+  "definicion": "predicción de signo: el sitio sube de puesto en el primer perfil frente al segundo; rangos calculados sin aplicar puertas",
+  "aciertos": 1,
+  "de": 9,
+  "exito_texto": "≥ 8/9 y Jaccard del top 1000 < 0,5 entre P1 y P2 y entre P1 y P4",
+  "exito": false,
+  "predicciones": [
+   {
+    "n": 1,
+    "sitio": "mcmurdo_dry_valleys",
+    "sube_en": "P1",
+    "baja_en": "P2",
+    "par_sube": "arcadia_P1",
+    "par_baja": "jezero_P2",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 1.0,
+    "fraccion_area_igual_o_mejor_sube_en": 3.892193126650844e-05,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 2,
+    "sitio": "svalbard_bockfjorden",
+    "sube_en": "P1",
+    "baja_en": "P4",
+    "par_sube": "arcadia_P1",
+    "par_baja": "jezero_P4",
+    "acierto": true,
+    "motivo": null,
+    "S_sube_en": 0.10789484530687332,
+    "fraccion_area_igual_o_mejor_sube_en": 0.982192272890548,
+    "S_baja_en": 0.05000000074505806,
+    "fraccion_area_igual_o_mejor_baja_en": 1.0
+   },
+   {
+    "n": 3,
+    "sitio": "haughton",
+    "sube_en": "P1",
+    "baja_en": "P2",
+    "par_sube": "arcadia_P1",
+    "par_baja": "jezero_P2",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 0.1244906485080719,
+    "fraccion_area_igual_o_mejor_sube_en": 0.8257156634623105,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 4,
+    "sitio": "yungay",
+    "sube_en": "P2",
+    "baja_en": "P1",
+    "par_sube": "jezero_P2",
+    "par_baja": "arcadia_P1",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": null,
+    "fraccion_area_igual_o_mejor_sube_en": null,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 5,
+    "sitio": "dalangtan_qaidam",
+    "sube_en": "P2",
+    "baja_en": "P1",
+    "par_sube": "jezero_P2",
+    "par_baja": "arcadia_P1",
+    "acierto": false,
+    "motivo": null,
+    "S_sube_en": 0.4316856861114502,
+    "fraccion_area_igual_o_mejor_sube_en": 0.07871447833117358,
+    "S_baja_en": 0.6504407525062561,
+    "fraccion_area_igual_o_mejor_baja_en": 0.004767571549880157
+   },
+   {
+    "n": 6,
+    "sitio": "death_valley_badwater",
+    "sube_en": "P2",
+    "baja_en": "P1",
+    "par_sube": "jezero_P2",
+    "par_baja": "arcadia_P1",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 0.3731510639190674,
+    "fraccion_area_igual_o_mejor_sube_en": 0.08899659118112821,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 7,
+    "sitio": "cinder_lake",
+    "sube_en": "P4",
+    "baja_en": "P1",
+    "par_sube": "jezero_P4",
+    "par_baja": "arcadia_P1",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 0.6152865886688232,
+    "fraccion_area_igual_o_mejor_sube_en": 0.31940724610914534,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 8,
+    "sitio": "mojave_silver_lake",
+    "sube_en": "P4",
+    "baja_en": "P1",
+    "par_sube": "jezero_P4",
+    "par_baja": "arcadia_P1",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 0.6592584252357483,
+    "fraccion_area_igual_o_mejor_sube_en": 0.27756298524247885,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   },
+   {
+    "n": 9,
+    "sitio": "haughton",
+    "sube_en": "P3",
+    "baja_en": "P2",
+    "par_sube": "shackleton_P3",
+    "par_baja": "jezero_P2",
+    "acierto": false,
+    "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto",
+    "S_sube_en": 0.22355017066001892,
+    "fraccion_area_igual_o_mejor_sube_en": 0.6767025522363501,
+    "S_baja_en": null,
+    "fraccion_area_igual_o_mejor_baja_en": null
+   }
+  ],
+  "jaccard": {
+   "P1_P2": {
+    "J": 0.005530417295123178,
+    "n_top_a": 1000,
+    "n_top_b": 1000,
+    "pares": [
+     "arcadia_P1",
+     "jezero_P2"
+    ]
+   },
+   "P1_P4": {
+    "J": 0.0005002501250625312,
+    "n_top_a": 1000,
+    "n_top_b": 1000,
+    "pares": [
+     "arcadia_P1",
+     "jezero_P4"
+    ]
+   }
+  },
+  "rango": "puesto = fracción del área (cos lat) de la base con S sin puertas ≥ la del sitio; sube = fracción menor"
+ },
+ "controles": {
+  "rotulo": "comprobación de cordura, no validación",
+  "regla": "0 de 7 en el top 20 % de S en cualquier perfil",
+  "nota": "las puertas los echan antes de puntuar: «0 de 7» es prueba trivial y ya no es condición de éxito (27 §2; 20 cabecera)",
+  "en_top": {
+   "jezero_P2": 0,
+   "jezero_P4": 2,
+   "arcadia_P1": 0,
+   "shackleton_P3": 1,
+   "shackleton_P5": 1
+  },
+  "filas": [
+   {
+    "par": "jezero_P2",
+    "sitio": "manaus",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "kisangani",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "kuching",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "dhaka",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "yangon",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "bergen",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P2",
+    "sitio": "paris",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "manaus",
+    "S": 0.6135076284408569,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.32635494444923224
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "kisangani",
+    "S": 0.47670605778694153,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.4458358290204463
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "kuching",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "dhaka",
+    "S": 0.9078084230422974,
+    "estado": "pasa",
+    "en_top": true,
+    "fraccion_area_igual_o_mejor": 0.056014522290614065
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "yangon",
+    "S": 0.985831618309021,
+    "estado": "pasa",
+    "en_top": true,
+    "fraccion_area_igual_o_mejor": 0.007622986306612003
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "bergen",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "jezero_P4",
+    "sitio": "paris",
+    "S": 0.5405387282371521,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.3935784266196327
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "manaus",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "kisangani",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "kuching",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "dhaka",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "yangon",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "bergen",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "arcadia_P1",
+    "sitio": "paris",
+    "S": 0.0,
+    "estado": "puerta_fallada",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 1.0
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "manaus",
+    "S": 0.29961878061294556,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.2491293989255171
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "kisangani",
+    "S": 0.2524183988571167,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.5298422589820316
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "kuching",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "dhaka",
+    "S": 0.3012488782405853,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.24017187789955374
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "yangon",
+    "S": 0.28164395689964294,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.3537992892863645
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "bergen",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "shackleton_P3",
+    "sitio": "paris",
+    "S": 0.3903295695781708,
+    "estado": "pasa",
+    "en_top": true,
+    "fraccion_area_igual_o_mejor": 0.04583930430894547
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "manaus",
+    "S": 0.1169702559709549,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.41993153216341383
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "kisangani",
+    "S": 0.11359289288520813,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.5286883150719963
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "kuching",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "dhaka",
+    "S": 0.11775586754083633,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.39209086336917826
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "yangon",
+    "S": 0.11432579904794693,
+    "estado": "pasa",
+    "en_top": false,
+    "fraccion_area_igual_o_mejor": 0.5070238296423282
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "bergen",
+    "S": null,
+    "estado": "puerta_sin_dato",
+    "en_top": null,
+    "fraccion_area_igual_o_mejor": null
+   },
+   {
+    "par": "shackleton_P5",
+    "sitio": "paris",
+    "S": 0.13322314620018005,
+    "estado": "pasa",
+    "en_top": true,
+    "fraccion_area_igual_o_mejor": 0.19886881724654853
+   }
+  ]
+ },
+ "descriptivo_polar": {
+  "tipo": "descriptivo, NO prerregistrado, sin umbral",
+  "medida": "percentil por área de S de shackleton + P3 y de shackleton + P5 en la celda de cada sitio de ensayo lunar con coordenadas de datos_json/sitios_ensayo.json",
+  "aviso": "al fijar esto ya se habían visto en la malla los valores de la celda de Haughton (117 días con máxima ≤ −23 °C, f_low 0,36); por eso no es validación",
+  "percentil_area": "100 × área (cos lat) de la base con S ≤ la del sitio / área evaluable",
+  "filas": [
+   {
+    "sitio": "haughton",
+    "par": "shackleton_P3",
+    "S": 0.22355017066001892,
+    "percentil_area": 31.7372326752424,
+    "motivo": null,
+    "lat": 75.3667,
+    "lon": -89.6833,
+    "celda": [
+     330,
+     180
+    ],
+    "estado": "pasa",
+    "S_p5": 0.1678818315267563,
+    "S_p95": 0.2896471321582794,
+    "fraccion_area_igual_o_mejor": 0.6826334726315657
+   },
+   {
+    "sitio": "haughton",
+    "par": "shackleton_P5",
+    "S": 0.4771541357040405,
+    "percentil_area": 97.77901084768,
+    "motivo": null,
+    "lat": 75.3667,
+    "lon": -89.6833,
+    "celda": [
+     330,
+     180
+    ],
+    "estado": "pasa",
+    "S_p5": 0.3243204951286316,
+    "S_p95": 0.7176864147186279,
+    "fraccion_area_igual_o_mejor": 0.02221568381210988
+   },
+   {
+    "sitio": "sp_crater",
+    "par": "shackleton_P3",
+    "S": 0.31092289090156555,
+    "percentil_area": 80.69111670061038,
+    "motivo": null,
+    "lat": 35.5822254,
+    "lon": -111.6318207,
+    "celda": [
+     251,
+     136
+    ],
+    "estado": "pasa",
+    "S_p5": 0.20856280624866486,
+    "S_p95": 0.40630125999450684,
+    "fraccion_area_igual_o_mejor": 0.19310731921990748
+   },
+   {
+    "sitio": "sp_crater",
+    "par": "shackleton_P5",
+    "S": 0.12053018063306808,
+    "percentil_area": 67.55306770829549,
+    "motivo": null,
+    "lat": 35.5822254,
+    "lon": -111.6318207,
+    "celda": [
+     251,
+     136
+    ],
+    "estado": "pasa",
+    "S_p5": 0.07397019863128662,
+    "S_p95": 0.1958463340997696,
+    "fraccion_area_igual_o_mejor": 0.3244877865266467
+   },
+   {
+    "sitio": "mistastin",
+    "par": "shackleton_P3",
+    "S": 0.16292116045951843,
+    "percentil_area": 10.589217143032823,
+    "motivo": null,
+    "lat": 55.883,
+    "lon": -63.3,
+    "celda": [
+     291,
+     233
+    ],
+    "estado": "pasa",
+    "S_p5": 0.12186133861541748,
+    "S_p95": 0.20626568794250488,
+    "fraccion_area_igual_o_mejor": 0.8941206482747446
+   },
+   {
+    "sitio": "mistastin",
+    "par": "shackleton_P5",
+    "S": 0.22597363591194153,
+    "percentil_area": 88.0397369179563,
+    "motivo": null,
+    "lat": 55.883,
+    "lon": -63.3,
+    "celda": [
+     291,
+     233
+    ],
+    "estado": "pasa",
+    "S_p5": 0.17734436690807343,
+    "S_p95": 0.26501601934432983,
+    "fraccion_area_igual_o_mejor": 0.11961543484163238
+   }
+  ]
+ },
+ "denominadores": {
+  "base": "tierra firme evaluable",
+  "regla": "al sur de −60°: fuera, salvo la celda de McMurdo Dry Valleys, que es roca y entra",
+  "celda_con_tierra": "celda cuenta si tierra_frac > 0; candidatos de 20 §2-§3 forzados (20 §7)",
+  "n_celdas_tierra_frac_mayor_0": 97313,
+  "n_celdas_tierra_con_forzadas": 97313,
+  "n_celdas_base": 69966,
+  "referencia_celdas": 67420,
+  "n_celdas_tierra_sur_de_menos_60_fuera": 27347,
+  "peso": "percentiles con peso cos(lat) (20 §7); integracion §3 da area_km2 para pesos por área"
+ },
+ "no_evaluables": [
+  {
+   "prueba": "H1",
+   "sitio": "death_valley_badwater",
+   "motivo": "no evaluable (cierres.sin_resolver): meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+  },
+  {
+   "prueba": "H1",
+   "sitio": "timanfaya",
+   "motivo": "no evaluable: D1 sin_dato en la celda"
+  },
+  {
+   "prueba": "H1",
+   "sitio": "dalangtan_qaidam",
+   "motivo": "no evaluable (cierres.sin_resolver): meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+  },
+  {
+   "prueba": "H1",
+   "sitio": "mauna_kea",
+   "motivo": "no evaluable: D1 sin_dato en la celda"
+  },
+  {
+   "prueba": "k0",
+   "sitio": "mcmurdo_dry_valleys",
+   "motivo": "no evaluable: aridez na por frío en la celda"
+  },
+  {
+   "prueba": "H1-S",
+   "sitio": "yungay",
+   "motivo": "no evaluable: C = 0.544 < 0.7"
+  },
+  {
+   "prueba": "H1-S",
+   "sitio": "death_valley_badwater",
+   "motivo": "par meridiani_P2 no calculado: meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+  },
+  {
+   "prueba": "H1-S",
+   "sitio": "mcmurdo_dry_valleys",
+   "motivo": "no evaluable: C = 0.257 < 0.7"
+  },
+  {
+   "prueba": "H1-S",
+   "sitio": "timanfaya",
+   "motivo": "no evaluable: puerta sin dato (casquete)"
+  },
+  {
+   "prueba": "H1-S",
+   "sitio": "dalangtan_qaidam",
+   "motivo": "par meridiani_P2 no calculado: meridiani: sin coordenadas en umbrales.json; meridiani: D3 sin variables (null en umbrales.json)"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "mcmurdo_dry_valleys",
+   "n": 1,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "haughton",
+   "n": 3,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "yungay",
+   "n": 4,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "death_valley_badwater",
+   "n": 6,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "cinder_lake",
+   "n": 7,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "mojave_silver_lake",
+   "n": 8,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  },
+  {
+   "prueba": "H3",
+   "sitio": "haughton",
+   "n": 9,
+   "motivo": "no evaluable en algún perfil (C < mínima o sin par): cuenta como no acierto"
+  }
+ ],
+ "valores_a_mano": [
+  {
+   "sitio": "mcmurdo_dry_valleys",
+   "variable": "permafrost_frac",
+   "celda": [
+    25,
+    685
+   ],
+   "antes": null,
+   "valor": 1.0
+  }
+ ],
+ "pares_fuera": [
+  {
+   "par": "meridiani_P2",
+   "motivos": [
+    "meridiani: sin coordenadas en umbrales.json",
+    "meridiani: D3 sin variables (null en umbrales.json)"
+   ]
+  }
+ ],
+ "decisiones": [
+  "Puertas con lógica de Kleene: si una puerta falla, la celda falla (S = 0) aunque otra puerta no tenga dato.",
+  "Dimensión con alguna variable sin_dato → sin_dato; variable na se quita de la media; dimensión toda na → sin_dato salvo D5 lunar (única regla na escrita; D4 con aridez na fuera de arcadia es null).",
+  "C = suma de pesos de las dimensiones con estado ok (na no cuenta como dato).",
+  "Monte Carlo: E × factor en escalas T y b × factor en saturaciones con a = 0; soc (1-20 g/kg) y tiempo a ciudad (2-48 h) no se perturban porque umbrales.json no dice cómo aplicar el factor a (a, b) con a ≠ 0; D9 no figura en afecta_a. La evaluabilidad (puertas y C) es la de la corrida central.",
+  "Percentiles de cada celda sobre réplicas: sin peso (todas las réplicas de una celda tienen la misma latitud). Peso cos(lat) en todos los percentiles por área.",
+  "Top por área: el sitio cuenta dentro si el área con valor ≥ el suyo (incluido su grupo de empate) es ≤ al corte.",
+  "Sitios de meridiani (Death Valley, Dalangtan): no evaluables en H1 y H1-S por cierres.sin_resolver; su s de D1 se da como informativo y no cuenta.",
+  "k₀: AI menor = mejor; celdas con aridez na o sin_dato fuera del orden de k₀ y sitio no evaluable en k₀.",
+  "H3: puesto = fracción del área con S sin puertas ≥ la del sitio; empate o no evaluable = no acierto. Jaccard sobre S sin puertas, top 1000 celdas incluyendo empates en el corte.",
+  "Tierra forzada en las 11 celdas de validación (20 §7). Base del denominador: tierra al norte de −60° más la celda de McMurdo.",
+  "Valor a mano aplicado: permafrost_frac = 1,0 en la celda de McMurdo. Bockfjorden: null en umbrales.json → se usa la malla."
+ ],
+ "sin_verificar": [
+  "H2 no se calcula aquí (revisión a mano de imágenes y literatura).",
+  "pieza_ensayable_aqui (20 % de §16) no se calcula aquí; sale de s_* y c_*.",
+  "Error del dato no perturbado en Monte Carlo (cierre n.º 4)."
+ ]
+}

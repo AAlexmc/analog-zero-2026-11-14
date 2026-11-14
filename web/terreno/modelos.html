@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero · 3D models</title>
+<link rel="stylesheet" href="estilo.css">
+<style>
+  body { overflow: auto; height: auto; }
+  main { padding: 10px 14px 30px; display: flex; flex-direction: column; gap: 18px; }
+  section > .et { display: block; padding-bottom: 4px; margin-bottom: 8px; border-bottom: 1px solid var(--linea); }
+  section > .tenue { margin: -4px 0 8px; }
+  .fila { display: flex; flex-wrap: wrap; gap: 12px; }
+  .tarjeta-modelo { width: 340px; border: 1px solid var(--linea); display: flex; flex-direction: column; }
+  .tarjeta-modelo canvas, .tarjeta-modelo .hueco-modelo { width: 340px; height: 255px; border-bottom: 1px solid var(--linea); }
+  .tarjeta-modelo canvas { display: block; }
+  .hueco-modelo { display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; color: var(--tenue);
+    background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(233, 240, 245, .04) 10px 20px); }
+  .tarjeta-modelo .txt { padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
+  .tarjeta-modelo h3 { margin: 0; font: 600 14px/1.15 var(--sans); }
+  .tarjeta-modelo .clase { font-weight: bold; letter-spacing: .08em; text-transform: uppercase; font-size: 10px; }
+  .tarjeta-modelo .sustituto { color: var(--ambar); font-weight: bold; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
+</script>
+</head>
+<body>
+<header class="barra">
+  <a class="marca" href="../index.html">ANALOG ZERO</a>
+  <span class="et">3D MODELS · CATALOGUE</span>
+  <span class="tenue">each card at true scale with a 1.8 m figure (amber) · grid 1 m, 5 m on large items</span>
+  <span class="hueco"></span>
+  <a class="et" href="index.html">Terrain viewer</a>
+</header>
+<main>
+  <section><span class="et">NASA official 3D models · Credit: NASA</span><div class="fila" id="oficiales"></div></section>
+  <section><span class="et">Schematic · built from published dimensions</span>
+    <div class="tenue">Drawn in code. Each dimension is either cited (a figure with source in the equipment catalogue) or illustrative. No cited size → not drawn.</div>
+    <div class="fila" id="esquematicos"></div></section>
+  <section><span class="et">Analog Zero concept · own design, assumed dimensions</span>
+    <div class="tenue">Our own designs (conceptos.json). Every dimension is an assumption, not a published figure.</div>
+    <div class="fila" id="conceptos"></div></section>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import { catalogoModelos, cargarModelo, figuraHumana, rotuloModelo, medidaTexto } from './modelo3d.js';
+import { construirEsquematico, construirConcepto } from './modelos_generados.js';
+
+const estado = { listo: false, tarjetas: [], errores: [] };
+window.__modelos = estado;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const W = 340, H = 255, PR = 2;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(PR);
+renderer.setSize(W, H, false);
+renderer.setClearColor(0x021226);
+
+// Modelo + figura sobre un plano con rejilla, vista axonométrica encuadrada; se copia a un lienzo 2D por tarjeta.
+function dibujar(base) {
+  const escena = new THREE.Scene();
+  const sol = new THREE.DirectionalLight(0xffffff, 2.5);
+  sol.position.set(4, 8, 3);
+  escena.add(new THREE.HemisphereLight(0xdfe8f0, 0x30363d, 2), sol);
+  const modelo = base.clone(true);
+  escena.add(modelo);
+  const cm = new THREE.Box3().setFromObject(modelo), tm = cm.getSize(new THREE.Vector3());
+  const luz = Math.max(tm.x, tm.y, tm.z);
+  const persona = figuraHumana();
+  persona.position.set(cm.max.x + Math.max(0.6, 0.06 * luz), 0, cm.max.z * 0.3);
+  escena.add(persona);
+  const todo = new THREE.Box3().setFromObject(escena);
+  const celda = Math.max(todo.max.x - todo.min.x, todo.max.z - todo.min.z) > 30 ? 5 : 1;
+  const lado = Math.ceil((Math.max(todo.max.x - todo.min.x, todo.max.z - todo.min.z) * 1.3 + 2) / celda) * celda;
+  const suelo = new THREE.Mesh(new THREE.PlaneGeometry(lado, lado).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x59636e, roughness: 1 }));
+  const rejilla = new THREE.GridHelper(lado, lado / celda, 0x8fa9c0, 0x8fa9c0);
+  rejilla.material.transparent = true; rejilla.material.opacity = 0.45;
+  rejilla.position.y = 0.003;
+  const c = todo.getCenter(new THREE.Vector3());
+  suelo.position.set(c.x, 0, c.z); rejilla.position.x = c.x; rejilla.position.z = c.z;
+  escena.add(suelo, rejilla);
+  const dir = new THREE.Vector3(1, 0.75, 1.5).normalize();
+  const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 10000);
+  cam.position.copy(c).addScaledVector(dir, 4 * luz + 20);
+  cam.lookAt(c);
+  cam.updateMatrixWorld();
+  const lo = new THREE.Vector2(Infinity, Infinity), hi = new THREE.Vector2(-Infinity, -Infinity);
+  for (const x of [todo.min.x, todo.max.x]) for (const y of [todo.min.y, todo.max.y]) for (const z of [todo.min.z, todo.max.z]) {
+    const p = new THREE.Vector3(x, y, z).applyMatrix4(cam.matrixWorldInverse);
+    lo.min(p); hi.max(p);
+  }
+  const cx = (lo.x + hi.x) / 2, cy = (lo.y + hi.y) / 2;
+  let w = (hi.x - lo.x) * 1.15, h = (hi.y - lo.y) * 1.15;
+  if (w / h > W / H) h = (w * H) / W; else w = (h * W) / H;
+  Object.assign(cam, { left: cx - w / 2, right: cx + w / 2, top: cy + h / 2, bottom: cy - h / 2 });
+  cam.updateProjectionMatrix();
+  renderer.render(escena, cam);
+  const lienzo = document.createElement('canvas');
+  lienzo.width = W * PR; lienzo.height = H * PR;
+  lienzo.getContext('2d').drawImage(renderer.domElement, 0, 0);
+  suelo.geometry.dispose(); suelo.material.dispose(); rejilla.geometry.dispose(); rejilla.material.dispose();
+  return { lienzo, celda };
+}
+
+function tarjeta(destino, { id, clase, nombre, base, lineas, medida }) {
+  const el = document.createElement('div');
+  el.className = 'tarjeta-modelo';
+  el.dataset.id = id;
+  let celda = null;
+  if (base) { const d = dibujar(base); el.append(d.lienzo); celda = d.celda; } else el.insertAdjacentHTML('beforeend', `<div class="hueco-modelo">no 3D model drawn</div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="txt"><span class="clase">${esc(clase)}</span><h3>${esc(nombre)}</h3>${lineas.join('')}
+    ${base ? `<div class="tenue"><span class="num">${esc(medidaTexto(medida))}</span> (length × width × height) · figure 1.8 m · grid ${celda} m</div>` : ''}</div>`);
+  destino.append(el);
+  estado.tarjetas.push({ id, clase, dibujado: !!base, medida, texto: el.querySelector('.txt').textContent.replace(/\s+/g, ' ').trim() });
+}
+
+try {
+  const cat = await catalogoModelos();
+  if (cat.error) estado.errores.push(cat.error);
+  if (cat.errorGenerados) estado.errores.push(cat.errorGenerados);
+  const eqDe = (id) => cat.equipos?.find((q) => q.id === id);
+  for (const m of cat.lista) {
+    let datos = null;
+    try { datos = await cargarModelo(m.fichero); } catch (e) { estado.errores.push(`${m.fichero}: ${e.message}`); }
+    const r = rotuloModelo(m, eqDe(m.equipo));
+    tarjeta(document.getElementById('oficiales'), {
+      id: m.id, clase: 'NASA official 3D model', nombre: r.titulo, base: datos?.base ?? null,
+      medida: datos ? [Math.max(datos.tam.x, datos.tam.z), Math.min(datos.tam.x, datos.tam.z), datos.tam.y] : null,
+      lineas: [r.sustituto ? `<div class="sustituto">${esc(r.sustituto)}</div>` : '', datos ? '' : '<div class="error-modelo">3D model failed to load</div>',
+        `<div class="tenue">Credit: NASA · <a href="${esc(m.fuente_url)}" target="_blank" rel="noopener">science.nasa.gov</a></div>`],
+    });
+  }
+  for (const eq of cat.equipos ?? []) {
+    if (eq.origen === 'mío') continue;
+    const r = construirEsquematico(eq, cat.conceptos);
+    const oficial = cat.lista.find((m) => m.equipo === eq.id);
+    tarjeta(document.getElementById('esquematicos'), {
+      id: eq.id, clase: r.titulo, nombre: eq.nombre, base: r.base, medida: r.medida,
+      lineas: [`<div>${esc(r.linea)}</div>`, oficial ? `<div class="tenue">in the viewer this system shows the NASA ${esc(oficial.nombre_real)} model instead</div>` : ''],
+    });
+  }
+  for (const c of cat.conceptos?.conceptos ?? []) {
+    const r = construirConcepto(c.id, {}, cat.conceptos);
+    tarjeta(document.getElementById('conceptos'), {
+      id: c.id, clase: r.titulo, nombre: c.nombre, base: r.base, medida: r.medida,
+      lineas: [`<div>${esc(r.linea)}</div>`, `<div class="tenue">${esc(c.descripcion)}</div>`],
+    });
+  }
+} catch (e) {
+  estado.errores.push(e.message);
+}
+for (const e of estado.errores) document.querySelector('main').insertAdjacentHTML('afterbegin', `<div class="error-modelo">${esc(e)}</div>`);
+estado.listo = true;
+</script>
+</body>
+</html>

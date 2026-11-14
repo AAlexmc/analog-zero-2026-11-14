@@ -1,0 +1,64 @@
+{
+ "terrenos": [
+  {
+   "id": "shackleton",
+   "cuerpo": "luna",
+   "nombre": "Shackleton crater, lunar south pole",
+   "lado_km": 40.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "haughton",
+   "cuerpo": "tierra",
+   "nombre": "Haughton impact crater, Devon Island, Canada",
+   "lado_km": 40.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "polo_sur",
+   "cuerpo": "luna",
+   "nombre": "Lunar south pole region",
+   "lado_km": 300.0,
+   "escala": "regional"
+  },
+  {
+   "id": "shackleton_borde",
+   "cuerpo": "luna",
+   "nombre": "Shackleton rim, most illuminated point",
+   "lado_km": 10.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "sp_crater",
+   "cuerpo": "tierra",
+   "nombre": "S P Crater, San Francisco volcanic field, Arizona",
+   "lado_km": 40.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "mistastin",
+   "cuerpo": "tierra",
+   "nombre": "Mistastin Lake impact structure, Labrador, Canada",
+   "lado_km": 40.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "shoemaker",
+   "cuerpo": "luna",
+   "nombre": "Shoemaker crater, lunar south pole",
+   "lado_km": 70.0,
+   "escala": "sitio"
+  },
+  {
+   "id": "cresta_shackleton_gerlache",
+   "cuerpo": "luna",
+   "nombre": "Shackleton–de Gerlache connecting ridge",
+   "lado_km": 40.0,
+   "escala": "sitio"
+  }
+ ],
+ "pareja_inicial": {
+  "tierra": "haughton",
+  "luna": "shackleton"
+ }
+}

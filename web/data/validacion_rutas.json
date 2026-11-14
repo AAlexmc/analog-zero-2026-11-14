@@ -1,0 +1,220 @@
+{
+ "comando": "python scripts/validar_rutas.py",
+ "terreno": "shackleton",
+ "n": 1024,
+ "m_por_px": 39.0625,
+ "altura_sha256": "b0608497d69350b4ef7ee091f3a2c7d725ff9edac82d100c58872e38e318b8bb",
+ "rutas_js_sha256": "3142ec667a2052deb6a233942aa6d82123ab13722df4743d3e47029a1f9d138b",
+ "vehiculo": "ltv",
+ "limite_pendiente_deg": 20.0,
+ "limite_fuente": "https://www.nasa.gov/moonbase-systems/",
+ "definicion_coste": "step = sqrt((L*m)^2 + dh^2) * (w_a + w_b)/2, L = 1 or sqrt(2), w = shadow factor on permanent-shadow cells else 1; cell passable if finite and cell slope <= limit",
+ "metodo_referencia": "skimage.graph.MCP_Flexible with travel_cost overridden by the same step formula (scikit-image 0.26.0)",
+ "pendiente_numpy_vs_js_max_abs_deg": 1.9073473680464303e-06,
+ "celdas_transitables_distintas_numpy_vs_js": 0,
+ "pares": [
+  {
+   "par": "P0 rim → Q1 NW",
+   "factor_sombra": 1.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    256,
+    256
+   ],
+   "coste_js_m": 11784.65594604878,
+   "coste_skimage_mismo_coste_m": 11784.655946048777,
+   "dif_rel": 3.087047109178842e-16,
+   "coste_skimage_geometric_m": 11979.081089174997,
+   "dif_rel_geometric": 0.01623038876512076,
+   "celdas_ruta_js": 254,
+   "ms_js": 15.1,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q2 NE",
+   "factor_sombra": 1.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    256,
+    768
+   ],
+   "coste_js_m": 27372.90663555976,
+   "coste_skimage_mismo_coste_m": 27372.90663555975,
+   "dif_rel": 3.9871309856064026e-16,
+   "coste_skimage_geometric_m": 27569.666680399696,
+   "dif_rel_geometric": 0.007136830746663301,
+   "celdas_ruta_js": 600,
+   "ms_js": 17.1,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q3 SW",
+   "factor_sombra": 1.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    768,
+    256
+   ],
+   "coste_js_m": 10776.074422317757,
+   "coste_skimage_mismo_coste_m": 10776.07442231776,
+   "dif_rel": 3.375977804642186e-16,
+   "coste_skimage_geometric_m": 10877.816405894615,
+   "dif_rel_geometric": 0.009353162416100765,
+   "celdas_ruta_js": 269,
+   "ms_js": 5.6,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q4 SE",
+   "factor_sombra": 1.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    768,
+    768
+   ],
+   "coste_js_m": 27601.467910589352,
+   "coste_skimage_mismo_coste_m": 27601.467910589374,
+   "dif_rel": 7.908228980160855e-16,
+   "coste_skimage_geometric_m": 27902.857097194512,
+   "dif_rel_geometric": 0.0108013736928561,
+   "celdas_ruta_js": 634,
+   "ms_js": 11.9,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "Q1 NW → Q4 SE",
+   "factor_sombra": 1.0,
+   "origen_fila_col": [
+    256,
+    256
+   ],
+   "destino_fila_col": [
+    768,
+    768
+   ],
+   "coste_js_m": 38794.98560726141,
+   "coste_skimage_mismo_coste_m": 38794.98560726142,
+   "dif_rel": 1.8754891902373987e-16,
+   "coste_skimage_geometric_m": 39106.934382624844,
+   "dif_rel_geometric": 0.007976814861305763,
+   "celdas_ruta_js": 876,
+   "ms_js": 28.0,
+   "s_skimage_flexible": 0.7
+  },
+  {
+   "par": "P0 rim → Q1 NW",
+   "factor_sombra": 3.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    256,
+    256
+   ],
+   "coste_js_m": 11787.929782895357,
+   "coste_skimage_mismo_coste_m": 11787.929782895353,
+   "dif_rel": 3.086189750103985e-16,
+   "coste_skimage_geometric_m": 11982.210377685453,
+   "dif_rel_geometric": 0.01621408643866795,
+   "celdas_ruta_js": 254,
+   "ms_js": 11.3,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q2 NE",
+   "factor_sombra": 3.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    256,
+    768
+   ],
+   "coste_js_m": 28268.4175449461,
+   "coste_skimage_mismo_coste_m": 28268.417544946125,
+   "dif_rel": 9.008587625802499e-16,
+   "coste_skimage_geometric_m": 28541.426686507755,
+   "dif_rel_geometric": 0.00956536421813537,
+   "celdas_ruta_js": 607,
+   "ms_js": 12.1,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q3 SW",
+   "factor_sombra": 3.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    768,
+    256
+   ],
+   "coste_js_m": 10821.484287699557,
+   "coste_skimage_mismo_coste_m": 10821.484287699555,
+   "dif_rel": 1.680905645830346e-16,
+   "coste_skimage_geometric_m": 10938.243320855843,
+   "dif_rel_geometric": 0.010674386163421937,
+   "celdas_ruta_js": 269,
+   "ms_js": 3.9,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "P0 rim → Q4 SE",
+   "factor_sombra": 3.0,
+   "origen_fila_col": [
+    500,
+    246
+   ],
+   "destino_fila_col": [
+    768,
+    768
+   ],
+   "coste_js_m": 27607.440105288195,
+   "coste_skimage_mismo_coste_m": 27607.44010528821,
+   "dif_rel": 5.271012152111644e-16,
+   "coste_skimage_geometric_m": 27939.50037605378,
+   "dif_rel_geometric": 0.011884975260695268,
+   "celdas_ruta_js": 634,
+   "ms_js": 4.0,
+   "s_skimage_flexible": 0.5
+  },
+  {
+   "par": "Q1 NW → Q4 SE",
+   "factor_sombra": 3.0,
+   "origen_fila_col": [
+    256,
+    256
+   ],
+   "destino_fila_col": [
+    768,
+    768
+   ],
+   "coste_js_m": 38901.8119069176,
+   "coste_skimage_mismo_coste_m": 38901.81190691762,
+   "dif_rel": 3.740678008311277e-16,
+   "coste_skimage_geometric_m": 39255.89647245732,
+   "dif_rel_geometric": 0.009019907768203767,
+   "celdas_ruta_js": 876,
+   "ms_js": 23.8,
+   "s_skimage_flexible": 0.7
+  }
+ ],
+ "max_dif_rel": 9.008587625802499e-16,
+ "max_dif_rel_geometric": 0.01623038876512076,
+ "nota_geometric": "MCP_Geometric only takes a per-cell cost averaged over the two cells of a step; here c = m*w/cos(cell slope). That is the isotropic surface stretch, not the Δh of the step, so it overestimates steps along contours: a known difference of definition, published as is."
+}

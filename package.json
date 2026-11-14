@@ -1,0 +1,9 @@
+{
+  "name": "analog-zero",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "playwright": "1.65.0",
+    "three": "0.187.0"
+  }
+}

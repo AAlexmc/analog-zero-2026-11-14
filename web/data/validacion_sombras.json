@@ -1,0 +1,178 @@
+{
+ "pregunta": "Does the viewer's cast-shadow model (web/terreno/calculo.js), averaged over all Sun positions, reproduce the official LOLA mean illumination and permanent-shadow maps?",
+ "protocolo": "pipeline/validacion_sombras/PROTOCOLO.md",
+ "oficial": {
+  "iluminacion": {
+   "producto": "AVGVISIB_85S_060M_201608",
+   "etiqueta": "http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/AVGVISIB_85S_060M_201608.LBL",
+   "cita_etiqueta": [
+    "indicate the percentage of timesteps where each pixel was sunlit (by any fraction of the solar disc)",
+    "The calculations are based on the LOLA elevation map LDEM_85S_060M and are described in [MAZARICOETAL2011]"
+   ],
+   "pagina": "https://pgda.gsfc.nasa.gov/products/69",
+   "cita_pagina": [
+    "computed the illumination conditions at the lunar poles over an entire lunar nutation cycle (~18.6 years) with a timestep of one hour",
+    "Because our light source is not a point but rather a finite disc"
+   ]
+  },
+  "sombra_permanente": {
+   "producto": "LPSR_85S_060M_201608",
+   "etiqueta": "http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_85S_060M_201608.LBL",
+   "cita_etiqueta": [
+    "The values are binary, indicating whether a pixel is in permanent shadow (1) or not (0)."
+   ]
+  }
+ },
+ "parametros": {
+  "pasoAz": 5,
+  "fases": 36,
+  "oblicuidad": 1.54,
+  "radioSol": 0.26652777777777775,
+  "muestras": 1296,
+  "unidades": {
+   "pasoAz": "deg of subsolar longitude",
+   "oblicuidad": "deg",
+   "radioSol": "deg"
+  },
+  "fuentes": {
+   "oblicuidad": [
+    "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (Obliquity to orbit 6.68 − Inclination to ecliptic 5.145 = 1.535°)",
+    "https://en.wikipedia.org/wiki/Moon (\"axial tilt with respect to the ecliptic is 1.5427°\")"
+   ],
+   "radioSol": [
+    "https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html (Apparent diameter from Earth at 1 A.U. 1919 arcsec)"
+   ]
+  },
+  "margen_borde_m": 30000.0,
+  "nunca_iluminada": "model fraction == 0 over all samples",
+  "sesgo": "model − official"
+ },
+ "supuestos": [
+  {
+   "origen": "mío",
+   "texto": "Subsolar longitude uniform and subsolar latitude arcsine-distributed (δ = ε·sin φ, φ uniform), independent of each other, over the 18.6-year average."
+  },
+  {
+   "origen": "mío",
+   "texto": "Earth-Moon parallax of the Sun (~0.15°), librations and Sun-distance changes ignored; apparent solar radius fixed at 1919″/2 (NASA Sun Fact Sheet, 1 AU)."
+  },
+  {
+   "origen": "mío",
+   "texto": "Sun below the tangent plane of the crop centre: sombras() clamps elevation to 0, so the terrain is tilted toward the Sun by tan|el| and sombras() is called at elevation 0 (equivalence tested for el > 0)."
+  }
+ ],
+ "terrenos": {
+  "polo_sur": {
+   "rol": "primary",
+   "lado_km": 300.0,
+   "m_por_px": 146.484375,
+   "margen_borde_m": 30000.0,
+   "centro_rejilla": {
+    "lat": -90,
+    "lon": 0
+   },
+   "sha256": {
+    "altura": "32be3db216ca4b8ef2cb5368b8b17971fae153c2661e58beeab7a7f629f08009",
+    "iluminacion": "e2fcc3f24d9da1be3767c654d823d3a6fd5bd28602f173388b38adbd691f022d",
+    "sombra_permanente": "5b9897935557f8d8e1bfe07cd2671a8e7db9b17fce2ed953e89f53af6442327c",
+    "calculo_js": "e96099c31e0e072987760dca59258fcc5fa54005fdf9f60c8bee51beda9d2c7d"
+   },
+   "elevacion_pasada_deg": {
+    "min": -1.2676120572835141,
+    "max": 1.8006676128390695
+   },
+   "segundos_calculo": 12.697,
+   "metricas": {
+    "iluminacion": {
+     "celdas": 2683044,
+     "pearson": 0.9914501982631997,
+     "spearman": 0.9923327534314795,
+     "error_abs_medio": 0.00909689449829047,
+     "sesgo_medio": 0.007029107281670501
+    },
+    "sombra_permanente": {
+     "celdas": 2683043,
+     "modelo": 365127,
+     "oficial": 348650,
+     "ambas": 337062,
+     "precision": 0.92313633338537,
+     "exhaustividad": 0.9667632295998853,
+     "iou": 0.8947400554796066
+    }
+   },
+   "figuras": [
+    "build/validacion_sombras/polo_sur/modelo.png",
+    "build/validacion_sombras/polo_sur/oficial.png",
+    "build/validacion_sombras/polo_sur/diferencia.png",
+    "build/validacion_sombras/polo_sur/dispersion.png"
+   ]
+  },
+  "shackleton": {
+   "rol": "secondary: no relief outside the crop, so no far horizon",
+   "lado_km": 40.0,
+   "m_por_px": 39.0625,
+   "margen_borde_m": 0.0,
+   "centro_rejilla": {
+    "lat": -89.67,
+    "lon": 129.77999999999997
+   },
+   "sha256": {
+    "altura": "b0608497d69350b4ef7ee091f3a2c7d725ff9edac82d100c58872e38e318b8bb",
+    "iluminacion": "127a46745f9064ee369d80dc0e3d61e72db4b2d759483175622479bd341f1c7a",
+    "sombra_permanente": "44e744b8d73d104d8100318e2ba821997ba6d8385304022d447f30a387ff3a79",
+    "calculo_js": "e96099c31e0e072987760dca59258fcc5fa54005fdf9f60c8bee51beda9d2c7d"
+   },
+   "elevacion_pasada_deg": {
+    "min": -1.5976096242095663,
+    "max": 2.130665179765122
+   },
+   "segundos_calculo": 2.68,
+   "metricas": {
+    "iluminacion": {
+     "celdas": 1048576,
+     "pearson": 0.8328866411471023,
+     "spearman": 0.7872437298801868,
+     "error_abs_medio": 0.08197407033674572,
+     "sesgo_medio": 0.07630176717856438
+    },
+    "sombra_permanente": {
+     "celdas": 1048574,
+     "modelo": 181350,
+     "oficial": 195229,
+     "ambas": 175235,
+     "precision": 0.9662806727322857,
+     "exhaustividad": 0.8975869363670357,
+     "iou": 0.8703264065479974
+    }
+   },
+   "figuras": [
+    "build/validacion_sombras/shackleton/modelo.png",
+    "build/validacion_sombras/shackleton/oficial.png",
+    "build/validacion_sombras/shackleton/diferencia.png",
+    "build/validacion_sombras/shackleton/dispersion.png"
+   ]
+  },
+  "polo_sur_en_huella_shackleton": {
+   "rol": "secondary: polo_sur model (with far horizon, 146 m/px) restricted to the shackleton footprint",
+   "metricas": {
+    "iluminacion": {
+     "celdas": 74529,
+     "pearson": 0.9611622901712654,
+     "spearman": 0.9593344703571277,
+     "error_abs_medio": 0.0204368006920742,
+     "sesgo_medio": 0.018672484808185015
+    },
+    "sombra_permanente": {
+     "celdas": 74529,
+     "modelo": 13226,
+     "oficial": 13848,
+     "ambas": 12881,
+     "precision": 0.9739150158778164,
+     "exhaustividad": 0.9301704217215483,
+     "iou": 0.9075600648206863
+    }
+   }
+  }
+ },
+ "comando": "node scripts/validar_sombras.mjs"
+}

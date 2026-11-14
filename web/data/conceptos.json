@@ -1,0 +1,69 @@
+{
+  "aviso": "Analog Zero's own designs (origen: mío). No dimension here is published by NASA or anyone else: every parameter is an assumption (supuesto: true) used only to draw the concept at a plausible size. For celda_verde, a cifra of the same name in equipo.json overrides the value here.",
+  "conceptos": [
+    {
+      "id": "nivelador",
+      "nombre": "Grader-compactor robot",
+      "origen": "mío",
+      "equipo": null,
+      "descripcion": "Tracked robot that cuts high spots with a front blade and compacts the regolith with a rear roller, to prepare pads and roads.",
+      "parametros": [
+        { "nombre": "largo_m", "etiqueta": "length", "valor": 2.6, "unidad": "m", "supuesto": true },
+        { "nombre": "ancho_m", "etiqueta": "width (blade)", "valor": 1.8, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_m", "etiqueta": "height", "valor": 1.3, "unidad": "m", "supuesto": true },
+        { "nombre": "diametro_rodillo_m", "etiqueta": "roller diameter", "valor": 0.7, "unidad": "m", "supuesto": true }
+      ]
+    },
+    {
+      "id": "planta_agua_concepto",
+      "nombre": "Water plant (extractor, electrolyser, two tanks)",
+      "origen": "mío",
+      "equipo": null,
+      "descripcion": "Regolith extractor with feed hopper, electrolyser with radiator fins and two storage tanks, connected by pipes.",
+      "parametros": [
+        { "nombre": "largo_m", "etiqueta": "length", "valor": 7, "unidad": "m", "supuesto": true },
+        { "nombre": "ancho_m", "etiqueta": "width", "valor": 3, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_m", "etiqueta": "height", "valor": 2.8, "unidad": "m", "supuesto": true },
+        { "nombre": "diametro_deposito_m", "etiqueta": "tank diameter", "valor": 1.2, "unidad": "m", "supuesto": true }
+      ]
+    },
+    {
+      "id": "deposito_propelente",
+      "nombre": "Propellant tank",
+      "origen": "mío",
+      "equipo": null,
+      "descripcion": "Horizontal tank with hemispherical ends on two saddles.",
+      "parametros": [
+        { "nombre": "largo_m", "etiqueta": "length", "valor": 8, "unidad": "m", "supuesto": true },
+        { "nombre": "diametro_m", "etiqueta": "diameter", "valor": 3, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_apoyos_m", "etiqueta": "saddle clearance", "valor": 0.5, "unidad": "m", "supuesto": true }
+      ]
+    },
+    {
+      "id": "tramo_carretera",
+      "nombre": "Road segment",
+      "origen": "mío",
+      "equipo": null,
+      "descripcion": "Compacted slab with a berm on each side; width and length are parameters.",
+      "parametros": [
+        { "nombre": "largo_m", "etiqueta": "length", "valor": 20, "unidad": "m", "supuesto": true },
+        { "nombre": "ancho_m", "etiqueta": "carriageway width", "valor": 6, "unidad": "m", "supuesto": true },
+        { "nombre": "espesor_m", "etiqueta": "slab thickness", "valor": 0.2, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_berma_m", "etiqueta": "berm height", "valor": 0.5, "unidad": "m", "supuesto": true },
+        { "nombre": "ancho_berma_m", "etiqueta": "berm width", "valor": 1.2, "unidad": "m", "supuesto": true }
+      ]
+    },
+    {
+      "id": "celda_verde",
+      "nombre": "Green cell (dome on a hexagonal base)",
+      "origen": "mío",
+      "equipo": "celda_verde",
+      "descripcion": "Hexagonal greenhouse module: walled hexagonal base with a faceted transparent dome and growing trays.",
+      "parametros": [
+        { "nombre": "ancho_entre_caras_m", "etiqueta": "across flats", "valor": 3.6, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_base_m", "etiqueta": "wall height", "valor": 2.2, "unidad": "m", "supuesto": true },
+        { "nombre": "alto_cupula_m", "etiqueta": "dome height", "valor": 1.4, "unidad": "m", "supuesto": true }
+      ]
+    }
+  ]
+}

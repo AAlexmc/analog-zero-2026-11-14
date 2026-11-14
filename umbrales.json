@@ -1,0 +1,1665 @@
+{
+ "version": "1",
+ "descripcion": "Umbrales, escalas, pesos, puertas, objetivos con sus valores citados, listas de validación y comprobaciones, fijados antes de calcular resultados. Transcripción de los documentos de diseño; donde no hay valor escrito va null con nota. Sustituye a perfiles.json y validacion.json (27 §1).",
+ "fuentes_de_diseno": [
+  {
+   "bloque": "precedencia",
+   "fuente": "encargo U1",
+   "texto": "27 §12-§18 > 27 §1-§11 > piezas/00-contrato.md > 20-metrica-v2.md > piezas/integracion.md §3 > piezas/03-motor.md, piezas/04-validacion.md"
+  },
+  {
+   "bloque": "variables",
+   "fuente": "piezas/integracion.md §3; 27 §5 y §12 (pH fuera, opacidad fuera, cráter fuera)"
+  },
+  {
+   "bloque": "funciones y agregacion",
+   "fuente": "20-metrica-v2.md §1.1; 27 §12 (suelo y cobertura)"
+  },
+  {
+   "bloque": "dimensiones",
+   "fuente": "27 §12 (tabla para transcribir, D1, D3, D4 según objetivo, rugosidad), §13 (aridez en frío), §4-§5; 20 §1.2 y §1.3"
+  },
+  {
+   "bloque": "misiones",
+   "fuente": "27 §3, §12 (relieve, pesos base polar, puerta sin dato), §13 (puerta de perforar hielo); 20 §4.1-§4.2; 00-contrato.md §3-§4"
+  },
+  {
+   "bloque": "objetivos",
+   "fuente": "27 §1, §5, §12, §15; 20 §1.2 y §5.2; 00-contrato.md §4"
+  },
+  {
+   "bloque": "pares",
+   "fuente": "27 §14; decisión previa al hash (par_inicial)"
+  },
+  {
+   "bloque": "validacion",
+   "fuente": "27 §2, §12, §13, §17; 20 §2, §6.1-§6.3, §7; verif/P34-permafrost-mcmurdo.md"
+  },
+  {
+   "bloque": "monte_carlo",
+   "fuente": "20 §6.4, §1.2, §9; piezas/03-motor.md"
+  },
+  {
+   "bloque": "comprobaciones",
+   "fuente": "27 §6, §7, §8, §15; verif/P22-crecimiento-cultivo.md; verif/P23-optimizacion-topologica.md §1.2"
+  },
+  {
+   "bloque": "energia",
+   "fuente": "27 §15, §7; 00-contrato.md §4 (semilla.json)"
+  },
+  {
+   "bloque": "pieza_ensayable_aqui",
+   "fuente": "27 §16, §12"
+  }
+ ],
+ "convenciones": {
+  "malla": "0,5° × 0,5°, 720 × 360, centros de celda; latitud −89,75 a 89,75 en malla.nc",
+  "longitud": "−180 a 180 en todo",
+  "sin_dato": "null o NaN, nunca 0",
+  "estados": [
+   "ok",
+   "na",
+   "sin_dato"
+  ],
+  "na_no_es_sin_dato": "na = la variable no aplica (p. ej. viento en la Luna, aridez por frío); sin_dato = falta el dato",
+  "origen_mio": "cada escala o criterio propio lleva origen \"mío\" y no lleva enlace",
+  "fuente": "00-contrato.md §2"
+ },
+ "variables": {
+  "tierra_frac": {
+   "unidad": "0-1",
+   "dimension": null,
+   "sale_de": "máscara",
+   "nota": "celda cuenta si > 0"
+  },
+  "area_km2": {
+   "unidad": "km²",
+   "dimension": null,
+   "sale_de": "geometría",
+   "nota": "pesos por área"
+  },
+  "elev_m": {
+   "unidad": "m",
+   "dimension": null,
+   "sale_de": "GMTED",
+   "nota": "media de celda"
+  },
+  "litologia_glim": {
+   "unidad": "clase",
+   "dimension": "D1",
+   "sale_de": "GLiM",
+   "nota": "tabla 20 §1.3"
+  },
+  "soc_g_kg": {
+   "unidad": "g/kg",
+   "dimension": "D1",
+   "sale_de": "SoilGrids",
+   "nota": "0-5 cm"
+  },
+  "ph_h2o": {
+   "unidad": "pH",
+   "dimension": null,
+   "sale_de": "SoilGrids",
+   "nota": "0-5 cm. Fuera de la métrica; solo se enseña en la hoja (27 §12)"
+  },
+  "rugosidad_tan": {
+   "unidad": "tangente",
+   "dimension": "D2",
+   "sale_de": "GMTED",
+   "nota": "mediana de pendiente diferencial, baseline ≈ 0,6 km"
+  },
+  "nv_dias_m23c": {
+   "unidad": "días/año",
+   "dimension": "D3",
+   "sale_de": "POWER diario T2M_MAX",
+   "nota": "días con máxima ≤ −23 °C"
+  },
+  "nv_dias_0c": {
+   "unidad": "días/año",
+   "dimension": "D3",
+   "sale_de": "POWER diario T2M_MAX",
+   "nota": "días con máxima ≤ 0 °C"
+  },
+  "amplitud_diurna_k": {
+   "unidad": "K",
+   "dimension": "D3",
+   "sale_de": "POWER T2M_MAX − T2M_MIN",
+   "nota": null
+  },
+  "f_low": {
+   "unidad": "0-1",
+   "dimension": "D3",
+   "sale_de": "solo latitud",
+   "nota": "geometría, sin dato externo"
+  },
+  "radiacion_kwh_m2_dia": {
+   "unidad": "kWh/m²·día",
+   "dimension": "energia",
+   "sale_de": "POWER ALLSKY_SFC_SW_DWN",
+   "nota": "para la superficie de panel (27 §15). No entra en el modelo de cultivo"
+  },
+  "t_media_c": {
+   "unidad": "°C",
+   "dimension": "hoja",
+   "sale_de": "POWER T2M",
+   "nota": "solo se enseña; el calor no se modela"
+  },
+  "aridez_ai": {
+   "unidad": "P/PET",
+   "dimension": "D4",
+   "sale_de": "POWER",
+   "nota": "PET por Hargreaves (27 §5)"
+  },
+  "permafrost_frac": {
+   "unidad": "0-1",
+   "dimension": "D4",
+   "sale_de": "PZI o ESA CCI",
+   "nota": "PZI si llega el permiso de Gruber; si no, ESA CCI (27 §5). Fuente en atributos"
+  },
+  "viento_p95_m_s": {
+   "unidad": "m/s",
+   "dimension": "D5",
+   "sale_de": "POWER diario WS2M_MAX",
+   "nota": "R se calcula en el motor"
+  },
+  "ndvi_max": {
+   "unidad": "0-1",
+   "dimension": "D6",
+   "sale_de": "GIBS MODIS",
+   "nota": null
+  },
+  "relieve_m": {
+   "unidad": "m",
+   "dimension": "D8",
+   "sale_de": "GMTED",
+   "nota": "baseline 1 km; solo puerta"
+  },
+  "tiempo_ciudad_h": {
+   "unidad": "h",
+   "dimension": "D8",
+   "sale_de": "Weiss 2018",
+   "nota": "viene en minutos"
+  },
+  "casquete_frac": {
+   "unidad": "0-1",
+   "dimension": "D8",
+   "sale_de": "GLiM clase hielo",
+   "nota": "puerta común P1-P4"
+  }
+ },
+ "funciones": {
+  "T_distancia": {
+   "formula": "s = 1 − min(1, |f(x_T) − f(x_O)| / E)",
+   "f": "identidad o log10",
+   "uso": "variable comparable en los dos cuerpos"
+  },
+  "U_saturacion": {
+   "formula": "s = clip((x − a)/(b − a), 0, 1)",
+   "inversa": "s = 1 − clip((x − a)/(b − a), 0, 1)",
+   "uso": "basta con llegar a (o inversa)"
+  },
+  "C_clase": {
+   "formula": "valor de la tabla de clase",
+   "uso": "litología"
+  },
+  "G_puerta": {
+   "formula": "pasa / no pasa",
+   "uso": "condición sin la cual el ensayo no tiene sentido"
+  },
+  "fuente": "20 §1.1"
+ },
+ "agregacion": {
+  "s_d": "media simple de sus variables; cada variable vive en una sola dimensión",
+  "S": "S = Π max(s_d, suelo)^w_d sobre dimensiones con dato, pesos renormalizados",
+  "suelo_similitud": 0.05,
+  "cobertura": "C = Σ w_d con dato",
+  "cobertura_minima": 0.7,
+  "cobertura_baja": "C < 0,7 → no evaluable, no se ordena",
+  "dato_ausente": "dato ausente ≠ 0",
+  "variable_que_falta": "variable que falta → dimensión sin_dato y cobertura menor (00-contrato.md §6)",
+  "puerta_fallida": "fuera del ranking; la tarjeta se muestra igual con el motivo",
+  "numeros_publicados": {
+   "A": "D1-D7, cuánto se parece",
+   "F": "D8, si se puede ensayar allí (viabilidad, no analogía)",
+   "nota": "20 §1.1 no escribe la fórmula de A (si renormaliza sin D8). F se exporta como canal B de c_*.png (00-contrato.md §3)"
+  },
+  "etiquetas": {
+   "fuerte": "s ≥ 0,7 (con T: distancia ≤ 0,3E)",
+   "parcial": "0,4 ≤ s < 0,7 (0,3E-0,6E)",
+   "se_rompe": "s < 0,4 (> 0,6E)",
+   "nota": "cortes 0,7/0,4 de v0 mantenidos como etiqueta (20 §1.1, §8 n.º 2)"
+  },
+  "fuente": "20 §1.1; 27 §12 (suelo 0,05 y C ≥ 0,7)"
+ },
+ "tablas_clase": {
+  "litologia": {
+   "origen": "mío",
+   "columnas": [
+    "marte_basaltico",
+    "marte_salino_sulfatos",
+    "luna_mare",
+    "luna_polar"
+   ],
+   "filas": {
+    "volcanica_basica": {
+     "marte_basaltico": 1.0,
+     "marte_salino_sulfatos": 0.3,
+     "luna_mare": 1.0,
+     "luna_polar": 0.4
+    },
+    "plutonica_basica": {
+     "marte_basaltico": 0.6,
+     "marte_salino_sulfatos": 0.2,
+     "luna_mare": 0.6,
+     "luna_polar": 0.6,
+     "nota": "anortosita no es clase propia"
+    },
+    "evaporitas": {
+     "marte_basaltico": 0.3,
+     "marte_salino_sulfatos": 1.0,
+     "luna_mare": 0.1,
+     "luna_polar": 0.1
+    },
+    "sedimentaria_siliciclastica": {
+     "marte_basaltico": 0.3,
+     "marte_salino_sulfatos": 0.4,
+     "luna_mare": 0.1,
+     "luna_polar": 0.1
+    },
+    "carbonatos_acidas_metamorficas": {
+     "marte_basaltico": 0.1,
+     "marte_salino_sulfatos": 0.1,
+     "luna_mare": 0.1,
+     "luna_polar": 0.1
+    }
+   },
+   "codigos_glim": {
+    "volcanica_basica": [
+     2
+    ],
+    "plutonica_basica": [
+     4
+    ],
+    "evaporitas": [
+     14
+    ],
+    "sedimentaria_siliciclastica": [
+     3
+    ],
+    "carbonatos_acidas_metamorficas": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "sin_dato": [
+     1,
+     5,
+     10,
+     12,
+     13
+    ],
+    "na": [
+     11,
+     16
+    ],
+    "leyenda": "1 su, 2 vb, 3 ss, 4 pb, 5 sm, 6 sc, 7 va, 8 mt, 9 pa, 10 vi, 11 wb, 12 py, 13 pi, 14 ev, 16 ig (Hartmann y Moosdorf 2012)",
+    "origen": "cierre n.º 1"
+   },
+   "nota": "20 §1.3 y §9: «Códigos GLiM: clases sí, códigos no». No está escrito qué código GLiM va a cada fila ni qué valor llevan las clases GLiM que no aparecen en la tabla",
+   "fuente": "20 §1.3"
+  }
+ },
+ "dimensiones": {
+  "D1": {
+   "nombre": "Geología y materiales",
+   "variables": {
+    "litologia_glim": {
+     "tipo": "C",
+     "escala": "tablas_clase.litologia, columna = clase_litologia del objetivo"
+    },
+    "soc_g_kg": {
+     "tipo": "U_inversa",
+     "a": 1,
+     "b": 20,
+     "unidad": "g/kg",
+     "origen": "mío",
+     "nota": "20 §1.2 lo marca (?)"
+    }
+   },
+   "combinacion": "media simple",
+   "fuera": {
+    "ph_h2o": "fuera de la métrica; se enseña en la hoja (27 §12)",
+    "sales_oxidantes": "solo tarjeta, sin escala global (20 §1.2)"
+   },
+   "na_y_sin_dato": "regla general de agregacion",
+   "fuente": "27 §12; 20 §1.2-§1.3"
+  },
+  "D2": {
+   "nombre": "Terreno",
+   "variables": {
+    "rugosidad_tan": {
+     "tipo": "T",
+     "f": "log10",
+     "E": 1,
+     "origen": "mío"
+    }
+   },
+   "valor_objetivo": "build/rugosidad_objetivos.json",
+   "procedimiento_rugosidad": {
+    "medida": "mediana de pendiente diferencial a baseline común ≈ 0,6 km",
+    "direccion": "solo norte-sur (a lo largo del meridiano), igual en la Tierra y en los objetivos",
+    "ventana_objetivos_km": 28,
+    "ventana_origen": "mío",
+    "estadistico_objetivos": "mediana con peso cos(lat) de todos los píxeles a menos de 28 km del punto",
+    "dem_objetivos": {
+     "jezero": "MOLA",
+     "arcadia": "MOLA",
+     "shackleton": "LOLA",
+     "tranquillitatis": "LOLA"
+    },
+    "dem_tierra": "GMTED remuestreado a la misma baseline",
+    "codigo": "el mismo que la rugosidad de la Tierra (27 §12)"
+   },
+   "fuera": {
+    "crater_cercano": "fuera; D2 = solo rugosidad (27 §5)"
+   },
+   "combinacion": "una sola variable",
+   "na_y_sin_dato": "regla general de agregacion",
+   "nota": "no está escrito qué hacer si la rugosidad de una celda es 0 (log10 no definido) ni si falta la rugosidad de un objetivo",
+   "fuente": "27 §12, §5; 20 §1.2",
+   "rugosidad_cero": "rugosidad_tan <= 0 → sin_dato (cierre n.º 2)"
+  },
+  "D3": {
+   "nombre": "Temperatura e iluminación",
+   "variables": {
+    "nv_dias_m23c": {
+     "tipo": "U",
+     "a": 0,
+     "b": 90,
+     "unidad": "días/año",
+     "origen": "mío",
+     "nota": "90 d = una campaña de campo"
+    },
+    "nv_dias_0c": {
+     "tipo": "U",
+     "a": 0,
+     "b": 90,
+     "unidad": "días/año",
+     "origen": "mío"
+    },
+    "amplitud_diurna_k": {
+     "tipo": "U_cociente",
+     "formula": "s = ΔT_T / ΔT_O",
+     "nota": "20 §1.2 lo da como tipo U (saturación, clip a [0,1]) con s = ΔT_T/ΔT_O; se espera s bajo en casi toda la Tierra"
+    },
+    "f_low": {
+     "tipo": "U",
+     "a": 0,
+     "b": 1,
+     "origen": "mío",
+     "nota": "fracción de horas de sol con elevación < 10°; geometría sin atmósfera ni relieve"
+    }
+   },
+   "por_objetivo": {
+    "jezero": {
+     "variables": [
+      "nv_dias_m23c"
+     ],
+     "nota": "amplitud diurna sin_dato: no hay ΔT_O único citado (cierre n.º 3)"
+    },
+    "arcadia": {
+     "variables": [
+      "nv_dias_0c"
+     ],
+     "nota": "amplitud diurna sin_dato: no hay ΔT_O único citado (cierre n.º 3)"
+    },
+    "shackleton": {
+     "variables": [
+      "f_low"
+     ],
+     "nota": "la T lunar no se compara: se rompe por declaración (20 §1.2)"
+    },
+    "tranquillitatis": {
+     "variables": [
+      "f_low"
+     ],
+     "nota": "la T lunar no se compara: se rompe por declaración (20 §1.2)"
+    },
+    "meridiani": {
+     "variables": null,
+     "nota": "27 §12 da D3 para jezero, arcadia y objetivos lunares; para meridiani no está escrito. Hace falta si se calcula S de meridiani + P2 (H1-S de Death Valley y Dalangtan)"
+    }
+   },
+   "combinacion": "media simple",
+   "nota": "27 §12 «D3 según el objetivo» nombra solo la variable de días fríos; la amplitud diurna sigue en la tabla de 27 §12 sin objetivo. Se transcribe en los dos objetivos de Marte",
+   "na_y_sin_dato": "regla general de agregacion",
+   "fuente": "27 §12, §5; 20 §1.2"
+  },
+  "D4": {
+   "nombre": "Agua, hielo, permafrost",
+   "variables": {
+    "aridez_ai": {
+     "tipo": "U_inversa",
+     "a": 0.05,
+     "b": 0.2,
+     "fuente": "[UNEP-AI] cortes UNEP: hiperárido < 0,05, árido < 0,20 https://help.earthmap.org/datasets/climate/aridity-index"
+    },
+    "permafrost_frac": {
+     "tipo": "U",
+     "a": 0,
+     "b": 1
+    }
+   },
+   "por_objetivo": {
+    "jezero": {
+     "variables": [
+      "aridez_ai"
+     ],
+     "combinacion": "solo aridez"
+    },
+    "meridiani": {
+     "variables": [
+      "aridez_ai"
+     ],
+     "combinacion": "solo aridez"
+    },
+    "shackleton": {
+     "variables": [
+      "aridez_ai"
+     ],
+     "combinacion": "solo aridez"
+    },
+    "tranquillitatis": {
+     "variables": [
+      "aridez_ai"
+     ],
+     "combinacion": "solo aridez"
+    },
+    "arcadia": {
+     "variables": [
+      "aridez_ai",
+      "permafrost_frac"
+     ],
+     "combinacion": "mínimo de las dos s",
+     "si_aridez_na_por_frio": "solo permafrost"
+    }
+   },
+   "aridez_en_frio": {
+    "metodo_pet": "Hargreaves",
+    "regla_mensual": "evapotranspiración de cada mes, mínimo 0 (Hargreaves da negativa por debajo de −17,8 °C)",
+    "umbral_pet_anual_mm": 100,
+    "umbral_origen": "mío",
+    "resultado": "PET anual < 100 mm → aridez_ai = na («frío: la aridez no aplica»)"
+   },
+   "na_y_sin_dato": "arcadia con aridez na por frío: D4 = s del permafrost (27 §13). Resto de objetivos con aridez na: no escrito (null)",
+   "na_otros_objetivos": null,
+   "nota_na": "27 §13 solo dice qué hace la D4 de arcadia con aridez na; para jezero, meridiani y los lunares no está escrito si D4 queda na (fuera de C) o sin_dato",
+   "fuente": "27 §12, §13; 20 §1.2"
+  },
+  "D5": {
+   "nombre": "Polvo y viento",
+   "variables": {
+    "R": {
+     "tipo": "T",
+     "f": "log10",
+     "E": 1,
+     "origen": "mío",
+     "formula": "R = P95(U) / U_umbral",
+     "entrada_tierra": "viento_p95_m_s"
+    }
+   },
+   "umbral_viento_2m": {
+    "tierra_m_s": 2.6,
+    "marte_m_s": 20,
+    "origen": "mío",
+    "nota": "ley logarítmica con z₀ = 1 cm; u*t ≈ 0,2 m/s Tierra y ≈ 1,5 m/s Marte [Kok12, Tabla 2.3] https://arxiv.org/abs/1201.4353"
+   },
+   "luna": "na",
+   "fuera": {
+    "opacidad": "fuera; D5 = solo viento (27 §5)"
+   },
+   "combinacion": "una sola variable",
+   "na_y_sin_dato": "objetivo lunar → D5 = na (no aplica); resto: regla general de agregacion",
+   "fuente": "27 §12, §5; 20 §1.2"
+  },
+  "D6": {
+   "nombre": "Biología y habitabilidad",
+   "variables": {
+    "ndvi_max": {
+     "tipo": "U_inversa",
+     "a": 0.1,
+     "b": 0.3,
+     "fuente": "[Esri-NDVI] https://pro.arcgis.com/en/pro-app/3.3/help/analysis/raster-functions/ndvi-function.htm ; [SH-NDVI] https://custom-scripts.sentinel-hub.com/sentinel-3/ndvi"
+    }
+   },
+   "fuera": {
+    "extremofilos_biofirmas": "solo tarjeta; no suma a S",
+    "uv": "declarado: se rompe"
+   },
+   "combinacion": "una sola variable",
+   "na_y_sin_dato": "regla general de agregacion",
+   "fuente": "27 §12; 20 §1.2"
+  },
+  "D8": {
+   "nombre": "Operaciones (viabilidad)",
+   "variables": {
+    "tiempo_ciudad_h": {
+     "tipo": "U_log_inversa",
+     "a_h": 2,
+     "b_h": 48,
+     "regla": "1 si ≤ 2 h, 0 si ≥ 48 h",
+     "origen": "mío",
+     "fuente_dato": "[Weiss18] https://ora.ox.ac.uk/objects/uuid:e4584ac4-b89c-488a-9f88-57b2fffc1aa8",
+     "nota": "«saturación en log» (27 §12): la interpolación entre 2 y 48 h se hace sobre log10(t); los documentos no escriben la fórmula más allá de eso"
+    }
+   },
+   "solo_puerta": [
+    "relieve_m",
+    "casquete_frac"
+   ],
+   "fuera": {
+    "permiso": "clase de 20 §1.3, sitio a sitio; no está en la tabla de 27 §12 ni en la malla",
+    "pendiente_100m_2km": "sustituida por relieve a 1 km (27 §5)"
+   },
+   "combinacion": "una sola variable",
+   "na_y_sin_dato": "regla general de agregacion",
+   "fuente": "27 §12, §5; 20 §1.2"
+  },
+  "D9": {
+   "nombre": "Frío operativo",
+   "variables": {
+    "nv_dias_m23c": {
+     "tipo": "U",
+     "a": 0,
+     "b": 90,
+     "unidad": "días/año",
+     "origen": "mío",
+     "nota": "misma escala que en D3 de jezero: 90 d = una campaña de campo"
+    }
+   },
+   "combinacion": "una sola variable",
+   "na_y_sin_dato": "regla general de agregacion",
+   "origen": "cierre n.º 6; solo la usa P5"
+  }
+ },
+ "dimensiones_fuera": {
+  "D7": "sale del motor: no hay catálogo global de tubos; la pareja pozo lunar ↔ tubo de Canarias queda como extra E1, a mano, sin ranking (27 §4)"
+ },
+ "puertas_reglas": {
+  "fallada": "la celda falla la puerta → fuera del ranking; S = 0 en los tres canales de s_* y bit de «fallada» en c_*; en H1-S cuenta con S = 0 (queda al final)",
+  "sin_dato": "la variable de una puerta es sin_dato → celda no evaluable para esa misión: sin S, fuera del ranking, fuera del denominador del 5 % y del 20 % de §16, no puede ser candidata (H2); se pinta en gris y se publica cuántas celdas son; 255 en s_* y bit de «sin dato» en c_*",
+  "na": "na no es sin_dato: la aridez na por frío sigue 27 §13",
+  "publicar": "junto a H1-S, fracción de la tierra que pasa las puertas de cada misión",
+  "max_puertas_por_mision": 4,
+  "fuente": "27 §12; 00-contrato.md §3"
+ },
+ "puerta_comun": {
+  "id": "casquete",
+  "expr": "casquete_frac<=0.5",
+  "variable": "casquete_frac",
+  "condicion": "<=",
+  "umbral": 0.5,
+  "texto": "celda con > 50 % de casquete de hielo fuera: un casquete no es terreno",
+  "aplica_a": [
+   "P1",
+   "P2",
+   "P3",
+   "P4"
+  ],
+  "fuente": "20 §4.2"
+ },
+ "misiones": {
+  "P1": {
+   "nombre": "perforar_hielo",
+   "nombre_largo": "Perforación de permafrost/hielo",
+   "objetivo_por_defecto": "arcadia",
+   "orden": [
+    "D4",
+    "D3",
+    "D1",
+    "D8",
+    "D2"
+   ],
+   "pesos": {
+    "D4": 0.457,
+    "D3": 0.257,
+    "D1": 0.157,
+    "D8": 0.09,
+    "D2": 0.04
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "expr": "casquete_frac<=0.5",
+     "variable": "casquete_frac",
+     "condicion": "<=",
+     "umbral": 0.5,
+     "fuente": "20 §4.2"
+    },
+    {
+     "id": "permafrost",
+     "expr": "permafrost_frac>=0.5",
+     "variable": "permafrost_frac",
+     "condicion": ">=",
+     "umbral": 0.5,
+     "fuente": "27 §13"
+    },
+    {
+     "id": "aridez",
+     "expr": "aridez_ai<=0.20 or aridez_ai==na_por_frio",
+     "variable": "aridez_ai",
+     "condicion": "<=",
+     "umbral": 0.2,
+     "si_na_por_frio": "pasa",
+     "fuente": "27 §13"
+    }
+   ],
+   "motivo_orden": "sin hielo no hay ensayo; T fija la dureza del hielo; roca fija el desgaste; relieve casi no afecta a un taladro fijo",
+   "nota": "puerta de 27 §13: permafrost ≥ 0,5 y (aridez ≤ 0,20 o aridez na por frío); se escribe como dos puertas unidas por «y». Con ESA CCI (sin permiso de Gruber) todo el hemisferio sur queda sin dato para esta misión (27 §12)"
+  },
+  "P2": {
+   "nombre": "cultivar",
+   "nombre_largo": "Cultivar en suelo local (regolito con sales + invernadero)",
+   "objetivo_por_defecto": "jezero",
+   "orden": [
+    "D1",
+    "D6",
+    "D4",
+    "D3",
+    "D8"
+   ],
+   "pesos": {
+    "D1": 0.457,
+    "D6": 0.257,
+    "D4": 0.157,
+    "D3": 0.09,
+    "D8": 0.04
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "expr": "casquete_frac<=0.5",
+     "variable": "casquete_frac",
+     "condicion": "<=",
+     "umbral": 0.5,
+     "fuente": "20 §4.2"
+    },
+    {
+     "id": "ndvi",
+     "expr": "ndvi_max<=0.3",
+     "variable": "ndvi_max",
+     "condicion": "<=",
+     "umbral": 0.3,
+     "fuente": "27 §3"
+    }
+   ],
+   "motivo_orden": "la química del suelo es el ensayo; suelo sin vida antes que clima, que el invernadero aísla",
+   "nota": "27 §3 sustituye la puerta de 20 §4.2 («NDVI ≤ 0,1; evaporita u oxidante») por NDVI máximo ≤ 0,3"
+  },
+  "P3": {
+   "nombre": "base_polar",
+   "nombre_largo": "Base lunar polar",
+   "objetivo_por_defecto": "shackleton",
+   "orden": [
+    "D3",
+    "D8",
+    "D2",
+    "D1"
+   ],
+   "pesos": {
+    "D3": 0.521,
+    "D8": 0.271,
+    "D2": 0.146,
+    "D1": 0.063
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "expr": "casquete_frac<=0.5",
+     "variable": "casquete_frac",
+     "condicion": "<=",
+     "umbral": 0.5,
+     "fuente": "20 §4.2"
+    },
+    {
+     "id": "relieve",
+     "expr": "relieve_m<=130",
+     "variable": "relieve_m",
+     "condicion": "<=",
+     "umbral": 130,
+     "unidad": "m",
+     "fuente": "27 §12: extremo permisivo del rango de Marte 100-130 m [Golombek12] https://hub.hku.hk/handle/10722/236658 ; en la Luna no hay número: se usa el mismo y se dice"
+    }
+   ],
+   "motivo_orden": "sol rasante manda energía y navegación; polar = logística cara; D1 añadido",
+   "nota": "D7 fuera; pesos ROC con n = 4 (27 §12)"
+  },
+  "P4": {
+   "nombre": "movilidad",
+   "nombre_largo": "Movilidad y aterrizaje",
+   "objetivo_por_defecto": "jezero",
+   "orden": [
+    "D2",
+    "D8",
+    "D5"
+   ],
+   "pesos": {
+    "D2": 0.611,
+    "D8": 0.278,
+    "D5": 0.111
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "expr": "casquete_frac<=0.5",
+     "variable": "casquete_frac",
+     "condicion": "<=",
+     "umbral": 0.5,
+     "fuente": "20 §4.2"
+    },
+    {
+     "id": "relieve",
+     "expr": "relieve_m<=130",
+     "variable": "relieve_m",
+     "condicion": "<=",
+     "umbral": 130,
+     "unidad": "m",
+     "fuente": "27 §12: extremo permisivo del rango de Marte 100-130 m [Golombek12] https://hub.hku.hk/handle/10722/236658"
+    }
+   ],
+   "motivo_orden": "terreno es el ensayo; D8 no mide analogía"
+  },
+  "P5": {
+   "nombre": "sombra_fria",
+   "nombre_largo": "Operar en frío y con sol rasante (sistemas que sobreviven a la sombra)",
+   "objetivo_por_defecto": "shackleton",
+   "orden": [
+    "D9",
+    "D3",
+    "D8",
+    "D2"
+   ],
+   "pesos": {
+    "D9": 0.521,
+    "D3": 0.271,
+    "D8": 0.146,
+    "D2": 0.063
+   },
+   "puertas": [
+    {
+     "id": "casquete",
+     "expr": "casquete_frac<=0.5",
+     "variable": "casquete_frac",
+     "condicion": "<=",
+     "umbral": 0.5,
+     "fuente": "20 §4.2"
+    },
+    {
+     "id": "relieve",
+     "expr": "relieve_m<=130",
+     "variable": "relieve_m",
+     "condicion": "<=",
+     "umbral": 130,
+     "unidad": "m",
+     "fuente": "27 §12: extremo permisivo del rango de Marte 100-130 m [Golombek12] https://hub.hku.hk/handle/10722/236658 ; en la Luna no hay número: se usa el mismo y se dice"
+    }
+   ],
+   "motivo_orden": "sobrevivir al frío es el ensayo; luego sol rasante; luego logística; luego terreno",
+   "prerregistrada": false,
+   "nota": "añadida tras la charla de NASA en la sede; pesos ROC n = 4. No entra en H1, H1-S ni H3"
+  }
+ },
+ "misiones_fuera": {
+  "P5": "sellar cavidad: fuera del selector (27 §3, §4)"
+ },
+ "metodo_pesos": {
+  "metodo": "ROC: w_k = (1/n) Σ_{i=k..n} 1/i [Barron96]",
+  "tabla": {
+   "3": [
+    0.611,
+    0.278,
+    0.111
+   ],
+   "4": [
+    0.521,
+    0.271,
+    0.146,
+    0.063
+   ],
+   "5": [
+    0.457,
+    0.257,
+    0.157,
+    0.09,
+    0.04
+   ]
+  },
+  "nota": "se fija solo el orden; los pesos salen de ROC redondeados a 3 decimales, por eso suman 1 ± 0,001",
+  "fuente": "20 §4.1"
+ },
+ "objetivos": {
+  "jezero": {
+   "nombre": "cráter Jezero",
+   "cuerpo": "marte",
+   "lat": 18.38,
+   "lon": 77.58,
+   "coordenadas_fuente": "[WP-Mars] Wikipedia, Jezero (crater) (20 §1.2)",
+   "clase_litologia": "marte_basaltico",
+   "misiones": [
+    "P2",
+    "P4"
+   ],
+   "valores_citados": {
+    "D1": {
+     "litologia": "toleíticas basálticas [McSween09] https://geodynamicsprogram.whoi.edu/wp-content/uploads/sites/14/2018/10/Integrated_Mars_Crust_McSween_Taylor_Wyatt_Science_2009_58186.pdf",
+     "soc_g_kg": "≈ 0 (20 §1.2, sin cita)"
+    },
+    "D2": {
+     "rugosidad": "build/rugosidad_objetivos.json"
+    },
+    "D3": {
+     "umbral_dias_frios_c": -23,
+     "umbral_fuente": "aire de Jezero −83 a −23 °C [MEDA-NASA] https://www.marsdaily.com/reports/Daily_records_of_atmospheric_temperature_with_Perseverance_999.html",
+     "amplitud_diurna_k": {
+      "min": 50,
+      "max": 60,
+      "valor_usado": null,
+      "fuente": "[Space21] https://www.space.com/perseverance-rover-mars-weather-report",
+      "nota": "20 §1.2 da un rango 50-60 K; no está escrito qué valor único es ΔT_O en s = ΔT_T/ΔT_O"
+     }
+    },
+    "D4": {
+     "aridez": "sin agua líquida ≡ AI → 0 (20 §1.2)"
+    },
+    "D5": {
+     "R_objetivo": null,
+     "umbral_m_s": 20,
+     "nota": "20 §1.2 da el umbral de Marte (≈ 20 m/s, mío) pero no el P95 del viento en Jezero; sin él no hay R_O"
+    },
+    "D6": {
+     "ndvi": "sin vegetación; la escala no usa valor del objetivo"
+    },
+    "D8": {
+     "nota": "viabilidad: solo Tierra"
+    }
+   },
+   "radiacion_kwh_m2_dia": {
+    "min": 1.0,
+    "max": 3.9,
+    "rotulo": "otra latitud; orden de magnitud",
+    "fuente": "Viking 1, Appelbaum & Flood 1989, tabla IV, vía verif/P22 https://ntrs.nasa.gov/api/citations/19890018252/downloads/19890018252.pdf"
+   },
+   "no_comparable": [
+    "gravedad",
+    "presion",
+    "radiacion",
+    "composicion_atmosferica"
+   ]
+  },
+  "shackleton": {
+   "nombre": "borde de Shackleton",
+   "cuerpo": "luna",
+   "lat": -89.67,
+   "lon": 129.78,
+   "coordenadas_fuente": "[WP-Moon] Wikipedia, Shackleton (crater) (20 §1.2)",
+   "clase_litologia": "luna_polar",
+   "misiones": [
+    "P3"
+   ],
+   "valores_citados": {
+    "D1": {
+     "litologia": "terreno de anortosita, Apollo 16 26,7 % Al₂O₃ [NU-LHT] https://ntrs.nasa.gov/api/citations/20110008071/downloads/20110008071.pdf ; simulante LHS-1 74,4 % anortosita [LHS1] https://cdn.shopify.com/s/files/1/0398/9268/0862/files/lhs-1-spec-sheet-Dec2023.pdf",
+     "soc_g_kg": "≈ 0 (20 §1.2, sin cita)"
+    },
+    "D2": {
+     "rugosidad": "build/rugosidad_objetivos.json"
+    },
+    "D3": {
+     "f_low": "≈ 1: el sol roza el horizonte, eje 1,5° [LROC-sol] https://lroc.im-ldi.com/visit/exhibits/1/gallery/57",
+     "nota": "la escala 0-1 no usa el valor del objetivo"
+    },
+    "D4": {
+     "aridez": "sin agua líquida ≡ AI → 0 (20 §1.2)"
+    },
+    "D5": {
+     "estado": "na"
+    },
+    "D8": {
+     "nota": "viabilidad: solo Tierra"
+    }
+   },
+   "energia": "no se calcula superficie; «paneles verticales en mástil, 10 kW por mástil en el programa de NASA» (27 §15, verif/P31 https://ntrs.nasa.gov/api/citations/20230012849/downloads/GCD%20Annual%20Review%20VSAT%20September%202023%20Final.pdf)",
+   "no_comparable": [
+    "gravedad",
+    "vacio",
+    "radiacion"
+   ]
+  },
+  "arcadia": {
+   "nombre": "Arcadia Planitia",
+   "cuerpo": "marte",
+   "lat": 47.2,
+   "lon": -175.7,
+   "lon_original": "184,3 E",
+   "coordenadas_fuente": "[WP-Mars] Wikipedia, Arcadia Planitia (20 §1.2); 184,3 E pasado a −180..180 (00-contrato.md §2)",
+   "clase_litologia": "marte_basaltico",
+   "misiones": [
+    "P1"
+   ],
+   "valores_citados": {
+    "D1": {
+     "litologia": "toleíticas basálticas [McSween09] (Marte en general, 20 §1.2)",
+     "soc_g_kg": "≈ 0 (20 §1.2, sin cita)"
+    },
+    "D2": {
+     "rugosidad": "build/rugosidad_objetivos.json"
+    },
+    "D3": {
+     "umbral_dias_frios_c": 0,
+     "umbral_fuente": "«perfil hielo: 0 °C» (20 §1.2; 27 §5), sin cita",
+     "amplitud_diurna_k": {
+      "valor_usado": null,
+      "nota": "el rango 50-60 K de 20 §1.2 es de Jezero [Space21]; para Arcadia no hay valor citado"
+     }
+    },
+    "D4": {
+     "aridez": "sin agua líquida ≡ AI → 0 (20 §1.2)",
+     "permafrost": "hielo somero en Arcadia y Deuteronilus [Morgan21] https://pubs.usgs.gov/publication/70226786 ; métodos sensibles a < ~5 m [MITTR21] https://www.technologyreview.com/2021/02/08/1017759/these-might-be-the-best-places-for-future-mars-colonists-to-look-for-ice/"
+    },
+    "D5": {
+     "R_objetivo": null,
+     "umbral_m_s": 20,
+     "nota": "sin P95 del viento citado para Arcadia; P1 no usa D5"
+    },
+    "D8": {
+     "nota": "viabilidad: solo Tierra"
+    }
+   },
+   "radiacion_kwh_m2_dia": {
+    "min": 1.0,
+    "max": 3.9,
+    "rotulo": "otra latitud; orden de magnitud",
+    "fuente": "Viking 1, Appelbaum & Flood 1989, vía verif/P22 (27 §15)"
+   },
+   "no_comparable": [
+    "gravedad",
+    "presion",
+    "radiacion",
+    "composicion_atmosferica"
+   ]
+  },
+  "meridiani": {
+   "nombre": "Meridiani",
+   "cuerpo": "marte",
+   "lat": null,
+   "lon": null,
+   "nota_coordenadas": "ningún documento de diseño da coordenadas de Meridiani (buscado en 20, 27, piezas/, 13, 16)",
+   "clase_litologia": "marte_salino_sulfatos",
+   "misiones": [],
+   "uso": "solo validación de sitios salinos (D1)",
+   "valores_citados": {
+    "D1": {
+     "litologia": "clase marte_salino_sulfatos (27 §1); Phoenix 0,5-0,6 % ClO₄⁻ [Catling10] solo tarjeta"
+    },
+    "D2": {
+     "rugosidad": null,
+     "nota": "27 §5 solo calcula rugosidad de Jezero, Arcadia, Shackleton y Tranquillitatis"
+    },
+    "D3": {
+     "valor": null,
+     "nota": "27 §12 no da D3 para meridiani"
+    },
+    "D4": {
+     "aridez": "sin agua líquida ≡ AI → 0 (20 §1.2)"
+    }
+   }
+  },
+  "tranquillitatis": {
+   "nombre": "pozo de Mare Tranquillitatis",
+   "cuerpo": "luna",
+   "lat": 8.3355,
+   "lon": 33.222,
+   "coordenadas_fuente": "[WP-Moon] Wikipedia, Mare Tranquillitatis pit (20 §5.2)",
+   "clase_litologia": "luna_mare",
+   "misiones": [],
+   "uso": "validación de terreno lunar (D2) y extra E1; no se ordena la Tierra por él",
+   "valores_citados": {
+    "D1": {
+     "litologia": "basalto mare (20 §4.3)"
+    },
+    "D2": {
+     "rugosidad": "build/rugosidad_objetivos.json"
+    },
+    "D3": {
+     "f_low": null,
+     "nota": "el ≈ 1 de 20 §1.2 es del polo; para el pozo ecuatorial no hay valor; la escala 0-1 no lo usa"
+    },
+    "D5": {
+     "estado": "na"
+    }
+   }
+  }
+ },
+ "pares": [
+  {
+   "objetivo": "jezero",
+   "mision": "P2"
+  },
+  {
+   "objetivo": "jezero",
+   "mision": "P4"
+  },
+  {
+   "objetivo": "arcadia",
+   "mision": "P1"
+  },
+  {
+   "objetivo": "shackleton",
+   "mision": "P3"
+  },
+  {
+   "objetivo": "shackleton",
+   "mision": "P5",
+   "prerregistrado": false
+  }
+ ],
+ "par_inicial": {
+  "objetivo": "shackleton",
+  "mision": "P3",
+  "nota": "decisión previa al hash: el producto abre por el polo sur lunar. 27 §14 abría por jezero + P2. No cambia ningún número"
+ },
+ "selector": "por sitio de base; cada sitio enseña solo sus misiones; no se ofrecen combinaciones sin definir (27 §14)",
+ "validacion": {
+  "corrida_oficial": "una sola, con la malla completa, el sábado a las 19:00 o cuando llegue el último paso de la malla, lo que ocurra antes; lo anterior es ensayo y no se publica; si falta una variable se corre igual y se dice (27 §13)",
+  "sitios": [
+   {
+    "n": 1,
+    "id": "yungay",
+    "nombre": "Yungay, Atacama",
+    "lat": -24.1,
+    "lon": -70.01,
+    "dim": "D4",
+    "objetivo": "jezero",
+    "mision": "P2"
+   },
+   {
+    "n": 2,
+    "id": "haughton",
+    "nombre": "Haughton",
+    "lat": 75.38,
+    "lon": -89.67,
+    "dim": "D4",
+    "objetivo": "arcadia",
+    "mision": "P1"
+   },
+   {
+    "n": 3,
+    "id": "death_valley_badwater",
+    "nombre": "Death Valley, Badwater",
+    "lat": 36.25,
+    "lon": -116.83,
+    "dim": "D1",
+    "objetivo": "meridiani",
+    "mision": "P2"
+   },
+   {
+    "n": 4,
+    "id": "mcmurdo_dry_valleys",
+    "nombre": "McMurdo Dry Valleys",
+    "lat": -77.47,
+    "lon": 162.52,
+    "dim": "D3",
+    "objetivo": "jezero",
+    "mision": "P1"
+   },
+   {
+    "n": 6,
+    "id": "timanfaya",
+    "nombre": "Timanfaya",
+    "lat": 28.99,
+    "lon": -13.79,
+    "dim": "D1",
+    "objetivo": "jezero",
+    "mision": "P2",
+    "nota": "isla forzada (20 §2, §7)"
+   },
+   {
+    "n": 7,
+    "id": "svalbard_bockfjorden",
+    "nombre": "Svalbard, Bockfjorden",
+    "lat": 79.47,
+    "lon": 13.33,
+    "dim": "D4",
+    "objetivo": "arcadia",
+    "mision": "P1"
+   },
+   {
+    "n": 8,
+    "id": "mdrs_utah",
+    "nombre": "MDRS, Utah",
+    "lat": 38.41,
+    "lon": -110.79,
+    "dim": "D2",
+    "objetivo": "jezero",
+    "mision": "P4"
+   },
+   {
+    "n": 9,
+    "id": "mojave_silver_lake",
+    "nombre": "Mojave, Silver Lake",
+    "lat": 35.34,
+    "lon": -116.11,
+    "dim": "D2",
+    "objetivo": "jezero",
+    "mision": "P4"
+   },
+   {
+    "n": 12,
+    "id": "dalangtan_qaidam",
+    "nombre": "Dalangtan, Qaidam",
+    "lat": 38.5,
+    "lon": 91.5,
+    "dim": "D1",
+    "objetivo": "meridiani",
+    "mision": "P2"
+   },
+   {
+    "n": 13,
+    "id": "mauna_kea",
+    "nombre": "Mauna Kea",
+    "lat": 19.82,
+    "lon": -155.47,
+    "dim": "D1",
+    "objetivo": "jezero",
+    "mision": "P2"
+   },
+   {
+    "n": 14,
+    "id": "cinder_lake",
+    "nombre": "Cinder Lake (punto Sunset Crater)",
+    "lat": 35.36,
+    "lon": -111.5,
+    "dim": "D2",
+    "objetivo": "tranquillitatis",
+    "mision": "P4",
+    "nota": "Cinder Lake exacto (?) (20 §2)"
+   }
+  ],
+  "sitios_fuente": "dim, objetivo y misión: 27 §2; lat y lon: 20 §2; Dhofar (n.º 10) sale por 27 §12",
+  "sitios_solo_escala_de_sitio": [
+   {
+    "n": 5,
+    "id": "rio_tinto",
+    "nombre": "Río Tinto, cabecera",
+    "lat": 37.7,
+    "lon": -6.55,
+    "dim": "D1",
+    "objetivo": "meridiani"
+   },
+   {
+    "n": 11,
+    "id": "dallol",
+    "nombre": "Dallol, Danakil",
+    "lat": 14.24,
+    "lon": 40.3,
+    "dim": "D1",
+    "objetivo": "meridiani"
+   },
+   {
+    "n": 15,
+    "id": "mistastin",
+    "nombre": "Mistastin",
+    "lat": 55.88,
+    "lon": -63.3,
+    "dim": "D1",
+    "objetivo": "shackleton"
+   },
+   {
+    "n": 16,
+    "id": "tubo_la_corona",
+    "nombre": "Tubo de La Corona",
+    "lat": 29.16,
+    "lon": -13.45,
+    "dim": "D7",
+    "objetivo": "tranquillitatis"
+   },
+   {
+    "n": 10,
+    "id": "dhofar",
+    "nombre": "Dhofar, zona AMADEE-18",
+    "lat": 18,
+    "lon": 54,
+    "coordenada_aproximada": true,
+    "dim": "D4",
+    "objetivo": "jezero",
+    "mision": "P2",
+    "nota": "20 §2 da «≈ 18 (?)», «≈ 54 (?)», sin coordenada exacta; sale de la lista global por 27 §12"
+   },
+   {
+    "id": "dalinouer",
+    "nombre": "Dalinouer",
+    "lat": null,
+    "lon": null,
+    "dim": null,
+    "objetivo": null,
+    "nota": "27 §5: «Dalinouer como sitio a escala de sitio». Coordenadas y objetivo no están en los documentos de la lista de precedencia (fuera-caja/A da una caja 43,999-44,327 N, 113,485-113,951 E y lo llama análogo de Jezero)"
+   }
+  ],
+  "sitios_solo_escala_de_sitio_regla": "no cuentan en k; 4 a mano, en tarjeta (20 §6.1, 27 §2)",
+  "valores_a_mano": [
+   {
+    "sitio": "mcmurdo_dry_valleys",
+    "variable": "permafrost_frac",
+    "valor": 1.0,
+    "origen": "fuente",
+    "fuentes": [
+     "Obu et al. (2020), The Cryosphere 14, 497-519, DOI 10.5194/tc-14-497-2020, https://tc.copernicus.org/articles/14/497/2020/ : «Permafrost in the Antarctic is present beneath all ice-free terrain, except for the lowest elevations of the maritime Antarctic and sub-Antarctic islands»",
+     "Bockheim, Campbell y McLeod (2007), Permafrost and Periglacial Processes 18(3), 217-227, DOI 10.1002/ppp.588, https://doi.org/10.1002/ppp.588 : «Permafrost is ubiquitous in the region»"
+    ],
+    "nota": "lectura de dos frases cualitativas como fracción 1; ninguna da un número (verif/P34). La puerta mide «hay permafrost», no «hay hielo cerca de la superficie»"
+   },
+   {
+    "sitio": "svalbard_bockfjorden",
+    "variable": "permafrost_frac",
+    "valor": null,
+    "origen": null,
+    "nota": "27 §12: «Bockfjorden si hiciera falta». No hay valor con fuente en los documentos. Sin fuente → sin_dato y el sitio sale «no evaluable» en H1-S"
+   }
+  ],
+  "valores_a_mano_regla": "van dentro de umbrales.json con su fuente antes del hash; sin fuente a las 09:45 → sin_dato y el sitio sale «no evaluable» en H1-S; H1 no cambia (27 §12)",
+  "controles": {
+   "rotulo": "comprobación de cordura, no validación",
+   "sitios": [
+    {
+     "id": "manaus",
+     "lat": -3.12,
+     "lon": -60.02
+    },
+    {
+     "id": "kisangani",
+     "lat": 0.52,
+     "lon": 25.2
+    },
+    {
+     "id": "kuching",
+     "lat": 1.56,
+     "lon": 110.34
+    },
+    {
+     "id": "dhaka",
+     "lat": 23.76,
+     "lon": 90.39
+    },
+    {
+     "id": "yangon",
+     "lat": 16.8,
+     "lon": 96.16
+    },
+    {
+     "id": "bergen",
+     "lat": 60.39,
+     "lon": 5.33
+    },
+    {
+     "id": "paris",
+     "lat": 48.86,
+     "lon": 2.35
+    }
+   ],
+   "regla": "0 de 7 en el top 20 % de S en cualquier perfil",
+   "nota": "las puertas los echan antes de puntuar: «0 de 7» es prueba trivial y ya no es condición de éxito (27 §2; 20 cabecera)",
+   "fuente": "20 §2, §6.1; 27 §2"
+  },
+  "denominador": {
+   "base": "tierra firme evaluable",
+   "referencia_celdas": 67420,
+   "referencia_nota": "celdas sin Antártida de 20 §7 (máscara CRU); se cuentan el sábado con la máscara real",
+   "antartida": "al sur de −60°: fuera, salvo la celda de McMurdo Dry Valleys, que es roca y entra",
+   "puerta_sin_dato": "celda no evaluable para la misión: fuera del denominador del 5 % y del 20 %",
+   "peso_area": "percentiles con peso cos(lat) (20 §7); integracion §3 da area_km2 para pesos por área",
+   "celda_con_tierra": "celda cuenta si tierra_frac > 0; candidatos de 20 §2-§3 forzados (20 §7)",
+   "fuente": "27 §12; 20 §6.1, §7"
+  },
+  "empates": "si el corte del 5 % cae dentro de un grupo de celdas empatadas, el sitio solo cuenta dentro si el grupo entero cabe en el 5 % (27 §12; sustituye a la regla de 20 §6.1 «usar la variable cruda»)",
+  "h1": {
+   "medida": "k = sitios de la lista (n = 11) cuya s_d de la dimensión primaria queda en el 5 % mejor por área de la tierra firme para su objetivo",
+   "n_sitios": 11,
+   "percentil_mejor": 0.05,
+   "exito": {
+    "k_min": 8,
+    "k_sobre_k0_min": 2,
+    "texto": "k ≥ 8 de 11 y k ≥ k₀ + 2; no se afloja al quitar Dhofar"
+   },
+   "linea_base": "k₀ = misma cuenta ordenando solo por aridez (AI)",
+   "linea_base_nota": "20 §6.1 no escribe el sentido del orden ni qué hacer con aridez na; se entiende AI menor = mejor (hiperárido)",
+   "senal_debil": "k = 6-7, o k ≥ 8 sin ganar a k₀: «la métrica detecta desiertos; las otras dimensiones aún no aportan»",
+   "fallo": "k ≤ 5",
+   "nulos": {
+    "nulo_1": "azar, p = 0,05: P(k ≥ 4) = 0,002 (mío)",
+    "nulo_2": "azar entre terreno sin vegetación, p ≈ 0,25 supuesto (?): P(k ≥ 8) = 0,003 (mío)",
+    "nota": "calculados en 20 §6.1 con n = 12; 27 no los recalcula para n = 11"
+   },
+   "si_falla": [
+    "1: revisar datos primero (celda correcta, máscara, ausentes); corrección de error ≠ ajuste, se apunta",
+    "2: si una dimensión falla ≥ 50 % de sus sitios, una reescritura de su transformación, documentada",
+    "3: diagnosticar solo con los sitios de n.º impar y reevaluar en los de n.º par; éxito ≥ 5/7",
+    "4: si sigue fallando, se publica s_d por dimensión, sin S y sin afirmar novedad; se cuenta como resultado"
+   ],
+   "si_falla_nota": "el paso 3 de 20 §6.1 cuenta 5 impares y 7 pares con Dhofar; sin Dhofar (n.º 10, par) quedan 6 pares y el umbral 5/7 no se ha reescrito",
+   "prohibido": "cambiar lista, umbral o k₀ después de ver datos",
+   "fuente": "27 §2, §12; 20 §6.1"
+  },
+  "h1_s": {
+   "medida": "cuántos de los 11 sitios quedan en el 5 % mejor de la puntuación combinada S, con la misión de su fila",
+   "umbral": null,
+   "tipo": "descriptiva, sin umbral; se publica el número sea cual sea",
+   "puerta_fallada": "la celda cuenta con S = 0 (queda al final)",
+   "puerta_sin_dato": "celda no evaluable: fuera del denominador",
+   "publicar_ademas": "fracción de la tierra que pasa las puertas de cada misión",
+   "fuente": "27 §2, §12"
+  },
+  "cifra_del_video": "la de H1 (cada sitio conocido en su dimensión clave); la web enseña H1 y H1-S juntas; no se cambia después de ver resultados (27 §17)",
+  "h3": {
+   "predicciones": [
+    {
+     "n": 1,
+     "sitio": "mcmurdo_dry_valleys",
+     "sube_en": "P1",
+     "baja_en": "P2"
+    },
+    {
+     "n": 2,
+     "sitio": "svalbard_bockfjorden",
+     "sube_en": "P1",
+     "baja_en": "P4"
+    },
+    {
+     "n": 3,
+     "sitio": "haughton",
+     "sube_en": "P1",
+     "baja_en": "P2"
+    },
+    {
+     "n": 4,
+     "sitio": "yungay",
+     "sube_en": "P2",
+     "baja_en": "P1"
+    },
+    {
+     "n": 5,
+     "sitio": "dalangtan_qaidam",
+     "sube_en": "P2",
+     "baja_en": "P1"
+    },
+    {
+     "n": 6,
+     "sitio": "death_valley_badwater",
+     "sube_en": "P2",
+     "baja_en": "P1"
+    },
+    {
+     "n": 7,
+     "sitio": "cinder_lake",
+     "sube_en": "P4",
+     "baja_en": "P1"
+    },
+    {
+     "n": 8,
+     "sitio": "mojave_silver_lake",
+     "sube_en": "P4",
+     "baja_en": "P1"
+    },
+    {
+     "n": 9,
+     "sitio": "haughton",
+     "sube_en": "P3",
+     "baja_en": "P2"
+    }
+   ],
+   "definicion": "predicción de signo: el sitio sube de puesto en el primer perfil frente al segundo; rangos calculados sin aplicar puertas",
+   "objetivo_de_cada_perfil": "el objetivo por defecto de cada misión (27 §12)",
+   "exito": {
+    "aciertos_min": 8,
+    "de": 9,
+    "jaccard_top": 1000,
+    "jaccard_max": 0.5,
+    "jaccard_pares": [
+     [
+      "P1",
+      "P2"
+     ],
+     [
+      "P1",
+      "P4"
+     ]
+    ],
+    "texto": "≥ 8/9 y Jaccard del top 1000 < 0,5 entre P1 y P2 y entre P1 y P4"
+   },
+   "si_falla": "perfiles no discriminan: mirar correlación entre dimensiones; si Spearman > 0,8, fusionarlas y declararlo; no retocar pesos para acertar",
+   "retirada": "predicción 10 (Timanfaya en P5) retirada porque P5 sale",
+   "nota": "27 §2 fija ≥ 8 de 9 y no menciona el Jaccard de 20 §6.3; se conserva porque 27 no lo toca",
+   "fuente": "27 §2, §12; 20 §6.3"
+  },
+  "h2": {
+   "medida": "agrupaciones de celdas contiguas a > 100 km de todo sitio en 20 §2, [CPA] y P8, con S ≥ mediana de los positivos, ≥ 3 dimensiones fuerte, puertas pasadas, C ≥ 0,7, y en el top 5 % en ≥ 80 % de las réplicas",
+   "distancia_min_km": 100,
+   "dimensiones_fuertes_min": 3,
+   "fraccion_replicas_min": 0.8,
+   "revision": "top 10 a mano: imagen GIBS + literatura; ¿artefacto (embalse, ciudad, mina, error de máscara)?",
+   "novedad": "búsqueda «nombre + Mars/lunar analog» en ADS y Scholar: 0 publicaciones como análogo",
+   "exito": "≥ 5 agrupaciones en ≥ 2 perfiles, ≥ 7/10 sin artefacto, ≥ 3/10 con novedad 0",
+   "no_candidata": "celda no evaluable por puerta sin dato (27 §12)",
+   "fuente": "20 §6.2; 27 §12"
+  },
+  "pares_solo_validacion": {
+   "regla": "los pares que H1-S necesita y no están en `pares` se calculan solo para la validación y no se exportan; si al objetivo le falta un dato necesario, el sitio sale «no evaluable» (cierre n.º 5)"
+  },
+  "descriptivo_polar": {
+   "tipo": "descriptivo, NO prerregistrado, sin umbral",
+   "medida": "percentil por área de S de shackleton + P3 y de shackleton + P5 en la celda de cada sitio de ensayo lunar con coordenadas de datos_json/sitios_ensayo.json",
+   "sitios": [
+    "haughton",
+    "sp_crater",
+    "mistastin"
+   ],
+   "aviso": "al fijar esto ya se habían visto en la malla los valores de la celda de Haughton (117 días con máxima ≤ −23 °C, f_low 0,36); por eso no es validación"
+  }
+ },
+ "monte_carlo": {
+  "n": 500,
+  "perturbaciones": [
+   {
+    "que": "dato de entrada",
+    "como": "σ del dato + desviación dentro de la celda",
+    "distribucion": null,
+    "nota": "20 §6.4 no da σ por variable ni la distribución",
+    "aplicar": false,
+    "nota_cierre": "no se aplica: sin σ por variable escrita. La incertidumbre publicada cubre escalas y pesos, no el error del dato (cierre n.º 4)"
+   },
+   {
+    "que": "escalas E (y a, b) marcadas (mío)",
+    "como": "E × factor",
+    "distribucion": "log-uniforme en [0,5, 2]",
+    "afecta_a": [
+     "D1.soc_g_kg",
+     "D2.rugosidad_tan",
+     "D3.nv_dias_m23c",
+     "D3.nv_dias_0c",
+     "D5.R",
+     "D8.tiempo_ciudad_h"
+    ],
+    "nota": "20 §6.4 dice «E × [0,5, 2] log-uniforme en los marcados (mío)»; no escribe cómo se aplica el factor a un par (a, b) de saturación. 20 §9 dice que también las clases (mío) se prueban en Monte Carlo, sin decir cómo"
+   },
+   {
+    "que": "pesos",
+    "como": "uniformes en el símplex ordenado (orden de cada misión)",
+    "distribucion": "uniforme",
+    "nota": "ROC es el centroide de ese símplex (20 §4.1)"
+   }
+  ],
+  "publicar": [
+   "p5 y p95 de S",
+   "p5 y p95 de cada dimensión (00-contrato.md §3, capas inc_*)",
+   "estabilidad de rango"
+  ],
+  "percentiles": [
+   5,
+   95
+  ],
+  "peso_percentiles": "cos(lat)",
+  "fuente": "20 §6.4; piezas/03-motor.md; 00-contrato.md §3"
+ },
+ "comprobaciones": {
+  "cultivo": {
+   "modelo": "MEC del BVAD (NASA/TP-2015-218570/REV1), lechuga",
+   "parametros": {
+    "ppf_umol_m2_s": 295,
+    "luz_mol_m2_dia": 17,
+    "fotoperiodo_h": 16,
+    "co2_umol_mol": 1000,
+    "dias_hasta_cosecha": 30,
+    "fraccion_comestible": 0.95
+   },
+   "parametros_fuente": {
+    "luz": "BVAD tabla 4-96, verif/P22",
+    "co2": "supuesto: el BVAD no da el nominal (verif/P22); se declara",
+    "dias": "t_M = 30 dAE, BVAD tabla 4-118, verif/P22",
+    "fraccion_comestible": "XFRT = 0,95, BVAD tabla 4-118, verif/P22"
+   },
+   "esperado_g_m2_dia": 6.57,
+   "esperado_unidad": "g secos comestibles por m² y día",
+   "esperado_fuente": "BVAD tabla 4-97",
+   "tolerancia_rel": 0.05,
+   "regla_por_dia": null,
+   "nota": "27 §6 no escribe cómo se pasa de biomasa comestible total a g/m²·día; la cuenta a mano de verif/P22 (≈ 6,59) usa t_E = 1, H = H_O = 16, integración diaria. No es predicción ciega: comprueba que el modelo está bien copiado. Con 28 días o 400 µmol/mol no pasa",
+   "fuente": "27 §6; verif/P22",
+   "estado": "no se corre: falta la regla de paso a g/m²·día (cierre n.º 7)"
+  },
+  "pieza": {
+   "caso": "media viga MBB, Andreassen et al. 2011 (top88), Struct. Multidisc. Optim. 43:1-16, DOI 10.1007/s00158-010-0594-7",
+   "parametros": {
+    "nelx": 60,
+    "nely": 20,
+    "volfrac": 0.5,
+    "penal": 3,
+    "rmin": 2.4,
+    "filtro": "sensibilidad (ft = 1)",
+    "E0": 1,
+    "Emin": 1e-09,
+    "nu": 0.3,
+    "carga": "F = −1 vertical en la esquina superior izquierda",
+    "parada": "cambio L∞ del diseño < 0,01"
+   },
+   "esperado_compliance": 216.81,
+   "tolerancia_rel": 0.01,
+   "fuente": "27 §8; verif/P23 §1.2 (Fig. 3 de Andreassen 2011)"
+  },
+  "energia_cordura": {
+   "formula": "19,2 kWh/m²·día ÷ producción fresca del modelo de cultivo (≈ 0,13 kg/m²·día) ≈ 146 kWh/kg",
+   "rango_publicado_kwh_kg": {
+    "min": 77,
+    "max": 256
+   },
+   "rotulo": "comprobación de cordura; no cuenta como tercera comprobación",
+   "fuente": "27 §7, §15"
+  }
+ },
+ "energia": {
+  "consumo_kwh_m2_dia": 19.2,
+  "area_cultivo_m2": 11.1,
+  "consumo_modulo_kwh_dia": 213,
+  "consumo_fuente": "EDEN ISS, Antártida (Zabel 2022), medido (verif/P28)",
+  "formula_panel_m2": "consumo_modulo_kwh_dia / (radiacion_kwh_m2_dia × rendimiento)",
+  "rendimientos": [
+   0.2,
+   0.3
+  ],
+  "rendimientos_origen": "mío",
+  "tierra": "radiacion_kwh_m2_dia de POWER de la celda",
+  "marte": "rango entre la peor y la mejor época con Viking 1 (1,0 a 3,9 kWh/m²·día), rotulado «otra latitud; orden de magnitud»",
+  "luna": "no se calcula superficie; «paneles verticales en mástil, 10 kW por mástil en el programa de NASA»",
+  "calor": "no se modela",
+  "retirado": "los 6 kW de lámparas del invernadero de Arizona (no cuadran con 295 µmol/m²/s)",
+  "fuente": "27 §15"
+ },
+ "pieza_ensayable_aqui": {
+  "regla": "una pieza «se puede ensayar aquí» si la celda pasa las puertas de su misión y su puntuación para esa misión está en el 20 % mejor",
+  "percentil_mejor": 0.2,
+  "origen": "mío",
+  "piezas_por_mision": {
+   "P1": [
+    "anclas",
+    "taladro"
+   ],
+   "P4": [
+    "patas",
+    "despliegue",
+    "hojas"
+   ],
+   "P2": [
+    "suelo",
+    "semilla"
+   ],
+   "P3": [
+    "operar con sol rasante"
+   ]
+  },
+  "celda_no_evaluable": "las piezas de esa misión salen como «not evaluable here»",
+  "denominador": "sin las celdas no evaluables por puerta sin dato (27 §12)",
+  "sentido_del_ensayo": "nota fija por pieza, una por cuerpo (Luna y Marte); la web enseña la del objetivo elegido; fuente solo en anclas, viento, polvo y arco",
+  "marte_dos_aterrizajes": "en jezero y arcadia: «Mars: two landings»",
+  "fuente": "27 §16"
+ },
+ "cierres": {
+  "quien": "Claude (sesión principal), antes del hash y antes de calcular ninguna puntuación",
+  "visto_antes": "de la malla solo las filas de control de Yungay, Haughton y Lanzarote y los mapas de días fríos y rugosidad; ninguna S ni s_d",
+  "decisiones": [
+   {
+    "n": 1,
+    "que": "códigos GLiM de la tabla de litología",
+    "decision": "vb→volcánica básica, pb→plutónica básica, ev→evaporitas, ss→siliciclástica, sc/va/mt/pa→fila común; su, sm, vi, py, pi → litología sin_dato (no se inventa similitud); wb, ig → na"
+   },
+   {
+    "n": 2,
+    "que": "rugosidad 0",
+    "decision": "sin_dato (lagos y llanuras de agua en GMTED)"
+   },
+   {
+    "n": 3,
+    "que": "ΔT_O de Marte y R_O de D5 en jezero",
+    "decision": "esas variables quedan sin_dato; D3 de jezero y arcadia = días fríos; D5 de jezero sin_dato y la cobertura lo refleja"
+   },
+   {
+    "n": 4,
+    "que": "σ del dato en Monte Carlo",
+    "decision": "no se perturba el dato; se dice"
+   },
+   {
+    "n": 5,
+    "que": "pares de H1-S fuera de los exportados",
+    "decision": "se calculan solo para validar"
+   },
+   {
+    "n": 6,
+    "que": "perfil nuevo P5 y dimensión D9",
+    "decision": "se añaden como no prerregistrados; los 4 pares y la validación de los documentos no cambian"
+   },
+   {
+    "n": 7,
+    "que": "comprobación de cultivo",
+    "decision": "no se corre"
+   },
+   {
+    "n": 8,
+    "que": "par inicial",
+    "decision": "shackleton + P3 (el producto abre por el polo sur lunar)"
+   }
+  ],
+  "sin_resolver": [
+   "meridiani: sin coordenadas ni D3 → sus sitios salen «no evaluable»",
+   "Dalinouer y permafrost de Bockfjorden: null",
+   "paso 3 de «si falla H1» cuenta 7 sitios pares y quedan 6"
+  ]
+ }
+}

@@ -1,0 +1,36 @@
+{
+  "aviso": "NASA 3D models (Credit: NASA), byte-identical to the file at fichero_url (sha256 compared). medida_m = bounding box of the glTF as published, length × width × height in metres (Y up), measured from its POSITION min/max. relacion is own criterion (origen: mío): sustituto = a different NASA system of the same class.",
+  "origen_relacion": "mío",
+  "modelos": [
+    {
+      "id": "rassor",
+      "fichero": "modelos/rassor.glb",
+      "nombre_real": "RASSOR excavator",
+      "fuente_url": "https://science.nasa.gov/3d-resources/regolith-advanced-surface-systems-operations-robot-rassor/",
+      "a_escala_real": true,
+      "medida_m": [
+        1.657,
+        0.848,
+        0.938
+      ],
+      "equipo": "ipex",
+      "relacion": "sustituto",
+      "fichero_url": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/model/regolith-advanced-surface-systems-operations-robot-(rassor)/Regolith%20Advanced%20Surface%20Systems%20Operations%20Robot%20(RASSOR).glb"
+    },
+    {
+      "id": "sev",
+      "fichero": "modelos/sev.glb",
+      "nombre_real": "Space Exploration Vehicle (SEV)",
+      "fuente_url": "https://science.nasa.gov/3d-resources/space-exploration-vehicle/",
+      "a_escala_real": true,
+      "medida_m": [
+        5.91,
+        4.038,
+        3.969
+      ],
+      "equipo": "ltv",
+      "relacion": "sustituto",
+      "fichero_url": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/model/space-exploration-vehicle/Space%20Exploration%20Vehicle.glb"
+    }
+  ]
+}

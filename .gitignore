@@ -1,0 +1,10 @@
+build/
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+test-results/
+capturas/
+*.tmp
+.claude/

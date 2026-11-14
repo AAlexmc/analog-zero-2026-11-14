@@ -1,0 +1,35 @@
+/* Obra: carretera en el panel de rutas y plataforma en la hoja (panel_obra.js). Usa las variables de estilo.css. */
+.obra { display: flex; flex-direction: column; gap: 5px; }
+.obra:empty { display: none; }
+.obra .params, .obra-pad .params { display: flex; flex-direction: column; gap: 2px; }
+.obra .fila-o, .obra-pad .fila-o { flex-direction: row; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.obra input[type=number], .obra-pad input[type=number] { font: 11px var(--mono); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); padding: 3px 4px; width: 72px; }
+.nota-o { font-size: 10px; }
+.supuesto, .propio { color: var(--ambar); letter-spacing: .06em; }
+.obra dl, .obra-pad dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 4px 0; }
+.obra dt, .obra-pad dt { font-size: 10px; letter-spacing: .12em; color: var(--tenue); }
+.obra dd, .obra-pad dd { margin: 0; text-align: right; }
+.obra .pide { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(255, 179, 64, .08); }
+.obra dl.primera dd { color: var(--blanco); font-weight: 600; }
+.no-medido { font-size: 10px; border: 1px dashed var(--tenue); padding: 3px 5px; color: var(--tenue); }
+.obra .aplicada, .obra-pad .aplicada { border-top: 1px solid var(--linea); padding-top: 4px; }
+.obra-pad { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--linea); padding-top: 5px; }
+.obra-pad:empty { display: none; }
+.obra-pad .botones { display: flex; gap: 6px; }
+.obra-pad .aviso-obs { color: var(--fondo); background: var(--blanco); padding: 2px 5px; }
+.perfil-obra { display: block; width: 100%; height: 90px; border: 1px solid var(--linea); background: rgba(2, 18, 38, .6); }
+.perfil-obra polyline { fill: none; vector-effect: non-scaling-stroke; }
+.perfil-obra .terreno { stroke: var(--tenue); stroke-width: 1; }
+.perfil-obra .rasante { stroke: var(--blanco); stroke-width: 1.5; }
+.perfil-obra .corte { fill: var(--ambar); opacity: .75; }
+.perfil-obra .relleno { fill: #9ef2ff; opacity: .6; }
+.m-corte, .m-relleno { display: inline-block; width: 9px; height: 9px; margin: 0 3px -1px 0; }
+.m-corte { background: var(--ambar); }
+.m-relleno { background: #9ef2ff; margin-left: 6px; }
+
+.obra-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: visible; }
+.obra-svg polyline { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.obra-svg .traza-fondo { stroke: var(--fondo); stroke-width: 5; opacity: .8; }
+.obra-svg .traza { stroke: var(--ambar); stroke-width: 2.5; stroke-dasharray: 8 4; }
+.obra-svg .obsoleta { opacity: .35; }
+.obra-svg .pad { fill: rgba(255, 179, 64, .18); stroke: var(--ambar); stroke-width: 1.5; }
