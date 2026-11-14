@@ -390,7 +390,7 @@
           "coordenadas_fuente": {
             "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
             "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2008–2009",
           "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
@@ -413,7 +413,7 @@
           "meses_fuente": {
             "fuente": "https://www3.nasa.gov/home/hqnews/2007/nov/HQ_07251_Inflatable_Lunar_Habitat.html",
             "cita": "which runs from January 2008 to February 2009",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -426,7 +426,7 @@
           "coordenadas_fuente": {
             "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
             "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2008",
           "fuente": "https://www.lpi.usra.edu/lunar/analogs/blackpoint/pdf/marsmoon_analogs_nasafactsheet.pdf",
@@ -736,7 +736,7 @@
           "coordenadas_fuente": {
             "fuente": "https://www.usap.gov/videoClipsAndMaps/mcmwebcam.cfm",
             "cita": "McMurdo Station (77°51'S, 166°40'E), the main U.S. station in Antarctica",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2016 onward",
           "fuente": "https://ntrs.nasa.gov/api/citations/20230009138/downloads/June%202023%20NRA%20Antarctica%20Study%20Information%20PackageV2.pdf",
@@ -915,7 +915,7 @@
           "meses_fuente": {
             "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
             "cita": "on July 12 and will operate the machines until July 31",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -940,7 +940,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/citations/20205010224",
             "cita": "conducted over 66 GPR surveys inside and surrounding the Askja caldera in August 2019",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1033,7 +1033,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
             "cita": "From 19 July to 8 August 2010",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1046,7 +1046,7 @@
           "coordenadas_fuente": {
             "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
             "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2009",
           "fuente": "https://phys.org/news/2009-09-nasa-lunar-robotics-arizona.html",
@@ -1160,7 +1160,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/citations/20190029009",
             "cita": "in Lava Beds National Monument (N. CA, USA) during August of 2018",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1332,7 +1332,7 @@
           "meses_fuente": {
             "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238",
             "cita": "BASALT-2 took place in the Mauna Ulu region on the Big Island of Hawai'i in November 2016",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1354,7 +1354,7 @@
           "meses_fuente": {
             "fuente": "https://www.nasa.gov/general/basalt-news/",
             "cita": "June 13-July 1, 2016 Deployment to Craters of the Moon, Idaho",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1375,7 +1375,7 @@
           "meses_fuente": {
             "fuente": "https://www.nasa.gov/general/basalt-research-program-hawaii-2017-field-deployment/",
             "cita": "took place from November 1-21, 2017",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1452,7 +1452,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/citations/20100033667",
             "cita": "demonstrated on Hawaii's Mauna Kea volcano in February 2010",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1534,14 +1534,14 @@
           "anos": "2007",
           "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
           "cita": "The robots, K10 Black and K10 Red, carry 3-D laser scanners and ground-penetrating radar.",
-          "verificado": false,
+          "verificado": true,
           "meses": [
             7
           ],
           "meses_fuente": {
             "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
             "cita": "on July 12 and will operate the machines until July 31",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1563,7 +1563,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/api/citations/20110008151/downloads/20110008151.pdf",
             "cita": "From 19 July to 8 August 2010",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1634,14 +1634,14 @@
           "anos": "2007",
           "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
           "cita": "The robots, K10 Black and K10 Red, carry 3-D laser scanners and ground-penetrating radar.",
-          "verificado": false,
+          "verificado": true,
           "meses": [
             7
           ],
           "meses_fuente": {
             "fuente": "https://phys.org/news/2007-07-nasa-robots-moon-survey-arctic.html",
             "cita": "on July 12 and will operate the machines until July 31",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1704,7 +1704,7 @@
           "meses_fuente": {
             "fuente": "https://www.nasa.gov/centers-and-facilities/johnson/moonwalking-test-mission-daily-field-log/",
             "cita": "Field Test 3 wrapped up on October 12",
-            "verificado": false
+            "verificado": true
           }
         },
         {
@@ -1725,7 +1725,7 @@
           "meses_fuente": {
             "fuente": "https://www.usgs.gov/centers/astrogeology-science-center/news/artemis-iii-mission-tests-san-francisco-volcanic-field",
             "cita": "JETT5 conducted mission simulations for Artemis III from May 13 to 17, 2024.",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1868,7 +1868,7 @@
           "meses_fuente": {
             "fuente": "https://www.nasa.gov/solar-system/planets/mars/nasa-tests-drones-in-death-valley-preps-for-martian-sands-and-skies",
             "cita": "Mesquite Flats Sand Dunes in late April and early September",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -1937,7 +1937,7 @@
           "meses_fuente": {
             "fuente": "https://photojournal.jpl.nasa.gov/catalog/PIA15683",
             "cita": "ran these mobility tests in early May 2012 in preparation for operating the Curiosity rover",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -2004,7 +2004,7 @@
           "coordenadas_fuente": {
             "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
             "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
@@ -2016,7 +2016,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/citations/20230007175",
             "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
@@ -2100,7 +2100,7 @@
           "coordenadas_fuente": {
             "fuente": "https://topoquest.com/place/arizona/bench/black-point/1577",
             "cita": "Black Point is a bench located in Coconino County, AZ at N35.687777° W111.359868°",
-            "verificado": false
+            "verificado": true
           },
           "anos": "2022",
           "fuente": "https://ntrs.nasa.gov/citations/20230007175",
@@ -2112,7 +2112,7 @@
           "meses_fuente": {
             "fuente": "https://ntrs.nasa.gov/citations/20230007175",
             "cita": "Analog tests conducted in October 2022 by the D-RATS team addressed three high-level objectives",
-            "verificado": false
+            "verificado": true
           }
         }
       ],
