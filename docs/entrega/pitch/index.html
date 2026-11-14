@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero · Pitch</title>
+<link rel="stylesheet" href="../../../web/marca/marca.css">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  .diapo { position: absolute; inset: 0; display: none; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 64px); align-items: center; padding: clamp(24px, 6vh, 72px) clamp(24px, 6vw, 96px); box-sizing: border-box; }
+  .diapo.actual { display: grid; }
+  .numero { font-family: var(--mono); color: var(--acento); font-size: 18px; margin: 0 0 16px; }
+  .diapo h2 { font-size: clamp(32px, 4.6vw, 64px); margin: 0 0 28px; }
+  .diapo ul { margin: 0; padding: 0; list-style: none; }
+  .diapo li { font-size: clamp(18px, 1.9vw, 26px); line-height: 1.35; margin: 0 0 18px; padding-left: 22px; position: relative; }
+  .diapo li::before { content: ""; position: absolute; left: 0; top: .55em; width: 8px; height: 8px; border-radius: 50%; background: var(--white); }
+  .diapo code { font-family: var(--mono); font-size: .72em; color: var(--texto-tenue); }
+  .hueco { aspect-ratio: 16 / 10; border: 2px dashed var(--linea); border-radius: var(--radio); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; padding: 24px; text-align: center; background: var(--panel); }
+  .hueco .fichero { font-family: var(--mono); font-size: 16px; overflow-wrap: anywhere; }
+  .hueco .guion { font-family: var(--mono); font-size: 14px; color: var(--texto-tenue); overflow-wrap: anywhere; }
+  .hueco .rotulo { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
+  .pie { position: fixed; right: clamp(16px, 3vw, 40px); bottom: 16px; display: flex; gap: 10px; align-items: center; font-family: var(--mono); font-size: 14px; color: var(--texto-tenue); }
+  .pie button { font: 700 14px/1 var(--cuerpo); color: var(--white); background: transparent; border: 1px solid var(--linea); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  .pie button:hover, .pie button:focus-visible { color: var(--neon-yellow); border-color: var(--neon-yellow); outline: none; }
+  @media (max-width: 800px) {
+    html, body { overflow: auto; }
+    .diapo { grid-template-columns: 1fr; align-content: start; position: relative; min-height: 100vh; }
+  }
+</style>
+</head>
+<body class="marca-fondo marca-cuerpo">
+<main id="diapos">
+
+<section class="diapo" aria-labelledby="t1">
+  <div>
+    <p class="numero">01 / 07</p>
+    <h2 class="marca-titulo" id="t1">Where on Earth do you test for the Moon and Mars?</h2>
+    <ul>
+      <li>Hardware for the Moon's south pole or Mars has to be tested on Earth first.</li>
+      <li>Famous analog sites exist, but the whole planet is rarely searched.</li>
+      <li>Analog Zero searches all of Earth's land and says how alike each place is.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/portada/01-portada-luna.png</span><span class="guion">scripts/captura_portada.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t2">
+  <div>
+    <p class="numero">02 / 07</p>
+    <h2 class="marca-titulo" id="t2">Pick a world, place a point</h2>
+    <ul>
+      <li>The Moon and Mars open in 3D on real elevation data.</li>
+      <li>On the Moon, NASA looks within 6° of the south pole (<code>web/data/sitio/indice.json</code>).</li>
+      <li>Mars has no chosen site yet, so any point can be placed.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/portada/06-luna-polo-sur.png</span><span class="guion">scripts/captura_portada.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t3">
+  <div>
+    <p class="numero">03 / 07</p>
+    <h2 class="marca-titulo" id="t3">The best base site, by NASA's own criteria</h2>
+    <ul>
+      <li>Sunlight, slope and distance to permanent shadow on the Moon; elevation, slope and hydrogen on Mars.</li>
+      <li>Each criterion carries its NASA quotation.</li>
+      <li>What NASA names and we cannot measure is listed as such.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/sitio/07-luna-auto.png</span><span class="guion">scripts/captura_sitio.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t4">
+  <div>
+    <p class="numero">04 / 07</p>
+    <h2 class="marca-titulo" id="t4">Every place on Earth, parameter by parameter</h2>
+    <ul>
+      <li>720 × 360 cells of 0.5°; eight parameters are compared with the target.</li>
+      <li>Each place shows what matches, how much, and what is far.</li>
+      <li>Gravity and air pressure are always shown as «cannot reproduce».</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/analogos/04-jezero-metrics.png</span><span class="guion">scripts/captura_analogos.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t5">
+  <div>
+    <p class="numero">05 / 07</p>
+    <h2 class="marca-titulo" id="t5">Search by NASA mission objective</h2>
+    <ul>
+      <li>Pick a kind of test NASA runs at analog sites, or write a new mission.</li>
+      <li>The traits behind it come from NASA campaign sources, quoted; which layer stands for each is our own mapping.</li>
+      <li>21 objectives are published (<code>web/data/misiones.json</code>); what has no layer is shown as NOT MEASURED.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/misiones/02-biomarcadores-ficha-abierta.png</span><span class="guion">scripts/captura_misiones.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t6">
+  <div>
+    <p class="numero">06 / 07</p>
+    <h2 class="marca-titulo" id="t6">A portfolio, not a single winner</h2>
+    <ul>
+      <li>The smallest set of Earth places that together cover every parameter.</li>
+      <li>What no place covers is what has to go to a lab.</li>
+      <li>Each place says whether a known analog site is within 300 km, or it is unlisted.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/cartera/jezero-2-portfolio.png</span><span class="guion">scripts/captura_cartera.mjs</span></div>
+</section>
+
+<section class="diapo" aria-labelledby="t7">
+  <div>
+    <p class="numero">07 / 07</p>
+    <h2 class="marca-titulo" id="t7">Plant it, see what breaks, and what failed</h2>
+    <ul>
+      <li>Real Moon terrain next to Earth analogs at the same scale; 13 systems with published limits (<code>web/data/equipo.json</code>).</li>
+      <li>Our global ranking had a pre-registered validation, and it failed: 1 of 11 known sites in the top 5 %, 8 were needed (<code>docs/validacion-global.md</code>).</li>
+      <li>It stays as exploratory. The environment types are unsupervised and weak; Mars temperature is a reanalysis.</li>
+    </ul>
+  </div>
+  <div class="hueco"><span class="rotulo">Capture</span><span class="fichero">capturas/base/01-base-generada.png</span><span class="guion">scripts/captura_base.mjs</span></div>
+</section>
+
+</main>
+<nav class="pie" aria-label="Slides">
+  <button type="button" id="atras" aria-label="Previous slide">←</button>
+  <span id="cuenta">1 / 7</span>
+  <button type="button" id="adelante" aria-label="Next slide">→</button>
+</nav>
+<script>
+  const diapos = [...document.querySelectorAll('.diapo')];
+  let i = 0;
+  function ir(n) {
+    i = Math.max(0, Math.min(diapos.length - 1, n));
+    diapos.forEach((d, k) => d.classList.toggle('actual', k === i));
+    document.getElementById('cuenta').textContent = `${i + 1} / ${diapos.length}`;
+    history.replaceState(null, '', `#${i + 1}`);
+  }
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); ir(i + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); ir(i - 1); }
+    else if (e.key === 'Home') ir(0);
+    else if (e.key === 'End') ir(diapos.length - 1);
+  });
+  document.getElementById('atras').addEventListener('click', () => ir(i - 1));
+  document.getElementById('adelante').addEventListener('click', () => ir(i + 1));
+  ir((parseInt(location.hash.slice(1), 10) || 1) - 1);
+</script>
+</body>
+</html>
