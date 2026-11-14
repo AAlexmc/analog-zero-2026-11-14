@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ID_NUEVA, TITULO_MAX, parametrosDe, referenciaDe, noMedidas, elegible, textoOpcion, resumenLugar, lineaResumen, validarNueva, sitiosReferencia, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, opcionesBusqueda, frasesNoUsados } from '../analogos/misiones.js';
+import { ID_NUEVA, TITULO_MAX, parametrosDe, referenciaDe, noMedidas, elegible, textoOpcion, resumenLugar, lineaResumen, validarNueva, sitiosReferencia, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, conMision, opcionesBusqueda, frasesNoUsados } from '../analogos/misiones.js';
 import { formatoValor, NOMBRE_CORTO, nombreCorto } from '../analogos/metricas.js';
 
 const leer = (r) => JSON.parse(readFileSync(new URL(r, import.meta.url), 'utf8'));
@@ -131,6 +131,19 @@ test('URL: new mission round trip with an awkward title; bad parameters or site 
   assert.equal(escribirEstado(new URLSearchParams(), sinRef).has('ref'), false);
   assert.equal(leerEstado(new URLSearchParams('mision=nueva&titulo=X&p=no_existe'), CATALOGO, INDICE, SITIOS), null);
   assert.equal(leerEstado(new URLSearchParams('mision=nueva&p=elev_m'), CATALOGO, INDICE, SITIOS), null);
+});
+
+test('links between the world view and the results carry the mission; no mission = the link of always', () => {
+  const ir = '../analogos/index.html?mundo=moon&lat=-89.9&lon=0&nombre=South%20pole';
+  assert.equal(conMision(ir, null), ir);
+  assert.equal(conMision(ir, activaDeCatalogo(mision('biomarcadores'), INDICE, SITIOS)), `${ir}&mision=biomarcadores`);
+  assert.equal(conMision('../explorar/index.html', activaDeCatalogo(mision('biomarcadores'), INDICE, SITIOS)), '../explorar/index.html?mision=biomarcadores');
+  const n = activaNueva({ titulo: 'Rover & drill?#1 «x»', parametros: ['elev_m', 't_min_k'], ref: 'yungay' }, INDICE, SITIOS);
+  const h = conMision(ir, n);
+  assert.ok(h.startsWith(`${ir}&mision=nueva&`));
+  const q = new URL(h, 'http://x/explorar/').searchParams;
+  assert.deepEqual([q.get('mundo'), q.get('nombre'), q.get('lat')], ['moon', 'South pole', '-89.9']);
+  assert.deepEqual(leerEstado(q, CATALOGO, INDICE, SITIOS), n);
 });
 
 test('parameters left out of the search are named with the reason', () => {

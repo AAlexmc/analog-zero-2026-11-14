@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../marca/marca.css">
 <link rel="stylesheet" href="explorar.css">
 <link rel="stylesheet" href="../sitio/sitio.css">
+<link rel="stylesheet" href="../analogos/mision.css">
 <script type="importmap">
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
@@ -22,9 +23,25 @@
 </header>
 <aside class="marca-panel panel" id="panel">
   <h1 class="marca-titulo mundo" id="nombre-mundo">&nbsp;</h1>
+  <section class="mision" id="mision-caja" hidden>
+    <h2 class="marca-subtitulo"><span class="num-paso marca-num">1</span> <label for="mision">Mission objective</label></h2>
+    <select id="mision"><option value="">All parameters (no mission)</option></select>
+    <form class="mision-nueva" id="mision-nueva" hidden>
+      <label class="mision-rotulo" for="mision-titulo">Mission title</label>
+      <input type="text" id="mision-titulo" maxlength="60" autocomplete="off">
+      <fieldset id="nueva-punto"><legend id="nueva-punto-titulo">Compared with your point</legend></fieldset>
+      <fieldset id="nueva-tierra"><legend>Earth only — compared with a test site</legend>
+        <label class="mision-rotulo" for="mision-ref">Test site</label>
+        <select id="mision-ref"><option value="">Pick a test site</option></select>
+        <p class="tenue nota" id="nueva-ref-nota" hidden>Pick a test site, or the Earth-only parameters are not used.</p>
+      </fieldset>
+      <button type="submit" class="marca-boton" id="mision-buscar" disabled>Use this mission</button>
+    </form>
+    <div class="mision-ficha" id="mision-ficha" hidden></div>
+  </section>
   <section class="sitio" id="sitio" hidden>
-    <details class="criterios" id="criterios" open>
-      <summary class="marca-subtitulo"><span class="num-paso marca-num">1</span> What makes a good base site?</summary>
+    <details class="criterios" id="criterios">
+      <summary class="marca-subtitulo"><span class="num-paso marca-num">2</span> What makes a good base site?</summary>
       <p class="ambito" id="ambito"></p>
       <div class="lista-criterios" id="lista-criterios"></div>
       <p class="tenue pesos-propios" id="pesos-propios" hidden>Own weights: NASA lists the criteria, not how much each one weighs.</p>
@@ -37,12 +54,12 @@
     <div class="resultado" id="resultado" aria-live="polite"></div>
   </section>
   <section class="paso" data-paso="1">
-    <h2 class="marca-subtitulo"><span class="num-paso marca-num">1</span> Pick a place</h2>
+    <h2 class="marca-subtitulo"><span class="num-paso marca-num">2</span> Pick a place</h2>
     <p>Tap the globe, or start here:</p>
   </section>
   <div class="sugerencias" id="sugerencias" role="group" aria-label="Suggested places"></div>
   <section class="paso" data-paso="2" hidden>
-    <h2 class="marca-subtitulo"><span class="num-paso marca-num">2</span> Find its twin on Earth</h2>
+    <h2 class="marca-subtitulo"><span class="num-paso marca-num">3</span> Find its twin on Earth</h2>
     <p class="nombre-punto" id="nombre-punto"></p>
     <p class="coords marca-num"><span id="lat">—</span><span id="lon">—</span></p>
     <div class="ambiente" id="ambiente" hidden>

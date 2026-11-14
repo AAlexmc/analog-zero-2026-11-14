@@ -142,8 +142,11 @@ try {
   await quieta(pag);
   let e = await estado(pag);
   const cab = await pag.evaluate(() => ({ titulo: document.querySelector('#criterios > summary').textContent.trim(), abierto: document.getElementById('criterios').open, ambito: document.getElementById('ambito').textContent, filas: [...document.querySelectorAll('.criterio')].map((f) => ({ id: f.dataset.id, limite: !!f.querySelector('input[type=number]'), peso: !!f.querySelector('input[type=range]'), nasa: !!f.querySelector('.nasa') })), nm: document.querySelectorAll('#no-medidos-lista li').length, propios: !document.getElementById('pesos-propios').hidden }));
-  if (!e.caja || e.estado !== 'ok' || !cab.abierto || cab.titulo !== '1 What makes a good base site?' || cab.ambito !== IDX.mundos.mars.ambito || cab.filas.length !== IDX.mundos.mars.criterios.length || !cab.filas.every((f) => f.nasa)) falla(`Mars box: ${JSON.stringify({ e: e.estado, cab })}`);
-  else ok(`Mars box open on arrival: "${cab.titulo}", ${cab.filas.map((f) => `${f.id}${f.limite ? ' [limit]' : ''}${f.peso ? ' [weight]' : ''}`).join(', ')}; ${cab.nm} not measured; own-weights line ${cab.propios}`);
+  if (!e.caja || e.estado !== 'ok' || cab.abierto || cab.titulo !== '2 What makes a good base site?' || cab.ambito !== IDX.mundos.mars.ambito || cab.filas.length !== IDX.mundos.mars.criterios.length || !cab.filas.every((f) => f.nasa)) falla(`Mars box: ${JSON.stringify({ e: e.estado, cab })}`);
+  else ok(`Mars box folded on arrival (step 1 is the mission): "${cab.titulo}", ${cab.filas.map((f) => `${f.id}${f.limite ? ' [limit]' : ''}${f.peso ? ' [weight]' : ''}`).join(', ')}; ${cab.nm} not measured; own-weights line ${cab.propios}`);
+  await pag.click('#criterios > summary');
+  await pag.waitForTimeout(100);
+  if (!(await pag.evaluate(() => document.getElementById('criterios').open))) falla('Mars: clicking "What makes a good base site?" does not open the criteria');
   const aj0 = ajustesDe(e);
   if (JSON.stringify(aj0) !== JSON.stringify(ajustesPorDefecto(W.mars))) falla(`Mars default settings ${JSON.stringify(aj0)}`);
   const lm = limitesMarteAMano(e.punto.lat, e.punto.lon);
@@ -248,6 +251,9 @@ try {
   if (!(e.punto.lat <= -84) || !vL || !Number.isFinite(vL.valores.iluminacion)) falla(`Moon best spot outside the south-pole patch: ${JSON.stringify(e.punto)}`);
   else ok(`Moon best spot ${formatoLatLon(e.punto.lat, e.punto.lon).texto} is inside the south-pole patch (within 6° of the pole, cell with data); worker ${e.ms.toFixed(0)} ms`);
   await pl.screenshot({ path: join(SALIDA, '07-luna-auto.png') });
+  await pl.click('#criterios > summary');
+  await pl.waitForTimeout(100);
+  if (!(await pl.evaluate(() => document.getElementById('criterios').open && [...document.querySelectorAll('.criterio input[type=range]')].every((r) => r.getClientRects().length > 0)))) falla('Moon: sliders not visible after opening the criteria');
   e = await regenerar(pl, `${deslizar('pendiente_deg', 1)}; ${deslizar('iluminacion', 0.1)}; ${deslizar('dist_sombra_km', 0.1)}`);
   const rL2 = compararConNodo('Moon, slope matters most', e, 'moon', ajustesDe(e));
   if (igualPunto(rL2.mejor, rL.mejor)) falla('Moon: putting slope first did not move the pin'); else ok(`Moon: slope first moves the pin to ${formatoLatLon(rL2.mejor.lat, rL2.mejor.lon).texto}`);

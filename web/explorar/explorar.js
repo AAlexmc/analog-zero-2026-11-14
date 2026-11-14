@@ -2,10 +2,12 @@
 import { webglDisponible, cargarMundos } from '../portada/espacio.js';
 import { formatoLatLon, normLon } from './geo.js';
 import { crearGlobo } from './globo.js';
-import { cargar } from '../buscar/motor.js';
+import { cargar, fetchBinario } from '../buscar/motor.js';
 import { formatoValor, celsius, partesSup } from '../analogos/metricas.js';
 import { montarSitio, rotuloRango } from '../sitio/panel.js';
 import { engancharRelieve } from '../relieve/enganche.js';
+import { leerEstado, conMision } from '../analogos/misiones.js';
+import { montarMision, pintarFicha } from '../analogos/mision_panel.js';
 
 // Vista inicial (propia): la Luna algo desde el sur para que se vea el polo; Marte de cara a Syrtis–Jezero.
 const VISTA0 = { moon: { lat: -38, lon: 0 }, mars: { lat: 15, lon: 72 } };
@@ -17,15 +19,21 @@ const az = (window.__az ??= {});
 const V = (az.vista = { listo: false, errores: [], textura: null });
 const oyentes = new Set();
 let punto = null;
+let activa = null;
 az.explorar = {
   mundo: idMundo,
   get punto() { return punto ? { lat: punto.lat, lon: punto.lon } : null; },
+  get mision() { return activa; },
   alCambiar(cb) { oyentes.add(cb); return () => oyentes.delete(cb); },
 };
 
 // Capas globales en segundo plano para «What it is like there»; si no han llegado, nada espera por ellas.
 V.motor = 'cargando';
-const motorP = cargar('../data/cuerpos/').then((M) => { V.motor = 'ok'; return M; }, (e) => { V.motor = 'error'; V.errores.push(String(e.message ?? e)); return null; });
+// El índice llega antes que las capas: el paso «Mission objective» lo usa sin esperar al resto.
+let indiceListo;
+const indiceP = new Promise((ok) => { indiceListo = ok; });
+indiceP.catch(() => {});
+const motorP = cargar('../data/cuerpos/', (url, tipo) => { const p = fetchBinario(url, tipo); if (url.endsWith('indice.json')) indiceListo(p); return p; }).then((M) => { V.motor = 'ok'; return M; }, (e) => { V.motor = 'error'; V.errores.push(String(e.message ?? e)); return null; });
 const AMBIENTE = [
   ['t_max_k', 'Daily high', (v) => celsius(v)],
   ['t_min_k', 'Daily low', (v) => celsius(v)],
@@ -68,7 +76,29 @@ if (!mundo) {
   await montar(mundo);
 }
 
+// Paso ① «Mission objective»: aquí solo se elige; la búsqueda la hace resultados. Sin misiones.json o sin índice no sale.
+async function montarPasoMision(m, ponerBuscar) {
+  const fallo = (e) => { V.errores.push(String(e?.message ?? e)); };
+  const json = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}: ${url}`); return r.json(); });
+  V.mision = 'cargando';
+  const [misiones, sitios, indice] = await Promise.all([
+    json('../data/misiones.json').then((j) => j.misiones ?? []).catch((e) => { fallo(e); return []; }),
+    json('../data/sitios_ensayo.json').then((j) => j.sitios ?? []).catch((e) => { fallo(e); return []; }),
+    indiceP.catch(() => null),
+  ]);
+  if (!misiones.length || !indice) { V.mision = 'sin datos'; return; }
+  const P = Object.fromEntries([...indice.parametros, ...(indice.parametros_tierra ?? [])].map((p) => [p.id, p]));
+  activa = leerEstado(q, misiones, indice, sitios);
+  const pintar = () => { pintarFicha({ activa, P, sitios }); ponerBuscar(); };
+  montarMision({ misiones, indice, sitios, mundo: m.id, activa, alCambiar: (a) => { activa = a; pintar(); } });
+  pintar();
+  V.mision = 'ok';
+}
+
 async function montar(m) {
+  let hrefBuscar = null;
+  const ponerBuscar = () => { if (hrefBuscar) $('buscar').href = conMision(hrefBuscar, activa); };
+  const misionP = montarPasoMision(m, ponerBuscar).catch((e) => { V.mision = 'error'; V.errores.push(String(e?.message ?? e)); });
   engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: m.id, alCambiar: az.explorar.alCambiar, punto: () => punto && { lat: punto.lat, lon: punto.lon, titulo: `${punto.sug?.nombre ?? 'Your pin'} · ${formatoLatLon(punto.lat, punto.lon).texto}` } });
   const caja = $('sugerencias');
   for (const s of m.sugerencias) {
@@ -92,7 +122,8 @@ async function montar(m) {
     $('lat').textContent = f.lat; $('lon').textContent = f.lon;
     $('nombre-punto').textContent = sug ? sug.nombre : origen ? rotuloRango(origen.rango) : 'Your pin';
     const cifra = (v) => (sug ? String(v) : v.toFixed(4));
-    $('buscar').href = `../analogos/index.html?mundo=${encodeURIComponent(m.id)}&lat=${cifra(punto.lat)}&lon=${cifra(punto.lon)}${sug ? `&nombre=${encodeURIComponent(sug.nombre)}` : ''}`;
+    hrefBuscar = `../analogos/index.html?mundo=${encodeURIComponent(m.id)}&lat=${cifra(punto.lat)}&lon=${cifra(punto.lon)}${sug ? `&nombre=${encodeURIComponent(sug.nombre)}` : ''}`;
+    ponerBuscar();
     caja.querySelectorAll('.sugerencia').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === punto.sugerencia)));
     caja.dataset.titulo = 'Move the pin: tap the globe or try one of these:';
     verPaso(2);
@@ -125,6 +156,7 @@ async function montar(m) {
     $('pista').textContent = 'This browser cannot draw the 3D globe. Pick one of the places below.';
     if (inicial) fijarInicial();
     await (await sitioP)?.inicial;
+    await misionP;
     V.listo = true;
     return;
   }
@@ -139,6 +171,7 @@ async function montar(m) {
   G.dibujar();
   V.textura = await G.texturaLista;
   await (await sitioP)?.inicial;
+  await misionP;
   await document.fonts.ready;
   V.listo = true;
 }

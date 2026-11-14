@@ -1,0 +1,33 @@
+/* Objetivo de misión (mision_panel.js): selector, formulario «New mission» y ficha; pantalla del mundo y resultados. Solo colores de marca.css. */
+.mision { margin: 0 0 12px; font-size: 14px; }
+.mision-rotulo { display: block; font-weight: 700; font-size: 13px; margin: 0 0 4px; }
+.mision select, .mision input[type="text"] { box-sizing: border-box; width: 100%; font: 15px/1.2 var(--cuerpo); color: var(--white); background: var(--deep-blue); border: 2px solid var(--linea); border-radius: 10px; padding: 8px 12px; min-height: 44px; }
+.mision select:hover, .mision input[type="text"]:hover { border-color: var(--white); }
+.mision select:focus-visible, .mision input[type="text"]:focus-visible { border-color: var(--neon-yellow); outline: none; }
+.mision-nueva { margin: 10px 0 0; display: grid; gap: 10px; }
+.mision-nueva[hidden] { display: none; }
+.mision-nueva fieldset { margin: 0; padding: 8px 10px 10px; border: 1px solid var(--linea); border-radius: 10px; min-width: 0; }
+.mision-nueva legend { font-weight: 700; font-size: 13px; padding: 0 4px; }
+.mision-nueva .casilla { display: flex; align-items: center; gap: 8px; min-height: 32px; cursor: pointer; }
+.mision-nueva .casilla input { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--neon-yellow); }
+.mision-nueva #mision-ref { margin-top: 2px; }
+.mision-nueva .nota { margin: 6px 0 0; font-size: 13px; }
+.mision-nueva .marca-boton { justify-self: start; }
+.mision-ficha { margin: 10px 0 0; padding: 10px 12px; border: 1px solid var(--linea); border-left: 3px solid var(--neon-yellow); border-radius: 10px; }
+.mision-ficha p { margin: 0 0 8px; }
+.mision-ficha .mision-titulo { font: 700 16px/1.25 var(--titulo); }
+.mision-ficha .como { margin: 0 0 8px; font-size: 13px; }
+.mision-ficha .como summary { cursor: pointer; font-weight: 700; color: var(--white); padding: 4px 0; }
+.mision-ficha .como summary:focus-visible { outline: 2px solid var(--neon-yellow); }
+.mision-ficha ul.campanas, .mision-ficha ul.no-medido { margin: 4px 0 0; padding-left: 18px; }
+.mision-ficha ul.campanas > li, .mision-ficha ul.no-medido > li { margin-bottom: 6px; }
+.mision-ficha a { color: var(--white); }
+.mision-ficha a:hover, .mision-ficha a:focus-visible { color: var(--neon-yellow); }
+.mision-ficha blockquote { margin: 4px 0 0; padding-left: 10px; border-left: 2px solid var(--linea); font-style: italic; }
+.mision-ficha .marca-chip { font-size: 10px; padding: 3px 7px; vertical-align: 1px; }
+.mision-ficha .chips { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.mision-ficha .chips .marca-chip { border-color: var(--neon-yellow); }
+.mision-ficha .chips .marca-chip.tierra { border-color: var(--white); }
+.mision-ficha .ref { padding-left: 10px; border-left: 3px solid var(--white); }
+.mision-ficha .aviso { color: var(--neon-yellow); }
+.mision-ficha .marca-boton { font-size: 13px; padding: 8px 14px; }

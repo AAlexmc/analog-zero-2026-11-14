@@ -1,5 +1,6 @@
 // Búsqueda por objetivo de misión en la pantalla de resultados, en Chromium: lugares, ficha, Metrics, Compare, Portfolio
 // y capa de similitud iguales a motor.js en node con los mismos parámetros y referencia; misión nueva; URL; móvil; contraste.
+// Pantalla del mundo: paso ① «Mission objective», paso a resultados con la misión y vuelta con ella puesta.
 // Uso: node scripts/captura_misiones.mjs
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -10,7 +11,7 @@ import { chromium } from 'playwright';
 import { cargar } from '../web/buscar/motor.js';
 import { formatoLatLon } from '../web/explorar/geo.js';
 import { fmtPct, formatoValor as formatoValorSup, planoSup, minMax, pintarMapa, nombreCorto, titularCartera, letra } from '../web/analogos/metricas.js';
-import { parametrosDe, referenciaDe, noMedidas, textoOpcion, resumenLugar, lineaResumen, activaDeCatalogo, activaNueva, opcionesBusqueda, frasesNoUsados } from '../web/analogos/misiones.js';
+import { parametrosDe, referenciaDe, noMedidas, textoOpcion, resumenLugar, lineaResumen, activaDeCatalogo, activaNueva, opcionesBusqueda, frasesNoUsados, conMision } from '../web/analogos/misiones.js';
 import { contraste } from '../web/marca/contraste.js';
 import { ORIGENES_EXTERNOS } from '../web/relieve/calculo.js';
 
@@ -411,6 +412,186 @@ try {
   if (malos.length) falla(`mobile new mission form: ${malos.join('; ')}`); else ok('mobile "New mission…" form inside the screen');
   await mv.screenshot({ path: join(SALIDA, '13-movil-nueva.png') });
   await mv.context().close();
+
+  // ---------- Pantalla del mundo: paso ① «Mission objective» ----------
+  const abrirMundo = async (pag, url) => {
+    await pag.goto(`${baseUrl}${url}`);
+    await pag.waitForFunction(() => window.__az?.vista?.listo === true, null, { timeout: 120000 });
+    const e = await pag.evaluate(() => window.__az.vista.errores);
+    if (e.length) falla(`world view errors: ${e.join('; ')}`);
+  };
+  const quietaMundo = (pag) => esperarQue(pag, () => new Promise((ok) => {
+    const v = window.__az.vista, a = v.camara.position.clone();
+    requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => ok(!v.animando() && v.camara.position.distanceTo(a) < 1e-12))));
+  }), 'the world view camera to stop');
+  const leerMundo = (pag) => pag.evaluate(() => {
+    const panel = document.getElementById('panel'), crit = document.getElementById('criterios');
+    const visible = (x) => !x.closest('[hidden]') && x.getClientRects().length > 0 && !x.closest('details:not([open]) > :not(summary)');
+    const r = [...document.querySelectorAll('.criterio input[type=range]')];
+    return {
+      primero: [...panel.children].filter((x) => x.id !== 'nombre-mundo' && visible(x))[0]?.id ?? null,
+      pasos: [...panel.querySelectorAll('.num-paso')].filter(visible).map((n) => n.parentElement.textContent.replace(/\s+/g, ' ').trim()),
+      opciones: [...document.getElementById('mision').options].map((o) => ({ v: o.value, t: o.textContent, d: o.disabled })),
+      valor: document.getElementById('mision').value, mision: window.__az.explorar.mision, estado: window.__az.vista.mision,
+      abierto: crit.open, deslizadores: r.length, deslizadoresVisibles: r.filter(visible).length,
+      buscar: document.getElementById('buscar').getAttribute('href'), url: location.search, punto: window.__az.explorar.punto,
+    };
+  });
+  const enPanel = (pag, sel) => pag.evaluate((sel) => {
+    const b = document.querySelector(sel);
+    b.scrollIntoView({ block: 'nearest' });
+    const r = b.getBoundingClientRect(), p = document.getElementById('panel').getBoundingClientRect();
+    return { dentro: r.top >= p.top - 0.5 && r.bottom <= p.bottom + 0.5 && r.bottom <= innerHeight + 0.5 && r.height >= 44, r: [r.top, r.bottom].map(Math.round), p: [p.top, p.bottom].map(Math.round) };
+  }, sel);
+  const quieroOpcMundo = (mundo) => [{ v: '', t: 'All parameters (no mission)', d: false }, ...CATALOGO.map((m) => ({ v: m.id, t: textoOpcion(m, mundo, M.indice), d: m.respaldo === 'no_encontrado' || !parametrosDe(m, M.indice).length })), { v: 'nueva', t: 'New mission…', d: false }];
+
+  // a + e. Luna sin misión: el paso ① va primero, los deslizadores no se ven hasta abrir los criterios y «Find Earth analogs» lleva la URL de siempre.
+  const pw = await pagina(1440, 900, 'Moon world view');
+  await abrirMundo(pw, '/explorar/index.html?mundo=moon');
+  await quietaMundo(pw);
+  const wL = await leerMundo(pw);
+  const hrefL = wL.punto && `../analogos/index.html?mundo=moon&lat=${wL.punto.lat.toFixed(4)}&lon=${wL.punto.lon.toFixed(4)}`;
+  const pasosQ = ['1 Mission objective', '2 What makes a good base site?', '3 Find its twin on Earth'];
+  if (wL.primero !== 'mision-caja' || JSON.stringify(wL.pasos) !== JSON.stringify(pasosQ) || wL.abierto || !wL.deslizadores || wL.deslizadoresVisibles || wL.valor !== '' || wL.mision !== null || wL.estado !== 'ok' || JSON.stringify(wL.opciones) !== JSON.stringify(quieroOpcMundo('moon'))) falla(`Moon world view step 1: ${JSON.stringify(wL)}`);
+  else ok(`Moon world view: first in the panel is "${wL.pasos[0]}"; steps ${wL.pasos.join(' | ')}; ${wL.deslizadores} sliders hidden until the criteria open; ${wL.opciones.length} options as on the results page`);
+  if (wL.buscar !== hrefL || /mision/.test(wL.url)) falla(`Moon no mission: "Find Earth analogs" ${wL.buscar} ≠ ${hrefL}; URL ${wL.url}`);
+  else ok(`no mission: "Find Earth analogs" → ${wL.buscar} (the link of always), world URL ${wL.url}`);
+  await pw.screenshot({ path: join(SALIDA, '20-mundo-luna-paso1.png') });
+  await revisarContraste(pw, 'world view step 1 (Moon)', '#mision-caja');
+  await pw.click('#criterios > summary');
+  await pw.waitForTimeout(150);
+  const wL2 = await leerMundo(pw);
+  if (!wL2.abierto || wL2.deslizadoresVisibles !== wL2.deslizadores) falla(`Moon criteria opened: ${JSON.stringify({ abierto: wL2.abierto, v: wL2.deslizadoresVisibles, n: wL2.deslizadores })}`);
+  else ok(`opening "What makes a good base site?" shows the ${wL2.deslizadores} sliders`);
+  await pw.screenshot({ path: join(SALIDA, '21-mundo-luna-criterios.png') });
+  await pw.context().close();
+
+  // b. Marte, biomarcadores: ficha sin resultados → «Find Earth analogs» → resultados con la misión = node.
+  const pm = await pagina(1440, 900, 'Mars world view');
+  await abrirMundo(pm, `/explorar/index.html?mundo=mars&lat=${J.lat}&lon=${J.lon}`);
+  await quietaMundo(pm);
+  const sugJ = JSON.parse(readFileSync(join(WEB, 'data/cuerpos/mundos.json'), 'utf8')).mundos.find((m) => m.id === 'mars').sugerencias.find((s) => s.lat === J.lat && s.lon === J.lon);
+  const hrefJ = `../analogos/index.html?mundo=mars&lat=${J.lat}&lon=${J.lon}&nombre=${encodeURIComponent(sugJ.nombre)}`;
+  await pm.selectOption('#mision', 'biomarcadores');
+  await pm.waitForTimeout(150);
+  const wB = await leerMundo(pm), fW = await leerFicha(pm);
+  const errW = [];
+  if (fW.oculta || fW.que !== mB.que_se_prueba) errW.push(`que ${fW.que}`);
+  if (fW.resumenCampanas !== `NASA ran this at (${mB.campanas.length} campaigns)` || fW.campanas.length !== mB.campanas.length) errW.push(`campaigns ${fW.resumenCampanas}`);
+  if (JSON.stringify(fW.chips) !== JSON.stringify(parametrosDe(mB, M.indice)) || fW.propio.join() !== 'own mapping') errW.push(`chips ${fW.chips} ${fW.propio}`);
+  if (fW.ref !== quieroRef) errW.push(`reference "${fW.ref}"`);
+  if (fW.noMedido !== `Named by NASA, NOT MEASURED here (${nmB.length})`) errW.push(`not measured ${fW.noMedido}`);
+  if (fW.avisos.length || /parameters? close|On each place|Searched/.test(fW.texto)) errW.push(`results talk in the world view: ${fW.texto}`);
+  if (wB.mision?.id !== 'biomarcadores' || !wB.url.endsWith('&mision=biomarcadores') || wB.buscar !== `${hrefJ}&mision=biomarcadores`) errW.push(`state ${JSON.stringify({ mision: wB.mision?.id, url: wB.url, buscar: wB.buscar })}`);
+  if (errW.length) falla(`Mars world view, biomarcadores: ${errW.join('; ')}`);
+  else ok(`Mars world view, biomarcadores: card with chips ${fW.chips.join(', ')} (own mapping), "${fW.ref}", ${fW.resumenCampanas}, ${fW.noMedido}; no results lines; URL ${wB.url}; "Find Earth analogs" → ${wB.buscar}`);
+  await pm.click('#mision-ficha .campanas-caja summary');
+  await pm.click('#mision-ficha .no-medido-caja summary');
+  await pm.waitForTimeout(150);
+  await pm.screenshot({ path: join(SALIDA, '22-mundo-marte-ficha.png') });
+  await revisarContraste(pm, 'world view mission card (open)', '#mision-caja');
+  const llega = await enPanel(pm, '#buscar');
+  if (!llega.dentro) falla(`with the card open, "Find Earth analogs" cannot be reached in the panel: ${JSON.stringify(llega)}`);
+  else ok(`with the card open, scrolling the panel reaches "Find Earth analogs" (y ${llega.r.join('–')} inside panel ${llega.p.join('–')})`);
+  await pm.click('#buscar');
+  await pm.waitForURL(/\/analogos\/index\.html\?/);
+  await pm.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+  await pm.evaluate(() => { window.__az.analogos.autoTerreno = false; });
+  await quieta(pm);
+  const resB = await pm.evaluate(() => ({ mision: window.__az.analogos.mision?.id, valor: document.getElementById('mision').value, volver: document.getElementById('volver').getAttribute('href'), otro: document.getElementById('otro').getAttribute('href'), url: location.search }));
+  const volverB = `../explorar/index.html?mundo=mars&lat=${J.lat}&lon=${J.lon}&mision=biomarcadores`;
+  if (resB.mision !== 'biomarcadores' || resB.valor !== 'biomarcadores' || resB.volver !== volverB || resB.otro !== volverB) falla(`results opened from the world view: ${JSON.stringify(resB)}`);
+  else ok(`results start with the mission (${resB.url}); "Back to the globe" and "Pick another place" → ${resB.volver}`);
+  compararLugares('results from the world view, biomarcadores', await leerLugares(pm), rB.resultados, true);
+  // Cambiar de misión en resultados actualiza los dos enlaces de vuelta.
+  await elegirMision(pm, 'habitats_inflables');
+  const volH = await pm.evaluate(() => [document.getElementById('volver').getAttribute('href'), document.getElementById('otro').getAttribute('href')]);
+  await elegirMision(pm, '');
+  const vol0 = await pm.evaluate(() => [document.getElementById('volver').getAttribute('href'), document.getElementById('otro').getAttribute('href')]);
+  const base = `../explorar/index.html?mundo=mars&lat=${J.lat}&lon=${J.lon}`;
+  if (volH.some((h) => h !== conMision(base, aH)) || vol0.some((h) => h !== base)) falla(`back links after switching: ${JSON.stringify({ volH, vol0 })}`);
+  else ok(`back links follow the mission picked on the results page: ${volH[0]} → (no mission) ${vol0[0]}`);
+  await elegirMision(pm, 'biomarcadores');
+  await quieta(pm);
+
+  // c. «Back to the globe» vuelve con la misión puesta.
+  await pm.click('#volver');
+  await pm.waitForURL(/\/explorar\/index\.html\?/);
+  await pm.waitForFunction(() => window.__az?.vista?.listo === true, null, { timeout: 120000 });
+  const wV = await leerMundo(pm), fV = await leerFicha(pm);
+  if (wV.valor !== 'biomarcadores' || wV.mision?.id !== 'biomarcadores' || fV.oculta || JSON.stringify(fV.chips) !== JSON.stringify(fW.chips) || wV.buscar !== `${hrefJ}&mision=biomarcadores` || !wV.url.includes('mision=biomarcadores')) falla(`back to the globe: ${JSON.stringify({ wV, oculta: fV.oculta })}`);
+  else ok(`"Back to the globe": world view with "${wV.opciones.find((o) => o.v === wV.valor).t}" still picked, card shown, "Find Earth analogs" → ${wV.buscar}`);
+  await pm.screenshot({ path: join(SALIDA, '23-mundo-vuelta.png') });
+
+  // d. «New mission…» en la pantalla del mundo.
+  await pm.selectOption('#mision', 'nueva');
+  await pm.waitForTimeout(150);
+  const n0 = await pm.evaluate(() => ({ form: !document.getElementById('mision-nueva').hidden, boton: document.getElementById('mision-buscar').disabled, texto: document.getElementById('mision-buscar').textContent, mision: window.__az.explorar.mision, buscar: document.getElementById('buscar').getAttribute('href'), punto: [...document.querySelectorAll('#nueva-punto input')].map((i) => i.value), tierra: [...document.querySelectorAll('#nueva-tierra input')].map((i) => i.value), leyenda: document.getElementById('nueva-punto-titulo').textContent }));
+  const dos = ['t_min_k', 'aridez_ai'];
+  for (const id of dos) await pm.check(`#mision-nueva input[value="${id}"]`);
+  const sinT = await pm.evaluate(() => document.getElementById('mision-buscar').disabled);
+  await pm.fill('#mision-titulo', TITULO);
+  await pm.selectOption('#mision-ref', 'mdrs_utah');
+  const conT = await pm.evaluate(() => document.getElementById('mision-buscar').disabled);
+  if (!n0.form || !n0.boton || n0.texto !== 'Use this mission' || n0.mision !== null || n0.buscar !== hrefJ || JSON.stringify(n0.punto) !== JSON.stringify(quieroPunto) || JSON.stringify(n0.tierra) !== JSON.stringify(quieroTierra) || n0.leyenda !== 'Compared with your point on Mars' || !sinT || conT) falla(`world view new mission form: ${JSON.stringify({ n0, sinT, conT })}`);
+  else ok(`world view "New mission…": same form (${n0.punto.length} + ${n0.tierra.length} boxes), "${n0.texto}" off without a title, on with title + 2 parameters; link back to no mission meanwhile`);
+  await pm.screenshot({ path: join(SALIDA, '24-mundo-nueva-formulario.png') });
+  await revisarContraste(pm, 'world view new mission form', '#mision-nueva');
+  await pm.click('#mision-buscar');
+  await pm.waitForTimeout(150);
+  const aN2 = activaNueva({ titulo: TITULO, parametros: dos, ref: 'mdrs_utah' }, M.indice, SITIOS);
+  const wN = await leerMundo(pm), fWN = await leerFicha(pm);
+  if (wN.mision?.tipo !== 'nueva' || fWN.titulo !== TITULO || fWN.tituloHtml !== 'Dust &lt;b&gt;test&lt;/b&gt; &amp; rover' || JSON.stringify(fWN.chips) !== JSON.stringify(aN2.parametros) || wN.buscar !== conMision(hrefJ, aN2) || !(await pm.evaluate(() => document.getElementById('mision-nueva').hidden))) falla(`world view new mission card: ${JSON.stringify({ wN, fWN })}`);
+  else ok(`world view new mission: form folds, card title as text "${fWN.titulo}", chips ${fWN.chips.join(', ')}; "Find Earth analogs" → ${wN.buscar}`);
+  await pm.screenshot({ path: join(SALIDA, '25-mundo-nueva-ficha.png') });
+  await pm.click('#buscar');
+  await pm.waitForURL(/\/analogos\/index\.html\?/);
+  await pm.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+  await pm.evaluate(() => { window.__az.analogos.autoTerreno = false; });
+  const resN = await pm.evaluate(() => ({ mision: window.__az.analogos.mision, valor: document.getElementById('mision').value, titulo: document.getElementById('mision-titulo').value }));
+  if (resN.valor !== 'nueva' || JSON.stringify(resN.mision) !== JSON.stringify(aN2) || resN.titulo !== TITULO) falla(`results from a world view new mission: ${JSON.stringify(resN)}`);
+  else ok(`results start with the new mission from the world view: "${resN.mision.titulo}", ${resN.mision.parametros.join(', ')}, test site ${resN.mision.ref}`);
+  compararLugares('results from the world view, new mission', await leerLugares(pm), nodo(aN2).r.resultados, true);
+  await pm.context().close();
+
+  // f. Móvil 390×844 con misión: nada se sale y «Find Earth analogs» queda en pantalla.
+  const mw = await pagina(390, 844, 'mobile world view', { isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
+  await abrirMundo(mw, '/explorar/index.html?mundo=mars&mision=biomarcadores');
+  await quietaMundo(mw);
+  const fueraMundo = () => mw.evaluate(() => {
+    const malos = [];
+    for (const e of document.querySelectorAll('#panel, #panel *')) {
+      if (e.closest('[hidden]') || !e.getClientRects().length || e.closest('details:not([open]) > :not(summary)')) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width && (r.left < -0.5 || r.right > innerWidth + 0.5)) malos.push(`${e.id || e.className || e.tagName} x ${r.left.toFixed(0)}–${r.right.toFixed(0)}`);
+    }
+    if (document.documentElement.scrollWidth > innerWidth) malos.push(`page ${document.documentElement.scrollWidth} px wide`);
+    const b = document.getElementById('buscar').getBoundingClientRect(), c = document.getElementById('mision-caja').getBoundingClientRect(), p = document.getElementById('panel').getBoundingClientRect();
+    return { malos, buscar: [b.top, b.bottom].map(Math.round), caja: [c.top, c.bottom].map(Math.round), panel: [p.top, p.bottom].map(Math.round) };
+  });
+  const mvW = await fueraMundo();
+  const wM = await leerMundo(mw);
+  if (mvW.malos.length || wM.mision?.id !== 'biomarcadores' || mvW.buscar[1] > 844 || mvW.buscar[0] < mvW.panel[0] || mvW.caja[0] < mvW.panel[0] || mvW.caja[0] > mvW.panel[0] + 120) falla(`mobile world view: ${JSON.stringify({ mvW, mision: wM.mision?.id })}`);
+  else ok(`mobile 390×844 world view: step 1 at the top of the sheet (y ${mvW.caja[0]}), card inside the screen, "Find Earth analogs" on screen (y ${mvW.buscar.join('–')})`);
+  await mw.screenshot({ path: join(SALIDA, '26-movil-mundo.png') });
+  await mw.selectOption('#mision', 'nueva');
+  await mw.$eval('#mision-nueva', (e) => e.scrollIntoView({ block: 'start' }));
+  const mvN = await fueraMundo();
+  if (mvN.malos.length || mvN.buscar[1] > 844) falla(`mobile world view new mission form: ${JSON.stringify(mvN)}`); else ok('mobile world view "New mission…" form inside the screen, "Find Earth analogs" still on screen');
+  await mw.screenshot({ path: join(SALIDA, '27-movil-mundo-nueva.png') });
+  await mw.context().close();
+
+  // g. Sin misiones.json: el paso ① no sale y lo demás sigue igual.
+  const ctxS = await nav.newContext({ viewport: { width: 1440, height: 900 } });
+  const ps = await ctxS.newPage();
+  ps.on('pageerror', (e) => falla(`page error (no catalogue): ${e.message}`));
+  await ps.route('**/data/misiones.json', (r) => r.fulfill({ status: 404, body: '' }));
+  await ps.goto(`${baseUrl}/explorar/index.html?mundo=moon&mision=biomarcadores`);
+  await ps.waitForFunction(() => window.__az?.vista?.listo === true, null, { timeout: 120000 });
+  const wS = await ps.evaluate(() => ({ caja: document.getElementById('mision-caja').hidden, estado: window.__az.vista.mision, mision: window.__az.explorar.mision, sitio: window.__az.vista.sitio?.estado, buscar: document.getElementById('buscar').getAttribute('href'), punto: window.__az.explorar.punto }));
+  if (!wS.caja || wS.estado !== 'sin datos' || wS.mision !== null || wS.sitio !== 'ok' || !wS.punto || /mision/.test(wS.buscar)) falla(`world view without misiones.json: ${JSON.stringify(wS)}`);
+  else ok(`without misiones.json: step 1 hidden, best spot still computed, "Find Earth analogs" → ${wS.buscar}`);
+  await ctxS.close();
 } catch (e) {
   falla(`script: ${e.stack ?? e.message}`);
 } finally {

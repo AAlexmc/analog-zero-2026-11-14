@@ -8,7 +8,8 @@ import { enlaceTerreno } from '../mapa/estado.js';
 import { CORTES, NO_COMPARADO, NO_COMPARADO_MISION, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview } from './metricas.js';
 import { engancharRelieve } from '../relieve/enganche.js';
 import { paisDe } from './paises.js';
-import { ID_NUEVA, comparables, elegible, textoOpcion, noMedidas, sitiosReferencia, resumenLugar, lineaResumen, validarNueva, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, opcionesBusqueda, frasesNoUsados } from './misiones.js';
+import { resumenLugar, lineaResumen, leerEstado, conMision, opcionesBusqueda, frasesNoUsados } from './misiones.js';
+import { montarMision, pintarFicha as fichaMision } from './mision_panel.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -70,6 +71,9 @@ async function montar() {
   const objetivo = M.leerPunto(mundo, lat, lon);
   // Objetivo de misión (misiones.js): elige los parámetros de la búsqueda; sin misión, los de siempre.
   let activa = leerEstado(q, misiones, M.indice, sitios);
+  // «Back to the globe» y «Pick another place» vuelven con la misión puesta.
+  const enlacesVolver = () => { const h = conMision(volver, activa); $('volver').href = h; $('otro').href = h; };
+  enlacesVolver();
   const corto = (id) => nombreCorto(id, P);
   const rotuloRef = () => (activa?.tipo === 'nueva' ? 'Test site' : 'NASA test site');
   let r = M.buscar(objetivo, opcionesBusqueda(activa));
@@ -457,45 +461,8 @@ async function montar() {
     ].filter(Boolean));
   }
 
-  // Ficha de la misión elegida: lo que dice el catálogo y lo que el motor no pudo usar.
-  const ligaFuente = (href) => el('a', { href, target: '_blank', rel: 'noopener', textContent: 'source' });
-  function campana(c) {
-    return el('li', {}, el('strong', { textContent: c.nombre }), el('br'),
-      [c.sitio_texto ?? sitios.find((x) => x.id === c.sitio)?.nombre, c.anos].filter(Boolean).join(' · '), ' ',
-      c.fuente ? ligaFuente(c.fuente) : null,
-      c.verificado === false ? el('span', {}, ' ', el('span', { className: 'marca-chip', textContent: 'source not verified' })) : null,
-      c.cita ? el('details', {}, el('summary', { textContent: 'Quote' }), el('blockquote', { textContent: c.cita })) : null);
-  }
-  function pintarFicha() {
-    const f = $('mision-ficha');
-    f.hidden = !activa;
-    if (!activa) { f.replaceChildren(); return; }
-    const m = activa.mision, nueva = activa.tipo === 'nueva', ref = activa.referencia;
-    const chip = (id) => {
-      const c = el('li', { className: `marca-chip${P[id].solo_tierra ? ' tierra' : ''}`, textContent: corto(id), title: P[id].solo_tierra ? `${P[id].nombre}: Earth only, compared with the test site` : P[id].nombre });
-      c.dataset.id = id;
-      return c;
-    };
-    const lineaRef = !activa.parametros.some((id) => P[id].solo_tierra) ? null
-      : ref ? `Earth-only parameters are compared with ${nueva ? 'the test site you picked' : "NASA's test site"}: ${ref.nombre} (${formatoLatLon(ref.lat, ref.lon).texto})`
-        : nueva ? 'No test site picked: Earth-only parameters are not used.' : 'No test site with coordinates: Earth-only parameters are not used.';
-    const nm = m ? noMedidas(m) : [];
-    const campanas = m?.campanas ?? [];
-    f.replaceChildren(...[
-      nueva ? el('p', { className: 'mision-titulo', textContent: activa.titulo }) : null,
-      nueva ? el('p', { className: 'tenue', textContent: 'Your own mission: parameters picked by hand.' }) : el('p', { className: 'mision-que', textContent: m.que_se_prueba }),
-      campanas.length ? el('details', { className: 'como campanas-caja' }, el('summary', { textContent: `NASA ran this at (${campanas.length} ${campanas.length === 1 ? 'campaign' : 'campaigns'})` }),
-        el('ul', { className: 'campanas' }, ...campanas.map(campana))) : null,
-      el('p', { className: 'mision-sub' }, 'Searched with these parameters', ...(nueva ? [] : [' ', el('span', { className: 'marca-chip', textContent: 'own mapping', title: 'Which of our layers stands for each trait NASA names is our own criterion.' })])),
-      el('ul', { className: 'chips' }, ...activa.parametros.map(chip)),
-      lineaRef ? el('p', { className: 'ref', textContent: lineaRef }) : null,
-      el('p', { className: 'tenue', textContent: `On each place: close = under ${CORTES.cerca} % off, far off = over ${CORTES.lejos} % off (own cut-offs).` }),
-      nm.length ? el('details', { className: 'como no-medido-caja' }, el('summary', { textContent: `Named by NASA, NOT MEASURED here (${nm.length})` }),
-        el('ul', { className: 'no-medido' }, ...nm.map((n) => el('li', {}, el('strong', { textContent: `${n.nombre}: ` }), n.motivo ?? 'not public')))) : null,
-      ...frasesNoUsados(r, activa, corto).map((t) => el('p', { className: 'aviso', textContent: t })),
-      nueva ? el('button', { type: 'button', className: 'marca-boton secundario', id: 'mision-cambiar', textContent: 'Change this mission', onclick: () => { $('mision-nueva').hidden = false; } }) : null,
-    ].filter(Boolean));
-  }
+  // Ficha de la misión elegida (mision_panel.js) con lo que el motor no pudo usar.
+  const pintarFicha = () => fichaMision({ activa, P, sitios, avisos: activa ? frasesNoUsados(r, activa, corto) : [] });
 
   // Al cambiar de misión se recalcula todo lo que sale de la búsqueda; el tipo de entorno no depende de ella.
   function repintar() {
@@ -529,57 +496,9 @@ async function montar() {
     if ($('panel').dataset.pestana === 'cartera' && cart.lugares.length) elegir('cartera', 0);
     G?.pedir();
   }
-  const guardarUrl = () => history.replaceState(history.state, '', `${location.pathname}?${escribirEstado(new URLSearchParams(location.search), activa)}`);
-
-  // Selector y formulario «New mission».
-  $('mision').append(...misiones.filter((m) => m.id !== ID_NUEVA).map((m) => el('option', { value: m.id, textContent: textoOpcion(m, mundo, M.indice), disabled: !elegible(m, M.indice) })),
-    el('option', { value: ID_NUEVA, textContent: 'New mission…' }));
-  $('mision').value = activa?.id ?? '';
-  $('nueva-punto-titulo').textContent = `Compared with your point ${EN[mundo]}`;
-  const casilla = (p) => {
-    const l = el('label', { className: 'casilla' }, el('input', { type: 'checkbox', value: p.id }), el('span', { textContent: p.nombre }));
-    l.dataset.id = p.id;
-    return l;
-  };
-  $('nueva-punto').append(...comparables(M.indice).filter((p) => !p.solo_tierra).map(casilla));
-  $('nueva-tierra').querySelector('legend').after(...comparables(M.indice).filter((p) => p.solo_tierra).map(casilla));
-  $('mision-ref').append(...sitiosReferencia(sitios).map((s) => el('option', { value: s.id, textContent: s.nombre })));
-  const marcados = () => [...$('mision-nueva').querySelectorAll('input[type=checkbox]:checked')].map((i) => i.value);
-  function revisarNueva() {
-    const v = validarNueva({ titulo: $('mision-titulo').value, parametros: marcados() }, M.indice);
-    $('mision-buscar').disabled = !v.ok;
-    $('nueva-ref-nota').hidden = !(v.parametros.some((id) => P[id].solo_tierra) && !$('mision-ref').value);
-  }
-  function rellenarNueva(a) {
-    $('mision-titulo').value = a?.titulo ?? '';
-    for (const i of $('mision-nueva').querySelectorAll('input[type=checkbox]')) i.checked = !!a?.parametros.includes(i.value);
-    $('mision-ref').value = a?.ref ?? '';
-    revisarNueva();
-  }
-  $('mision-nueva').addEventListener('input', revisarNueva);
-  $('mision-nueva').addEventListener('change', revisarNueva);
-  $('mision-nueva').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const a = activaNueva({ titulo: $('mision-titulo').value, parametros: marcados(), ref: $('mision-ref').value }, M.indice, sitios);
-    if (!a) return;
-    activa = a;
-    $('mision-nueva').hidden = true;
-    guardarUrl();
-    repintar();
-  });
-  $('mision').addEventListener('change', () => {
-    const v = $('mision').value;
-    $('mision-nueva').hidden = v !== ID_NUEVA;
-    if (v === ID_NUEVA) rellenarNueva(null);
-    const antes = activa;
-    activa = v && v !== ID_NUEVA ? activaDeCatalogo(misiones.find((m) => m.id === v), M.indice, sitios) : null;
-    if (!antes && !activa) return;
-    guardarUrl();
-    repintar();
-  });
-  rellenarNueva(activa?.tipo === 'nueva' ? activa : null);
+  // Selector y formulario «New mission» (mision_panel.js).
+  montarMision({ misiones, indice: M.indice, sitios, mundo, activa, alCambiar: (a) => { activa = a; enlacesVolver(); repintar(); } });
   pintarFicha();
-  $('mision-caja').hidden = false;
 
   verPestana('lugares');
   if (r.resultados.length) elegir('resultados', 0);

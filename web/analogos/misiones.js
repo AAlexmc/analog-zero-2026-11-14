@@ -87,6 +87,12 @@ export function escribirEstado(q, activa) {
   return out;
 }
 
+// Enlace entre la pantalla del mundo y resultados con la misión al final; sin misión, el enlace tal cual.
+export function conMision(href, activa) {
+  const s = escribirEstado(new URLSearchParams(), activa).toString();
+  return s ? `${href}${href.includes('?') ? '&' : '?'}${s}` : href;
+}
+
 export function opcionesBusqueda(activa) {
   if (!activa) return {};
   return activa.referencia ? { parametros: activa.parametros, referencia: { lat: activa.referencia.lat, lon: activa.referencia.lon } } : { parametros: activa.parametros };
