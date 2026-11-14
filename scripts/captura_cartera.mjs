@@ -80,6 +80,8 @@ const quieta = (pag) => esperarQue(pag, () => new Promise((ok) => {
 async function abrir(pag, mundo, s) {
   await pag.goto(`${baseUrl}/analogos/index.html?mundo=${mundo}&lat=${s.lat}&lon=${s.lon}&nombre=${encodeURIComponent(s.nombre)}`);
   await pag.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+  // El terreno que se abre solo al pulsar un lugar se comprueba en captura_relieve.
+  await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; });
   const e = await pag.evaluate(() => window.__az.analogos.errores);
   if (e.length) falla(`analogs page errors: ${e.join('; ')}`);
   await quieta(pag);

@@ -103,7 +103,26 @@ async function montar() {
   const lugarSel = () => (A.sel ? listaDe(A.sel.lista)[A.sel.k] : null);
   const rotuloSel = () => ({ resultados: `Place ${A.sel.k + 1}`, parciales: 'Partly compared place', cartera: `Portfolio place ${letra(A.sel.k)}` })[A.sel.lista];
   $('ver-relieve').hidden = !(r.resultados.length || r.parciales.length || cart.lugares.length);
-  engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
+  // La vista de terreno ocupa el hueco del globo: el panel sigue a la vista para pulsar otro lugar (en móvil, pantalla entera).
+  const hueco = () => { const p = $('panel').getBoundingClientRect(); return p.width >= innerWidth - 2 ? { right: 0, bottom: 0 } : { right: Math.max(0, innerWidth - p.left), bottom: 0 }; };
+  const relieve = engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', hueco, punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
+  $('panel').addEventListener('transitionend', (e) => { if (e.target === $('panel')) relieve.encajar(); });
+  const fotograma = () => new Promise((ok) => requestAnimationFrame(ok));
+  // Tras pulsar un lugar: cuando el globo termina de girar y ampliar, se abre su terreno sin más clics.
+  let turno = 0;
+  async function terrenoDe(lista, k) {
+    if (!G || A.autoTerreno === false) return;
+    const t = ++turno;
+    A.terrenoAuto = 'esperando';
+    do await fotograma(); while (t === turno && (G.animando() || az.relieve?.estado === 'cargando'));
+    if (t !== turno || A.sel?.lista !== lista || A.sel.k !== k) return;
+    relieve.cerrar();
+    A.terrenoAuto = 'abriendo';
+    const ok = await relieve.abrir();
+    if (t !== turno) { relieve.cerrar(); return; }
+    A.terrenoAuto = ok ? 'abierto' : 'fallo';
+  }
+  const pulsar = (lista, k) => { elegir(lista, k); terrenoDe(lista, k); };
 
   // Sitio conocido a menos de 300 km, o «unlisted»: solo quiere decir fuera de NUESTRO catálogo.
   const nSitios = sitiosConCoordenadas(sitios);
@@ -129,8 +148,8 @@ async function montar() {
         worldview(x)));
     li.dataset.lista = lista; li.dataset.k = k;
     li.tabIndex = 0;
-    li.addEventListener('click', () => elegir(lista, k));
-    li.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === li) elegir(lista, k); });
+    li.addEventListener('click', () => pulsar(lista, k));
+    li.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === li) pulsar(lista, k); });
     return li;
   }
   function pintarLista() {
@@ -162,8 +181,8 @@ async function montar() {
       el('div', { className: 'acciones' }, worldview(x)));
     li.dataset.lista = 'cartera'; li.dataset.k = k;
     li.tabIndex = 0;
-    li.addEventListener('click', () => elegir('cartera', k));
-    li.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === li) elegir('cartera', k); });
+    li.addEventListener('click', () => pulsar('cartera', k));
+    li.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === li) pulsar('cartera', k); });
     return li;
   }
   $('cartera-titular').textContent = titularCartera(cart);
@@ -186,7 +205,7 @@ async function montar() {
     numeros.forEach((b) => b.remove());
     numeros = r.resultados.map((x, k) => {
       const b = el('button', { type: 'button', textContent: String(k + 1), title: `Place ${k + 1}: ${fmtPct(x.similitud_pct)} match` });
-      b.addEventListener('click', () => elegir('resultados', k));
+      b.addEventListener('click', () => pulsar('resultados', k));
       $('numeros').append(b);
       return b;
     });
@@ -213,7 +232,7 @@ async function montar() {
   const letras = cart.lugares.map((x, k) => {
     const b = el('button', { type: 'button', className: 'letra', textContent: letra(k), title: `Portfolio place ${letra(k)}: ${fmtPct(x.similitud_pct)} match` });
     b.hidden = true;
-    b.addEventListener('click', () => elegir('cartera', k));
+    b.addEventListener('click', () => pulsar('cartera', k));
     $('numeros').append(b);
     return b;
   });
@@ -287,6 +306,9 @@ async function montar() {
   });
 
   function elegir(lista, k) {
+    turno++;
+    A.terrenoAuto = null;
+    relieve.cerrar();
     A.sel = { lista, k };
     document.querySelectorAll('.tarjeta').forEach((t) => t.setAttribute('aria-current', String(t.dataset.lista === lista && Number(t.dataset.k) === k)));
     numeros.forEach((b, i) => b.setAttribute('aria-current', String(lista === 'resultados' && i === k)));

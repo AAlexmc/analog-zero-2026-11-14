@@ -71,7 +71,11 @@ async function esperarQue(pag, f, que, ms = 20000, arg) {
   while (Date.now() - t0 < ms) { if (await pag.evaluate(f, arg)) return; await pag.waitForTimeout(80); }
   throw new Error(`timeout waiting for ${que}`);
 }
-const listo = (pag) => pag.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+// El terreno que se abre solo al pulsar un lugar se comprueba en captura_relieve; aquí se apaga para seguir en el globo.
+const listo = async (pag) => {
+  await pag.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+  await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; });
+};
 const quieta = (pag, clave = 'analogos') => esperarQue(pag, (clave) => new Promise((ok) => {
   const v = clave === 'analogos' ? window.__az.analogos.vista : window.__az.vista, a = v.camara.position.clone();
   requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => ok(!v.animando() && v.camara.position.distanceTo(a) < 1e-12))));

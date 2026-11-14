@@ -181,8 +181,9 @@ async function esperarQue(pag, f, que, ms = 30000, arg) {
   throw new Error(`timeout waiting for ${que}`);
 }
 const estadoRelieve = (pag) => pag.evaluate(() => window.__az?.relieve?.estado ?? null);
+// boton = null: la vista se abre sola (resultados, tras pulsar un lugar).
 async function abrirVista(pag, boton, ms = 60000) {
-  await pag.click(boton);
+  if (boton) await pag.click(boton);
   await esperarQue(pag, () => ['abierto', 'error'].includes(window.__az?.relieve?.estado), 'the terrain view to open or fail', ms);
   if ((await estadoRelieve(pag)) === 'abierto') await esperarQue(pag, () => window.__az.relieve.dibujos > 0 && document.querySelector('.relieve-capa.visible'), 'the first frame', 20000);
   await pag.waitForTimeout(400);
@@ -311,9 +312,11 @@ try {
     const sel = await pag.evaluate(() => ({ x: window.__az.analogos.r.resultados[1], d: window.__az.analogos.vista.camara.position.length(), boton: !document.getElementById('ver-relieve').hidden }));
     if (!(sel.d < d0 - 0.05) || !sel.boton) falla(`clicking place 2 should bring the globe closer and show "See the terrain" (distance ${d0.toFixed(2)} → ${sel.d.toFixed(2)}, button ${sel.boton})`);
     else ok(`click on place 2: globe closer (${d0.toFixed(2)} → ${sel.d.toFixed(2)} radii), "See the terrain" shown`);
-    await pag.screenshot({ path: join(SALIDA, 'a-resultados-lugar-2.png') });
     const x = sel.x, f = fuenteRelieve('earth', x.lat, x.lon, LADO_KM * 1000);
-    const v = await abrirVista(pag, '#ver-relieve');
+    const v = await abrirVista(pag, null);
+    const auto = await pag.evaluate(() => { const c = document.querySelector('.relieve-capa')?.getBoundingClientRect(), p = document.getElementById('panel').getBoundingClientRect(); return { auto: window.__az.analogos.terrenoAuto, capa: c ? Math.round(c.right) : null, panel: Math.round(p.left), tarjeta: !!document.elementFromPoint(p.left + p.width / 2, p.top + p.height / 2)?.closest('#panel') }; });
+    if (f.tipo && (auto.auto !== 'abierto' || auto.capa !== auto.panel || !auto.tarjeta)) falla(`clicking place 2 should open its terrain by itself beside the panel: ${JSON.stringify(auto)}`);
+    else if (f.tipo) ok(`the terrain of place 2 opens by itself after the globe stops, beside the panel (view ends at ${auto.capa} px = panel left)`);
     if (!f.tipo) {
       if (v.aviso !== f.mensaje) falla(`place 2 at ${x.lat}: expected "${f.mensaje}", got ${JSON.stringify(v)}`); else ok(`place 2 at ${x.lat}°: "${v.aviso}"`);
     } else {
