@@ -16,7 +16,7 @@ What it does:
   - It also lists the environment traits the source names as the reason for the site.
   - Which of our layers stands for each trait is our own criterion, labelled «own mapping».
   - Traits we have no layer for are shown as «NOT MEASURED».
-  - The published catalogue has 12 objectives (`web/data/misiones.json`); format in `docs/contrato-misiones.md`.
+  - The published catalogue has 21 objectives (`web/data/misiones.json`); format in `docs/contrato-misiones.md`.
 - **Earth-only parameters.** Dryness, wind, day-night swing, permafrost, elevation, travel time to a city and rock type. These are compared with the Earth site where NASA runs that test (the mission's reference site), not with the Moon or Mars (`indice.json`, `parametros_tierra`; `docs/metrica-analogos.md`).
 - **Similarity, in plain numbers.** Each parameter gets a deviation in percent over a reference range; similarity is 100 minus the deviation, averaged over the parameters used (`docs/metrica-analogos.md`). No data on either side gives «no data», never 0.
 - **Portfolio.** The smallest set of Earth places that together cover each parameter (deviation under 15 %). Whatever no place covers is what has to be tested in a lab (`docs/metrica-analogos.md`, «Cartera de análogos»).
