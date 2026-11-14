@@ -59,6 +59,16 @@ const huella = (r) => createHash('sha256')
   .update(Buffer.from(r.mapa.buffer))
   .digest('hex');
 
+// Quita lo que añadieron los parámetros solo-Tierra (origen_objetivo, sin_referencia, sus valores en el objetivo) para comparar con huellas fijadas antes.
+const sinOrigen = (xs) => xs.map(({ origen_objetivo, ...x }) => x);
+function sinNovedades(r, idsTierra = []) {
+  const { sin_referencia, ...resto } = r;
+  const out = { ...resto };
+  if (r.objetivo?.valores) out.objetivo = { ...r.objetivo, valores: Object.fromEntries(Object.entries(r.objetivo.valores).filter(([k]) => !idsTierra.includes(k))) };
+  for (const k of ['resultados', 'parciales', 'lugares']) if (r[k]) out[k] = r[k].map((x) => ({ ...x, parametros: sinOrigen(x.parametros) }));
+  return out;
+}
+
 test('identity: a target taken from an Earth cell finds that cell first with 0 % deviation everywhere', async () => {
   const M = await cargar('base/', sintetico());
   const o = M.leerPunto('earth', lat(180), lon(400));
@@ -264,8 +274,8 @@ test('default search output is byte-identical to the one pinned before classes e
     const M = await cargar('base/', leer);
     const o = M.leerPunto('moon', 0.25, 10.25);
     const h = createHash('sha256');
-    for (const c of [{}, { n: 8, separacion_km: 0 }, { completos: false }, { pesos: { a: 3, b: 1 } }, { parametros: ['b'] }, { incluir_casquete: true }]) h.update(huella(M.buscar(o, c)));
-    h.update(huella(M.buscar(M.leerPunto('earth', -10.25, 20.25))));
+    for (const c of [{}, { n: 8, separacion_km: 0 }, { completos: false }, { pesos: { a: 3, b: 1 } }, { parametros: ['b'] }, { incluir_casquete: true }]) h.update(huella(sinNovedades(M.buscar(o, c))));
+    h.update(huella(sinNovedades(M.buscar(M.leerPunto('earth', -10.25, 20.25)))));
     assert.equal(h.digest('hex'), 'fd3a712065edfe5b60035595b17ba64d77d4fee3ce51af9138520dbc6ccf8733');
   }
 });
@@ -420,10 +430,11 @@ test('real data: default search output is byte-identical to the one pinned befor
     return;
   }
   const M = await cargar(REAL.pathname, leerDisco);
+  const idsT = (M.indice.parametros_tierra ?? []).map((p) => p.id);
   const h = createHash('sha256');
   for (const [c, la, lo] of [['moon', -89.68643, -162.9371], ['moon', 8.3355, 33.222], ['mars', 18.38, 77.58], ['mars', 47.2, -175.7], ['earth', -24.1, -70.01]]) {
-    h.update(huella(M.buscar(M.leerPunto(c, la, lo))));
-    h.update(huella(M.buscar(M.leerPunto(c, la, lo), { completos: false, n: 10, separacion_km: 100 })));
+    h.update(huella(sinNovedades(M.buscar(M.leerPunto(c, la, lo)), idsT)));
+    h.update(huella(sinNovedades(M.buscar(M.leerPunto(c, la, lo), { completos: false, n: 10, separacion_km: 100 }), idsT)));
   }
   assert.equal(h.digest('hex'), 'dfbd0c50c125d2b1acce6bdef42a84d0b26af99e04c9e03bfdd8f01354e8ee4c');
 });
@@ -476,4 +487,172 @@ test('real data: Shackleton rim portfolio — each place covers what it says, an
       assert.ok(!c.cubiertos.every((id) => { const d = M.desviacion(id, v[id], o.valores[id]); return d !== null && d < 15; }), `cell ${i} covers everything`);
     }
   }
+});
+
+// Parámetros solo-Tierra (indice.parametros_tierra) y referencia terrestre.
+function conTierra(leer) {
+  const fila = (i) => Math.floor(i / 720), col = (i) => i % 720;
+  const enTierra = (i) => fila(i) >= 100 && fila(i) < 260;
+  const ficheros = {
+    'earth/x.f32': buf((i) => (enTierra(i) && !(fila(i) >= 200 && fila(i) < 210) ? col(i) : NaN)),
+    'earth/y.f32': buf((i) => (enTierra(i) ? 1 + fila(i) : NaN)),
+    'earth/lito.f32': buf((i) => (enTierra(i) && col(i) % 50 !== 7 ? 1 + (col(i) % 3) : NaN)),
+  };
+  const fuentes = { earth: { texto: 't', url: 'https://example.org' } };
+  const extra = [
+    { id: 'x', nombre: 'X', grupo: 'g', unidad: 'u', capas: { earth: 'earth/x.f32' }, fuentes, definicion: 'd', aviso: null, solo_tierra: true,
+      rango_ref: { min: 0, max: 720, origen: 'mío', regla: 'r' }, transformacion: 'lineal' },
+    { id: 'y', nombre: 'Y', grupo: 'g', unidad: 'u', capas: { earth: 'earth/y.f32' }, fuentes, definicion: 'd', aviso: null, solo_tierra: true,
+      rango_ref: { min: 1, max: 1000, origen: 'mío', regla: 'r' }, transformacion: 'log10' },
+    { id: 'lito', nombre: 'Rock type', grupo: 'geology', unidad: 'class', capas: { earth: 'earth/lito.f32' }, fuentes, definicion: 'd', aviso: null, solo_tierra: true,
+      rango_ref: null, transformacion: 'categoria', clases: { 1: 'uno', 2: 'dos', 3: 'tres' } },
+  ];
+  return async (ruta, tipo) => {
+    const r = ruta.replace(/^base\//, '');
+    if (tipo === 'json' && !ruta.endsWith('clases.json')) return { ...(await leer(ruta, tipo)), parametros_tierra: JSON.parse(JSON.stringify(extra)) };
+    return ficheros[r] ? ficheros[r].slice(0) : leer(ruta, tipo);
+  };
+}
+const LUNA = [0.25, 10.25];
+const cerca = (a, b, tol = 1e-9) => assert.ok(Math.abs(a - b) < tol, `${a} vs ${b}`);
+
+test('Earth-only parameters: leerPunto gives their Earth values; the Moon and Mars get null', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const t = M.leerPunto('earth', lat(150), lon(300));
+  assert.deepEqual([t.valores.x, t.valores.y, t.valores.lito], [300, 151, 1]);
+  for (const c of ['moon', 'mars']) {
+    const o = M.leerPunto(c, ...LUNA);
+    assert.deepEqual([o.valores.x, o.valores.y, o.valores.lito], [null, null, null]);
+  }
+  const M0 = await cargar('base/', sintetico());
+  const { x, y, lito, ...resto } = M.leerPunto('moon', ...LUNA).valores;
+  assert.deepEqual(resto, M0.leerPunto('moon', ...LUNA).valores);
+});
+
+test('Earth-only parameters in the index do not change a search or a portfolio that does not ask for them', async () => {
+  const M0 = await cargar('base/', sintetico());
+  const M = await cargar('base/', conTierra(sintetico()));
+  const o = M0.leerPunto('moon', ...LUNA);
+  for (const c of [{}, { completos: false }, { parametros: ['b'] }, { pesos: { a: 3, b: 1 } }]) assert.deepEqual(M.buscar(o, c), M0.buscar(o, c));
+  assert.deepEqual(M.cartera(o), M0.cartera(o));
+  const r = M.buscar(o);
+  assert.deepEqual(r.sin_referencia, []);
+  assert.ok(r.resultados.every((x) => x.parametros.every((p) => p.origen_objetivo === 'punto')));
+});
+
+test('mixing: point parameters are compared with the Moon point, Earth-only ones with the reference cell on Earth', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const o = M.leerPunto('moon', ...LUNA);
+  const r = M.buscar(o, { parametros: ['a', 'x'], referencia: { lat: lat(150), lon: lon(300) } });
+  assert.deepEqual(r.usados, ['a', 'x']);
+  assert.deepEqual(r.sin_dato, []); assert.deepEqual(r.sin_referencia, []);
+  assert.equal(r.resultados.length, 5);
+  for (const c of r.resultados) {
+    const pa = c.parametros.find((p) => p.id === 'a'), px = c.parametros.find((p) => p.id === 'x');
+    assert.equal(pa.origen_objetivo, 'punto'); assert.equal(pa.valor_objetivo, o.valores.a);
+    assert.equal(px.origen_objetivo, 'referencia'); assert.equal(px.valor_objetivo, 300); assert.equal(px.valor_tierra, c.col);
+    cerca(px.desviacion_pct, (Math.abs(c.col - 300) / 720) * 100);
+    cerca(c.similitud_pct, (200 - pa.desviacion_pct - px.desviacion_pct) / 2);
+  }
+  const da = M.desviacion('a', 150 + 20 / 1000, o.valores.a), dx = M.desviacion('x', 20, 300);
+  cerca(r.mapa[idx(150, 20)], (200 - da - dx) / 2, 1e-3);
+});
+
+test('an Earth-only parameter without a reference, or without data at the reference, is not used and is listed in sin_referencia', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const o = M.leerPunto('moon', ...LUNA);
+  for (const opc of [{ parametros: ['a', 'x'] }, { parametros: ['a', 'x'], referencia: { lat: lat(205), lon: lon(300) } }]) {
+    const r = M.buscar(o, opc);
+    assert.deepEqual(r.usados, ['a']); assert.deepEqual(r.sin_referencia, ['x']); assert.deepEqual(r.sin_dato, []);
+    const px = r.resultados[0].parametros.find((p) => p.id === 'x');
+    assert.deepEqual([px.valor_objetivo, px.desviacion_pct, px.estado, px.origen_objetivo], [null, null, 'sin_referencia', 'referencia']);
+  }
+  const r = M.buscar(o, { parametros: ['c', 'x'] });
+  assert.deepEqual([r.usados, r.sin_dato, r.sin_referencia, r.resultados], [[], ['c'], ['x'], []]);
+  // Un objetivo de la Tierra tampoco pone el valor solo-Tierra: sale de la referencia.
+  assert.deepEqual(M.buscar(M.leerPunto('earth', lat(150), lon(300)), { parametros: ['a', 'x'] }).sin_referencia, ['x']);
+});
+
+test('categorical rock type: 0 % deviation for the same class, 100 % for another, no data stays out', async () => {
+  const M = await cargar('base/', conTierra(conClases(sintetico(), clasesSinteticas())));
+  assert.equal(M.desviacion('lito', 2, 2), 0);
+  assert.equal(M.desviacion('lito', 2, 3), 100);
+  assert.equal(M.desviacion('lito', null, 2), null);
+  const o = M.leerPunto('moon', ...LUNA);
+  const ref = { lat: lat(150), lon: lon(301) };
+  const r = M.buscar(o, { parametros: ['lito'], referencia: ref, separacion_km: 0 });
+  for (const c of r.resultados) {
+    assert.equal(c.similitud_pct, 100);
+    assert.equal(c.parametros[0].valor_tierra, 2); assert.equal(c.parametros[0].valor_objetivo, 2);
+  }
+  assert.equal(r.mapa[idx(150, 301)], 100);
+  assert.equal(r.mapa[idx(150, 300)], 0);
+  assert.ok(Number.isNaN(r.mapa[idx(150, 57)]));
+  assert.throws(() => M.buscar(o, { metrica: 'componentes', parametros: ['lito'], referencia: ref }), /parametros/);
+});
+
+test('only Earth-only parameters with the reference at a site: that site comes first at 100 %', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const r = M.buscar(M.leerPunto('mars', ...LUNA), { parametros: ['x', 'y', 'lito'], referencia: { lat: lat(150), lon: lon(301) } });
+  const p = r.resultados[0];
+  assert.deepEqual([p.fila, p.col, p.similitud_pct], [150, 301, 100]);
+  for (const x of p.parametros) { assert.equal(x.desviacion_pct, 0); assert.equal(x.origen_objetivo, 'referencia'); }
+  assert.ok(r.resultados.slice(1).every((x) => x.similitud_pct < 100));
+});
+
+test('unknown parameter ids and a reference off the grid are refused with a clear error', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const o = M.leerPunto('moon', ...LUNA);
+  assert.throws(() => M.buscar(o, { parametros: ['nada'] }), /parámetro desconocido: nada/);
+  assert.throws(() => M.cartera(o, { parametros: ['nada'] }), /parámetro desconocido: nada/);
+  for (const referencia of [{ lat: 95, lon: 0 }, { lat: NaN, lon: 0 }, {}]) {
+    assert.throws(() => M.buscar(o, { parametros: ['x'], referencia }), /referencia fuera de la rejilla/);
+    assert.throws(() => M.cartera(o, { parametros: ['x'], referencia }), /referencia fuera de la rejilla/);
+  }
+});
+
+test('portfolio takes parametros and referencia with the same meaning; by default it still uses every reproducible parameter', async () => {
+  const M = await cargar('base/', conTierra(sintetico()));
+  const o = M.leerPunto('moon', ...LUNA);
+  assert.deepEqual(M.cartera(o).usados, ['a', 'b']);
+  const c = M.cartera(o, { parametros: ['a', 'x', 'lito'], referencia: { lat: lat(150), lon: lon(300) } });
+  assert.deepEqual(c.usados, ['a', 'x', 'lito']); assert.deepEqual(c.sin_referencia, []);
+  assert.ok(c.lugares.length >= 1);
+  for (const l of c.lugares) {
+    for (const p of l.parametros) {
+      assert.equal(l.cubre.includes(p.id), p.desviacion_pct !== null && p.desviacion_pct < 15, p.id);
+      assert.equal(p.origen_objetivo, p.id === 'a' ? 'punto' : 'referencia');
+    }
+  }
+  assert.deepEqual(new Set(c.lugares.flatMap((l) => l.cubre)), new Set(c.cubiertos));
+  const sin = M.cartera(o, { parametros: ['a', 'x'] });
+  assert.deepEqual([sin.usados, sin.sin_referencia], [['a'], ['x']]);
+});
+
+test('real data: without the new options buscar, cartera, claseDe and leerPunto give what they gave before Earth-only parameters', { skip: !hayReal && 'sin web/data/cuerpos' }, async (t) => {
+  if (await entradaReal() !== '3a443cdd9d2d6c713f6f31ed63c7f423facfb1b1f3fc15939c0f7100df808fc9') {
+    t.skip('las capas cambiaron desde que se fijó la huella');
+    return;
+  }
+  const M = await cargar(REAL.pathname, leerDisco);
+  const idsT = M.indice.parametros_tierra.map((p) => p.id);
+  const o = M.leerPunto('mars', 18.38, 77.58);
+  const h = createHash('sha256');
+  h.update(huella(sinNovedades(M.buscar(o), idsT)));
+  h.update(huella(sinNovedades(M.buscar(o, { completos: false, parametros: ['precip_mm_ano', 't_min_k'] }), idsT)));
+  h.update(JSON.stringify(sinNovedades(M.cartera(o), idsT)));
+  h.update(JSON.stringify(M.claseDe(o)));
+  const e = M.leerPunto('earth', -24.1, -70.01);
+  h.update(JSON.stringify({ ...e, valores: Object.fromEntries(Object.entries(e.valores).filter(([k]) => !idsT.includes(k))) }));
+  assert.equal(h.digest('hex'), '287c142cee58e60a34074cefa094e3c881297a9ccee7c33d177595fc063c89ec');
+});
+
+test('real data: Earth-only parameters only, reference at Yungay (Atacama): Yungay\'s cell comes first at 100 %', { skip: !hayReal && 'sin web/data/cuerpos' }, async () => {
+  const M = await cargar(REAL.pathname, leerDisco);
+  const ids = M.indice.parametros_tierra.map((p) => p.id);
+  const ref = { lat: -24.08, lon: -69.92 };
+  const c = M.leerPunto('earth', ref.lat, ref.lon);
+  const r = M.buscar(M.leerPunto('mars', 18.38, 77.58), { parametros: ids, referencia: ref });
+  assert.deepEqual(r.sin_referencia, ids.filter((id) => c.valores[id] === null));
+  assert.deepEqual([r.resultados[0].fila, r.resultados[0].col, r.resultados[0].similitud_pct], [c.fila, c.col, 100]);
 });

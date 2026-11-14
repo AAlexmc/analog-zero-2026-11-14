@@ -625,5 +625,262 @@
    "url": "https://epic.awi.de/id/eprint/31092/1/hartmann-moosdorf_2012.zip"
   }
  },
- "clases": "clases.json"
+ "clases": "clases.json",
+ "parametros_tierra": [
+  {
+   "id": "aridez_ai",
+   "nombre": "Dryness (rain ÷ evaporation demand)",
+   "grupo": "water",
+   "unidad": "1",
+   "capas": {
+    "earth": "earth/aridez_ai.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "own computation on NASA POWER MERRA-2 climatology (PRECTOTCORR, T2M, T2M_RANGE): P / PET, PET by Hargreaves, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov",
+     "origen": "mío"
+    }
+   },
+   "definicion": "Annual precipitation divided by annual potential evapotranspiration (Hargreaves, FAO-56 eq. 52) at the 0.5° cell",
+   "transformacion": "log10",
+   "aviso": "No value where the yearly evaporation demand is under 100 mm (cold places: the index does not apply). Compared on a log scale.",
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 0.00299679,
+    "max": 4.87392,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      0.00299679,
+      4.87392
+     ]
+    }
+   }
+  },
+  {
+   "id": "viento_medio_m_s",
+   "nombre": "Mean wind at 2 m",
+   "grupo": "wind",
+   "unidad": "m/s",
+   "capas": {
+    "earth": "earth/viento_medio_m_s.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 climatology, WS2M, annual mean, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov"
+    }
+   },
+   "definicion": "Annual mean wind speed 2 m above the ground at the 0.5° cell",
+   "transformacion": "lineal",
+   "aviso": null,
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 0.085022,
+    "max": 9.302,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      0.085022,
+      9.302
+     ]
+    }
+   }
+  },
+  {
+   "id": "viento_p95_m_s",
+   "nombre": "Strong wind at 2 m",
+   "grupo": "wind",
+   "unidad": "m/s",
+   "capas": {
+    "earth": "earth/viento_p95_m_s.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 daily WS2M_MAX, ten years, 95th percentile over the days, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov"
+    }
+   },
+   "definicion": "95th percentile over ten years of the daily maximum wind speed 2 m above the ground at the 0.5° cell",
+   "transformacion": "lineal",
+   "aviso": null,
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 0.525024,
+    "max": 17.3142,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      0.525024,
+      17.3142
+     ]
+    }
+   }
+  },
+  {
+   "id": "amplitud_diurna_k",
+   "nombre": "Day-night air temperature swing",
+   "grupo": "temperature",
+   "unidad": "K",
+   "capas": {
+    "earth": "earth/amplitud_diurna_k.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, T2M_RANGE, annual mean, bilinear to 0.5°",
+     "url": "https://power.larc.nasa.gov"
+    }
+   },
+   "definicion": "Annual mean of the daily range (maximum − minimum) of air temperature 2 m above the ground at the 0.5° cell",
+   "transformacion": "lineal",
+   "aviso": "Air at 2 m, not the ground surface: not the same quantity as the surface temperatures compared with the Moon and Mars.",
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 3.592,
+    "max": 16.391,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      3.592,
+      16.391
+     ]
+    }
+   }
+  },
+  {
+   "id": "permafrost_frac",
+   "nombre": "Permafrost share",
+   "grupo": "water",
+   "unidad": "1",
+   "capas": {
+    "earth": "earth/permafrost_frac.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "ESA CCI Permafrost extent v5.0 (PFR, MODIS LST and CryoGrid), 0.01°, mean of the cell",
+     "url": "https://dap.ceda.ac.uk/neodc/esacci/permafrost/data/permafrost_extent/L4/area4/pp/v05.0/northern_hemisphere/2022/ESACCI-PERMAFROST-L4-PFR-MODISLST_CRYOGRID-AREA4_PP-2022-fv05.0.nc"
+    }
+   },
+   "definicion": "Share of the 0.5° cell with permafrost: mean of the valid 0.01° pixels, percent ÷ 100",
+   "transformacion": "lineal",
+   "aviso": "Only 25° N to 85° N. No data in the whole southern hemisphere and over much of the temperate northern land: the product's fill value there is kept as no data, not read as 0 % (docs/validacion-global.md).",
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 0.0,
+    "max": 1.0,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      0.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "elev_m",
+   "nombre": "Elevation",
+   "grupo": "terrain",
+   "unidad": "m",
+   "capas": {
+    "earth": "earth/elev_m.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "USGS GMTED2010 30″, mean of the land pixels of the cell",
+     "url": "https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn30_grd.zip"
+    }
+   },
+   "definicion": "Mean elevation of the land part of the 0.5° cell (GMTED2010 30″ pixels with elevation ≠ 0)",
+   "transformacion": "lineal",
+   "aviso": null,
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 9.69726,
+    "max": 4585.69,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      9.69726,
+      4585.69
+     ]
+    }
+   }
+  },
+  {
+   "id": "tiempo_ciudad_h",
+   "nombre": "Travel time to a city",
+   "grupo": "operations",
+   "unidad": "h",
+   "capas": {
+    "earth": "earth/tiempo_ciudad_h.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "Weiss et al. (Nature), global map of travel time to cities, 1/30° version, mean of the cell",
+     "url": "https://doi.org/10.1038/nature25181"
+    }
+   },
+   "definicion": "Mean travel time to the nearest city over the pixels of the 0.5° cell, minutes ÷ 60",
+   "transformacion": "log10",
+   "aviso": "No data south of 60° S (Antarctica) or north of 85° N. Compared on a log scale.",
+   "solo_tierra": true,
+   "rango_ref": {
+    "min": 0.240741,
+    "max": 149.185,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land (cells with land share ≥ 0.5, weighted by area); Earth only",
+    "por_cuerpo": {
+     "earth": [
+      0.240741,
+      149.185
+     ]
+    }
+   }
+  },
+  {
+   "id": "litologia_glim",
+   "nombre": "Rock type",
+   "grupo": "geology",
+   "unidad": "class",
+   "capas": {
+    "earth": "earth/litologia_glim.f32"
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "GLiM global lithological map (Hartmann and Moosdorf), 0.5° grid as is",
+     "url": "https://epic.awi.de/id/eprint/31092/1/hartmann-moosdorf_2012.zip"
+    }
+   },
+   "definicion": "Lithology class of the 0.5° cell in the GLiM 0.5° grid (Hartmann and Moosdorf)",
+   "transformacion": "categoria",
+   "aviso": "A class, not a number: same class = 0 % deviation, different class = 100 % (own criterion). Class 15 (no data) is left as no data.",
+   "solo_tierra": true,
+   "rango_ref": null,
+   "clases": {
+    "1": "unconsolidated sediments",
+    "2": "basic volcanic",
+    "3": "siliciclastic sedimentary",
+    "4": "basic plutonic",
+    "5": "mixed sedimentary",
+    "6": "carbonate sedimentary",
+    "7": "acid volcanic",
+    "8": "metamorphic",
+    "9": "acid plutonic",
+    "10": "intermediate volcanic",
+    "11": "water bodies",
+    "12": "pyroclastics",
+    "13": "intermediate plutonic",
+    "14": "evaporites",
+    "16": "ice and glaciers"
+   }
+  }
+ ]
 }

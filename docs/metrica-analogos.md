@@ -21,6 +21,16 @@ Parámetros usados = los pedidos que se pueden reproducir en la Tierra y tienen 
 ## Resultados
 Las n mejores celdas (por defecto 5), separadas al menos `separacion_km` (por defecto 500 km, círculo máximo con el radio medio de la Tierra), elegidas en orden de similitud; empate → la celda de índice menor.
 
+## Parámetros solo-Tierra y referencia (`opc.referencia`)
+`indice.parametros_tierra` (lo escribe `python -m pipeline.cuerpos.tierra_extra`, y también `python -m pipeline.cuerpos`) lista capas que solo existen o solo tienen sentido en la Tierra, con `solo_tierra: true` y solo `capas.earth`. `parametros` no cambia. `M.leerPunto('earth', …)` da también sus valores; en la Luna y Marte valen `null`.
+
+Su valor objetivo no sale del punto de la Luna o de Marte: sale de la Tierra en `opc.referencia = { lat, lon }` (p. ej. el sitio donde NASA hace ese ensayo). `buscar` y `cartera` aceptan en `opc.parametros` ids de los dos tipos; sin `referencia`, o si ahí no hay dato, el id no se usa y sale en `sin_referencia` (no en `sin_dato`). El resto (media ponderada, mitad mínima, completos/parciales, separación, cartera) es igual sobre los usados. Cada parámetro de un resultado lleva `origen_objetivo: 'punto' | 'referencia'` (sin referencia: `estado: 'sin_referencia'`). Id desconocido o referencia fuera de la rejilla → error. Sin `parametros` ni `referencia` todo da lo mismo que antes (test con huella fijada con el motor anterior).
+
+- `rango_ref`: p1–p99 de la tierra firme (tierra ≥ 0,5) de la Tierra sola, celdas pesadas por área.
+- `transformacion` (mirando la distribución real por área): `aridez_ai` log10 (p1 0,003, p50 0,70, p99 4,87: tres órdenes de magnitud); `tiempo_ciudad_h` log10 (p1 0,24 h, p50 5,2 h, p99 149 h: cola larga); vientos, amplitud diurna, permafrost (0–1) y elevación (hay valores < 0) lineales: su p99 no pasa de ~10× la mediana.
+- `litologia_glim`: `transformacion: 'categoria'` (criterio propio): desviación 0 % si la clase GLiM coincide con la de la referencia y 100 % si no; `rango_ref: null`, nombres en `clases`. No entra en la métrica por componentes (que ya no admite `parametros`).
+- Límites: con log10 lo que queda por debajo de p1 cuenta como p1 (todo lo más seco que aridez 0,003 se ve igual). Permafrost solo tiene dato de 25° N a 85° N, y no en buena parte de la tierra templada (`docs/validacion-global.md`): con una referencia del hemisferio sur sale en `sin_referencia`.
+
 ## Límites conocidos
 - La similitud depende de qué parámetros entran y del rango de referencia: no es una probabilidad ni una medida física.
 - Cada parámetro declara en `aviso` en qué no es igual entre cuerpos (p. ej. insolación de la Tierra en superficie con nubes frente a la Luna sin atmósfera).

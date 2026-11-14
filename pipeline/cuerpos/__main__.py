@@ -361,7 +361,10 @@ def main(argv):
         params[2:2] = parametros_temperatura(t, temps, k)
         i = next(j for j, p in enumerate(params) if p["id"] == "presion_superficie_pa")
         params[i] = parametro_presion(t, k)
-    escribe_indice(indice(params, k))
+    from pipeline.cuerpos import tierra_extra
+    idx = indice(params, k)
+    idx["parametros_tierra"] = tierra_extra.fichas(t, SALIDA)
+    escribe_indice(idx)
     for p in params:
         print(p["id"], p["rango_ref"]["min"], p["rango_ref"]["max"], p["rango_ref"]["por_cuerpo"], flush=True)
 

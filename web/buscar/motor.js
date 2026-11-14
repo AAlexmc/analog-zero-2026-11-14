@@ -10,6 +10,7 @@ export async function fetchBinario(url, tipo) {
 const finito = (v) => typeof v === 'number' && Number.isFinite(v);
 
 function transformador(p) {
+  if (p.transformacion === 'categoria') return (v) => v;
   const { min, max } = p.rango_ref;
   if (p.transformacion === 'log10') return (v) => Math.log10(Math.max(v, min));
   if (p.transformacion === 'log1p') return (v) => Math.log10(1 + Math.max(v, 0));
@@ -61,14 +62,18 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
   const R = { ancho: g.ancho, alto: g.alto, paso: g.paso_deg, lat0: g.lat0, lon0: g.lon0, fila0: g.fila0 };
   const N = g.ancho * g.alto;
   const rutas = new Set([indice.mascara_tierra, indice.mascara_casquete].filter(Boolean));
-  for (const p of indice.parametros) for (const r of Object.values(p.capas ?? {})) if (r) rutas.add(r);
+  // Parámetros solo-Tierra: su valor objetivo sale de una celda de referencia de la Tierra, no del punto.
+  const todos = [...indice.parametros, ...(indice.parametros_tierra ?? [])];
+  for (const p of todos) for (const r of Object.values(p.capas ?? {})) if (r) rutas.add(r);
   const capas = new Map();
   await Promise.all([...rutas].map(async (r) => capas.set(r, aF32(await leer(base + r, 'f32'), N, r))));
 
-  const params = new Map(indice.parametros.map((p) => {
+  const params = new Map(todos.map((p) => {
     const f = transformador(p);
-    return [p.id, { p, f, den: f(p.rango_ref.max) - f(p.rango_ref.min) }];
+    const cat = p.transformacion === 'categoria';
+    return [p.id, { p, f, den: cat ? NaN : f(p.rango_ref.max) - f(p.rango_ref.min), cat }];
   }));
+  const soloTierra = (id) => params.get(id).p.solo_tierra === true;
   const tierra = capas.get(indice.mascara_tierra);
   const casquete = indice.mascara_casquete ? capas.get(indice.mascara_casquete) : null;
   const radioTierra = indice.cuerpos.earth.radio_km;
@@ -124,7 +129,10 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
   function desviacion(param, vTierra, vObjetivo) {
     const e = params.get(typeof param === 'string' ? param : param?.id);
     if (!e) throw new Error(`parámetro desconocido: ${param}`);
-    if (!finito(vTierra) || !finito(vObjetivo) || !(e.den > 0)) return null;
+    if (!finito(vTierra) || !finito(vObjetivo)) return null;
+    // Categoría (criterio propio): misma clase 0 %, otra clase 100 %.
+    if (e.cat) return vTierra === vObjetivo ? 0 : 100;
+    if (!(e.den > 0)) return null;
     return Math.min(100, (Math.abs(e.f(vTierra) - e.f(vObjetivo)) / e.den) * 100);
   }
 
@@ -195,13 +203,33 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const vo = finito(valores[p.id]) ? valores[p.id] : null;
     return { id: p.id, valor_tierra: vt, valor_objetivo: vo, desviacion_pct: desviacion(p.id, vt, vo) };
   });
-  const parametrosEn = (valores, reproducibles, usados, i) => reproducibles.map((id) => {
+  const parametrosEn = (objetivos, reproducibles, usados, i) => reproducibles.map((id) => {
     const vt = valorEn(params.get(id).p, 'earth', i);
-    const vo = finito(valores[id]) ? valores[id] : null;
+    const vo = objetivos[id];
+    const ref = soloTierra(id);
     const d = usados.includes(id) ? desviacion(id, vt, vo) : null;
-    const estado = vo === null ? 'sin_dato_objetivo' : !usados.includes(id) ? 'no_usado' : vt === null ? 'sin_dato_tierra' : 'ok';
-    return { id, valor_tierra: vt, valor_objetivo: vo, desviacion_pct: d, similitud_pct: d === null ? null : 100 - d, estado };
+    const estado = vo === null ? (ref ? 'sin_referencia' : 'sin_dato_objetivo') : !usados.includes(id) ? 'no_usado' : vt === null ? 'sin_dato_tierra' : 'ok';
+    return { id, valor_tierra: vt, valor_objetivo: vo, desviacion_pct: d, similitud_pct: d === null ? null : 100 - d, estado, origen_objetivo: ref ? 'referencia' : 'punto' };
   });
+
+  // Valor objetivo de cada parámetro comparable: el del punto, o el de la Tierra en opc.referencia si es solo-Tierra.
+  function objetivosDe(valores, pedidos, referencia) {
+    for (const id of pedidos) if (!params.has(id)) throw new Error(`parámetro desconocido: ${id}`);
+    let iRef = null;
+    if (referencia != null) {
+      const c = celdaDeLatLon(R, referencia.lat, referencia.lon);
+      if (!c) throw new Error(`referencia fuera de la rejilla: ${referencia.lat}, ${referencia.lon}`);
+      iRef = c.fila * g.ancho + c.col;
+    }
+    const comparables = pedidos.filter((id) => params.get(id).p.reproducible_en_tierra || soloTierra(id));
+    const objetivos = {};
+    for (const id of comparables) {
+      const v = !soloTierra(id) ? valores[id] : iRef === null ? null : valorEn(params.get(id).p, 'earth', iRef);
+      objetivos[id] = finito(v) ? v : null;
+    }
+    const sinValor = (ref) => comparables.filter((id) => soloTierra(id) === ref && objetivos[id] === null);
+    return { comparables, objetivos, sin_dato: sinValor(false), sin_referencia: sinValor(true) };
+  }
 
   function buscar(objetivo, opc = {}) {
     const n = opc.n ?? 5;
@@ -216,16 +244,13 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     if (porComp && (opc.pesos || opc.parametros)) throw new Error('metrica componentes: usa los parámetros de clases.json, sin pesos ni parametros');
     const valores = objetivo.valores ?? leerPunto(objetivo.cuerpo, objetivo.lat, objetivo.lon).valores;
     const pedidos = opc.parametros ?? indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
-    for (const id of pedidos) if (!params.has(id)) throw new Error(`parámetro desconocido: ${id}`);
-
-    const reproducibles = pedidos.filter((id) => params.get(id).p.reproducible_en_tierra);
-    const usados = reproducibles.filter((id) => finito(valores[id]) && (pesos[id] ?? 1) > 0);
-    const sin_dato = reproducibles.filter((id) => !finito(valores[id]));
+    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia);
+    const usados = reproducibles.filter((id) => objetivos[id] !== null && (pesos[id] ?? 1) > 0);
     const minimo = Math.ceil(usados.length / 2);
 
     const cols = usados.map((id) => {
-      const { f, den } = params.get(id);
-      return { id, a: tierraTransformada(id), fo: f(valores[id]), den, w: pesos[id] ?? 1 };
+      const { f, den, cat } = params.get(id);
+      return { id, a: tierraTransformada(id), fo: f(objetivos[id]), den, cat, w: pesos[id] ?? 1 };
     });
     const mapa = new Float32Array(N).fill(NaN);
     const sim = new Float64Array(N).fill(NaN);
@@ -239,7 +264,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
         for (const c of cols) {
           const v = c.a[i];
           if (v !== v) continue;
-          const d = Math.min(100, (Math.abs(v - c.fo) / c.den) * 100);
+          const d = c.cat ? (v === c.fo ? 0 : 100) : Math.min(100, (Math.abs(v - c.fo) / c.den) * 100);
           sw += c.w; ss += c.w * (100 - d); k++;
         }
         if (k < minimo || !(sw > 0)) continue;
@@ -290,7 +315,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const ficha0 = ({ i, lat, lon }) => ({
       lat, lon, fila: Math.floor(i / g.ancho), col: i % g.ancho, similitud_pct: sim[i], comparados: cobertura[i], de: total,
       no_reproducibles: noReproEn(valores, i),
-      parametros: parametrosEn(valores, reproducibles, usados, i),
+      parametros: parametrosEn(objetivos, reproducibles, usados, i),
     });
     const ficha = porComp ? (x) => ({ ...ficha0(x), similitud_parametros_pct: simParam[x.i], distancia_componentes: dist[x.i] }) : ficha0;
     const resultados = elegidos.map(ficha);
@@ -299,7 +324,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     // Parámetro con capa en la Tierra: el valor de la mejor celda (cada resultado lleva el suyo).
     const no_reproducibles = noReproEn(valores, elegidos.length ? elegidos[0].i : null);
 
-    const salida = { objetivo, usados, sin_dato, resultados, parciales, no_reproducibles, mapa, cobertura };
+    const salida = { objetivo, usados, sin_dato, sin_referencia, resultados, parciales, no_reproducibles, mapa, cobertura };
     if (porComp) {
       salida.metrica = 'componentes';
       salida.componentes = { proyectado: proy !== null, faltan: proy ? proy.faltan : clases.pca.parametros.filter((id) => !finito(valores[id])), d_ref: clases.d_ref.valor, residuo_z: proy ? proy.residuo : null, residuo_z_p99_tierra: clases.pca.residuo_z_p99 };
@@ -313,14 +338,14 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const sep = opc.separacion_km ?? 0;
     const conCasquete = opc.incluir_casquete === true;
     const valores = valoresDe(objetivo);
-    const reproducibles = indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
-    const usados = reproducibles.filter((id) => finito(valores[id]));
-    const sin_dato = reproducibles.filter((id) => !finito(valores[id]));
+    const pedidos = opc.parametros ?? indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
+    const { comparables: reproducibles, objetivos, sin_dato, sin_referencia } = objetivosDe(valores, pedidos, opc.referencia);
+    const usados = reproducibles.filter((id) => objetivos[id] !== null);
     if (usados.length > 16) throw new Error('cartera: más de 16 parámetros');
     const minimo = Math.ceil(usados.length / 2);
     const cols = usados.map((id) => {
-      const { f, den } = params.get(id);
-      return { a: tierraTransformada(id), fo: f(valores[id]), den };
+      const { f, den, cat } = params.get(id);
+      return { a: tierraTransformada(id), fo: f(objetivos[id]), den, cat };
     });
 
     const mejorDesv = usados.map(() => ({ d: Infinity, i: -1 }));
@@ -338,7 +363,7 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
         const v = c.a[i];
         ds[j] = NaN;
         if (v !== v) return;
-        ds[j] = Math.min(100, (Math.abs(v - c.fo) / c.den) * 100);
+        ds[j] = c.cat ? (v === c.fo ? 0 : 100) : Math.min(100, (Math.abs(v - c.fo) / c.den) * 100);
         ss += 100 - ds[j]; k++;
         if (ds[j] < corte) m |= 1 << j;
       });
@@ -393,13 +418,13 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     const lugares = lugaresI.map((i) => ({
       ...latLon(i), fila: Math.floor(i / g.ancho), col: i % g.ancho, similitud_pct: sim[i], comparados: cobertura[i], de: usados.length,
       cubre: usados.filter((_, j) => mascara[i] & (1 << j)),
-      parametros: parametrosEn(valores, reproducibles, usados, i),
+      parametros: parametrosEn(objetivos, reproducibles, usados, i),
     }));
     const sin_cubrir = usados.map((id, j) => ({ id, j })).filter(({ j }) => !(todo & (1 << j))).map(({ id, j }) => {
       const b = mejorDesv[j];
       return b.i < 0 ? { id, mejor_desviacion_pct: null, lat: null, lon: null } : { id, mejor_desviacion_pct: b.d, ...latLon(b.i) };
     });
-    const out = { corte, usados, sin_dato, lugares, cubiertos: usados.filter((_, j) => todo & (1 << j)), sin_cubrir };
+    const out = { corte, usados, sin_dato, sin_referencia, lugares, cubiertos: usados.filter((_, j) => todo & (1 << j)), sin_cubrir };
     if (sep > 0) Object.assign(out, { separacion_km: sep, separacion_cumplida });
     return out;
   }
