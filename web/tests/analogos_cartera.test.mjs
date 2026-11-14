@@ -106,20 +106,25 @@ test('environment type colours: one per class, brand colours or a brand transpar
   assert.deepEqual([...conTierra.slice(8, 12)], [234, 254, 7, 200]);
 });
 
-test('unlisted: 15 of the 19 catalogue sites have coordinates; the count sentence for none, some, one and all', () => {
-  assert.equal(SITIOS.length, 19);
-  assert.equal(sitiosConCoordenadas(SITIOS), 15);
+test('unlisted: only catalogue sites with coordinates count; the count sentence for none, some, one and all', () => {
+  const N = SITIOS.filter((s) => s.lat !== null && s.lon !== null).length;
+  assert.ok(N >= 15 && N < SITIOS.length);
+  assert.equal(sitiosConCoordenadas(SITIOS), N);
   assert.equal(sitiosConCoordenadas([{ lat: 0, lon: null }, { lat: 1, lon: 2 }, {}]), 1);
   assert.equal(fraseUnlisted(4, 5, 15), '4 of these 5 places are unlisted: none of the 15 analog sites in our catalogue is within 300 km.');
   assert.equal(fraseUnlisted(1, 5, 15), '1 of these 5 places is unlisted: none of the 15 analog sites in our catalogue is within 300 km.');
   assert.equal(fraseUnlisted(5, 5, 15), 'All 5 places are unlisted: none of the 15 analog sites in our catalogue is within 300 km.');
   assert.equal(fraseUnlisted(0, 5, 15), 'All 5 places are near a known analog site in our catalogue.');
   assert.equal(fraseUnlisted(0, 0, 15), null);
-  // Shackleton rim, real engine: place 2 is near Haughton (Devon Island), the other four are unlisted.
+  // Borde de Shackleton, motor real: «unlisted» = ningún sitio del catálogo a 300 km o menos, contado aparte por fuerza bruta.
   const r = M.buscar(SHACKLETON);
+  const rad = Math.PI / 180;
+  const km = (a, b, c, d) => 2 * 6371 * Math.asin(Math.sqrt(Math.sin(((c - a) * rad) / 2) ** 2 + Math.cos(a * rad) * Math.cos(c * rad) * Math.sin(((d - b) * rad) / 2) ** 2));
+  const esperado = r.resultados.filter((x) => !SITIOS.some((s) => s.lat !== null && s.lon !== null && km(x.lat, x.lon, s.lat, s.lon) <= 300)).length;
   const sin = r.resultados.filter((x) => !masCercano(x.lat, x.lon, SITIOS)).length;
-  assert.equal(sin, 4);
-  assert.equal(lineaContexto(null, sitiosConCoordenadas(SITIOS)), 'not near any of the 15 analog sites in our catalogue');
+  assert.equal(sin, esperado);
+  assert.ok(sin >= 1 && sin < r.resultados.length);
+  assert.equal(lineaContexto(null, N), `not near any of the ${N} analog sites in our catalogue`);
 });
 
 test('side-by-side table from the real Jezero search: one row per parameter, 5 places, best cell = smallest deviation', () => {

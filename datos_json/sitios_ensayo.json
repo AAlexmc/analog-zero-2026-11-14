@@ -467,7 +467,7 @@
    "coordenadas": {"texto": "sampling site 'Yungay' of the source, decimal degrees as given",
     "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11653780/",
     "cita": "The next site along the transect is Yungay (YU, 1004 masl, S 24.0883, W 69.9946)",
-    "verificado": false},
+    "verificado": true},
    "relevancia": {"texto": "Mars: soil chemistry, extreme dryness, very low levels of life",
     "fuente": "https://www.nasa.gov/image-article/tire-tracks-mars-atacama-rover-astrobiology-drilling-studies/",
     "cita": "The location is used as an analog for, or good representation of, the conditions on Mars",
@@ -611,11 +611,11 @@
    "coordenadas": {"texto": "coordinates of the valleys as a whole (Wikipedia), not of a specific valley",
     "fuente": "https://en.wikipedia.org/wiki/McMurdo_Dry_Valleys",
     "cita": "77°28′S 162°31′E / 77.467°S 162.517°E",
-    "verificado": false},
+    "verificado": true},
    "relevancia": {"texto": "Mars: extremely cold and dry conditions",
     "fuente": "https://www.nasa.gov/mission/haughton-mars-project-hmp-canadian-arctic/",
     "cita": "The Dry Valleys of Antarctica are some of the most Mars-like places on our planet due to the extremely cold and dry conditions.",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "NASA Ames drilling technology tests", "ano": null,
      "sistema": "drilling systems",
@@ -625,7 +625,7 @@
      "nota": "year not stated in the quoted source",
      "fuente": "https://www.nasa.gov/mission/haughton-mars-project-hmp-canadian-arctic/",
      "cita": "Recent work has focused on validating drilling systems that could one day be used to drill on Mars.",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -663,11 +663,11 @@
    "coordenadas": {"texto": "location of the NASA ASTER scenes of Badwater, to one decimal as given",
     "fuente": "https://www.jpl.nasa.gov/images/pia26197-badwater-death-valley/",
     "cita": "cover an area of 24 by 28.5 km, and are located at 36.3 degrees north, 116.8 degrees west",
-    "verificado": false},
+    "verificado": true},
    "relevancia": {"texto": "Mars: evaporite minerals seen by remote sensing",
     "fuente": "https://astrobiology.nasa.gov/nai/annual-reports/2002/asu/exploring-mars-for-past-or-present-life/index.html",
     "cita": "developed detailed mineralogical ground truth for remotely sensed Mars analog sites in the Badwater Basin of Death Valley",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "NASA Astrobiology Institute remote sensing analog studies", "ano": null,
      "sistema": "airborne and orbital thermal infrared remote sensing with ground truth",
@@ -677,7 +677,7 @@
      "nota": "year not stated in the quoted sentence",
      "fuente": "https://astrobiology.nasa.gov/nai/annual-reports/2003/asu/astrobiological-exploration-of-mars/index.html",
      "cita": "we completed our remote sensing analog studies of the Badwater Basin in Death Valley designed to evaluate spatial resolution detectability thresholds for a variety of evaporite minerals",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -695,7 +695,7 @@
    "relevancia": {"texto": "Mars: soil chemistry and landforms",
     "fuente": "https://ntrs.nasa.gov/citations/20110014304",
     "cita": "an important chemical and morphological Mars analog site",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "DOMEX simulated human Mars mission", "ano": 2009,
      "sistema": "crew with manual and robotic subsurface sampling equipment",
@@ -704,7 +704,7 @@
      "equipo_relacionado": [],
      "fuente": "https://ntrs.nasa.gov/citations/20110014304",
      "cita": "A crew simulating a human mission to Mars performed activities focused on subsurface science for 2 weeks in November 2009 at Mars Desert Research Station near Hanksville, Utah",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -718,11 +718,11 @@
    "coordenadas": {"texto": "coordinates of the hydrothermal system (Wikipedia)",
     "fuente": "https://en.wikipedia.org/wiki/Dallol_(hydrothermal_system)",
     "cita": "14°14′30″N 40°18′00″E / 14.24167°N 40.30000°E",
-    "verificado": false},
+    "verificado": true},
    "relevancia": {"texto": "Mars: hydrothermal environments",
     "fuente": "https://www.europlanet-society.org/?p=5790",
     "cita": "The unusual geochemistry of Dallol has close parallels to hydrothermal environments found on Mars, including the Gusev Crater, where NASA’s Spirit Mars Exploration Rover landed.",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "Europlanet 2020 RI characterisation of the Dallol planetary field analogue site", "ano": null,
      "sistema": "field campaigns (geology, mineralogy, biology)",
@@ -732,7 +732,7 @@
      "nota": "EU-funded research infrastructure, not a space agency; year not stated in the quoted sentence",
      "fuente": "https://www.europlanet-society.org/?p=5790",
      "cita": "The paper is the culmination of a two-year process supported by Europlanet 2020 RI to characterise the Dallol site’s geology, mineralogy and biology in preparation for further study by planetary researchers.",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -746,7 +746,7 @@
    "coordenadas": {"texto": "coordinates of the national park (Wikipedia)",
     "fuente": "https://en.wikipedia.org/wiki/Timanfaya_National_Park",
     "cita": "28°59′39″N 13°47′36″W / 28.99417°N 13.79333°W",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "ESA PANGAEA astronaut geology course, Lanzarote session", "ano": null,
      "sistema": "astronaut field geology training",
@@ -756,7 +756,7 @@
      "nota": "weak evidence: photo caption only; see the lanzarote entry for the course itself",
      "fuente": "https://blogs.esa.int/caves/2021/12/01/goodbye-volcanoes-hello-moon/",
      "cita": "Remnants of lava flows in Timanfaya.",
-     "verificado": false}
+     "verificado": true}
    ]
   },
   {
@@ -770,7 +770,7 @@
    "coordenadas": {"texto": "coordinates of Cueva de los Verdes (Wikipedia)",
     "fuente": "https://en.wikipedia.org/wiki/Cueva_de_los_Verdes",
     "cita": "29°09′40″N 13°26′20″W / 29.16111°N 13.43889°W",
-    "verificado": false},
+    "verificado": true},
    "relevancia": {"texto": "Moon and Mars: lava tubes as candidate sites for human habitats",
     "fuente": "https://www.esa.int/ESA_Multimedia/Images/2018/08/Astronaut_and_rover_in_lava_tube",
     "cita": "This type of settings are potential candidates to host human habitats in future missions to the Moon and Mars.",
@@ -807,7 +807,7 @@
    "relevancia": {"texto": "Moon: cratered mare surface (Sea of Tranquility), artificial craters",
     "fuente": "https://science.nasa.gov/earth/arizonas-lunar-craters/",
     "cita": "The first of these fields (1968 image) was designed to simulate the Sea of Tranquility",
-    "verificado": false},
+    "verificado": true},
    "campanas": [
     {"nombre": "Apollo astronaut training in the Cinder Lake crater fields", "ano": null,
      "sistema": "astronaut field training on artificial crater fields",
@@ -817,7 +817,7 @@
      "nota": "year not stated in the quoted sentence",
      "fuente": "https://science.nasa.gov/earth/arizonas-lunar-craters/",
      "cita": "The U.S. Geological Survey created the two Cinder Lake crater fields, near Flagstaff, Arizona, to help train Apollo astronauts bound for the lunar surface.",
-     "verificado": false}
+     "verificado": true}
    ]
   }
  ]
