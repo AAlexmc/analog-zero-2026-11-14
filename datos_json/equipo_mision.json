@@ -218,7 +218,28 @@
             "masa": null
           },
           "limites": [],
-          "modelo3d": null
+          "modelo3d": {
+            "origen": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Space%20Exploration%20Vehicle",
+            "repositorio": "https://github.com/nasa/NASA-3D-Resources",
+            "fichero": "3D Models/Space Exploration Vehicle/Space Exploration Vehicle.glb",
+            "formato": "glb",
+            "bytes": 22431576,
+            "uso": {
+              "fuente": "https://github.com/nasa/NASA-3D-Resources",
+              "cita": "These assets are free and without copyright.",
+              "verificado": false
+            },
+            "lleva_insignia": null,
+            "copiado": null,
+            "motivo_no_copiado": "Larger than 8 MB.",
+            "sustituto_de": {
+              "equipo": "Lunar Electric Rover",
+              "motivo": "No public model of the Lunar Electric Rover itself; the Space Exploration Vehicle is the concept that grew out of it.",
+              "fuente": "https://en.wikipedia.org/wiki/Space_Exploration_Vehicle",
+              "cita": "The concept evolved from the Lunar Electric Rover (LER) concept",
+              "verificado": false
+            }
+          }
         }
       ]
     },
@@ -498,7 +519,21 @@
               "nota": "Slope in soft sand, said by a rover driver during the Scarecrow dune tests."
             }
           ],
-          "modelo3d": null
+          "modelo3d": {
+            "origen": "https://science.nasa.gov/3d-resources/curiosity-scarescrow-test-rover/",
+            "repositorio": "https://github.com/nasa/NASA-3D-Resources",
+            "fichero": "3D Models/Curiosity Scarecrow Test Rover/Curiosity Scarecrow Test Rover.blend",
+            "formato": "blend",
+            "bytes": 4613488,
+            "uso": {
+              "fuente": "https://github.com/nasa/NASA-3D-Resources",
+              "cita": "These assets are free and without copyright.",
+              "verificado": false
+            },
+            "lleva_insignia": null,
+            "copiado": null,
+            "motivo_no_copiado": "Only published as .blend (and a .zip), not .glb."
+          }
         }
       ]
     },
