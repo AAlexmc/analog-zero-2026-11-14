@@ -230,6 +230,28 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .tabla-calendario tr.actual th { box-shadow: inset 3px 0 0 var(--neon-yellow); }
 #calendario .tabla-scroll { margin: 0 0 14px; }
 #calendario .aviso-mes { color: var(--neon-yellow); }
+/* Equipo de la misión mes a mes: dos estados con signo (✓ blanco, ✕ con borde rojo sobre deep blue); el texto nunca va sobre rojo. */
+.plan .plan-equipo { font-size: 14px; color: var(--white); margin: 0 0 10px; padding-left: 10px; border-left: 3px solid var(--rocket-red); }
+.equipo-mes .leyenda-equipo { margin: 0 0 10px; }
+.equipo-mes ul.equipos { list-style: none; padding: 0; margin: 0; }
+.equipo-mes li.equipo { border-top: 1px solid var(--linea); padding: 10px 0 4px; margin: 0; }
+.equipo-mes li.equipo:first-child { border-top: 0; padding-top: 0; }
+.equipo-mes .equipo-nombre { margin: 0; font-size: 15px; color: var(--white); }
+.equipo-mes .equipo-tipo { margin: 0 0 8px; }
+.tira-equipo { margin: 0 0 6px; }
+.tira-equipo .casilla { height: 22px; display: grid; place-items: center; font: 700 15px/1 var(--cuerpo); box-sizing: border-box; }
+.tira-equipo .casilla.ok { background: var(--white); color: var(--deep-blue); }
+.tira-equipo .casilla.rompe { background: var(--deep-blue); color: var(--white); border: 2px solid var(--rocket-red); }
+.tira-equipo .casilla.sin_dato { background: var(--deep-blue); color: var(--white); border: 1px dashed var(--white); }
+.equipo-mes .equipo-frase { font-size: 14px; color: var(--white); margin: 0 0 4px; }
+.equipo-mes ul.equipo-limites { margin: 0 0 4px; padding-left: 18px; font-size: 13px; }
+.equipo-mes .equipo-nasa { font-size: 14px; color: var(--neon-yellow); margin: 0 0 4px; }
+.equipo-mes .no-medido { color: var(--white); }
+.equipo-mes .no-medido a, .equipo-mes .equipo-fuentes a { color: var(--white); }
+.equipo-mes .no-medido a:hover, .equipo-mes .no-medido a:focus-visible, .equipo-mes .equipo-fuentes a:hover, .equipo-mes .equipo-fuentes a:focus-visible { color: var(--neon-yellow); }
+.equipo-mes .equipo-fuentes { margin: 6px 0 4px; }
+.equipo-mes .equipo-fuentes blockquote { margin: 4px 0 0; padding-left: 10px; border-left: 2px solid var(--linea); font-style: italic; font-size: 13px; }
+.equipo-mes .marca-chip { font-size: 10px; padding: 3px 7px; vertical-align: 1px; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   .pestanas { gap: 2px; }
   .pestanas button { padding: 10px 4px; font-size: 15px; }

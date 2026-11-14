@@ -12,6 +12,7 @@ import { paisDe } from './paises.js';
 import { resumenLugar, lineaResumen, leerEstado, conMision, opcionesBusqueda, frasesNoUsados } from './misiones.js';
 import { montarMision, pintarFicha as fichaMision, montarMes } from './mision_panel.js';
 import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, rachas, planRepetir, moverEnMes, fraseRepetir, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from './meses.js';
+import { equiposDe, calendarioEquipo, idsMensualesEquipo, campanasCerca, fraseNasaAqui, fraseRepeticion, nombreTipo, fmtLimite, verUnidad, sujetoDe, esSuperficie } from './equipo_mes.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -42,13 +43,15 @@ async function montar() {
   document.title = `Analog Zero · Earth analogs for ${nombre ?? coords}`;
   $('estado').classList.add('cargando');
 
-  const [mundos, sitios, terrenos, M, paises, misiones] = await Promise.all([
+  const [mundos, sitios, terrenos, M, paises, misiones, equipoCat] = await Promise.all([
     cargarMundos('../data/cuerpos/mundos.json').catch((e) => { fallo(e); return []; }),
     fetch('../data/sitios_ensayo.json').then((r) => r.json()).then((j) => j.sitios ?? []).catch((e) => { fallo(e); return []; }),
     cargarTerrenos().catch((e) => { fallo(e); return []; }),
     cargar('../data/cuerpos/').catch((e) => { fallo(e); return null; }),
     fetch('../data/paises_110m.json').then((r) => r.json()).then((j) => j.paises ?? []).catch((e) => { fallo(e); return []; }),
     fetch('../data/misiones.json').then((r) => r.json()).then((j) => j.misiones ?? []).catch((e) => { fallo(e); return []; }),
+    // Sin catálogo de equipo, Calendar sale sin su bloque.
+    fetch('../data/equipo_mision.json').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}: equipo_mision.json`); return r.json(); }).catch((e) => { fallo(e); return null; }),
   ]);
   const tierra = mundos.find((m) => m.id === 'earth');
   if (tierra) $('credito').textContent = `Image: ${tierra.credito}. Country borders: Natural Earth (public domain).`;
@@ -633,6 +636,75 @@ async function montar() {
     s.addEventListener('change', () => cambiar(Number(s.value)));
     return s;
   };
+  // Equipo de la misión en el lugar: límites publicados frente a la Tierra de ese lugar, mes a mes (equipo_mes.js).
+  let eqFallo = null;
+  function calendariosEquipo(eq, x) {
+    const ids = idsMensualesEquipo(eq, M.conMeses);
+    if (ids.length && eqFallo) return null;
+    const lugar = { lat: x.lat, lon: x.lon }, anuales = M.leerPunto('earth', x.lat, x.lon).valores;
+    // Objetivo = la Tierra del propio lugar: así cada parámetro sale con su valor del mes aunque la Luna o Marte no lo tengan.
+    const per = ids.length ? M.perfilMensual({ cuerpo: 'earth', lat: x.lat, lon: x.lon, valores: anuales }, lugar, { parametros: ids, referencia: lugar }) : null;
+    return eq.map((e) => calendarioEquipo(e, per, anuales));
+  }
+  const SIGNO = { ok: '✓', rompe: '✕', sin_dato: '–' };
+  const ESTADO = { ok: 'within its published limits', rompe: 'outside a published limit', sin_dato: 'no data' };
+  const rotuloLimite = (L) => { const s = sujetoDe(L.parametro).replace(/^the /, ''); return `${s[0].toUpperCase()}${s.slice(1)}: ${L.tipo === 'min' ? 'min.' : 'max.'} ${fmtLimite(L)}`; };
+  const noMedido = (l, x) => el('p', { className: 'no-medido' }, `${rotuloLimite(l.limite)}. NOT MEASURED here (`,
+    ...(l.limite.parametro === 'pendiente_grados' ? ['no slope layer at this scale; ', el('a', { href: simular({ lat: x.lat, lon: x.lon, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }).href, textContent: 'see the simulation' })] : [l.motivo]), ').');
+  function tiraEquipo(c) {
+    const med = c.limites.filter((l) => l.medible);
+    const ol = el('ol', { className: 'tira tira-equipo' }, ...c.resumen.veredictos.map((v) => {
+      const detalle = med.map((l) => { const w = l.veredictos[v.mes - 1], s = sujetoDe(l.limite.parametro).replace(/^the /, ''); return w.valor === null ? `${s}: no data` : `${s} ${w.valor.toFixed(1)}${verUnidad(l.limite.unidad)} (limit ${fmtLimite(l.limite)})`; });
+      const etiqueta = `${nombreMes(v.mes)}: ${ESTADO[v.estado]} — ${detalle.join('; ')}`;
+      const li = el('li', { className: `mes${v.mes === mes ? ' activo' : ''}`, title: etiqueta },
+        el('span', { className: `casilla ${v.estado}`, textContent: SIGNO[v.estado] }),
+        el('span', { className: 'inicial', textContent: MESES_CORTO[v.mes - 1][0] }));
+      li.setAttribute('aria-label', etiqueta);
+      li.querySelectorAll('span').forEach((s) => s.setAttribute('aria-hidden', 'true'));
+      if (v.mes === mes) li.setAttribute('aria-current', 'true');
+      li.dataset.mes = v.mes; li.dataset.estado = v.estado;
+      return li;
+    }));
+    ol.setAttribute('aria-label', `${c.nombre}: published limits month by month`);
+    return ol;
+  }
+  function fuentesLimite(l) {
+    const L = l.limite;
+    return el('li', {}, el('strong', { textContent: rotuloLimite(L) }),
+      l.origen === 'anual' ? el('span', {}, ' ', el('span', { className: 'marca-chip', textContent: 'year value' })) : null,
+      el('blockquote', { textContent: L.cita }),
+      el('p', {}, el('a', { href: L.fuente, target: '_blank', rel: 'noopener', textContent: 'source' }), ...(L.verificado === false ? [' ', el('span', { className: 'marca-chip', textContent: 'source not verified' })] : [])),
+      L.nota ? el('p', { textContent: L.nota }) : null,
+      esSuperficie(L.parametro) ? el('p', { textContent: 'Surface temperature, not air (own comparison): we use the ground surface temperature of the average day of each month; an operating limit is usually given for the air.' }) : null,
+      l.origen === 'anual' ? el('p', { textContent: 'Year value: this layer has no monthly version, so all 12 months show the same.' }) : null);
+  }
+  function bloqueEquipo(eq, eqCal, x) {
+    const s = el('section', { className: 'bloque equipo-mes', id: 'equipo-mes' }, el('h3', { textContent: 'Mission equipment at this place, month by month' }));
+    if (!eq.length) { s.append(el('p', { className: 'vacio', textContent: 'No equipment listed for this mission.' })); return s; }
+    if (!eqCal) { s.append(el('p', { className: 'aviso-mes', textContent: 'Could not download the climate month by month, so the equipment is not checked here. Try again later.' })); return s; }
+    const conLimites = eqCal.filter((c) => c.limites.length), sinLimites = eqCal.filter((c) => !c.limites.length);
+    const nasa = fraseNasaAqui(campanasCerca(activa.mision, x.lat, x.lon));
+    if (conLimites.some((c) => c.medibles)) s.append(el('p', { className: 'leyenda-equipo', textContent: '✓ within the published limit · ✕ outside it · – no data. Earth data of this place against the limits the maker or NASA published (own comparison).' }));
+    s.append(el('ul', { className: 'equipos' }, ...conLimites.map((c) => {
+      const med = c.limites.filter((l) => l.medible);
+      const li = el('li', { className: 'equipo' },
+        el('p', { className: 'equipo-nombre' }, el('strong', { textContent: c.nombre })),
+        el('p', { className: 'equipo-tipo', textContent: `${nombreTipo(c.tipo)} · ${c.campana}` }),
+        ...(c.medibles ? [
+          tiraEquipo(c),
+          el('p', { className: 'equipo-frase' }, c.resumen.frase, ...(med.length === 1 && med[0].origen === 'anual' ? [' ', el('span', { className: 'marca-chip', textContent: 'year value' })] : [])),
+          med.length > 1 ? el('ul', { className: 'equipo-limites' }, ...med.map((l) => el('li', {}, l.frase, ...(l.origen === 'anual' ? [' ', el('span', { className: 'marca-chip', textContent: 'year value' })] : [])))) : null,
+          nasa ? el('p', { className: 'equipo-nasa', textContent: nasa }) : null,
+          c.superficie ? el('p', { className: 'equipo-nota', textContent: 'Surface temperature, not air (own comparison).' }) : null,
+        ] : []),
+        ...c.limites.filter((l) => !l.medible).map((l) => noMedido(l, x)),
+        el('details', { className: 'como equipo-fuentes' }, el('summary', { textContent: 'Limits and sources' }), el('ul', {}, ...c.limites.map(fuentesLimite))));
+      li.dataset.id = c.id;
+      return li;
+    })));
+    if (sinLimites.length) s.append(el('p', { className: 'sin-limites', textContent: `No published limits — NOT MEASURED: ${sinLimites.map((c) => c.nombre).join(', ')}.` }));
+    return s;
+  }
   async function pintarCalendario() {
     const caja = $('calendario'), x = lugarSel();
     if (!x) { caja.replaceChildren(el('p', { className: 'tenue', textContent: 'Pick a place in the list first.' })); return; }
@@ -646,10 +718,24 @@ async function montar() {
       return;
     }
     const o = opcionesBusqueda(activa);
-    const clave = JSON.stringify([o, x.lat, x.lon]);
-    if (calCache?.clave !== clave) calCache = { clave, cal: M.calendario(objetivo, { ...o, lugar: { lat: x.lat, lon: x.lon } }), per: M.perfilMensual(objetivo, { lat: x.lat, lon: x.lon }, o) };
-    const { cal, per } = calCache;
+    // Equipo de la misión del catálogo: antes, los meses de sus límites que la búsqueda no baja.
+    const eq = activa?.tipo === 'catalogo' && equipoCat ? equiposDe(equipoCat, activa.id) : null;
+    const faltanEq = eq && !eqFallo ? idsMensualesEquipo(eq, M.conMeses).filter((id) => !cargados.has(id)) : [];
+    if (faltanEq.length) {
+      caja.replaceChildren(el('p', { className: 'tenue', textContent: 'Loading the climate month by month…' }));
+      try {
+        await M.cargarMeses(faltanEq);
+        faltanEq.forEach((id) => cargados.add(id));
+        A.mesesCargados = [...cargados];
+      } catch (e) { eqFallo = String(e?.message ?? e); A.equipoFallo = eqFallo; }
+      if ($('panel').dataset.pestana === 'calendario') pintarCalendario();
+      return;
+    }
+    const clave = JSON.stringify([o, activa?.id ?? null, x.lat, x.lon]);
+    if (calCache?.clave !== clave) calCache = { clave, cal: M.calendario(objetivo, { ...o, lugar: { lat: x.lat, lon: x.lon } }), per: M.perfilMensual(objetivo, { lat: x.lat, lon: x.lon }, o), eq: eq && calendariosEquipo(eq, x) };
+    const { cal, per, eq: eqCal } = calCache;
     A.calendario = { lat: x.lat, lon: x.lon, filas: cal };
+    A.equipoMes = eqCal ? { lat: x.lat, lon: x.lon, calendarios: eqCal } : null;
     const donde = (f) => `${formatoLatLon(f.lat, f.lon).texto}${pais(f) ? ` (${pais(f)})` : ''}`;
     plan.inicio ??= mes ?? 1;
     const p = planRepetir(cal, plan.inicio, plan.despues);
@@ -682,8 +768,10 @@ async function montar() {
           el('label', { className: 'mision-rotulo', htmlFor: 'plan-despues', textContent: 'Repeat after' }),
           selector('plan-despues', Array.from({ length: 11 }, (_, k) => [k + 1, `${k + 1} month${k ? 's' : ''}`]), plan.despues, (v) => { plan.despues = v; pintarCalendario(); })),
         el('p', { className: `plan-frase${p.mover ? ' mover' : ''}`, id: 'plan-frase', textContent: frase }),
+        eqCal && fraseRepeticion(eqCal, p.repeticion.mes) ? el('p', { className: 'plan-equipo', id: 'plan-equipo', textContent: fraseRepeticion(eqCal, p.repeticion.mes) }) : null,
         ir,
         el('p', { textContent: `Move = this place is more than ${MARGEN} points below the best place on Earth that month (own threshold).` })),
+      eq ? bloqueEquipo(eq, eqCal, x) : null,
       el('div', { className: 'tabla-scroll' }, el('table', { className: 'tabla-calendario' },
         el('thead', {}, el('tr', {}, el('th', { scope: 'col', textContent: 'Month' }), el('th', { scope: 'col', textContent: 'This place' }), el('th', { scope: 'col', textContent: 'Best place on Earth' }),
           el('th', { scope: 'col' }, 'Move?', el('small', { textContent: `own threshold: ${MARGEN} points` })))),

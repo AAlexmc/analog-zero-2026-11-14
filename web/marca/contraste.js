@@ -63,4 +63,9 @@ export const PAREJAS = [
   { uso: 'terrain viewer: side panel muted text over the brand gradient (lightest corner)', texto: TENUE(mezclar('deep-blue', 0.86, 'electric-blue')), fondo: mezclar('deep-blue', 0.86, 'electric-blue') },
   { uso: 'terrain viewer: ground view note on its white pill', texto: 'deep-blue', fondo: 'white' },
   { uso: 'terrain viewer: "your place could not be built" notice', texto: 'white', fondo: 'deep-blue' },
+  { uso: 'terrain viewer: mission equipment label, assumed size and slope over the limit (accent) on the side panel', texto: 'neon-yellow', fondo: mezclar('deep-blue', 0.86, 'electric-blue') },
+  { uso: 'terrain viewer: mission equipment text on the equipment list', texto: 'white', fondo: mezclar('deep-blue', 0.95, 'electric-blue') },
+  { uso: 'Calendar equipment strip: "works" box (tick on white)', texto: 'deep-blue', fondo: 'white' },
+  { uso: 'Calendar equipment strip: "breaks" and "no data" boxes (sign on deep blue, red only as border)', texto: 'white', fondo: 'deep-blue' },
+  { uso: 'Calendar equipment: "NASA ran this here" line over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
 ];
