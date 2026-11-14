@@ -97,7 +97,7 @@ try {
     const barra = await pag.evaluate(() => ({ nombre: document.querySelector('.marca-barra .marca-nombre')?.textContent, inicio: document.querySelector('.marca-barra .marca-nombre')?.getAttribute('href'),
       enlaces: [...document.querySelectorAll('.marca-barra a.marca-enlace')].map((a) => [a.querySelector(innerWidth <= 520 ? '.corto' : '.largo')?.textContent, a.getAttribute('href')]),
       fuente: getComputedStyle(document.querySelector('.marca-barra .marca-nombre')).fontFamily }));
-    const esperados = movil ? [['Map', 'mapa/index.html'], ['Terrain', 'terreno/index.html']] : [['Global map', 'mapa/index.html'], ['Terrain viewer', 'terreno/index.html']];
+    const esperados = movil ? [['Map', 'mapa/index.html'], ['Data', 'datos/index.html']] : [['Global map', 'mapa/index.html'], ['Data sources', 'datos/index.html']];
     if (barra.nombre !== 'Analog Zero' || barra.inicio !== 'index.html' || JSON.stringify(barra.enlaces) !== JSON.stringify(esperados) || !/Fira Sans/.test(barra.fuente)) falla(`${etiqueta}: top bar ${JSON.stringify(barra)}`);
     else ok(`${etiqueta}: top bar "Analog Zero" (Fira Sans) → portada, links ${barra.enlaces.map((x) => x[0]).join(', ')}`);
 

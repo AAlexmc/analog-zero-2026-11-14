@@ -22,6 +22,16 @@ export function leerLugar(search) {
   return { lat, lon, nombre, lado_km };
 }
 
+// Enlace al visor (relativo a la raíz de la web) con el lugar de la Tierra y, si se sabe, el terreno lunar del punto elegido;
+// sin terreno lunar (p. ej. un punto de Marte) el lugar se abre solo.
+export function enlaceSimulacion({ lat, lon, nombre = null, lunar = null }) {
+  const q = new URLSearchParams({ lugar: `${lat.toFixed(4)},${lon.toFixed(4)}` });
+  if (nombre) q.set('nombre', nombre);
+  if (lunar) q.set('b', lunar); else q.set('solo', 'lugar');
+  q.set('vista', 'suelo');
+  return `terreno/index.html?${q.toString()}`;
+}
+
 export const idLugar = ({ lat, lon, lado_km }) => `lugar_${lat.toFixed(4)}_${lon.toFixed(4)}_${lado_km}km`;
 
 // Lado en el suelo de un píxel de tesela Web Mercator a esa latitud (la misma cuenta que zoomPara).

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { leerLugar, idLugar, ventanaLugar, pixelTesela, terrenoDeRelieve, textoMuestreo, fuentesDeTeselas, FUENTES_TERRARIUM, LADOS_KM, LADO_DEFECTO_KM, N_MAX } from '../terreno/lugar.js';
+import { leerLugar, idLugar, ventanaLugar, pixelTesela, terrenoDeRelieve, textoMuestreo, fuentesDeTeselas, FUENTES_TERRARIUM, LADOS_KM, LADO_DEFECTO_KM, N_MAX, enlaceSimulacion } from '../terreno/lugar.js';
 import { rejillaLocal, zoomPara, ZOOM_MAX_TERRARIUM, CREDITOS_TIERRA, R_TIERRA_M } from '../relieve/calculo.js';
 import { centroPixel, pixelALatLon } from '../terreno/georef.js';
 import { pendienteGrados, rango } from '../terreno/calculo.js';
@@ -187,4 +187,19 @@ test('sampling label states the real spacing, the source resolution from the til
   assert.equal(parcial.capas.altura.resolucion_origen_m, null);
   const dos = textoMuestreo({ ...srtm, muestreo: { ...srtm.muestreo, m: 4.8123 } });
   assert.match(dos, /sampled every 4\.8 m/i);
+});
+
+test('simulation link: the Earth place goes with the lunar terrain of the target, or alone when there is none', () => {
+  const con = enlaceSimulacion({ lat: 75.25, lon: -84.25, nombre: 'Place 2 · 75.25° N, 84.25° W', lunar: 'shackleton_borde' });
+  assert.ok(con.startsWith('terreno/index.html?'));
+  const q = new URLSearchParams(con.split('?')[1]);
+  assert.equal(q.get('lugar'), '75.2500,-84.2500');
+  assert.equal(q.get('b'), 'shackleton_borde');
+  assert.equal(q.get('solo'), null);
+  assert.equal(q.get('vista'), 'suelo');
+  assert.deepEqual(leerLugar(`?${con.split('?')[1]}`), { lat: 75.25, lon: -84.25, nombre: 'Place 2 · 75.25° N, 84.25° W', lado_km: 10 });
+  const sin = new URLSearchParams(enlaceSimulacion({ lat: -24.0883, lon: -69.9946 }).split('?')[1]);
+  assert.equal(sin.get('solo'), 'lugar');
+  assert.equal(sin.get('b'), null);
+  assert.equal(sin.get('nombre'), null);
 });

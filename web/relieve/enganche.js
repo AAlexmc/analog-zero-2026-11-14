@@ -7,7 +7,8 @@ let conCss = false;
 
 // punto() → { lat, lon, titulo, celda? } o null; mundo: id o función que lo devuelve; alCambiar(cb): avisa si se mueve el punto.
 // hueco() → { right, bottom } en px: margen que la vista deja libre (p. ej. el panel de resultados).
-export function engancharRelieve({ boton, aviso, mundo, punto, alCambiar = null, hueco = null }) {
+// accion(p) → { texto, href } o null: botón principal dentro de la vista.
+export function engancharRelieve({ boton, aviso, mundo, punto, alCambiar = null, hueco = null, accion = null }) {
   if (!conCss) {
     conCss = true;
     document.head.append(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: new URL('relieve.css', import.meta.url).href }));
@@ -45,7 +46,7 @@ export function engancharRelieve({ boton, aviso, mundo, punto, alCambiar = null,
     document.body.append(capa);
     encajar();
     try {
-      abierta = await abrirRelieve(capa, { mundo: typeof mundo === 'function' ? mundo() : mundo, ...p, alVolver: cerrada });
+      abierta = await abrirRelieve(capa, { mundo: typeof mundo === 'function' ? mundo() : mundo, ...p, accion: accion?.(p) ?? null, alVolver: cerrada });
       requestAnimationFrame(() => capa?.classList.add('visible'));
       abierta.volver.focus();
       R.estado = 'abierto';

@@ -7,6 +7,7 @@ import { cargar } from '../buscar/motor.js';
 import { enlaceTerreno } from '../mapa/estado.js';
 import { CORTES, NO_COMPARADO, NO_COMPARADO_MISION, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview, colorRampa, SIN_COMPARAR } from './metricas.js';
 import { engancharRelieve } from '../relieve/enganche.js';
+import { enlaceSimulacion } from '../terreno/lugar.js';
 import { paisDe } from './paises.js';
 import { resumenLugar, lineaResumen, leerEstado, conMision, opcionesBusqueda, frasesNoUsados } from './misiones.js';
 import { montarMision, pintarFicha as fichaMision, montarMes } from './mision_panel.js';
@@ -153,7 +154,9 @@ async function montar() {
   $('ver-relieve').hidden = !(r.resultados.length || r.parciales.length || cart.lugares.length);
   // La vista de terreno ocupa el hueco del globo: el panel sigue a la vista para pulsar otro lugar (en móvil, pantalla entera).
   const hueco = () => { const p = $('panel').getBoundingClientRect(); return p.width >= innerWidth - 2 ? { right: 0, bottom: 0 } : { right: Math.max(0, innerWidth - p.left), bottom: 0 }; };
-  const relieve = engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', hueco, punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
+  // «Generate simulation»: del terreno del lugar al visor con las dos vistas; la misión y el mes viajan en la URL.
+  const simular = (p) => ({ texto: 'Generate simulation', href: conMes(conMision(`../${enlaceSimulacion({ lat: p.lat, lon: p.lon, nombre: p.titulo, lunar: objetivoLunar })}`, activa), mes) });
+  const relieve = engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', hueco, accion: simular, punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
   $('panel').addEventListener('transitionend', (e) => { if (e.target === $('panel')) relieve.encajar(); });
   const fotograma = () => new Promise((ok) => requestAnimationFrame(ok));
   // Tras pulsar un lugar: cuando el globo termina de girar y ampliar, se abre su terreno sin más clics.

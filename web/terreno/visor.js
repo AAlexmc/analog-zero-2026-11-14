@@ -56,7 +56,10 @@ async function elegirIds() {
   // Con ?lugar= el panel de la Tierra se hace en el momento; el del catálogo queda de reserva.
   const reserva = a;
   if (LUGAR) a = ID_LUGAR;
-  const solo = qs.get('solo');
+  // ?solo=lugar: el lugar de la Tierra sin pareja (p. ej. cuando el punto elegido está en Marte); no es la vista ampliada.
+  const unico = qs.get('solo') === 'lugar' && !!LUGAR;
+  if (unico) { b = null; document.body.dataset.unico = 'a'; }
+  const solo = unico ? null : qs.get('solo');
   if (solo && solo !== a && solo !== b) {
     const t = indice?.terrenos?.find((x) => x.id === solo);
     if (t?.cuerpo === 'tierra') a = solo; else b = solo;
@@ -1059,6 +1062,8 @@ async function iniciar() {
   refrescarPlantado();
   const solo = [pa, pb].find((p) => p.id && p.id === sel.solo);
   if (solo?.escena) alternarAmpliado(solo, true);
+  // «Generate simulation» entra de pie en el lugar de la Tierra (&vista=suelo), no en vista aérea.
+  if (qs.get('vista') === 'suelo' && pa.escena?.meta.dinamico) alternarSuelo(pa, true);
   requestAnimationFrame(bucle);
   estado.listo = true;
 }

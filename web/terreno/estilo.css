@@ -45,6 +45,8 @@ button:disabled, button:disabled:hover { opacity: .45; cursor: default; color: v
 #paneles { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; min-height: 0; }
 body[data-ampliado] #paneles { grid-template-columns: 1fr; }
 body[data-ampliado] .panel:not(.ampliado) { display: none; }
+body[data-unico] #paneles { grid-template-columns: 1fr; }
+body[data-unico] .panel[data-lado=b] { display: none; }
 /* Panel lateral en el borde exterior de cada lado: los dos lienzos quedan juntos en el centro y miden lo mismo. */
 .panel { position: relative; min-width: 0; min-height: 0; display: grid; container-type: inline-size; gap: 0 12px; overflow: hidden;
   grid-template-rows: 1fr auto; grid-template-columns: var(--ancho-lado) 1fr; grid-template-areas: "lado lienzo" "lado lect"; }

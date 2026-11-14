@@ -44,3 +44,4 @@
 .relieve-aviso[hidden] { display: none; }
 .mandos .relieve-aviso { position: absolute; top: 100%; left: 0; width: max-content; max-width: min(420px, calc(100vw - 32px)); margin-top: 8px; box-sizing: border-box; }
 .explorar .ver-relieve { width: 100%; }
+.relieve-accion { display: inline-flex; margin-top: 10px; text-decoration: none; }

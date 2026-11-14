@@ -13,7 +13,8 @@ const AMARILLO = 0xeafe07;
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
 
 // Carga primero (si falla, lanza el mensaje llano y no toca el contenedor) y luego monta la vista.
-export async function abrirRelieve(contenedor, { mundo, lat, lon, lado_km = LADO_KM, titulo, celda = null, alVolver = null }) {
+// accion (opcional): { texto, href } → botón principal bajo el título (p. ej. «Generate simulation»).
+export async function abrirRelieve(contenedor, { mundo, lat, lon, lado_km = LADO_KM, titulo, celda = null, alVolver = null, accion = null }) {
   const d = await cargarRelieve({ mundo, lat, lon, lado_km });
   const est = estadisticas(d.z, d.n);
   const sol = SOL[mundo] ?? SOL.otro;
@@ -37,6 +38,7 @@ export async function abrirRelieve(contenedor, { mundo, lat, lon, lado_km = LADO
       el('p', { className: 'relieve-cifras' }, cifra('Elevation at the pin', formatoMetros(est.centro), 'altitud'),
         cifra(`Relief in this ${Math.round(lado_km_real)} km window`, formatoMetros(est.desnivel), 'desnivel')),
       el('p', { className: 'relieve-fuente', textContent: `Read from ${d.rotulos.altura}.` }),
+      accion ? el('a', { className: 'marca-boton relieve-accion', href: accion.href, textContent: accion.texto }) : null,
       celda ? el('p', { className: 'relieve-celda' }, el('span', { className: 'muestra', ariaHidden: 'true' }), 'Outline: the 0.5° cell we compared') : null),
     el('div', { className: 'relieve-pie' },
       el('div', { className: 'relieve-mandos marca-panel' },
