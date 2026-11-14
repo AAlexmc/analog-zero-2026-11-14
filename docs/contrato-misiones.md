@@ -65,6 +65,7 @@ La búsqueda de análogos pasa a elegirse por **objetivo de misión**: un tipo d
 | `respaldo` | `"confirmado"`, `"parcial"` o `"no_encontrado"` |
 | `campanas[].sitio` | `id` de `datos_json/sitios_ensayo.json` si el sitio ya está ahí; si no, `null` y se rellenan `sitio_texto`, `lat`, `lon` y `coordenadas_fuente` (objeto `{fuente, cita, verificado}`) |
 | `campanas[].lat`, `lon` | grados decimales; `null` si la fuente no los da. La primera campaña con coordenadas es el **sitio de referencia** de la misión para los parámetros que solo existen en la Tierra |
+| `campanas[].meses` (opcional) | meses del año en que se hizo la campaña sobre el terreno, como lista de enteros 1–12 (`[7, 8]` = julio y agosto). Solo si una fuente lo dice; si no, el campo no se pone. Va siempre con `meses_fuente` = `{fuente, cita, verificado}`, con la frase literal que nombra los meses o las fechas |
 | `fuente`, `cita`, `verificado` | igual que en `sitios_ensayo.json`: URL exacta, fragmento literal contiguo de 5 a 40 palabras, y `true` solo si `scripts/verificar_citas.py` la encuentra |
 | `caracteristicas[].en_lista_de_partida` | `true` si ya estaba en la lista de partida; `false` si la añade la fuente |
 | `caracteristicas[].valor_texto` | valor del entorno que dé la fuente, con unidad, copiado tal cual; `null` si no da número |
