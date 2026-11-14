@@ -20,7 +20,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-ENTRADAS = [RAIZ / "datos_json" / n for n in ("equipo.json", "sitios_ensayo.json", "obra.json")]
+ENTRADAS = [RAIZ / "datos_json" / n for n in ("equipo.json", "sitios_ensayo.json", "obra.json", "cuerpos.json")]
 CACHE = RAIZ / "build" / "citas_cache"
 INFORME = RAIZ / "build" / "citas_informe.json"
 AGENTE = "Mozilla/5.0 (X11; Linux x86_64) citation-checker/1.0"

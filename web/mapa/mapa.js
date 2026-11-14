@@ -403,7 +403,7 @@ async function cargarCandidatos(par) {
 function actualizarURL() {
   const h = estado.hoja ? latLonDeCelda(estado.rejilla, estado.hoja.fila, estado.hoja.col) : null;
   const c = estado.cond;
-  history.replaceState(null, '', escribirCond(escribirURL({ ejemplo: EJEMPLO, par: estado.par?.id, capa: estado.capa, lat: h?.lat ?? null, lon: h?.lon ?? null }),
+  history.replaceState(null, '', location.pathname + escribirCond(escribirURL({ ejemplo: EJEMPLO, par: estado.par?.id, capa: estado.capa, lat: h?.lat ?? null, lon: h?.lon ?? null }),
     { modo: estado.modo, eq: c?.eqId, req: c?.clave, acc: c?.acc }));
 }
 

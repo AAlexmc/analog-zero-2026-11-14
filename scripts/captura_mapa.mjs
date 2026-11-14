@@ -74,7 +74,7 @@ const clicCelda = async (p, f, c) => {
 };
 
 try {
-  await pag.goto(`${base}/index.html${Q}`);
+  await pag.goto(`${base}/mapa/index.html${Q}`);
   await listo(pag);
   const info = await pag.evaluate(() => ({ errores: window.__mapa.errores, par: window.__mapa.par?.id, capa: window.__mapa.capa, banda: !document.getElementById('banda-sintetico').hidden, titulo: document.title, lema: document.querySelector('.lema')?.textContent }));
   if (info.errores.length) falla(`page errors: ${info.errores.join('; ')}`);
@@ -289,7 +289,7 @@ try {
   const pag5 = await nav.newPage({ viewport: { width: 1200, height: 800 } });
   vigilar(pag5, ' (no conditions)');
   await pag5.route(/condiciones\.json$/, (r) => r.fulfill({ status: 404, body: '' }));
-  await pag5.goto(`${base}/index.html${Q}`);
+  await pag5.goto(`${base}/mapa/index.html${Q}`);
   await listo(pag5);
   const nc = await pag5.evaluate(() => ({ dis: document.querySelector('#modos [data-modo=cond]').disabled, nota: document.getElementById('modo-nota').textContent, modo: window.__mapa.modo }));
   if (!nc.dis || nc.nota !== 'test conditions not generated' || nc.modo !== 'ranking') falla(`without condiciones.json: ${JSON.stringify(nc)}`); else ok('without condiciones.json: TEST CONDITIONS disabled, "test conditions not generated"');
@@ -301,7 +301,7 @@ try {
   pag3.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) falla(`console (no data): ${m.text()}`); });
   pag3.on('pageerror', (e) => falla(`page error (no data): ${e.message}`));
   await pag3.route(/\/data\/global(_ejemplo)?\//, (r) => r.fulfill({ status: 404, body: '' }));
-  await pag3.goto(`${base}/index.html`);
+  await pag3.goto(`${base}/mapa/index.html`);
   await listo(pag3);
   const sin = await pag3.evaluate(() => ({ txt: document.getElementById('lienzo').textContent, banda: !document.getElementById('banda-sintetico').hidden, par: window.__mapa.par, val: document.getElementById('val-linea').textContent }));
   if (!/global layers not found/.test(sin.txt) || sin.banda || sin.par || !/validation pending/.test(sin.val)) falla(`without global data: ${JSON.stringify(sin)}`);

@@ -1,0 +1,47 @@
+{
+  "descripcion": "Worlds of the home page and the globe view. Textures are equirectangular, longitude -180 at the left edge, 0 in the centre, north up; paths relative to this file. Suggestions copy coordinates from the file named in fuente, unchanged.",
+  "mundos": [
+    {
+      "id": "moon",
+      "nombre": "Moon",
+      "rol": "destino",
+      "radio_km": 1737.4,
+      "radio_fuente": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+      "textura": "texturas/moon_4k.jpg",
+      "credito": "NASA's Scientific Visualization Studio (CGI Moon Kit, LRO camera colour mosaic by Arizona State University)",
+      "credito_fuente": "https://svs.gsfc.nasa.gov/4720",
+      "sugerencias": [
+        { "id": "polo_sur", "nombre": "South pole", "nota": "NASA's planned base region", "base_nasa": true, "lat": -90.0, "lon": 0.0, "fuente": "web/data/terreno/polo_sur/meta.json (centro)" },
+        { "id": "shackleton_borde", "nombre": "Shackleton rim", "lat": -89.68643, "lon": -162.9371, "fuente": "web/data/terreno/shackleton_borde/meta.json (centro: most illuminated point of the rim)" },
+        { "id": "shoemaker", "nombre": "Shoemaker crater", "lat": -88.137, "lon": 45.911, "fuente": "web/data/terreno/shoemaker/meta.json (centro, IAU https://planetarynames.wr.usgs.gov/Feature/5494)" },
+        { "id": "cresta_shackleton_gerlache", "nombre": "Shackleton–de Gerlache ridge", "lat": -89.45683, "lon": -100.3459, "fuente": "web/data/terreno/cresta_shackleton_gerlache/meta.json (centro)" },
+        { "id": "tranquillitatis", "nombre": "Mare Tranquillitatis pit", "lat": 8.3355, "lon": 33.222, "fuente": "umbrales.json (objetivos.tranquillitatis)" }
+      ]
+    },
+    {
+      "id": "mars",
+      "nombre": "Mars",
+      "rol": "destino",
+      "radio_km": 3389.5,
+      "radio_fuente": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+      "textura": "texturas/mars_4k.jpg",
+      "credito": "NASA/JPL/USGS (Viking colour mosaic)",
+      "credito_fuente": "USGS Astrogeology, Mars_Viking_ClrMosaic_global_925m",
+      "sugerencias": [
+        { "id": "jezero", "nombre": "Jezero crater", "lat": 18.38, "lon": 77.58, "fuente": "umbrales.json (objetivos.jezero)" },
+        { "id": "arcadia", "nombre": "Arcadia Planitia", "lat": 47.2, "lon": -175.7, "fuente": "umbrales.json (objetivos.arcadia)" }
+      ]
+    },
+    {
+      "id": "earth",
+      "nombre": "Earth",
+      "rol": "analogo",
+      "radio_km": 6371.0,
+      "radio_fuente": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+      "textura": "texturas/earth_4k.jpg",
+      "credito": "NASA Blue Marble, via NASA GIBS",
+      "credito_fuente": "https://gibs.earthdata.nasa.gov/",
+      "sugerencias": []
+    }
+  ]
+}

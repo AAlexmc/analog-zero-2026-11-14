@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero · Pick a place</title>
+<link rel="stylesheet" href="../marca/marca.css">
+<link rel="stylesheet" href="explorar.css">
+<script type="importmap">
+{ "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
+</script>
+</head>
+<body class="marca-fondo marca-cuerpo explorar">
+<canvas id="globo" aria-label="Globe. Drag to turn, scroll or pinch to zoom, tap to drop a pin."></canvas>
+<header class="marca-barra">
+  <a class="marca-nombre" href="../index.html">Analog Zero</a>
+  <a class="marca-enlace volver" href="../index.html"><span aria-hidden="true">←</span> <span class="largo">All worlds</span><span class="corto">Worlds</span></a>
+  <span class="hueco"></span>
+  <a class="marca-enlace" href="../mapa/index.html"><span class="largo">Global map</span><span class="corto">Map</span></a>
+  <a class="marca-enlace" href="../terreno/index.html"><span class="largo">Terrain viewer</span><span class="corto">Terrain</span></a>
+</header>
+<aside class="marca-panel panel" id="panel">
+  <h1 class="marca-titulo mundo" id="nombre-mundo">&nbsp;</h1>
+  <section class="paso" data-paso="1">
+    <h2 class="marca-subtitulo"><span class="num-paso marca-num">1</span> Pick a place</h2>
+    <p>Tap the globe, or start here:</p>
+  </section>
+  <section class="paso" data-paso="2" hidden>
+    <h2 class="marca-subtitulo"><span class="num-paso marca-num">2</span> Find its twin on Earth</h2>
+    <p class="nombre-punto" id="nombre-punto"></p>
+    <p class="coords marca-num"><span id="lat">—</span><span id="lon">—</span></p>
+    <a class="marca-boton grande" id="buscar" href="#">Find Earth analogs <span aria-hidden="true">→</span></a>
+    <p class="tenue">Tap somewhere else to move the pin.</p>
+  </section>
+  <section class="paso" data-paso="sin-mundo" hidden>
+    <h2 class="marca-subtitulo">We don't have that world yet.</h2>
+    <a class="marca-boton grande" href="../index.html">Back to all worlds</a>
+  </section>
+  <div class="sugerencias" id="sugerencias" role="group" aria-label="Suggested places"></div>
+  <p class="credito" id="credito"></p>
+</aside>
+<button type="button" class="marca-boton secundario reiniciar" id="reiniciar">Reset view</button>
+<p class="pista" id="pista"><span>Drag to turn</span><span>Scroll or pinch to zoom</span><span>Tap to drop a pin</span></p>
+<script type="module" src="explorar.js"></script>
+</body>
+</html>

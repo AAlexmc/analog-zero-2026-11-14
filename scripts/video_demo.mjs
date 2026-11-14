@@ -510,7 +510,7 @@ try {
     marca_roja_tras_allanar: await par.$eval('.panel[data-lado=b] .marca.sel', (d) => d.classList.contains('rompe')) };
 
   // ---------- Plano 6 (21-26 s): mapa global, TEST CONDITIONS ----------
-  const mapa = await abrir('index.html?modo=cond&eq=ltv&req=1', { w: W, h: 720, dsf: 1.5, etiqueta: 'map', listo: () => window.__mapa?.listo === true && window.__mapa.modo === 'cond' });
+  const mapa = await abrir('mapa/index.html?modo=cond&eq=ltv&req=1', { w: W, h: 720, dsf: 1.5, etiqueta: 'map', listo: () => window.__mapa?.listo === true && window.__mapa.modo === 'cond' });
   await pintado(mapa, 4);
   const res1 = await texto(mapa, '#cond-resumen');
   if (!/^Continuous darkness ≥ 150 h: [\d.]+ % of land/.test(res1 ?? '')) falla(`darkness summary: ${res1}`); else ok(`map: ${res1}`);

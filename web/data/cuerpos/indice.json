@@ -1,0 +1,628 @@
+{
+ "rejilla": {
+  "ancho": 720,
+  "alto": 360,
+  "paso_deg": 0.5,
+  "lat0": 89.75,
+  "lon0": -179.75,
+  "fila0": "norte",
+  "formato": "float32 little-endian, NaN = no data, longitude east positive"
+ },
+ "cuerpos": {
+  "earth": {
+   "nombre": "Earth",
+   "radio_km": 6371.0,
+   "fuente": {
+    "texto": "Earth volumetric mean radius: 6371 km",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+    "cita": "Volumetric mean radius (km) 6371.000 Core radius (km) 3485"
+   }
+  },
+  "moon": {
+   "nombre": "Moon",
+   "radio_km": 1737.4,
+   "fuente": {
+    "texto": "Moon volumetric mean radius: 1737.4 km",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+    "cita": "Volumetric mean radius (km) 1737.4 6371.0 0.2727"
+   }
+  },
+  "mars": {
+   "nombre": "Mars",
+   "radio_km": 3389.5,
+   "fuente": {
+    "texto": "Mars volumetric mean radius: 3389.5 km",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+    "cita": "Volumetric mean radius (km) 3389.5 6371.0 0.532"
+   }
+  }
+ },
+ "metrica": {
+  "origen": "mío",
+  "doc": "docs/metrica-analogos.md",
+  "desviacion_pct": "min(100, |f(v_Earth) − f(v_target)| / (f(max) − f(min)) × 100), f = transformacion (lineal: v; log10: log10(max(v, min)); log1p: log10(1 + max(v, 0))), [min, max] = rango_ref",
+  "similitud_pct": "100 − desviacion_pct; cell similarity = weighted mean over the used parameters with data; a cell is ranked only if it has data for every used parameter, cells with at least half of them are listed apart as partly compared"
+ },
+ "parametros": [
+  {
+   "id": "rugosidad_tan",
+   "nombre": "Terrain roughness",
+   "grupo": "terrain",
+   "unidad": "1 (tangent)",
+   "capas": {
+    "earth": "earth/rugosidad_tan.f32",
+    "moon": "moon/rugosidad_tan.f32",
+    "mars": "mars/rugosidad_tan.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "own computation on GMTED2010 7.5″ (231.7 m/px N-S)",
+     "url": "https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn75_grd.zip",
+     "origen": "mío"
+    },
+    "moon": {
+     "texto": "own computation on LOLA LDEM_64 (64 px/deg), 473.8 m/px N-S",
+     "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.img",
+     "origen": "mío"
+    },
+    "mars": {
+     "texto": "own computation on MOLA MGS global mosaic 463 m (128 px/deg), 463.1 m/px N-S",
+     "url": "https://planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif",
+     "origen": "mío"
+    }
+   },
+   "definicion": "Median over the 0.5° cell of the N-S differential slope |s(L) − s(2L)|, L = 600 m (Kreslavsky and Head 2000)",
+   "rango_ref": {
+    "min": 0.000221959,
+    "max": 0.0617453,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      0.000491702,
+      0.0617453
+     ],
+     "moon": [
+      0.000221959,
+      0.00776857
+     ],
+     "mars": [
+      0.000246175,
+      0.0041879
+     ]
+    }
+   },
+   "transformacion": "log10",
+   "reproducible_en_tierra": true,
+   "aviso": "Same formula, baseline and N-S sampling on the three bodies, but the DEMs have different pixels (Earth 231.7 m, Moon 473.8 m, Mars 463.1 m): on the Moon and Mars the samples are interpolated between pixels, which can smooth the value. Earth: no data south of 56° S (GMTED 7.5″ coverage)."
+  },
+  {
+   "id": "relieve_m",
+   "nombre": "Local relief",
+   "grupo": "terrain",
+   "unidad": "m",
+   "capas": {
+    "earth": "earth/relieve_m.f32",
+    "moon": "moon/relieve_m.f32",
+    "mars": "mars/relieve_m.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "own computation on GMTED2010 7.5″ (231.7 m/px N-S)",
+     "url": "https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn75_grd.zip",
+     "origen": "mío"
+    },
+    "moon": {
+     "texto": "own computation on LOLA LDEM_64 (64 px/deg), 473.8 m/px N-S",
+     "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.img",
+     "origen": "mío"
+    },
+    "mars": {
+     "texto": "own computation on MOLA MGS global mosaic 463 m (128 px/deg), 463.1 m/px N-S",
+     "url": "https://planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif",
+     "origen": "mío"
+    }
+   },
+   "definicion": "Median over the 0.5° cell of the N-S height difference |z(+L/2) − z(−L/2)|, L = 1000 m",
+   "rango_ref": {
+    "min": 0.683262,
+    "max": 205.422,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      0.683262,
+      169.335
+     ],
+     "moon": [
+      1.66588,
+      205.422
+     ],
+     "mars": [
+      0.999756,
+      73.4525
+     ]
+    }
+   },
+   "transformacion": "log10",
+   "reproducible_en_tierra": true,
+   "aviso": "Same formula, baseline and N-S sampling on the three bodies, but the DEMs have different pixels (Earth 231.7 m, Moon 473.8 m, Mars 463.1 m): on the Moon and Mars the samples are interpolated between pixels, which can smooth the value. Earth: no data south of 56° S (GMTED 7.5″ coverage)."
+  },
+  {
+   "id": "t_max_k",
+   "nombre": "Surface temperature, daily maximum",
+   "grupo": "temperature",
+   "unidad": "K",
+   "capas": {
+    "earth": "earth/t_max_k.f32",
+    "moon": "moon/t_max_k.f32",
+    "mars": "mars/t_max_k.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23, annual), bilinear to 0.5°, + 273.15",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "moon": {
+     "texto": "LRO Diviner Global Cumulative Products (Williams et al. 2017, Icarus 283, 300-325): bolometric brightness temperature tbol in 96 bins of 0.25 h of local time per 0.5° cell; a cell gets a value only with ≥ 48 valid bins and no gap longer than 2 h of local time",
+     "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.lbl",
+     "citas": [
+      "binned at 0.5 degree latitude and longitude and 0.25 hours of local time derived from a compilation of all nadir observations",
+      "Constant -9999 corresponds to bins that contained no observations."
+     ]
+    },
+    "mars": {
+     "texto": "OpenMARS reanalysis, surface temperature tsurf, Mars year 30 (668.583 sols, 12 steps per sol), 5° grid copied to 0.5° by the nearest node (real resolution 5°). Holmes, James; Streeter, Paul; Lewis, Stephen; Patel, Manish; Rajendran, Kylash (2023). OpenMARS continuous MY28-35 standard database. The Open University. Dataset. CC BY 4.0",
+     "url": "https://doi.org/10.21954/ou.rd.24573205.v3",
+     "citas": [
+      "grid spacing is 5˚ in both longitude and latitude",
+      "Although none of the surface variables are directly assimilated in the reanalysis product, each one is altered indirectly as a result of the assimilation of temperature profiles and column dust optical depth."
+     ]
+    }
+   },
+   "definicion": "Hottest value of the mean daily cycle at the 0.5° cell (each time of day averaged over the whole record)",
+   "rango_ref": {
+    "min": 166.776,
+    "max": 395.259,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      221.347,
+      317.697
+     ],
+     "moon": [
+      242.201,
+      395.259
+     ],
+     "mars": [
+      166.776,
+      286.305
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": true,
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+  },
+  {
+   "id": "t_min_k",
+   "nombre": "Surface temperature, daily minimum",
+   "grupo": "temperature",
+   "unidad": "K",
+   "capas": {
+    "earth": "earth/t_min_k.f32",
+    "moon": "moon/t_min_k.f32",
+    "mars": "mars/t_min_k.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23, annual), bilinear to 0.5°, + 273.15",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "moon": {
+     "texto": "LRO Diviner Global Cumulative Products (Williams et al. 2017, Icarus 283, 300-325): bolometric brightness temperature tbol in 96 bins of 0.25 h of local time per 0.5° cell; a cell gets a value only with ≥ 48 valid bins and no gap longer than 2 h of local time",
+     "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.lbl",
+     "citas": [
+      "binned at 0.5 degree latitude and longitude and 0.25 hours of local time derived from a compilation of all nadir observations",
+      "Constant -9999 corresponds to bins that contained no observations."
+     ]
+    },
+    "mars": {
+     "texto": "OpenMARS reanalysis, surface temperature tsurf, Mars year 30 (668.583 sols, 12 steps per sol), 5° grid copied to 0.5° by the nearest node (real resolution 5°). Holmes, James; Streeter, Paul; Lewis, Stephen; Patel, Manish; Rajendran, Kylash (2023). OpenMARS continuous MY28-35 standard database. The Open University. Dataset. CC BY 4.0",
+     "url": "https://doi.org/10.21954/ou.rd.24573205.v3",
+     "citas": [
+      "grid spacing is 5˚ in both longitude and latitude",
+      "Although none of the surface variables are directly assimilated in the reanalysis product, each one is altered indirectly as a result of the assimilation of temperature profiles and column dust optical depth."
+     ]
+    }
+   },
+   "definicion": "Coldest value of the mean daily cycle at the 0.5° cell (each time of day averaged over the whole record)",
+   "rango_ref": {
+    "min": 58.8609,
+    "max": 297.992,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      217.666,
+      297.992
+     ],
+     "moon": [
+      58.8609,
+      96.2554
+     ],
+     "mars": [
+      149.816,
+      193.642
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": true,
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+  },
+  {
+   "id": "t_media_k",
+   "nombre": "Surface temperature, mean",
+   "grupo": "temperature",
+   "unidad": "K",
+   "capas": {
+    "earth": "earth/t_media_k.f32",
+    "moon": "moon/t_media_k.f32",
+    "mars": "mars/t_media_k.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 20-year climatology, Earth skin temperature at each UTC hour (TS_00…TS_23, annual), bilinear to 0.5°, + 273.15",
+     "url": "https://nasa-power.s3.us-west-2.amazonaws.com/merra2/spatial/power_merra2_climatology_spatial_utc.zarr"
+    },
+    "moon": {
+     "texto": "LRO Diviner Global Cumulative Products (Williams et al. 2017, Icarus 283, 300-325): bolometric brightness temperature tbol in 96 bins of 0.25 h of local time per 0.5° cell; a cell gets a value only with ≥ 48 valid bins and no gap longer than 2 h of local time",
+     "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.lbl",
+     "citas": [
+      "binned at 0.5 degree latitude and longitude and 0.25 hours of local time derived from a compilation of all nadir observations",
+      "Constant -9999 corresponds to bins that contained no observations."
+     ]
+    },
+    "mars": {
+     "texto": "OpenMARS reanalysis, surface temperature tsurf, Mars year 30 (668.583 sols, 12 steps per sol), 5° grid copied to 0.5° by the nearest node (real resolution 5°). Holmes, James; Streeter, Paul; Lewis, Stephen; Patel, Manish; Rajendran, Kylash (2023). OpenMARS continuous MY28-35 standard database. The Open University. Dataset. CC BY 4.0",
+     "url": "https://doi.org/10.21954/ou.rd.24573205.v3",
+     "citas": [
+      "grid spacing is 5˚ in both longitude and latitude",
+      "Although none of the surface variables are directly assimilated in the reanalysis product, each one is altered indirectly as a result of the assimilation of temperature profiles and column dust optical depth."
+     ]
+    }
+   },
+   "definicion": "Mean of the mean daily cycle at the 0.5° cell",
+   "rango_ref": {
+    "min": 129.224,
+    "max": 303.435,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      219.464,
+      303.435
+     ],
+     "moon": [
+      129.224,
+      229.614
+     ],
+     "mars": [
+      163.524,
+      224.848
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": true,
+   "aviso": "Not the same kind of number on the three bodies: Earth is a reanalysis skin temperature (MERRA-2), the Moon is a measured brightness temperature (Diviner), Mars is a reanalysis model value (OpenMARS, 5° cells, not a direct measurement). The day is sampled every 1 h (Earth), every 0.25 lunar hour (Moon) and every 2 Martian hours (Mars): the coarser sampling can miss the peak."
+  },
+  {
+   "id": "insolacion_kwh_m2_dia",
+   "nombre": "Sunlight on a flat surface",
+   "grupo": "light",
+   "unidad": "kWh m-2 per 24 h",
+   "capas": {
+    "earth": "earth/insolacion_kwh_m2_dia.f32",
+    "moon": "moon/insolacion_kwh_m2_dia.f32",
+    "mars": "mars/insolacion_kwh_m2_dia.f32"
+   },
+   "constante": null,
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER SYN1deg climatology, ALLSKY_SFC_SW_DWN (surface, all sky), annual mean × 24/1000",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "moon": {
+     "texto": "own computation from latitude: daily mean on a horizontal plane, averaged over the orbit (uniform in true longitude) × 1/√(1 − e²); × 24 h / 1000; S = 1361 W/m², obliquity to the ecliptic 1.535° (6.68 − 5.145), e = 0.0167 (Earth's orbit)",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+     "origen": "mío",
+     "citas": [
+      "Solar irradiance (W/m2) 1361.0 1361.0 1.000",
+      "Obliquity to orbit (deg) 6.68",
+      "Inclination to ecliptic (deg) 5.145",
+      "Orbit eccentricity 0.0167 Sidereal rotation period (hrs) 23.9345"
+     ]
+    },
+    "mars": {
+     "texto": "own computation from latitude: daily mean on a horizontal plane, averaged over the orbit (uniform in true longitude) × 1/√(1 − e²); × 24 h / 1000; S = 586.2 W/m² (at the semimajor axis), obliquity 25.19°, e = 0.0935",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+     "origen": "mío",
+     "citas": [
+      "Solar irradiance (W/m2) 586.2 1361.0 0.431",
+      "Obliquity to orbit (deg) 25.19 23.44 1.075",
+      "Orbit eccentricity 0.0935 0.0167 5.599",
+      "Semimajor axis (106 km) 227.956 149.598 1.524"
+     ]
+    }
+   },
+   "definicion": "Annual mean solar energy reaching a horizontal surface, per 24 hours, at the 0.5° cell",
+   "rango_ref": {
+    "min": 1.50464,
+    "max": 10.396,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      2.2188,
+      6.72027
+     ],
+     "moon": [
+      1.50464,
+      10.396
+     ],
+     "mars": [
+      1.94969,
+      4.28641
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": true,
+   "aviso": "Not the same quantity on the three bodies: Earth is measured at the surface, under clouds and air; the Moon has no atmosphere, so its value is the surface value but without shadows from relief (polar craters get less); Mars is computed at the top of the atmosphere, without dust or air. Moon and Mars depend only on latitude."
+  },
+  {
+   "id": "ndvi_max",
+   "nombre": "Vegetation (NDVI)",
+   "grupo": "biology",
+   "unidad": "1",
+   "capas": {
+    "earth": "earth/ndvi_max.f32",
+    "moon": null,
+    "mars": null
+   },
+   "constante": {
+    "earth": null,
+    "moon": 0.0,
+    "mars": 0.0
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA GIBS MODIS Terra NDVI 16-day, maximum of 23 images of one year, mean of the cell",
+     "url": "https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=MODIS_Terra_L3_NDVI_16Day&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=3600&HEIGHT=1800&FORMAT=image/png"
+    },
+    "moon": {
+     "texto": "0 by definition: no vegetation (not a measurement)",
+     "url": null,
+     "origen": "mío"
+    },
+    "mars": {
+     "texto": "0 by definition: no vegetation (not a measurement)",
+     "url": null,
+     "origen": "mío"
+    }
+   },
+   "definicion": "Highest vegetation index of the year at the 0.5° cell",
+   "rango_ref": {
+    "min": 0.0,
+    "max": 0.9315,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      0.0792,
+      0.9315
+     ],
+     "moon": [
+      0.0,
+      0.0
+     ],
+     "mars": [
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": true,
+   "aviso": "Moon and Mars are set to 0 by definition, not measured. Earth: no data where NDVI ≤ 0 or missing (ice, water): the source image does not tell them apart."
+  },
+  {
+   "id": "precip_mm_ano",
+   "nombre": "Rain and snowfall",
+   "grupo": "water",
+   "unidad": "mm/year",
+   "capas": {
+    "earth": "earth/precip_mm_ano.f32",
+    "moon": null,
+    "mars": null
+   },
+   "constante": {
+    "earth": null,
+    "moon": 0.0,
+    "mars": 0.0
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 climatology, PRECTOTCORR, sum of the monthly means",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "moon": {
+     "texto": "0 by definition: no atmosphere, no precipitation (not a measurement)",
+     "url": null,
+     "origen": "mío"
+    },
+    "mars": {
+     "texto": "0 by definition: no liquid precipitation counted (not a measurement)",
+     "url": null,
+     "origen": "mío"
+    }
+   },
+   "definicion": "Total precipitation per year at the 0.5° cell",
+   "rango_ref": {
+    "min": 0.0,
+    "max": 2830.65,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      6.99334,
+      2830.65
+     ],
+     "moon": [
+      0.0,
+      0.0
+     ],
+     "mars": [
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "transformacion": "log1p",
+   "reproducible_en_tierra": true,
+   "aviso": "Moon and Mars are set to 0 by definition. Frost, snowfall of CO₂ or water ice on Mars and ice in polar craters are not counted here. Compared on a log scale, log10(1 + mm/year), so that dryness counts by orders of magnitude (own criterion)."
+  },
+  {
+   "id": "gravedad_m_s2",
+   "nombre": "Gravity",
+   "grupo": "physics",
+   "unidad": "m/s2",
+   "capas": null,
+   "constante": {
+    "earth": 9.82,
+    "moon": 1.62,
+    "mars": 3.73
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "Earth mean surface gravity: 9.82 m/s2",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html",
+     "cita": "Surface gravity (mean) (m/s2) 9.820"
+    },
+    "moon": {
+     "texto": "Moon surface gravity: 1.62 m/s2",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+     "cita": "Surface gravity (m/s2) 1.62 9.80 0.165"
+    },
+    "mars": {
+     "texto": "Mars mean surface gravity: 3.73 m/s2",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+     "cita": "Surface gravity (mean) (m/s2) 3.73 9.82 0.380"
+    }
+   },
+   "definicion": "Mean surface gravity of the whole body",
+   "rango_ref": {
+    "min": 1.62,
+    "max": 9.82,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      9.82,
+      9.82
+     ],
+     "moon": [
+      1.62,
+      1.62
+     ],
+     "mars": [
+      3.73,
+      3.73
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": false,
+   "aviso": "Cannot be reproduced at a fixed place on Earth."
+  },
+  {
+   "id": "presion_superficie_pa",
+   "nombre": "Air pressure",
+   "grupo": "physics",
+   "unidad": "Pa",
+   "capas": {
+    "earth": "earth/presion_superficie_pa.f32",
+    "moon": null,
+    "mars": "mars/presion_superficie_pa.f32"
+   },
+   "constante": {
+    "earth": null,
+    "moon": 3e-10,
+    "mars": null
+   },
+   "fuentes": {
+    "earth": {
+     "texto": "NASA POWER MERRA-2 climatology, surface pressure PS, annual mean, bilinear to 0.5°, hPa × 100",
+     "url": "https://power.larc.nasa.gov"
+    },
+    "moon": {
+     "texto": "Moon surface pressure at night (daytime not given by the source): 3e-15 bar",
+     "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+     "cita": "Surface pressure (night): 3 x 10-15 bar (2 x 10-12 torr)"
+    },
+    "mars": {
+     "texto": "OpenMARS reanalysis, surface pressure ps, Mars year 30 mean, 5° grid copied to 0.5° by the nearest node. Holmes, James; Streeter, Paul; Lewis, Stephen; Patel, Manish; Rajendran, Kylash (2023). OpenMARS continuous MY28-35 standard database. The Open University. Dataset. CC BY 4.0",
+     "url": "https://doi.org/10.21954/ou.rd.24573205.v3",
+     "citas": [
+      "grid spacing is 5˚ in both longitude and latitude",
+      "Although none of the surface variables are directly assimilated in the reanalysis product, each one is altered indirectly as a result of the assimilation of temperature profiles and column dust optical depth."
+     ]
+    }
+   },
+   "definicion": "Annual mean atmospheric pressure at the surface of the 0.5° cell",
+   "rango_ref": {
+    "min": 3e-10,
+    "max": 101342.0,
+    "origen": "mío",
+    "regla": "p1–p99 of Earth land ∪ p1–p99 of each target body (cells weighted by area; a constant body counts as its value)",
+    "por_cuerpo": {
+     "earth": [
+      58538.0,
+      101342.0
+     ],
+     "moon": [
+      3e-10,
+      3e-10
+     ],
+     "mars": [
+      311.606,
+      1008.67
+     ]
+    }
+   },
+   "transformacion": "lineal",
+   "reproducible_en_tierra": false,
+   "aviso": "Cannot be reproduced outdoors on Earth (vacuum chambers only). Earth and Mars are reanalysis values per cell (Mars at 5°); the Moon is the single night-time value given by NASA."
+  }
+ ],
+ "mascara_tierra": "earth/tierra_frac.f32",
+ "mascara_casquete": "earth/casquete_frac.f32",
+ "mascaras_fuente": {
+  "tierra_frac": {
+   "texto": "GMTED2010 30″: share of pixels with elevation ≠ 0",
+   "url": "https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn30_grd.zip"
+  },
+  "casquete_frac": {
+   "texto": "GLiM class 16 (ice and glaciers), 1 = ice cap",
+   "url": "https://epic.awi.de/id/eprint/31092/1/hartmann-moosdorf_2012.zip"
+  }
+ }
+}

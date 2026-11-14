@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero · Earth analogs</title>
+<link rel="stylesheet" href="../marca/marca.css">
+<style>
+  html, body { margin: 0; min-height: 100%; }
+  main { box-sizing: border-box; min-height: 100vh; display: grid; place-content: center; gap: 18px; padding: 96px 24px 48px; max-width: 640px; margin: 0 auto; }
+  h1 { font-size: clamp(36px, 7vw, 64px); margin: 0; }
+  .coords { font-size: 22px; margin: 0; }
+  p { margin: 0; }
+  .tenue { color: var(--texto-tenue); }
+  .marca-boton { text-decoration: none; justify-self: start; }
+</style>
+</head>
+<body class="marca-fondo marca-cuerpo">
+<header class="marca-barra">
+  <a class="marca-nombre" href="../index.html">Analog Zero</a>
+  <a class="marca-enlace volver" id="volver" href="../index.html"><span aria-hidden="true">←</span> <span class="largo">Back to the globe</span><span class="corto">Globe</span></a>
+  <span class="hueco"></span>
+  <a class="marca-enlace" href="../mapa/index.html"><span class="largo">Global map</span><span class="corto">Map</span></a>
+  <a class="marca-enlace" href="../terreno/index.html"><span class="largo">Terrain viewer</span><span class="corto">Terrain</span></a>
+</header>
+<main>
+  <p class="tenue" id="mundo">&nbsp;</p>
+  <h1 class="marca-titulo">Earth analogs</h1>
+  <p class="coords marca-num" id="coords">—</p>
+  <p id="estado">Searching the whole Earth… <span class="marca-acento">(coming next)</span></p>
+  <a class="marca-boton secundario" id="otro" href="../index.html">Pick another place</a>
+</main>
+<script type="module">
+  import { formatoLatLon } from '../explorar/geo.js';
+  const NOMBRES = { moon: 'Moon', mars: 'Mars' };
+  const q = new URLSearchParams(location.search);
+  const mundo = q.get('mundo'), lat = Number(q.get('lat')), lon = Number(q.get('lon'));
+  const valido = mundo in NOMBRES && q.get('lat') !== null && q.get('lon') !== null && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+  window.__az = { ...(window.__az ?? {}), analogos: { mundo: valido ? mundo : null, lat: valido ? lat : null, lon: valido ? lon : null } };
+  if (valido) {
+    const volver = `../explorar/index.html?mundo=${mundo}&lat=${q.get('lat')}&lon=${q.get('lon')}`;
+    document.getElementById('mundo').textContent = `Your place on ${mundo === 'moon' ? 'the Moon' : NOMBRES[mundo]}`;
+    document.getElementById('coords').textContent = formatoLatLon(lat, lon).texto;
+    document.getElementById('volver').href = volver;
+    document.getElementById('otro').href = volver;
+  } else {
+    document.getElementById('estado').textContent = 'No place picked yet.';
+  }
+</script>
+</body>
+</html>
