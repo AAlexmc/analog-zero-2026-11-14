@@ -179,5 +179,5 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     return { objetivo, usados, sin_dato, resultados, parciales, no_reproducibles, mapa, cobertura };
   }
 
-  return { indice, leerPunto, desviacion, buscar };
+  return { indice, leerPunto, desviacion, buscar, tierra };
 }

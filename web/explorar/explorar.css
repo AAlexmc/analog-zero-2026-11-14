@@ -52,3 +52,13 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   .pista span:nth-child(2) { display: none; }
   .credito { margin-top: 10px; font-size: 11px; }
 }
+.ambiente { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--linea); border-radius: 12px; }
+.ambiente h3 { font: 700 14px/1.2 var(--cuerpo); margin: 0 0 8px; color: var(--texto-tenue); }
+.ambiente dl { display: grid; grid-template-columns: auto auto; gap: 4px 14px; margin: 0; font-size: 14px; }
+.ambiente dd { margin: 0; text-align: right; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .ambiente { padding: 8px 12px; margin-bottom: 12px; }
+  .ambiente h3 { display: none; }
+  .ambiente dl { grid-template-columns: auto auto auto auto; font-size: 13px; gap: 2px 10px; }
+}
+.ambiente sup { font-size: .7em; line-height: 0; }

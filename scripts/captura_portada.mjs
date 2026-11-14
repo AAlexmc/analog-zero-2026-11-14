@@ -263,9 +263,10 @@ try {
   const href = await pag.getAttribute('#buscar', 'href');
   await pag.click('#buscar');
   await pag.waitForURL(/\/analogos\/index\.html\?/);
-  const a = await pag.evaluate(() => ({ ...window.__az.analogos, coords: document.getElementById('coords').textContent, estado: document.getElementById('estado').textContent, url: location.search }));
-  if (a.mundo !== 'moon' || a.lat !== -90 || a.lon !== 0 || a.coords !== formatoLatLon(-90, 0).texto || !/Searching the whole Earth/.test(a.estado)) falla(`analogs page: ${JSON.stringify(a)} (href ${href})`);
-  else ok(`"Find Earth analogs" → ${a.url}: "${a.coords}", "${a.estado}"`);
+  await pag.waitForFunction(() => window.__az?.analogos?.listo === true, null, { timeout: 120000 });
+  const a = await pag.evaluate(() => ({ mundo: window.__az.analogos.mundo, lat: window.__az.analogos.lat, lon: window.__az.analogos.lon, nombre: window.__az.analogos.nombre, origen: document.getElementById('origen').textContent, url: location.search }));
+  if (a.mundo !== 'moon' || a.lat !== -90 || a.lon !== 0 || a.nombre !== 'South pole' || !a.origen.includes(formatoLatLon(-90, 0).texto)) falla(`analogs page: ${JSON.stringify(a)} (href ${href})`);
+  else ok(`"Find Earth analogs" → ${a.url}: "${a.origen}"`);
   await pag.screenshot({ path: join(SALIDA, '07-analogos.png') });
   await pag.goBack();
   await listoVista(pag);

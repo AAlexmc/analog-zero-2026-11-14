@@ -40,5 +40,8 @@ export const PAREJAS = [
   { uso: 'panel muted text, worst case over a bright planet', texto: TENUE(PANEL_PEOR), fondo: PANEL_PEOR },
   { uso: 'panel accent, worst case over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
   { uso: 'top bar text over the gradient', texto: 'white', fondo: BARRA },
+  { uso: 'numbered place marker on the globe', texto: 'deep-blue', fondo: 'white' },
+  { uso: 'selected place marker and its card number', texto: 'deep-blue', fondo: 'neon-yellow' },
+  { uso: 'similarity legend and partial-place note over a bright globe', texto: 'neon-yellow', fondo: PANEL_PEOR },
   { uso: 'top bar muted links over the gradient', texto: TENUE(BARRA), fondo: BARRA },
 ];

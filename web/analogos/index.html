@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Analog Zero · Earth analogs</title>
 <link rel="stylesheet" href="../marca/marca.css">
-<style>
-  html, body { margin: 0; min-height: 100%; }
-  main { box-sizing: border-box; min-height: 100vh; display: grid; place-content: center; gap: 18px; padding: 96px 24px 48px; max-width: 640px; margin: 0 auto; }
-  h1 { font-size: clamp(36px, 7vw, 64px); margin: 0; }
-  .coords { font-size: 22px; margin: 0; }
-  p { margin: 0; }
-  .tenue { color: var(--texto-tenue); }
-  .marca-boton { text-decoration: none; justify-self: start; }
-</style>
+<link rel="stylesheet" href="analogos.css">
+<script type="importmap">
+{ "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
+</script>
 </head>
-<body class="marca-fondo marca-cuerpo">
+<body class="marca-fondo marca-cuerpo analogos">
+<canvas id="globo" aria-label="Earth globe with the best matching places. Drag to turn, scroll or pinch to zoom."></canvas>
+<div class="numeros" id="numeros"></div>
 <header class="marca-barra">
   <a class="marca-nombre" href="../index.html">Analog Zero</a>
   <a class="marca-enlace volver" id="volver" href="../index.html"><span aria-hidden="true">←</span> <span class="largo">Back to the globe</span><span class="corto">Globe</span></a>
@@ -23,29 +20,40 @@
   <a class="marca-enlace" href="../mapa/index.html"><span class="largo">Global map</span><span class="corto">Map</span></a>
   <a class="marca-enlace" href="../terreno/index.html"><span class="largo">Terrain viewer</span><span class="corto">Terrain</span></a>
 </header>
-<main>
-  <p class="tenue" id="mundo">&nbsp;</p>
-  <h1 class="marca-titulo">Earth analogs</h1>
-  <p class="coords marca-num" id="coords">—</p>
-  <p id="estado">Searching the whole Earth… <span class="marca-acento">(coming next)</span></p>
-  <a class="marca-boton secundario" id="otro" href="../index.html">Pick another place</a>
-</main>
-<script type="module">
-  import { formatoLatLon } from '../explorar/geo.js';
-  const NOMBRES = { moon: 'Moon', mars: 'Mars' };
-  const q = new URLSearchParams(location.search);
-  const mundo = q.get('mundo'), lat = Number(q.get('lat')), lon = Number(q.get('lon'));
-  const valido = mundo in NOMBRES && q.get('lat') !== null && q.get('lon') !== null && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
-  window.__az = { ...(window.__az ?? {}), analogos: { mundo: valido ? mundo : null, lat: valido ? lat : null, lon: valido ? lon : null } };
-  if (valido) {
-    const volver = `../explorar/index.html?mundo=${mundo}&lat=${q.get('lat')}&lon=${q.get('lon')}`;
-    document.getElementById('mundo').textContent = `Your place on ${mundo === 'moon' ? 'the Moon' : NOMBRES[mundo]}`;
-    document.getElementById('coords').textContent = formatoLatLon(lat, lon).texto;
-    document.getElementById('volver').href = volver;
-    document.getElementById('otro').href = volver;
-  } else {
-    document.getElementById('estado').textContent = 'No place picked yet.';
-  }
-</script>
+<aside class="marca-panel panel" id="panel" data-pestana="lugares">
+  <div class="cabecera">
+    <p class="origen" id="origen">&nbsp;</p>
+    <a class="otro" id="otro" href="../index.html">Pick another place</a>
+  </div>
+  <p class="estado" id="estado" role="status">Searching the whole Earth…</p>
+  <div class="pestanas" role="tablist" aria-label="Results" hidden id="pestanas">
+    <button type="button" role="tab" id="tab-lugares" aria-controls="lugares" aria-selected="true">Places</button>
+    <button type="button" role="tab" id="tab-metricas" aria-controls="metricas" aria-selected="false">Metrics</button>
+  </div>
+  <section id="lugares" role="tabpanel" aria-labelledby="tab-lugares" hidden>
+    <h1 class="marca-titulo titulo">Most similar places on Earth</h1>
+    <ol class="lista" id="lista"></ol>
+    <details class="parciales" id="parciales" hidden>
+      <summary>Partly compared places</summary>
+      <p class="tenue">Earth data is missing for some parameters here (mostly Antarctica), so they are not ranked with the places above.</p>
+      <ol class="lista" id="lista-parciales"></ol>
+    </details>
+  </section>
+  <section id="metricas" role="tabpanel" aria-labelledby="tab-metricas" hidden></section>
+  <p class="credito" id="credito"></p>
+</aside>
+<div class="mandos" id="mandos" hidden>
+  <label class="interruptor"><input type="checkbox" id="capa"> <span>Show similarity everywhere</span></label>
+  <button type="button" class="marca-boton secundario" id="reiniciar">Reset view</button>
+</div>
+<div class="leyenda" id="leyenda" hidden>
+  <span class="marca-num" id="ley-min"></span>
+  <span class="rampa" aria-hidden="true"></span>
+  <span class="marca-num" id="ley-max"></span>
+  <span class="tenue">match, own metric</span>
+  <span class="sin-comparar" aria-hidden="true"></span>
+  <span class="tenue" id="ley-sin">not compared (ice or missing data)</span>
+</div>
+<script type="module" src="analogos.js"></script>
 </body>
 </html>
