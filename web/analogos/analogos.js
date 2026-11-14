@@ -5,9 +5,10 @@ import { crearGlobo } from '../explorar/globo.js';
 import { formatoLatLon } from '../explorar/geo.js';
 import { cargar } from '../buscar/motor.js';
 import { enlaceTerreno } from '../mapa/estado.js';
-import { CORTES, NO_COMPARADO, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview } from './metricas.js';
+import { CORTES, NO_COMPARADO, NO_COMPARADO_MISION, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview } from './metricas.js';
 import { engancharRelieve } from '../relieve/enganche.js';
 import { paisDe } from './paises.js';
+import { ID_NUEVA, comparables, elegible, textoOpcion, noMedidas, sitiosReferencia, resumenLugar, lineaResumen, validarNueva, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, opcionesBusqueda, frasesNoUsados } from './misiones.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -38,12 +39,13 @@ async function montar() {
   document.title = `Analog Zero · Earth analogs for ${nombre ?? coords}`;
   $('estado').classList.add('cargando');
 
-  const [mundos, sitios, terrenos, M, paises] = await Promise.all([
+  const [mundos, sitios, terrenos, M, paises, misiones] = await Promise.all([
     cargarMundos('../data/cuerpos/mundos.json').catch((e) => { fallo(e); return []; }),
     fetch('../data/sitios_ensayo.json').then((r) => r.json()).then((j) => j.sitios ?? []).catch((e) => { fallo(e); return []; }),
     cargarTerrenos().catch((e) => { fallo(e); return []; }),
     cargar('../data/cuerpos/').catch((e) => { fallo(e); return null; }),
     fetch('../data/paises_110m.json').then((r) => r.json()).then((j) => j.paises ?? []).catch((e) => { fallo(e); return []; }),
+    fetch('../data/misiones.json').then((r) => r.json()).then((j) => j.misiones ?? []).catch((e) => { fallo(e); return []; }),
   ]);
   const tierra = mundos.find((m) => m.id === 'earth');
   if (tierra) $('credito').textContent = `Image: ${tierra.credito}. Country borders: Natural Earth (public domain).`;
@@ -63,14 +65,19 @@ async function montar() {
     A.listo = true;
     return;
   }
-  const P = Object.fromEntries(M.indice.parametros.map((p) => [p.id, p]));
+  const P = Object.fromEntries([...M.indice.parametros, ...(M.indice.parametros_tierra ?? [])].map((p) => [p.id, p]));
   const logaritmicos = M.indice.parametros.filter((p) => p.reproducible_en_tierra && p.transformacion !== 'lineal').map((p) => p.nombre.toLowerCase());
   const objetivo = M.leerPunto(mundo, lat, lon);
-  let r = M.buscar(objetivo);
-  const r0 = r;
-  const cart = M.cartera(objetivo);
+  // Objetivo de misión (misiones.js): elige los parámetros de la búsqueda; sin misión, los de siempre.
+  let activa = leerEstado(q, misiones, M.indice, sitios);
+  const corto = (id) => nombreCorto(id, P);
+  const rotuloRef = () => (activa?.tipo === 'nueva' ? 'Test site' : 'NASA test site');
+  let r = M.buscar(objetivo, opcionesBusqueda(activa));
+  let r0 = r;
+  let cart = M.cartera(objetivo, opcionesBusqueda(activa));
   A.r = r;
   A.cartera = cart;
+  A.mision = activa;
   A.clase = M.claseDe(objetivo);
   const lineaE = lineaEntorno(A.clase, M.clases?.clases.length);
   $('entorno').hidden = !lineaE;
@@ -130,6 +137,8 @@ async function montar() {
     el('p', { className: `contexto${c ? ' conocido' : ''}`, textContent: lineaContexto(c, nSitios) }),
     c ? null : el('span', { className: 'marca-chip unlisted', textContent: 'unlisted', title: `No analog site from our catalogue within ${RADIO_CONTEXTO_KM} km` }),
   ];
+  // Con misión: cuántos parámetros comparados quedan cerca y cuáles no (cortes propios de Metrics).
+  const resumen = (x) => (activa ? el('p', { className: 'resumen', textContent: lineaResumen(resumenLugar(x), corto), title: `Close: under ${CORTES.cerca} % off; far off: over ${CORTES.lejos} % off (own cut-offs)` }) : null);
   const worldview = (x) => { const href = enlaceWorldview(x.lat, x.lon); return href && el('a', { className: 'otro worldview', href, target: '_blank', rel: 'noopener', textContent: 'Open in NASA Worldview', onclick: (e) => e.stopPropagation() }); };
   function tarjeta(x, k, lista) {
     const c = masCercano(x.lat, x.lon, sitios);
@@ -139,6 +148,7 @@ async function montar() {
       el('p', { className: 'pct' }, el('span', { textContent: fmtPct(x.similitud_pct) }), el('small', { textContent: 'match' })),
       lineaPais(x),
       el('p', { className: 'coords marca-num', textContent: formatoLatLon(x.lat, x.lon).texto }),
+      resumen(x),
       lista === 'parciales' ? el('p', { className: 'parcial', textContent: fraseParcial(x) }) : null,
       ...contexto(c),
       lineaDistancia(x.distancia_componentes, M.clases?.d_ref.valor) ? el('p', { className: 'distancia marca-num', textContent: lineaDistancia(x.distancia_componentes, M.clases.d_ref.valor) }) : null,
@@ -169,6 +179,7 @@ async function montar() {
       el('p', { className: 'pct' }, el('span', { textContent: fmtPct(x.similitud_pct) }), el('small', { textContent: 'match' })),
       lineaPais(x),
       el('p', { className: 'coords marca-num', textContent: formatoLatLon(x.lat, x.lon).texto }),
+      resumen(x),
       x.comparados < x.de ? el('p', { className: 'parcial', textContent: fraseParcial(x) }) : null,
       ...contexto(masCercano(x.lat, x.lon, sitios)),
       el('p', { className: 'cubre-titulo', textContent: 'Close match here for' }),
@@ -185,19 +196,22 @@ async function montar() {
     li.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === li) pulsar('cartera', k); });
     return li;
   }
-  $('cartera-titular').textContent = titularCartera(cart);
-  $('cartera-como').append(...reglaCartera(cart).map((t) => el('p', { textContent: t })));
-  $('lista-cartera').replaceChildren(...cart.lugares.map(tarjetaCartera));
-  $('sin-cubrir').append(...[cart.sin_cubrir.length
-    ? el('ul', {}, ...cart.sin_cubrir.map((s) => {
-      const li = el('li', {}, el('strong', { textContent: `${P[s.id].nombre}. ` }),
-        el('span', { className: 'cerca', textContent: fraseSinCubrir(s, s.lat === null ? '' : `${formatoLatLon(s.lat, s.lon).texto}${pais(s) ? ` (${pais(s)})` : ''}`) }), ' ',
-        el('span', { className: 'lab', textContent: 'Test this in a lab or a chamber.' }));
-      li.dataset.id = s.id;
-      return li;
-    }))
-    : el('p', { textContent: 'Every parameter is covered by at least one place above.' }),
-  cart.sin_dato.length ? el('p', { textContent: `No data at your point for: ${cart.sin_dato.map((id) => P[id].nombre).join(', ')}. Not counted.` }) : null].filter(Boolean));
+  function pintarCartera() {
+    $('cartera-titular').textContent = titularCartera(cart);
+    $('cartera-como').replaceChildren($('cartera-como').querySelector('summary'), ...reglaCartera(cart).map((t) => el('p', { textContent: t })));
+    $('lista-cartera').replaceChildren(...cart.lugares.map(tarjetaCartera));
+    $('sin-cubrir').replaceChildren($('sin-cubrir').querySelector('h3'), ...[cart.sin_cubrir.length
+      ? el('ul', {}, ...cart.sin_cubrir.map((s) => {
+        const li = el('li', {}, el('strong', { textContent: `${P[s.id].nombre}. ` }),
+          el('span', { className: 'cerca', textContent: fraseSinCubrir(s, s.lat === null ? '' : `${formatoLatLon(s.lat, s.lon).texto}${pais(s) ? ` (${pais(s)})` : ''}`) }), ' ',
+          el('span', { className: 'lab', textContent: 'Test this in a lab or a chamber.' }));
+        li.dataset.id = s.id;
+        return li;
+      }))
+      : el('p', { textContent: 'Every parameter is covered by at least one place above.' }),
+    cart.sin_dato.length ? el('p', { textContent: `No data at your point for: ${cart.sin_dato.map((id) => P[id].nombre).join(', ')}. Not counted.` }) : null].filter(Boolean));
+  }
+  pintarCartera();
 
   // Números (Places, Metrics) o letras (Portfolio) sobre el globo, colocados en cada fotograma.
   let numeros = [];
@@ -213,7 +227,7 @@ async function montar() {
   crearNumeros();
 
   // Avanzado: el mismo top 5 con la métrica por componentes (los parámetros que van juntos cuentan una vez).
-  $('avanzado').hidden = !M.clases;
+  $('avanzado').hidden = !M.clases || !!activa;
   if (M.clases) $('avanzado-texto').replaceChildren(...textoComponentes(M.clases).map((t) => el('p', { textContent: t })));
   let rComp = null;
   $('por-componentes').addEventListener('change', () => {
@@ -229,13 +243,18 @@ async function montar() {
     crearNumeros();
     elegir('resultados', 0);
   });
-  const letras = cart.lugares.map((x, k) => {
-    const b = el('button', { type: 'button', className: 'letra', textContent: letra(k), title: `Portfolio place ${letra(k)}: ${fmtPct(x.similitud_pct)} match` });
-    b.hidden = true;
-    b.addEventListener('click', () => pulsar('cartera', k));
-    $('numeros').append(b);
-    return b;
-  });
+  let letras = [];
+  const crearLetras = () => {
+    letras.forEach((b) => b.remove());
+    letras = cart.lugares.map((x, k) => {
+      const b = el('button', { type: 'button', className: 'letra', textContent: letra(k), title: `Portfolio place ${letra(k)}: ${fmtPct(x.similitud_pct)} match` });
+      b.hidden = true;
+      b.addEventListener('click', () => pulsar('cartera', k));
+      $('numeros').append(b);
+      return b;
+    });
+  };
+  crearLetras();
   if (G) G.alDibujar(() => {
     const p = $('panel').getBoundingClientRect(), m = $('mandos').getBoundingClientRect();
     const enCartera = $('panel').dataset.pestana === 'cartera';
@@ -255,7 +274,7 @@ async function montar() {
   });
 
   // Capa de similitud: rejilla del motor pintada con la rampa de la marca sobre una esfera un poco mayor.
-  const mm = minMax(r.mapa);
+  let mm = minMax(r.mapa);
   A.leyenda = mm;
   let capa = null;
   $('capa').addEventListener('change', () => {
@@ -267,6 +286,7 @@ async function montar() {
       tex.colorSpace = THREE.SRGBColorSpace;
       capa = new THREE.Mesh(new THREE.SphereGeometry(1.002, 192, 96), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
       capa.name = 'similitud';
+      A.capaLienzo = cv;
       G.escena.add(capa);
     }
     if (capa) capa.visible = on;
@@ -342,8 +362,8 @@ async function montar() {
     const det = el('details', { className: 'fila' });
     det.dataset.id = x.id;
     const valores = el('dl', { className: 'valores' },
-      el('dt', { textContent: NOMBRES[mundo] }), el('dd', {}, ...conSup(formatoValor(x.valor_objetivo, p.unidad))),
-      el('dt', { textContent: 'Earth' }), el('dd', {}, ...conSup(formatoValor(x.valor_tierra, p.unidad))));
+      el('dt', { textContent: x.origen_objetivo === 'referencia' ? rotuloRef() : NOMBRES[mundo] }), el('dd', {}, ...conSup(formatoValor(x.valor_objetivo, p.unidad, p))),
+      el('dt', { textContent: 'Earth' }), el('dd', {}, ...conSup(formatoValor(x.valor_tierra, p.unidad, p))));
     valores.children[1].dataset.v = 'objetivo'; valores.children[3].dataset.v = 'tierra';
     const desv = el('span', { className: 'desv', textContent: d === null ? 'no data' : `${fmtPct(d)} off` });
     desv.dataset.v = 'desv';
@@ -370,11 +390,11 @@ async function montar() {
     const det = el('details', { className: 'comparar', open: !!A.compararAbierto }, el('summary', { textContent: `Compare the ${n} places side by side` }),
       el('p', { className: 'tenue', textContent: 'Each cell: the Earth value and how far off it is. The closest place in each row is marked.' }));
     det.addEventListener('toggle', () => { A.compararAbierto = det.open; });
-    const filas = tablaComparar(r.resultados, reproducibles).map((f) => {
+    const filas = tablaComparar(r.resultados, activa ? r.usados : reproducibles).map((f) => {
       const tr = el('tr', {}, el('th', { scope: 'row', textContent: nombreCorto(f.id, P), title: P[f.id].nombre }),
-        el('td', { className: 'objetivo' }, ...conSup(formatoValor(f.objetivo, P[f.id].unidad))),
+        el('td', { className: 'objetivo' }, ...conSup(formatoValor(f.objetivo, P[f.id].unidad, P[f.id])), P[f.id].solo_tierra ? el('small', { textContent: rotuloRef() }) : null),
         ...f.celdas.map((c) => el('td', { className: c.mejor ? 'mejor' : '', title: c.mejor ? `Closest of the ${n}` : '' },
-          el('span', { className: 'valor' }, ...conSup(formatoValor(c.valor, P[f.id].unidad))),
+          el('span', { className: 'valor' }, ...conSup(formatoValor(c.valor, P[f.id].unidad, P[f.id]))),
           el('span', { className: 'desv', textContent: c.desv === null ? 'no data' : `${fmtPct(c.desv)} off` }))));
       tr.dataset.id = f.id;
       return tr;
@@ -384,6 +404,17 @@ async function montar() {
         ...r.resultados.map((x, k) => el('th', { scope: 'col' }, `Place ${k + 1}`, el('small', { className: 'pais', textContent: pais(x) ?? '' }), el('small', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto }))))),
       el('tbody', {}, ...filas))));
     return det;
+  }
+
+  // Solo con misión y parámetros solo-Tierra en uso (docs/metrica-analogos.md, «Parámetros solo-Tierra y referencia»).
+  function fraseSoloTierra() {
+    const ids = activa ? r.usados.filter((id) => P[id].solo_tierra) : [];
+    if (!ids.length) return null;
+    const logs = ids.filter((id) => P[id].transformacion === 'log10' || P[id].transformacion === 'log1p').map(corto);
+    const cat = ids.filter((id) => P[id].transformacion === 'categoria').map(corto);
+    return el('p', { textContent: [`Earth-only parameters (${ids.map(corto).join(', ')}): the target is the Earth value at the test site, and [min, max] is from Earth land only`,
+      logs.length ? `logarithmic for ${logs.join(', ')}` : null,
+      cat.length ? `${cat.join(', ')}: 0 % if the class is the same, 100 % if not (own criterion)` : null].filter(Boolean).join('; ') + '.' });
   }
 
   function pintarMetricas() {
@@ -410,7 +441,8 @@ async function montar() {
         el('p', {}, 'For each parameter: ', el('code', { textContent: 'deviation % = min(100, |f(Earth) − f(your point)| / (f(max) − f(min)) × 100)' }), '.'),
         el('p', { textContent: `f is the scale of the parameter: logarithmic for ${logaritmicos.join(', ')}; plain for the rest. [min, max] is the range from the 1st to the 99th percentile of Earth land and of the Moon and Mars.` }),
         el('p', { textContent: 'Match % = 100 − deviation %. The match of a place is the average over the parameters with data there, all with the same weight.' }),
-        el('p', { textContent: `Groups: under ${CORTES.cerca} % deviation is a close match, over ${CORTES.lejos} % is far off (own cut-offs). Gravity and air pressure are shown apart and do not count.` })),
+        el('p', { textContent: `Groups: under ${CORTES.cerca} % deviation is a close match, over ${CORTES.lejos} % is far off (own cut-offs). Gravity and air pressure are shown apart and do not count.` }),
+        fraseSoloTierra()),
       comparar(),
       sinDato.length ? el('p', { className: 'sin-dato', textContent: `No data at your point for: ${sinDato.join(', ')}.` }) : null,
       el('div', { className: 'grupos' },
@@ -420,10 +452,134 @@ async function montar() {
       g.sin.length ? grupo('sin', 'No Earth data here', 'not counted in the match', g.sin, '') : null,
       el('section', { className: 'bloque no-repro' }, el('h3', { textContent: 'Earth cannot reproduce this' }), el('ul', {}, ...noRepro),
         el('p', { textContent: 'No place on Earth has this gravity or this air pressure, so there is no percentage here.' })),
-      el('section', { className: 'bloque no-comparado' }, el('h3', { textContent: 'Not compared yet' }), el('ul', {}, ...NO_COMPARADO.map((t) => el('li', { textContent: t }))),
+      el('section', { className: 'bloque no-comparado' }, el('h3', { textContent: 'Not compared yet' }), el('ul', {}, ...(activa ? NO_COMPARADO_MISION : NO_COMPARADO).map((t) => el('li', { textContent: t }))),
         el('p', { textContent: 'no global layer in this version' })),
     ].filter(Boolean));
   }
+
+  // Ficha de la misión elegida: lo que dice el catálogo y lo que el motor no pudo usar.
+  const ligaFuente = (href) => el('a', { href, target: '_blank', rel: 'noopener', textContent: 'source' });
+  function campana(c) {
+    return el('li', {}, el('strong', { textContent: c.nombre }), el('br'),
+      [c.sitio_texto ?? sitios.find((x) => x.id === c.sitio)?.nombre, c.anos].filter(Boolean).join(' · '), ' ',
+      c.fuente ? ligaFuente(c.fuente) : null,
+      c.verificado === false ? el('span', {}, ' ', el('span', { className: 'marca-chip', textContent: 'source not verified' })) : null,
+      c.cita ? el('details', {}, el('summary', { textContent: 'Quote' }), el('blockquote', { textContent: c.cita })) : null);
+  }
+  function pintarFicha() {
+    const f = $('mision-ficha');
+    f.hidden = !activa;
+    if (!activa) { f.replaceChildren(); return; }
+    const m = activa.mision, nueva = activa.tipo === 'nueva', ref = activa.referencia;
+    const chip = (id) => {
+      const c = el('li', { className: `marca-chip${P[id].solo_tierra ? ' tierra' : ''}`, textContent: corto(id), title: P[id].solo_tierra ? `${P[id].nombre}: Earth only, compared with the test site` : P[id].nombre });
+      c.dataset.id = id;
+      return c;
+    };
+    const lineaRef = !activa.parametros.some((id) => P[id].solo_tierra) ? null
+      : ref ? `Earth-only parameters are compared with ${nueva ? 'the test site you picked' : "NASA's test site"}: ${ref.nombre} (${formatoLatLon(ref.lat, ref.lon).texto})`
+        : nueva ? 'No test site picked: Earth-only parameters are not used.' : 'No test site with coordinates: Earth-only parameters are not used.';
+    const nm = m ? noMedidas(m) : [];
+    const campanas = m?.campanas ?? [];
+    f.replaceChildren(...[
+      nueva ? el('p', { className: 'mision-titulo', textContent: activa.titulo }) : null,
+      nueva ? el('p', { className: 'tenue', textContent: 'Your own mission: parameters picked by hand.' }) : el('p', { className: 'mision-que', textContent: m.que_se_prueba }),
+      campanas.length ? el('details', { className: 'como campanas-caja' }, el('summary', { textContent: `NASA ran this at (${campanas.length} ${campanas.length === 1 ? 'campaign' : 'campaigns'})` }),
+        el('ul', { className: 'campanas' }, ...campanas.map(campana))) : null,
+      el('p', { className: 'mision-sub' }, 'Searched with these parameters', ...(nueva ? [] : [' ', el('span', { className: 'marca-chip', textContent: 'own mapping', title: 'Which of our layers stands for each trait NASA names is our own criterion.' })])),
+      el('ul', { className: 'chips' }, ...activa.parametros.map(chip)),
+      lineaRef ? el('p', { className: 'ref', textContent: lineaRef }) : null,
+      el('p', { className: 'tenue', textContent: `On each place: close = under ${CORTES.cerca} % off, far off = over ${CORTES.lejos} % off (own cut-offs).` }),
+      nm.length ? el('details', { className: 'como no-medido-caja' }, el('summary', { textContent: `Named by NASA, NOT MEASURED here (${nm.length})` }),
+        el('ul', { className: 'no-medido' }, ...nm.map((n) => el('li', {}, el('strong', { textContent: `${n.nombre}: ` }), n.motivo ?? 'not public')))) : null,
+      ...frasesNoUsados(r, activa, corto).map((t) => el('p', { className: 'aviso', textContent: t })),
+      nueva ? el('button', { type: 'button', className: 'marca-boton secundario', id: 'mision-cambiar', textContent: 'Change this mission', onclick: () => { $('mision-nueva').hidden = false; } }) : null,
+    ].filter(Boolean));
+  }
+
+  // Al cambiar de misión se recalcula todo lo que sale de la búsqueda; el tipo de entorno no depende de ella.
+  function repintar() {
+    const o = opcionesBusqueda(activa);
+    r0 = r = M.buscar(objetivo, o);
+    cart = M.cartera(objetivo, o);
+    rComp = null;
+    $('por-componentes').checked = false;
+    A.porComponentes = false;
+    $('avanzado').hidden = !M.clases || !!activa;
+    A.r = r; A.cartera = cart; A.mision = activa;
+    $('estado').hidden = !!r.resultados.length;
+    if (!r.resultados.length) $('estado').textContent = activa ? 'No place on Earth could be compared with these parameters.' : 'No place on Earth could be compared with this point.';
+    $('ver-relieve').hidden = !(r.resultados.length || r.parciales.length || cart.lugares.length);
+    pintarLista();
+    $('parciales').hidden = !r.parciales.length;
+    $('lista-parciales').replaceChildren(...r.parciales.map((x, k) => tarjeta(x, k, 'parciales')));
+    pintarCartera();
+    crearNumeros();
+    crearLetras();
+    if (capa) { G.escena.remove(capa); capa.geometry.dispose(); capa.material.map.dispose(); capa.material.dispose(); capa = null; A.capaLienzo = null; }
+    mm = minMax(r.mapa);
+    A.leyenda = mm;
+    $('capa').dispatchEvent(new Event('change'));
+    pintarFicha();
+    turno++;
+    A.terrenoAuto = null;
+    relieve.cerrar();
+    A.sel = null; A.metSel = null;
+    if (r.resultados.length) elegir('resultados', 0); else pintarMetricas();
+    if ($('panel').dataset.pestana === 'cartera' && cart.lugares.length) elegir('cartera', 0);
+    G?.pedir();
+  }
+  const guardarUrl = () => history.replaceState(history.state, '', `${location.pathname}?${escribirEstado(new URLSearchParams(location.search), activa)}`);
+
+  // Selector y formulario «New mission».
+  $('mision').append(...misiones.filter((m) => m.id !== ID_NUEVA).map((m) => el('option', { value: m.id, textContent: textoOpcion(m, mundo, M.indice), disabled: !elegible(m, M.indice) })),
+    el('option', { value: ID_NUEVA, textContent: 'New mission…' }));
+  $('mision').value = activa?.id ?? '';
+  $('nueva-punto-titulo').textContent = `Compared with your point ${EN[mundo]}`;
+  const casilla = (p) => {
+    const l = el('label', { className: 'casilla' }, el('input', { type: 'checkbox', value: p.id }), el('span', { textContent: p.nombre }));
+    l.dataset.id = p.id;
+    return l;
+  };
+  $('nueva-punto').append(...comparables(M.indice).filter((p) => !p.solo_tierra).map(casilla));
+  $('nueva-tierra').querySelector('legend').after(...comparables(M.indice).filter((p) => p.solo_tierra).map(casilla));
+  $('mision-ref').append(...sitiosReferencia(sitios).map((s) => el('option', { value: s.id, textContent: s.nombre })));
+  const marcados = () => [...$('mision-nueva').querySelectorAll('input[type=checkbox]:checked')].map((i) => i.value);
+  function revisarNueva() {
+    const v = validarNueva({ titulo: $('mision-titulo').value, parametros: marcados() }, M.indice);
+    $('mision-buscar').disabled = !v.ok;
+    $('nueva-ref-nota').hidden = !(v.parametros.some((id) => P[id].solo_tierra) && !$('mision-ref').value);
+  }
+  function rellenarNueva(a) {
+    $('mision-titulo').value = a?.titulo ?? '';
+    for (const i of $('mision-nueva').querySelectorAll('input[type=checkbox]')) i.checked = !!a?.parametros.includes(i.value);
+    $('mision-ref').value = a?.ref ?? '';
+    revisarNueva();
+  }
+  $('mision-nueva').addEventListener('input', revisarNueva);
+  $('mision-nueva').addEventListener('change', revisarNueva);
+  $('mision-nueva').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const a = activaNueva({ titulo: $('mision-titulo').value, parametros: marcados(), ref: $('mision-ref').value }, M.indice, sitios);
+    if (!a) return;
+    activa = a;
+    $('mision-nueva').hidden = true;
+    guardarUrl();
+    repintar();
+  });
+  $('mision').addEventListener('change', () => {
+    const v = $('mision').value;
+    $('mision-nueva').hidden = v !== ID_NUEVA;
+    if (v === ID_NUEVA) rellenarNueva(null);
+    const antes = activa;
+    activa = v && v !== ID_NUEVA ? activaDeCatalogo(misiones.find((m) => m.id === v), M.indice, sitios) : null;
+    if (!antes && !activa) return;
+    guardarUrl();
+    repintar();
+  });
+  rellenarNueva(activa?.tipo === 'nueva' ? activa : null);
+  pintarFicha();
+  $('mision-caja').hidden = false;
 
   verPestana('lugares');
   if (r.resultados.length) elegir('resultados', 0);

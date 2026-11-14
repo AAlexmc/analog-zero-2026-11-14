@@ -7,6 +7,8 @@ export const CORTES = { cerca: 15, lejos: 70 };
 export const RADIO_TIERRA_KM = 6371;
 export const RADIO_CONTEXTO_KM = 300;
 export const NO_COMPARADO = ['Radiation', 'Dust and wind', 'Geology and minerals', 'Subsurface and ice'];
+// Con misión entran viento, tipo de roca y permafrost de la Tierra: lo que sigue sin capa se nombra más fino.
+export const NO_COMPARADO_MISION = ['Radiation', 'Dust in the air', 'Minerals and soil chemistry', 'Ice under the ground'];
 
 const finito = (v) => typeof v === 'number' && Number.isFinite(v);
 const signo = (s) => s.replace(/^-/, MENOS);
@@ -40,9 +42,15 @@ function cientifico(v) {
   return `${Math.abs(m - Math.round(m)) < 0.05 ? Math.round(m) : m.toFixed(1)} × 10${sup}`;
 }
 
-export function formatoValor(v, unidad) {
+// p (opcional): el parámetro del índice, para los que la unidad sola no basta (diferencia en K, clase de roca).
+export function formatoValor(v, unidad, p = null) {
   if (!finito(v)) return 'no data';
+  if (p?.transformacion === 'categoria') return p.clases?.[String(v)] ?? `rock class ${v}`;
+  if (p?.id === 'amplitud_diurna_k') return `${signo(v.toFixed(1))} K`;
+  if (p?.transformacion === 'log10' && unidad === '1') return signo(String(Number(v.toPrecision(2))));
   switch (unidad) {
+    case 'h': return `${signo(Math.abs(v) < 10 ? v.toFixed(1) : v.toFixed(0))} h`;
+    case 'm/s': return `${signo(v.toFixed(1))} m/s`;
     case 'K': return `${signo(v.toFixed(1))} K (${signo((v - 273.15).toFixed(1))} °C)`;
     case 'm': return `${signo(Math.abs(v) < 10 ? v.toFixed(1) : v.toFixed(0))} m`;
     case '1 (tangent)': return `${signo(v.toPrecision(2))} (slope tangent)`;
@@ -154,6 +162,8 @@ export const letra = (k) => String.fromCharCode(65 + k);
 export const NOMBRE_CORTO = {
   rugosidad_tan: 'roughness', relieve_m: 'relief', t_max_k: 'daytime high', t_min_k: 'night-time low', t_media_k: 'mean temperature',
   insolacion_kwh_m2_dia: 'sunlight', ndvi_max: 'vegetation', precip_mm_ano: 'rain and snow',
+  aridez_ai: 'dryness', viento_medio_m_s: 'mean wind', viento_p95_m_s: 'strong wind', amplitud_diurna_k: 'day-night swing',
+  permafrost_frac: 'permafrost', elev_m: 'elevation', tiempo_ciudad_h: 'time to a city', litologia_glim: 'rock type',
 };
 export const nombreCorto = (id, P) => NOMBRE_CORTO[id] ?? P?.[id]?.nombre ?? id;
 
