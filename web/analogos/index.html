@@ -25,21 +25,43 @@
     <p class="origen" id="origen">&nbsp;</p>
     <a class="otro" id="otro" href="../index.html">Pick another place</a>
   </div>
+  <div class="entorno" id="entorno" hidden>
+    <p class="entorno-linea" id="entorno-linea"></p>
+    <details class="como" id="entorno-como">
+      <summary>How we know</summary>
+      <div id="entorno-texto"></div>
+      <label class="interruptor pequeno"><input type="checkbox" id="capa-clases"> <span>Show Earth's environment types</span></label>
+      <ul class="leyenda-clases" id="leyenda-clases"></ul>
+    </details>
+  </div>
   <p class="estado" id="estado" role="status">Searching the whole Earth…</p>
   <div class="pestanas" role="tablist" aria-label="Results" hidden id="pestanas">
     <button type="button" role="tab" id="tab-lugares" aria-controls="lugares" aria-selected="true">Places</button>
     <button type="button" role="tab" id="tab-metricas" aria-controls="metricas" aria-selected="false">Metrics</button>
+    <button type="button" role="tab" id="tab-cartera" aria-controls="cartera" aria-selected="false">Portfolio</button>
   </div>
   <section id="lugares" role="tabpanel" aria-labelledby="tab-lugares" hidden>
     <h1 class="marca-titulo titulo">Most similar places on Earth</h1>
+    <p class="unlisted-resumen" id="unlisted" hidden></p>
     <ol class="lista" id="lista"></ol>
     <details class="parciales" id="parciales" hidden>
       <summary>Partly compared places</summary>
       <p class="tenue">Earth data is missing for some parameters here (mostly Antarctica), so they are not ranked with the places above.</p>
       <ol class="lista" id="lista-parciales"></ol>
     </details>
+    <details class="como avanzado" id="avanzado" hidden>
+      <summary>Advanced</summary>
+      <label class="interruptor pequeno"><input type="checkbox" id="por-componentes"> <span>Count related parameters once</span></label>
+      <div id="avanzado-texto"></div>
+    </details>
   </section>
   <section id="metricas" role="tabpanel" aria-labelledby="tab-metricas" hidden></section>
+  <section id="cartera" role="tabpanel" aria-labelledby="tab-cartera" hidden>
+    <h1 class="marca-titulo titular" id="cartera-titular"></h1>
+    <details class="como" id="cartera-como"><summary>How this works</summary></details>
+    <ol class="lista" id="lista-cartera"></ol>
+    <section class="bloque sin-cubrir" id="sin-cubrir"><h3>What no place on Earth covers</h3></section>
+  </section>
   <p class="credito" id="credito"></p>
 </aside>
 <div class="mandos" id="mandos" hidden>

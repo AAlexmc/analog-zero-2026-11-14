@@ -76,7 +76,18 @@ export function masCercano(lat, lon, lista, maxKm = RADIO_CONTEXTO_KM, R = RADIO
   return mejor;
 }
 
-export const lineaContexto = (c) => (c ? `near ${c.item.nombre} — a known analog site (${Math.round(c.km)} km)` : `no listed analog site within ${RADIO_CONTEXTO_KM} km`);
+export const sitiosConCoordenadas = (sitios) => (sitios ?? []).filter((s) => finito(s?.lat) && finito(s?.lon)).length;
+
+export const lineaContexto = (c, nSitios) => (c ? `near ${c.item.nombre} — a known analog site (${Math.round(c.km)} km)` : `not near any of the ${nSitios} analog sites in our catalogue`);
+
+// Cuántos lugares no tienen un sitio del catálogo a menos de RADIO_CONTEXTO_KM («unlisted»: solo fuera de NUESTRO catálogo).
+export function fraseUnlisted(sinSitio, total, nSitios) {
+  if (!total) return null;
+  const cola = `none of the ${nSitios} analog sites in our catalogue is within ${RADIO_CONTEXTO_KM} km`;
+  if (sinSitio === 0) return `All ${total} places are near a known analog site in our catalogue.`;
+  if (sinSitio === total) return `All ${total} places are unlisted: ${cola}.`;
+  return `${sinSitio} of these ${total} places ${sinSitio === 1 ? 'is' : 'are'} unlisted: ${cola}.`;
+}
 
 export const fraseParcial = (r) => `only ${r.comparados} of ${r.de} parameters have Earth data here`;
 
@@ -127,6 +138,93 @@ export function pintarMapa(mapa, min, max, alfa = 210, tierra = null) {
     out.set([r, g, b, alfa], i * 4);
   }
   return out;
+}
+
+// Cartera (M.cartera): letras de los lugares, nombres cortos de los parámetros y textos.
+export const letra = (k) => String.fromCharCode(65 + k);
+export const NOMBRE_CORTO = {
+  rugosidad_tan: 'roughness', relieve_m: 'relief', t_max_k: 'daytime high', t_min_k: 'night-time low', t_media_k: 'mean temperature',
+  insolacion_kwh_m2_dia: 'sunlight', ndvi_max: 'vegetation', precip_mm_ano: 'rain and snow',
+};
+export const nombreCorto = (id, P) => NOMBRE_CORTO[id] ?? P?.[id]?.nombre ?? id;
+
+export function titularCartera(c) {
+  const y = c.usados.length, x = c.cubiertos.length, n = c.lugares.length;
+  if (!y) return 'No parameter could be compared at this point.';
+  if (!n) return `No place on Earth comes within ${c.corte} % on any of the ${y} parameters.`;
+  if (n === 1 && x === y) return `One place on Earth covers all ${y} parameters.`;
+  if (n === 1) return `No single place on Earth matches everything. This place covers ${x} of ${y} parameters.`;
+  return `No single place on Earth matches everything. Together, these ${n} places cover ${x} of ${y} parameters.`;
+}
+
+// Un parámetro que ningún lugar cubre: lo más cerca que llega la Tierra y dónde (texto del sitio ya formateado).
+export function fraseSinCubrir(s, donde) {
+  if (!finito(s.mejor_desviacion_pct)) return 'No place on Earth has data for it.';
+  return `The closest any place gets is ${fmtPct(s.mejor_desviacion_pct)} off, at ${donde}.`;
+}
+
+export const reglaCartera = (c) => [
+  `A parameter is covered at a place when its deviation there is under ${c.corte} % (the "close match" cut-off of Metrics; own criterion).`,
+  'We check every land cell on Earth and find the smallest set of places that together cover every parameter that any place can cover. The search is exact, not a guess.',
+  'If several sets have that size, we keep the one with the highest average match.',
+  'Cells must be at least half land, not ice cap, and have Earth data for at least half of the parameters.',
+];
+
+// Tipo de entorno (M.claseDe) en una línea; null si el punto no se pudo proyectar.
+export function lineaEntorno(k, nTipos) {
+  if (!k || k.id === null || k.id === undefined) return null;
+  if (!k.dentro) return `Earth has nothing quite like this: its conditions fall outside all ${nTipos} types of land environment we found. Closest type: “${k.rotulo}”.`;
+  return `Its conditions fall within an Earth environment type: “${k.rotulo}”.`;
+}
+
+// «How we know»: lo que dice clases.json y la distancia del punto, sin texto propio salvo el que explica la silueta.
+export function comoSabemos(clases, k) {
+  const sil = clases.criterio_k?.tabla?.find((t) => t.k === clases.criterio_k.k)?.silueta_media;
+  const tipo = clases.clases.find((c) => c.id === k?.id);
+  return [
+    clases.que_es,
+    clases.metodo,
+    `${clases.clases.length} types from ${clases.celdas.n} land cells (${clases.celdas.pct_area_tierra_firme.toFixed(1)} % of the land area without ice caps).`,
+    finito(sil) ? `The groups are weak: mean silhouette ${sil.toFixed(2)}, on a scale where 1 is sharp groups and 0 is none. Earth's land is a continuum, so the borders between types are a convention.` : null,
+    tipo && finito(k.distancia) ? `Your point is ${k.distancia.toFixed(1)} from the centre of “${tipo.rotulo}”; 95 % of that type's own land is within ${tipo.radio.toFixed(2)}. Units: Earth's own spread.` : null,
+    k?.faltan?.length ? `No data at your point for ${k.faltan.length} parameter(s); placed with the ones it has.` : null,
+  ].filter(Boolean);
+}
+
+// Capa de tipos de entorno: colores de la marca y una transparencia de la paleta (blanco al 50 % sobre martian red).
+export const COLORES_CLASE = ['#0042A6', '#C78880', '#EAFE07', '#2E96F5', '#FFFFFF', '#8E1100'];
+// Tierra firme sin clase (hielo, sin dato) → deep blue opaco, como en la capa de similitud: el hielo blanco no se confunde con una clase.
+export function pintarClases(clase, colores = COLORES_CLASE, alfa = 225, tierra = null) {
+  const out = new Uint8ClampedArray(clase.length * 4);
+  for (let i = 0; i < clase.length; i++) {
+    const v = clase[i];
+    if (v !== v || !colores[v]) {
+      if (tierra && tierra[i] >= 0.5) out.set([...rgb(SIN_COMPARAR), 240], i * 4);
+      continue;
+    }
+    out.set([...rgb(colores[v]), alfa], i * 4);
+  }
+  return out;
+}
+
+// Orden por componentes (buscar con metrica 'componentes'): la distancia en múltiplos de d_ref; su % no se enseña (sale 0 lejos de la Tierra).
+export const lineaDistancia = (d, dRef) => (finito(d) && finito(dRef) && dRef > 0 ? `distance ${(d / dRef).toFixed(2)} × Earth's own spread` : null);
+export const textoComponentes = (clases) => [
+  'Daily maximum, minimum and mean temperature move together, so by default they weigh three times.',
+  'With this on, places are ordered by distance in the principal components of Earth\'s land (the same ones as the environment types): each independent direction counts once. Own criterion.',
+  `Earth's own spread = ${clases.d_ref.valor.toFixed(2)}, the distance that 99 % of pairs of Earth land cells (a fixed sample of 5000) stay under.`,
+  'Points on the Moon and Mars are far from all of Earth in this space, so the distance is not turned into a percentage. The match % on each card is still the per-parameter one.',
+];
+
+// Tabla lado a lado: una fila por parámetro; en cada lugar valor y desviación; la menor desviación de la fila marcada (empates: todas).
+export function tablaComparar(lugares, ids) {
+  return ids.map((id) => {
+    const ps = lugares.map((x) => x.parametros.find((q) => q.id === id) ?? null);
+    const celdas = ps.map((p) => ({ valor: p?.valor_tierra ?? null, desv: finito(p?.desviacion_pct) ? p.desviacion_pct : null }));
+    const ds = celdas.map((c) => c.desv).filter((d) => d !== null);
+    const min = ds.length ? Math.min(...ds) : null;
+    return { id, objetivo: ps.find(Boolean)?.valor_objetivo ?? null, celdas: celdas.map((c) => ({ ...c, mejor: min !== null && c.desv === min })) };
+  });
 }
 
 // Superíndices de formatoValor (m/s², 10⁻¹⁰) en trozos para pintarlos con <sup>: la fuente mono no los tiene.

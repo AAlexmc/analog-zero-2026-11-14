@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { cargar } from '../web/buscar/motor.js';
 import { enlaceTerreno } from '../web/mapa/estado.js';
 import { formatoLatLon } from '../web/explorar/geo.js';
-import { NO_COMPARADO, grupoDe, fmtPct, formatoValor as formatoValorSup, celsius, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, planoSup } from '../web/analogos/metricas.js';
+import { NO_COMPARADO, grupoDe, fmtPct, formatoValor as formatoValorSup, celsius, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, planoSup, sitiosConCoordenadas } from '../web/analogos/metricas.js';
 
 // En pantalla los superíndices van en <sup>: su texto es el de planoSup.
 const formatoValor = (v, u) => planoSup(formatoValorSup(v, u));
@@ -103,7 +103,7 @@ function compararLugares(que, dom, esperado, mundo, lat, lon) {
   if (dom.length !== esperado.length) { falla(`${que}: ${dom.length} cards on screen, node has ${esperado.length}`); return; }
   esperado.forEach((x, k) => {
     const c = masCercano(x.lat, x.lon, SITIOS);
-    const quiero = { pct: fmtPct(x.similitud_pct), coords: formatoLatLon(x.lat, x.lon).texto, contexto: lineaContexto(c), terreno: terrenoEsperado(mundo, lat, lon, x) };
+    const quiero = { pct: fmtPct(x.similitud_pct), coords: formatoLatLon(x.lat, x.lon).texto, contexto: lineaContexto(c, sitiosConCoordenadas(SITIOS)), terreno: terrenoEsperado(mundo, lat, lon, x) };
     for (const [kk, v] of Object.entries(quiero)) if (dom[k][kk] !== v) falla(`${que} card ${k + 1} ${kk}: screen "${dom[k][kk]}" ≠ node "${v}"`);
   });
   ok(`${que}: ${dom.map((d) => `${d.num}. ${d.pct} ${d.coords}${d.terreno ? ' [terrain]' : ''}`).join(' | ')} = node`);
@@ -213,14 +213,14 @@ try {
   await verLugares(pag);
   await pag.click('#lista > .tarjeta[data-k="0"]');
   await quieta(pag);
-  await pag.click('label.interruptor');
+  await pag.click('label.interruptor:has(#capa)');
   await pag.waitForTimeout(300);
   const ley = await pag.evaluate(() => ({ on: window.__az.analogos.capa, visible: !document.getElementById('leyenda').hidden, min: document.getElementById('ley-min').textContent, max: document.getElementById('ley-max').textContent }));
   const mmJ = minMax(rJ.mapa);
   if (!ley.on || !ley.visible || ley.min !== fmtPct(mmJ.min) || ley.max !== fmtPct(mmJ.max)) falla(`similarity layer legend: ${JSON.stringify(ley)} ≠ node ${fmtPct(mmJ.min)}–${fmtPct(mmJ.max)}`);
   else ok(`"Show similarity everywhere": legend ${ley.min} – ${ley.max} = node min/max of the map`);
   await pag.screenshot({ path: join(SALIDA, '07-jezero-capa.png') });
-  await pag.click('label.interruptor');
+  await pag.click('label.interruptor:has(#capa)');
   await pag.waitForTimeout(200);
   if (await pag.evaluate(() => !document.getElementById('leyenda').hidden)) falla('legend should hide when the layer is off');
   await pag.context().close();
@@ -316,7 +316,7 @@ try {
   const filasFuera = await mv.evaluate(() => [...document.querySelectorAll('#metricas .fila, #metricas .grupo, #metricas .bloque')].filter((e) => { const r = e.getBoundingClientRect(); return r.left < -0.5 || r.right > innerWidth + 0.5; }).length);
   if (malos.length || filasFuera) falla(`mobile metrics: ${malos.join('; ')} ${filasFuera} rows past the edge`); else ok('mobile Metrics tab: every row inside 390 px');
   await mv.screenshot({ path: join(SALIDA, '13-movil-metrics.png') });
-  await mv.tap('label.interruptor');
+  await mv.tap('label.interruptor:has(#capa)');
   await mv.waitForTimeout(300);
   malos = await fuera();
   if (malos.length) falla(`mobile layer on: ${malos.join('; ')}`); else ok('mobile layer on: legend between the controls and the panel');

@@ -51,4 +51,9 @@ export const PAREJAS = [
   { uso: 'base site box: "NASA says" link and met-limit tick over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
   { uso: 'base site box: NASA quote and limit number field', texto: 'white', fondo: 'deep-blue' },
   { uso: 'base site box: option markers on the globe, normal and hover', texto: 'deep-blue', fondo: 'neon-yellow' },
+  { uso: 'portfolio letter markers on the globe and their cards, normal', texto: 'deep-blue', fondo: 'white' },
+  { uso: 'portfolio letter markers on the globe and their cards, selected', texto: 'deep-blue', fondo: 'neon-yellow' },
+  { uso: 'portfolio "test this in a lab" and Compare best cell over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
+  { uso: 'unlisted chip and environment legend notes over a bright planet', texto: TENUE(PANEL_PEOR), fondo: PANEL_PEOR },
+  { uso: 'Compare table first column (opaque deep blue)', texto: 'white', fondo: 'deep-blue' },
 ];

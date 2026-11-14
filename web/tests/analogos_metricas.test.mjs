@@ -73,9 +73,9 @@ test('nearest known analog site: real catalogue, sites without coordinates skipp
   const c = masCercano(75.25, -84.25, SITIOS);
   assert.equal(c.item.id, 'haughton');
   assert.ok(Math.abs(c.km - distanciaKm(75.25, -84.25, h.lat, h.lon)) < 1e-9);
-  assert.equal(lineaContexto(c), `near ${h.nombre} — a known analog site (${Math.round(c.km)} km)`);
+  assert.equal(lineaContexto(c, 15), `near ${h.nombre} — a known analog site (${Math.round(c.km)} km)`);
   assert.equal(masCercano(38.25, 90.25, SITIOS), null);
-  assert.equal(lineaContexto(null), 'no listed analog site within 300 km');
+  assert.equal(lineaContexto(null, 15), 'not near any of the 15 analog sites in our catalogue');
   const lejos = { nombre: 'X', lat: 0, lon: 0 };
   assert.equal(masCercano(0, 300.01 / 111.195, [lejos]), null);
   assert.equal(masCercano(0, 299.9 / 111.195, [lejos]).item, lejos);
