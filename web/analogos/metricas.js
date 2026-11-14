@@ -76,6 +76,13 @@ export function masCercano(lat, lon, lista, maxKm = RADIO_CONTEXTO_KM, R = RADIO
   return mejor;
 }
 
+// NASA Worldview centrado en el lugar: v=lonMin,latMin,lonMax,latMax, ±2° recortado a ±180/±90, 4 decimales sin ceros de cola.
+export function enlaceWorldview(lat, lon, margen = 2) {
+  if (!finito(lat) || !finito(lon)) return null;
+  const c = (v, tope) => String(Number(Math.max(-tope, Math.min(tope, v)).toFixed(4)));
+  return `https://worldview.earthdata.nasa.gov/?v=${[c(lon - margen, 180), c(lat - margen, 90), c(lon + margen, 180), c(lat + margen, 90)].join(',')}`;
+}
+
 export const sitiosConCoordenadas = (sitios) => (sitios ?? []).filter((s) => finito(s?.lat) && finito(s?.lon)).length;
 
 export const lineaContexto = (c, nSitios) => (c ? `near ${c.item.nombre} — a known analog site (${Math.round(c.km)} km)` : `not near any of the ${nSitios} analog sites in our catalogue`);

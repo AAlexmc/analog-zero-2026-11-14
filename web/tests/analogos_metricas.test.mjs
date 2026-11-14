@@ -122,6 +122,33 @@ test('map painting: sea transparent, land not compared → deep blue, min → el
   assert.deepEqual([...px.slice(8, 12)], [234, 254, 7, 200]);
 });
 
+// Formato elegido: como mucho 4 decimales (≈ 11 m), sin ceros de cola ni ruido de coma flotante; −0 sale «0».
+test('NASA Worldview link: ±2° box lonMin,latMin,lonMax,latMax, clipped to ±180/±90, at most 4 decimals', async () => {
+  const { enlaceWorldview } = await import('../analogos/metricas.js');
+  const W = 'https://worldview.earthdata.nasa.gov/?v=';
+  assert.equal(enlaceWorldview(18.38, 77.58), `${W}75.58,16.38,79.58,20.38`);
+  assert.equal(enlaceWorldview(1.1, 4.35), `${W}2.35,-0.9,6.35,3.1`);
+  assert.equal(enlaceWorldview(-4.35, 0), `${W}-2,-6.35,2,-2.35`);
+  assert.equal(enlaceWorldview(0.123456, 10.987654), `${W}8.9877,-1.8765,12.9877,2.1235`);
+  assert.equal(enlaceWorldview(0, -2.00001), `${W}-4,-2,0,2`);
+  assert.equal(enlaceWorldview(-89.68643, -162.9371), `${W}-164.9371,-90,-160.9371,-87.6864`);
+  assert.equal(enlaceWorldview(89, 10), `${W}8,87,12,90`);
+  assert.equal(enlaceWorldview(0, 179.5), `${W}177.5,-2,180,2`);
+  assert.equal(enlaceWorldview(0, -179), `${W}-180,-2,-177,2`);
+  for (const [la, lo] of [[NaN, 0], [0, NaN], [Infinity, 0], [0, -Infinity], [null, 0], [0, undefined], ['10', 0]]) assert.equal(enlaceWorldview(la, lo), null, `${la},${lo}`);
+  for (const [la, lo] of [[18.38, 77.58], [-89.68643, -162.9371], [89.9, -179.9], [-33.33, 151.2]]) {
+    const u = new URL(enlaceWorldview(la, lo));
+    assert.equal(u.protocol, 'https:');
+    assert.equal(u.host, 'worldview.earthdata.nasa.gov');
+    const v = u.searchParams.get('v').split(',').map(Number);
+    assert.equal(v.length, 4);
+    assert.ok(v.every(Number.isFinite));
+    const [lonMin, latMin, lonMax, latMax] = v;
+    assert.ok(lonMin < lo && lo < lonMax && latMin < la && la < latMax, `${la},${lo} inside ${v}`);
+    assert.ok(lonMin >= -180 && lonMax <= 180 && latMin >= -90 && latMax <= 90, String(v));
+  }
+});
+
 test('superscripts split into parts for <sup>, and the plain text the screen shows', async () => {
   const { partesSup, planoSup } = await import('../analogos/metricas.js');
   assert.deepEqual(partesSup('3 × 10⁻¹⁰ Pa'), [{ t: '3 × 10' }, { sup: '−10' }, { t: ' Pa' }]);

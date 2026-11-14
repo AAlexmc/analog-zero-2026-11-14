@@ -5,7 +5,7 @@ import { crearGlobo } from '../explorar/globo.js';
 import { formatoLatLon } from '../explorar/geo.js';
 import { cargar } from '../buscar/motor.js';
 import { enlaceTerreno } from '../mapa/estado.js';
-import { CORTES, NO_COMPARADO, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes } from './metricas.js';
+import { CORTES, NO_COMPARADO, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview } from './metricas.js';
 import { engancharRelieve } from '../relieve/enganche.js';
 import { paisDe } from './paises.js';
 
@@ -111,6 +111,7 @@ async function montar() {
     el('p', { className: `contexto${c ? ' conocido' : ''}`, textContent: lineaContexto(c, nSitios) }),
     c ? null : el('span', { className: 'marca-chip unlisted', textContent: 'unlisted', title: `No analog site from our catalogue within ${RADIO_CONTEXTO_KM} km` }),
   ];
+  const worldview = (x) => { const href = enlaceWorldview(x.lat, x.lon); return href && el('a', { className: 'otro worldview', href, target: '_blank', rel: 'noopener', textContent: 'Open in NASA Worldview', onclick: (e) => e.stopPropagation() }); };
   function tarjeta(x, k, lista) {
     const c = masCercano(x.lat, x.lon, sitios);
     const t = masCercano(x.lat, x.lon, tierraTerrenos);
@@ -124,7 +125,8 @@ async function montar() {
       lineaDistancia(x.distancia_componentes, M.clases?.d_ref.valor) ? el('p', { className: 'distancia marca-num', textContent: lineaDistancia(x.distancia_componentes, M.clases.d_ref.valor) }) : null,
       el('div', { className: 'acciones' },
         el('button', { type: 'button', className: 'marca-boton', textContent: 'See metrics', onclick: (e) => { e.stopPropagation(); elegir(lista, k); verPestana('metricas'); } }),
-        t ? el('a', { className: 'marca-boton secundario', textContent: 'Open detailed terrain', href: `../${enlaceTerreno(t.item.id, objetivoLunar, lunares).href}`, onclick: (e) => e.stopPropagation() }) : null));
+        t ? el('a', { className: 'marca-boton secundario', textContent: 'Open detailed terrain', href: `../${enlaceTerreno(t.item.id, objetivoLunar, lunares).href}`, onclick: (e) => e.stopPropagation() }) : null,
+        worldview(x)));
     li.dataset.lista = lista; li.dataset.k = k;
     li.tabIndex = 0;
     li.addEventListener('click', () => elegir(lista, k));
@@ -156,7 +158,8 @@ async function montar() {
         const c = el('li', { className: 'marca-chip', textContent: nombreCorto(id, P), title: `${P[id].nombre}: ${fmtPct(d)} off` });
         c.dataset.id = id;
         return c;
-      })));
+      })),
+      el('div', { className: 'acciones' }, worldview(x)));
     li.dataset.lista = 'cartera'; li.dataset.k = k;
     li.tabIndex = 0;
     li.addEventListener('click', () => elegir('cartera', k));

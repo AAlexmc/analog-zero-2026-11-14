@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { cargar } from '../web/buscar/motor.js';
 import { enlaceTerreno } from '../web/mapa/estado.js';
 import { formatoLatLon } from '../web/explorar/geo.js';
-import { NO_COMPARADO, grupoDe, fmtPct, formatoValor as formatoValorSup, celsius, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, planoSup, sitiosConCoordenadas } from '../web/analogos/metricas.js';
+import { NO_COMPARADO, grupoDe, fmtPct, formatoValor as formatoValorSup, celsius, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, planoSup, sitiosConCoordenadas, enlaceWorldview } from '../web/analogos/metricas.js';
 
 // En pantalla los superíndices van en <sup>: su texto es el de planoSup.
 const formatoValor = (v, u) => planoSup(formatoValorSup(v, u));
@@ -81,6 +81,7 @@ const leerLugares = (pag, sel = '#lista') => pag.evaluate((sel) => [...document.
   num: t.querySelector('.num').textContent, pct: t.querySelector('.pct span').textContent, coords: t.querySelector('.coords').textContent,
   contexto: t.querySelector('.contexto').textContent, parcial: t.querySelector('.parcial')?.textContent ?? null,
   terreno: t.querySelector('a.marca-boton')?.getAttribute('href') ?? null,
+  worldview: ((a) => a && `${a.textContent} ${a.getAttribute('href')} ${a.target} ${a.rel}`)(t.querySelector('a.worldview')),
 })), sel);
 const leerMetricas = (pag) => pag.evaluate(() => {
   const c = document.getElementById('metricas');
@@ -103,7 +104,7 @@ function compararLugares(que, dom, esperado, mundo, lat, lon) {
   if (dom.length !== esperado.length) { falla(`${que}: ${dom.length} cards on screen, node has ${esperado.length}`); return; }
   esperado.forEach((x, k) => {
     const c = masCercano(x.lat, x.lon, SITIOS);
-    const quiero = { pct: fmtPct(x.similitud_pct), coords: formatoLatLon(x.lat, x.lon).texto, contexto: lineaContexto(c, sitiosConCoordenadas(SITIOS)), terreno: terrenoEsperado(mundo, lat, lon, x) };
+    const quiero = { pct: fmtPct(x.similitud_pct), coords: formatoLatLon(x.lat, x.lon).texto, contexto: lineaContexto(c, sitiosConCoordenadas(SITIOS)), terreno: terrenoEsperado(mundo, lat, lon, x), worldview: `Open in NASA Worldview ${enlaceWorldview(x.lat, x.lon)} _blank noopener` };
     for (const [kk, v] of Object.entries(quiero)) if (dom[k][kk] !== v) falla(`${que} card ${k + 1} ${kk}: screen "${dom[k][kk]}" ≠ node "${v}"`);
   });
   ok(`${que}: ${dom.map((d) => `${d.num}. ${d.pct} ${d.coords}${d.terreno ? ' [terrain]' : ''}`).join(' | ')} = node`);
@@ -188,6 +189,12 @@ try {
   const s1 = await pag.evaluate(([la, lo]) => ({ s: window.__az.analogos.vista.aPantalla(la, lo), sel: window.__az.analogos.sel, num: document.querySelector('#numeros button[aria-current="true"]')?.textContent }), [rJ.resultados[1].lat, rJ.resultados[1].lon]);
   if (!s1.s.visible || s1.sel.k !== 1 || s1.num !== '2') falla(`card 2 should select place 2 and turn the globe: ${JSON.stringify(s1)}`); else ok('clicking card 2 selects place 2, its globe marker turns yellow and faces the camera');
   await pag.screenshot({ path: join(SALIDA, '03-jezero-lugar-2.png') });
+  // «Open in NASA Worldview» de la tarjeta 1 (navegación anulada aquí): no debe elegir la tarjeta.
+  await pag.evaluate(() => window.addEventListener('click', (e) => { if (e.target.closest('a.worldview')) e.preventDefault(); }, { capture: true }));
+  await pag.click('#lista > .tarjeta[data-k="0"] a.worldview');
+  await pag.waitForTimeout(100);
+  const sWv = await pag.evaluate(() => window.__az.analogos.sel);
+  if (sWv.k !== 1) falla(`"Open in NASA Worldview" on card 1 changed the selection: ${JSON.stringify(sWv)}`); else ok('"Open in NASA Worldview" on card 1 leaves place 2 selected');
 
   // ---------- 3. Metrics del primero ----------
   await pag.click('#lista > .tarjeta[data-k="0"]');
