@@ -80,27 +80,27 @@ export function crearRutas(p, ctx) {
 
   const fuenteVeh = (v) => ctx.fuenteYCita(v.req);
   aside.innerHTML = `
-    <div class="et">ROUTE · ${esc(e.meta.id)}</div>
+    <div class="et">Route · ${esc(e.meta.id)}</div>
     <div class="aviso-obs" data-r="vista" hidden>routes, zones and suggestions are computed on the retouched terrain; the view shows the original</div>
     ${vehs.length ? '' : '<div class="tenue">no vehicle with a slope limit in the catalogue</div>'}
-    <label><span class="et">VEHICLE</span><select data-r="veh">${vehs.map((v) => `<option value="${esc(v.equipo.id)}">${esc(ctx.nombreCorto(v.equipo.id))} · ≤ ${v.limite}°</option>`).join('')}</select></label>
+    <label><span class="et">Vehicle</span><select data-r="veh">${vehs.map((v) => `<option value="${esc(v.equipo.id)}">${esc(ctx.nombreCorto(v.equipo.id))} · ≤ ${v.limite}°</option>`).join('')}</select></label>
     <div class="tenue" data-r="veh-src"></div>
-    <div class="punto"><span class="et">FROM</span><select data-r="desde"></select><button type="button" data-r="clic-desde" title="Click a point on the terrain">Click</button></div>
-    <div class="punto"><span class="et">TO</span><select data-r="hasta"></select><button type="button" data-r="clic-hasta" title="Click a point on the terrain">Click</button></div>
-    <label class="fila-r"><span class="et">AVOID PERM. SHADOW</span><span><input type="number" data-r="factor" min="1" max="20" step="0.5" value="1" ${hayPSR ? '' : 'disabled'}> ×</span></label>
+    <div class="punto"><span class="et">From</span><select data-r="desde"></select><button type="button" data-r="clic-desde" title="Click a point on the terrain">Click</button></div>
+    <div class="punto"><span class="et">To</span><select data-r="hasta"></select><button type="button" data-r="clic-hasta" title="Click a point on the terrain">Click</button></div>
+    <label class="fila-r"><span class="et">Avoid perm. shadow</span><span><input type="number" data-r="factor" min="1" max="20" step="0.5" value="1" ${hayPSR ? '' : 'disabled'}> ×</span></label>
     <div class="tenue">${hayPSR ? 'cost × this factor on permanent-shadow cells · own criterion · 1 = no penalty' : 'no permanent-shadow layer on this terrain'}</div>
     <div class="botones"><button type="button" data-r="calcular">Compute route</button><button type="button" data-r="borrar">Clear</button></div>
     <div class="res-ruta" data-r="res"></div>
-    <div class="et sub">VISIT ALL · round trip from the first ticked</div>
+    <div class="et sub">Visit all · round trip from the first ticked</div>
     <div class="paradas" data-r="paradas"></div>
     <div class="botones"><button type="button" data-r="visitar">Visit all</button></div>
     <div class="res-ruta" data-r="res-visita"></div>
     <div class="tenue nota-pend">Slope limit applied per cell: gradient magnitude at the DEM resolution (${e.m.toFixed(1)} m/px), the same in every driving direction. Conservative: a vehicle could zig-zag across a slope it cannot climb straight.</div>
-    <div class="et sub">SITES · where can this go?</div>
-    <label><span class="et">EQUIPMENT</span><select data-r="eq">${(ctx.catalogo?.equipos ?? []).map((q) => `<option value="${esc(q.id)}">${esc(ctx.nombreCorto(q.id))}</option>`).join('')}</select></label>
+    <div class="et sub">Sites · where can this go?</div>
+    <label><span class="et">Equipment</span><select data-r="eq">${(ctx.catalogo?.equipos ?? []).map((q) => `<option value="${esc(q.id)}">${esc(ctx.nombreCorto(q.id))}</option>`).join('')}</select></label>
     <div class="botones"><button type="button" data-r="zona" aria-pressed="false">Where can this go?</button></div>
     <div class="res-ruta" data-r="res-zona"></div>
-    <div class="et sub">SUGGEST SITES · TOPSIS · own weights</div>
+    <div class="et sub">Suggest sites · TOPSIS · own weights</div>
     <div class="criterios">${CRITERIOS.map((c) => `<label class="crit" data-crit="${c.id}"><input type="checkbox" data-r="usa-${c.id}"><span>${c.nombre}${c.id === 'dist_ref' ? ' <select data-r="ref"></select>' : ''} <span class="tenue">(${c.beneficio ? 'more' : 'less'} is better)</span></span><input type="number" data-r="peso-${c.id}" min="0" step="0.5" value="1" title="weight (own)"></label>`).join('')}</div>
     <div class="botones"><button type="button" data-r="sugerir">Suggest ${N_SUG} sites</button></div>
     <div class="tenue">best ${N_SUG} cells of the suitable zone, ≥ ${SEPARACION_SUG_M / 1000} km apart (own threshold); equal weights by default (own); method: TOPSIS, as used for lunar landing sites in ${ctx.fuenteYCita(TOPSIS_REF)}</div>
@@ -183,7 +183,7 @@ export function crearRutas(p, ctx) {
     R.eligiendo = k;
     p.el.classList.add('plantando');
     aviso.hidden = false;
-    aviso.innerHTML = `<span class="et">ROUTE</span> click the terrain for ${k === 'desde' ? 'FROM' : 'TO'} · Esc cancels`;
+    aviso.innerHTML = `<span class="et">Route</span> click the terrain for ${k === 'desde' ? 'FROM' : 'TO'} · Esc cancels`;
   }
   function dejarDeElegir() {
     R.eligiendo = null;

@@ -2,21 +2,21 @@
 :root { --hielo: #b880ff; }
 .muestra-hielo { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; background: var(--hielo); border: 1px solid var(--linea); }
 
-.perforacion { position: absolute; top: 40px; right: 10px; z-index: 3; width: 330px; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px;
-  background: rgba(7, 23, 63, .94); border: 1px solid var(--linea); height: max-content; max-height: calc(100% - 50px); font-size: 11px; }
+.perforacion { position: absolute; top: 52px; right: 10px; z-index: 3; width: 330px; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px;
+  background: rgba(7, 23, 63, .94); border: 1px solid var(--linea); border-radius: var(--radio); height: max-content; max-height: calc(100% - 62px); font-size: 13px; }
 .perforacion[hidden] { display: none; }
 .perforacion .cab-hoja { display: flex; justify-content: space-between; align-items: center; }
 .perforacion .cab-hoja button { padding: 2px 6px; font-size: 13px; }
 .perforacion .botones { display: flex; gap: 8px; align-items: center; }
 .perforacion dl, .vol-hoja dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 2px 0; }
-.perforacion dt, .vol-hoja dt { font-size: 10px; letter-spacing: .12em; color: var(--tenue); }
+.perforacion dt, .vol-hoja dt { font-size: 13px; color: var(--tenue); }
 .perforacion dd, .vol-hoja dd { margin: 0; text-align: right; }
 .perforacion .fila-o { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
 .perforacion input[type=number] { font: 11px var(--mono); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); padding: 3px 4px; width: 72px; }
 .perforacion .sin-ruta, .vol-hoja .sin-ruta { font-weight: bold; border: 1px dashed var(--tenue); padding: 4px 6px; }
 .perforacion dd[data-v=hielo][data-valor=si] { color: var(--hielo); }
 
-.aviso-perf { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; padding: 5px 10px; background: var(--blanco); color: var(--fondo); }
+.aviso-perf { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; padding: 7px 14px; border-radius: 999px; background: var(--blanco); color: var(--fondo); }
 .aviso-perf .et { color: var(--prusia); }
 .aviso-perf[hidden] { display: none; }
 
@@ -25,9 +25,9 @@
 .perf-marca[hidden] { display: none; }
 .perf-marca .pin { display: inline-block; width: 14px; height: 14px; vertical-align: middle; border: 2px solid var(--hielo); border-radius: 50%;
   background: radial-gradient(circle, var(--hielo) 0 2px, rgba(7, 23, 63, .6) 3px); }
-.perf-marca .rot { margin-left: 5px; font-size: 10px; letter-spacing: .1em; padding: 1px 4px; background: rgba(7, 23, 63, .82); border: 1px solid var(--hielo); vertical-align: middle; }
+.perf-marca .rot { margin-left: 5px; font: 700 12px/1.2 var(--sans); padding: 2px 8px; background: var(--panel); border: 1px solid var(--hielo); border-radius: 999px; vertical-align: middle; }
 
-.vol-hoja { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--linea); padding-top: 5px; font-size: 11px; }
+.vol-hoja { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--linea); padding-top: 5px; font-size: 13px; }
 .vol-hoja:empty { display: none; }
 .vol-hoja .hielo-celda { padding: 3px 6px; border-left: 3px solid var(--tenue); }
 .vol-hoja .hielo-celda.si { border-left-color: var(--hielo); }

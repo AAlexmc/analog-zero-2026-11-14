@@ -18,7 +18,7 @@ const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
 const CLAVE = (id) => `analog-zero.retouch.${id}`;
 const CLAVE_PLANTADO = (id) => `analog-zero.planted.${id}`;
-const CUERPO = { luna: 'MOON', tierra: 'EARTH', marte: 'MARS' };
+const CUERPO = { luna: 'Moon', tierra: 'Earth', marte: 'Mars' };
 const NOMBRE_CAPA = { iluminacion: 'Illumination', sombra_permanente: 'Perm. shadow', temp_max: 'Max temp', temp_media: 'Mean temp' };
 const HERRAMIENTAS = [['navegar', 'Navigate'], ['subir', 'Raise'], ['bajar', 'Lower'], ['allanar', 'Flatten'], ['suavizar', 'Smooth']];
 const RAMPA_CAPA = 'linear-gradient(90deg, rgb(13,31,89), rgb(158,242,255))';
@@ -74,8 +74,8 @@ function crearPanel(lado) {
   el.innerHTML = `
     <div class="lienzo"><div class="rotulos"></div>
       <div class="marcas"><svg class="huellas"></svg></div>
-      <div class="tarjeta"><div class="et cab">LOADING…</div></div>
-      <div class="acciones"><button type="button" class="ver-paleta" aria-pressed="false" disabled>Equipment</button><button type="button" class="ampliar" disabled>Expand</button></div>
+      <div class="tarjeta"><div class="et cab">Loading…</div></div>
+      <div class="acciones"><button type="button" class="ver-paleta marca-boton secundario" aria-pressed="false" disabled>Equipment</button><button type="button" class="ampliar marca-boton secundario" disabled>Expand</button></div>
       <div class="paleta" hidden></div>
       <div class="aviso-plantar" hidden></div>
       <aside class="hoja" hidden></aside>
@@ -83,12 +83,12 @@ function crearPanel(lado) {
     </div>
     <aside class="retoque"></aside>
     <footer class="lectura">
-      <span><span class="et">LAT</span> <span class="num v" data-k="lat">—</span></span>
-      <span><span class="et">LON</span> <span class="num v" data-k="lon">—</span></span>
-      <span><span class="et">ELEV</span> <span class="num v corta" data-k="cota">—</span></span>
-      <span><span class="et">SLOPE</span> <span class="num v mini" data-k="pend">—</span></span>
-      <span class="lect-agua" hidden><span class="et">WATER</span> <span class="num v mini" data-k="agua">—</span></span>
-      <span class="lect-res"><span class="et">RES</span> <span class="num" data-k="res">—</span></span>
+      <span><span class="et">Lat</span> <span class="num v" data-k="lat">—</span></span>
+      <span><span class="et">Lon</span> <span class="num v" data-k="lon">—</span></span>
+      <span><span class="et">Elevation</span> <span class="num v corta" data-k="cota">—</span></span>
+      <span><span class="et">Slope</span> <span class="num v mini" data-k="pend">—</span></span>
+      <span class="lect-agua" hidden><span class="et">Water</span> <span class="num v mini" data-k="agua">—</span></span>
+      <span class="lect-res"><span class="et">Resolution</span> <span class="num" data-k="res">—</span></span>
       <span class="hueco"></span>
       <span class="escala"><span class="regla"></span><span class="num et-escala"></span></span>
     </footer>`;
@@ -104,7 +104,7 @@ function mostrarError(p, msg) {
   d.className = 'error';
   d.innerHTML = `<b>${esc(msg)}</b><span class="pista">${EJEMPLO ? '' : 'expected in web/data/terreno/ · add ?ejemplo=1 for a synthetic example'}</span>`;
   p.el.querySelector('.lienzo').appendChild(d);
-  p.el.querySelector('.tarjeta').innerHTML = `<div class="et">${p.id ? esc(p.id) : 'NO TERRAIN'}</div>`;
+  p.el.querySelector('.tarjeta').innerHTML = `<div class="et">${p.id ? esc(p.id) : 'No terrain'}</div>`;
   estado.errores.push(msg);
 }
 
@@ -113,16 +113,16 @@ function rellenarTarjeta(p, datos) {
   const notas = [...datos.notas];
   if (p.escena.fraccionNaN > 0) notas.push(`${(p.escena.fraccionNaN * 100).toFixed(2)} % no-data cells shown as gaps`);
   p.el.querySelector('.tarjeta').innerHTML = `
-    <div class="et">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)} · ${esc(m.id)}${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}</div>
-    <h2>${esc(m.nombre)}</h2>
+    <div class="et">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)}${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}</div>
+    <h2 class="marca-titulo">${esc(m.nombre)}</h2>
     <div class="cifras">
-      <div><span class="et">CENTER</span><span class="num">${fmtLat(m.centro.lat)} ${fmtLon(m.centro.lon)}</span></div>
-      <div><span class="et">SIDE</span><span class="num">${fmt(m.lado_km, 1)} <u>km</u></span></div>
-      <div><span class="et">RES</span><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
+      <div><span class="et">Center</span><span class="num">${fmtLat(m.centro.lat, 2)} ${fmtLon(m.centro.lon, 2)}</span></div>
+      <div><span class="et">Side</span><span class="num">${fmt(m.lado_km, 1)} <u>km</u></span></div>
+      <div><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
     </div>
-    <div class="fuente recorte"><span class="et">DEM</span> ${enlaceFuente(h)}${h.resolucion_origen_m ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}</div>
+    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}</div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
-    ${m.notas ? `<details class="notas-meta"><summary class="et">NOTES</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}`;
+    ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}`;
   p.el.querySelector('[data-k=res]').textContent = `${fmt(m.m_por_px, 2)} m/px`;
   p.el.querySelector('.lect-agua').hidden = !p.escena.capas.agua;
   p.el.classList.toggle('con-agua', !!p.escena.capas.agua);
@@ -148,15 +148,15 @@ function crearMandos(p) {
   const capas = Object.keys(m.capas).filter((k) => k !== 'altura' && k !== 'agua' && p.escena.capas[k]);
   const el = p.el.querySelector('.mandos');
   el.innerHTML = `
-    <div class="fila"><span class="et">COLOR</span>
+    <div class="fila"><span class="et">Colour</span>
       <button type="button" data-modo="relieve" aria-pressed="true">Relief</button>
       <button type="button" data-modo="cota" aria-pressed="false">Elevation</button>
       <button type="button" data-modo="pendiente" aria-pressed="false">Slope</button></div>
-    ${capas.length ? `<div class="fila"><span class="et">LAYER</span>
+    ${capas.length ? `<div class="fila"><span class="et">Layer</span>
       <button type="button" data-capa="" aria-pressed="true">None</button>
       ${capas.map((k) => `<button type="button" data-capa="${esc(k)}" aria-pressed="false">${esc(NOMBRE_CAPA[k] ?? k)}</button>`).join('')}</div>` : ''}
-    <div class="fila"><span class="et">${polar ? 'SUN LON' : 'SUN AZ'}</span><input type="range" data-sol="az" min="0" max="359" step="1" value="315"><span class="num" data-v="az">${txtAz(315)}</span>
-      <span class="et">EL</span><input type="range" data-sol="el" min="0" max="${luna ? 10 : 90}" step="${luna ? 0.1 : 0.5}" value="${luna ? 1.5 : 30}"><span class="num" data-v="el">${luna ? '1.5' : '30.0'}°</span>
+    <div class="fila"><span class="et">${polar ? 'Sun longitude' : 'Sun azimuth'}</span><input type="range" data-sol="az" min="0" max="359" step="1" value="315"><span class="num" data-v="az">${txtAz(315)}</span>
+      <span class="et">Elevation</span><input type="range" data-sol="el" min="0" max="${luna ? 10 : 90}" step="${luna ? 0.1 : 0.5}" value="${luna ? 1.5 : 30}"><span class="num" data-v="el">${luna ? '1.5' : '30.0'}°</span>
       ${polar && luna ? '<button type="button" data-a="dia" aria-pressed="false" title="Sweeps the subsolar longitude through 360° in 20 s at the current elevation">Lunar day ▶</button>' : ''}</div>
     <div class="leyenda"></div>`;
   p.modo = 'relieve'; p.capa = null; p.rangoCapa = null;
@@ -205,12 +205,12 @@ const esBinaria = (nombre, c) => nombre === 'sombra_permanente' || (c.tipo === '
 function leyenda(p) {
   const e = p.escena, partes = [];
   if (p.modo === 'relieve') {
-    partes.push(`<span class="et">RELIEF · cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span>`);
+    partes.push(`<span class="et">Relief · cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span>`);
   } else if (p.modo === 'cota') {
-    partes.push(`<span class="et">ELEVATION · contours every ${e.uniforms.uCurva.value} m</span><div class="bar" style="background:${RAMPA_BASE}"></div>
+    partes.push(`<span class="et">Elevation · contours every ${e.uniforms.uCurva.value} m</span><div class="bar" style="background:${RAMPA_BASE}"></div>
       <div class="ext num"><span>${fmt(e.zmin, 0)} m</span><span>${fmt(e.zmax, 0)} m</span></div>`);
   } else {
-    partes.push(`<span class="et">SLOPE · 5° classes</span><div class="bar" style="background:${RAMPA_BASE}"></div>
+    partes.push(`<span class="et">Slope · 5° classes</span><div class="bar" style="background:${RAMPA_BASE}"></div>
       <div class="ext num"><span>0°</span><span>22.5°</span><span>≥45°</span></div>`);
   }
   if (e.capas.agua) {
@@ -220,12 +220,12 @@ function leyenda(p) {
       for (const v of e.capas.agua) if (v >= 1) k.set(v, (k.get(v) ?? 0) + 1);
       return [...k].sort((a, b) => a[0] - b[0]).map(([v, x]) => `${claseAgua(e.meta, v)} ${(100 * x / e.capas.agua.length).toFixed(x / e.capas.agua.length < 0.001 ? 3 : 1)} %`);
     })();
-    partes.push(`<div data-leyenda="agua"><span class="et"><i class="muestra-agua"></i>WATER · ${esc(p.clasesAgua.join(' · ') || 'none on this terrain')} of cells · not ground</span>
-      <div class="recorte"><span class="et">SOURCE</span> ${enlaceFuente(c)}</div></div>`);
+    partes.push(`<div data-leyenda="agua"><span class="et"><i class="muestra-agua"></i>Water · ${esc(p.clasesAgua.join(' · ') || 'none on this terrain')} of cells · not ground</span>
+      <div class="recorte"><span class="et">Source</span> ${enlaceFuente(c)}</div></div>`);
   }
   if (p.capa) {
     const c = e.meta.capas[p.capa];
-    const src = `<div class="recorte"><span class="et">SOURCE</span> ${enlaceFuente(c)}${c.origen ? ` · origin: ${esc(c.origen)}` : ''}</div>`;
+    const src = `<div class="recorte"><span class="et">Source</span> ${enlaceFuente(c)}${c.origen ? ` · origin: ${esc(c.origen)}` : ''}</div>`;
     if (esBinaria(p.capa, c)) {
       partes.push(`<span class="et">${esc(NOMBRE_CAPA[p.capa] ?? p.capa)} · hatched = 1 (${esc(c.unidad)})</span>${src}`);
     } else {
@@ -302,13 +302,13 @@ function crearRetoque(p) {
   const aSlider = (r) => Math.round(1000 * Math.log(r / rmin) / Math.log(rmax / rmin));
   const deSlider = (v) => rmin * (rmax / rmin) ** (v / 1000);
   el.innerHTML = `
-    <div class="et">RETOUCH · ${esc(e.meta.id)}</div>
+    <div class="et">Retouch · ${esc(e.meta.id)}</div>
     <div class="botones" data-g="herr">${HERRAMIENTAS.map(([k, t]) => `<button type="button" data-herr="${k}" aria-pressed="${k === 'navegar'}">${t}</button>`).join('')}</div>
-    <label><span><span class="et">BRUSH RADIUS</span><span class="num" data-v="radio"></span></span><input type="range" data-i="radio" min="0" max="1000" value="${aSlider(p.radio_m)}"></label>
-    <label><span><span class="et">STRENGTH</span><span class="num" data-v="int"></span></span><input type="range" data-i="int" min="1" max="100" value="${p.intensidad * 100}"></label>
+    <label><span><span class="et">Brush radius</span><span class="num" data-v="radio"></span></span><input type="range" data-i="radio" min="0" max="1000" value="${aSlider(p.radio_m)}"></label>
+    <label><span><span class="et">Strength</span><span class="num" data-v="int"></span></span><input type="range" data-i="int" min="1" max="100" value="${p.intensidad * 100}"></label>
     <div class="botones"><button type="button" data-a="deshacer" title="Ctrl+Z">Undo</button><button type="button" data-a="rehacer" title="Ctrl+Shift+Z">Redo</button><button type="button" data-a="reset">Reset</button></div>
-    <div class="botones"><span class="et" style="align-self:center">VIEW</span><button type="button" data-ver="retocado" aria-pressed="true">Retouched</button><button type="button" data-ver="original" aria-pressed="false">Original</button></div>
-    <dl><dt>CELLS</dt><dd class="num" data-v="celdas">0</dd><dt>CUT</dt><dd class="num" data-v="exc">0 m³</dd><dt>FILL</dt><dd class="num" data-v="rel">0 m³</dd><dt>CELL AREA</dt><dd class="num">${fmtVol(e.m * e.m)} m²</dd></dl>
+    <div class="botones"><span class="et" style="align-self:center">View</span><button type="button" data-ver="retocado" aria-pressed="true">Retouched</button><button type="button" data-ver="original" aria-pressed="false">Original</button></div>
+    <dl><dt>Cells</dt><dd class="num" data-v="celdas">0</dd><dt>Cut</dt><dd class="num" data-v="exc">0 m³</dd><dt>Fill</dt><dd class="num" data-v="rel">0 m³</dd><dt>Cell area</dt><dd class="num">${fmtVol(e.m * e.m)} m²</dd></dl>
     <div class="ipex" data-v="ipex" hidden></div>
     <div class="botones"><button type="button" data-a="exportar">Export retouch</button><label class="boton">Import<input type="file" accept=".json,application/json" hidden data-a="importar"></label></div>
     <div class="estado"></div>`;
@@ -551,7 +551,7 @@ function pintarPaleta(p) {
   }
   const grupos = new Map();
   for (const q of eqs) { if (!grupos.has(q.clase)) grupos.set(q.clase, []); grupos.get(q.clase).push(q); }
-  pal.innerHTML = `<div class="et">PLANT · pick one, then click the terrain</div>${[...grupos].map(([k, qs]) => `
+  pal.innerHTML = `<div class="et">Plant equipment: pick one, then click the terrain</div>${[...grupos].map(([k, qs]) => `
     <div class="et clase">${esc(CLASE[k] ?? k)}</div>
     ${qs.map((q) => `<button type="button" class="item-eq" data-eq="${esc(q.id)}" aria-pressed="false">
       <span class="nom">${esc(q.nombre)}${q.origen ? ` <span class="sello-propio">own concept</span>` : ''}</span><span class="est">${esc(q.estado ?? '')}</span></button>`).join('')}`).join('')}`;
@@ -567,7 +567,7 @@ function modoPlantar(p, id) {
   const av = p.el.querySelector('.aviso-plantar');
   av.hidden = !id;
   if (id) {
-    av.innerHTML = `<span class="et">PLANT</span> ${esc(nombreCorto(id))} · click the terrain · Esc cancels`;
+    av.innerHTML = `<span class="et">Plant</span> ${esc(nombreCorto(id))} · click the terrain · Esc cancels`;
     p.el.querySelector('.paleta').hidden = true;
     p.el.querySelector('.ver-paleta').setAttribute('aria-pressed', 'false');
   }
@@ -712,20 +712,20 @@ function pintarHoja(p) {
   const cifras = eq.cifras ?? [];
   hoja.hidden = false;
   hoja.innerHTML = `
-    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · PLANTED</span><button type="button" data-a="cerrar" title="Close">×</button></div>
+    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
     <h3>${esc(eq.nombre)}</h3>
-    ${med.agua >= 1 ? `<div class="aviso-agua" data-a="agua">ON WATER — ${esc(claseAgua(e.meta, med.agua))} in the ${enlaceAgua(e.meta)}: not ground</div>` : ''}
+    ${med.agua >= 1 ? `<div class="aviso-agua" data-a="agua">On water —${esc(claseAgua(e.meta, med.agua))} in the ${enlaceAgua(e.meta)}: not ground</div>` : ''}
     <div class="tenue">${esc(eq.estado ?? '')}${eq.origen ? ' · own concept' : ''}</div>
     <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(cota, 1)} m${retocada ? (e.verOriginal ? ' (original view; this cell is retouched)' : ' (retouched)') : ''} · cell ${item.fila},${item.col}</div>
     ${h ? `<div class="tenue">footprint ${h.forma === 'rect' ? `${h.largo_m} × ${h.ancho_m} m` : `hexagon ${h.entre_caras_m} m across flats`} (${esc(h.cifra.texto ?? h.cifra.nombre)}) · drawn to scale when zoomed in</div>` : ''}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
     <div class="cerca"></div>
-    <div class="et">REQUIREMENTS · value here vs design limit</div>
+    <div class="et">Requirements · value here vs design limit</div>
     ${evs.length ? evs.map((r) => filaRequisito(r, e.meta)).join('') : '<div class="tenue">The catalogue has no public design limit for this system.</div>'}
     <div class="obra-pad"></div>
     <div class="vol-hoja"></div>
     ${comparacion(p, item, eq, evs)}
-    <details class="cifras-eq"><summary class="et">FIGURES (${cifras.length})</summary>${cifras.map((c) => `
+    <details class="cifras-eq"><summary class="et">Figures (${cifras.length})</summary>${cifras.map((c) => `
       <div class="cifra"><span>${esc(c.nombre)}</span> <span class="num">${c.valor === null || c.valor === undefined ? 'not public' : esc(Array.isArray(c.valor) ? c.valor.join(' – ') : c.valor)} ${esc(c.unidad ?? '')}</span>
       ${c.texto ? `<div class="tenue">${esc(c.texto)}</div>` : ''}${c.fuente ? `<div>${fuenteYCita(c)}</div>` : ''}</div>`).join('')}</details>`;
   hoja.querySelector('[data-a=cerrar]').addEventListener('click', () => { p.sel = null; refrescarPlantado(); });
@@ -744,8 +744,8 @@ function comparacion(p, item, eq, evs) {
   const lista = noEns.length
     ? noEns.map((x) => `<div class="no-ens"><b>${esc(FACTOR[x.factor] ?? x.factor ?? '')}</b> ${esc(x.texto ?? '')} · ${fuenteYCita(x)}</div>`).join('')
     : '<div class="tenue">No public source states what cannot be tested on Earth for this system.</div>';
-  const cab = `<div class="et">MOON vs EARTH · ${esc(luna ? p.escena.meta.id : q.escena.meta.id)} vs ${esc(luna ? q.escena.meta.id : p.escena.meta.id)}</div>`;
-  if (!otro) return `${cab}<div class="tenue">plant a ${esc(nombreCorto(item.equipo))} on the ${esc(otroNombre)} panel to compare</div><div class="et">NOT TESTABLE ON EARTH (catalogue)</div>${lista}`;
+  const cab = `<div class="et">Moon vs Earth · ${esc(luna ? p.escena.meta.id : q.escena.meta.id)} vs ${esc(luna ? q.escena.meta.id : p.escena.meta.id)}</div>`;
+  if (!otro) return `${cab}<div class="tenue">plant a ${esc(nombreCorto(item.equipo))} on the ${esc(otroNombre)} panel to compare</div><div class="et">Not testable on Earth (catalogue)</div>${lista}`;
   const evsOtro = evaluar(q, otro);
   const filas = evs.map((r, k) => {
     const [el, et] = luna ? [r, evsOtro[k]] : [evsOtro[k], r];
@@ -758,10 +758,10 @@ function comparacion(p, item, eq, evs) {
   }).join('');
   const margenes = [...new Set(evs.map((r) => r.req.variable))].filter((v) => MARGEN[v]).map((v) => `${VARIABLE[v] ?? v} ± max(${MARGEN[v].abs}, ${Math.round(MARGEN[v].rel * 100)} %)`).join(' · ');
   const bases = evs.some((r) => r.req.variable === 'pendiente_deg') ? notaBasesPendiente(luna ? p.escena.m : q.escena.m, luna ? q.escena.m : p.escena.m) : null;
-  return `${cab}${evs.length ? `<table class="comp"><thead><tr><th></th><th>MOON</th><th>EARTH</th><th>reading</th></tr></thead><tbody>${filas}</tbody></table>
+  return `${cab}${evs.length ? `<table class="comp"><thead><tr><th></th><th>Moon</th><th>Earth</th><th>Reading</th></tr></thead><tbody>${filas}</tbody></table>
     ${bases ? `<div class="motivo" data-nota="bases">${esc(bases)}</div>` : ''}
     <div class="tenue">reproduced = Earth within a margin of the Moon value; own threshold, not from a source: ${esc(margenes)}</div>` : ''}
-    <div class="et">NOT TESTABLE ON EARTH (catalogue)</div>${lista}`;
+    <div class="et">Not testable on Earth (catalogue)</div>${lista}`;
 }
 
 function guardarPlantado(p) {
@@ -810,7 +810,7 @@ function cargasIpex(p, vol) {
   const c = cargasExcavadora(vol, dens.map((d) => d.valor), carga.valor);
   const n1 = (x) => (x >= 100 ? fmtVol(x) : fmt(x, 1));
   const rho = dens.map((d) => d.valor / 1000).sort((a, b) => a - b);
-  caja.innerHTML = `<span class="et">CUT ≈ IPEx LOADS</span> <span class="num">${c.min === c.max ? n1(c.min) : `${n1(c.min)}–${n1(c.max)}`}</span>
+  caja.innerHTML = `<span class="et">Cut ≈ IPEx loads</span> <span class="num">${c.min === c.max ? n1(c.min) : `${n1(c.min)}–${n1(c.max)}`}</span>
     <div class="tenue">cut × regolith bulk density ${rho.map((x) => x.toFixed(2)).join('–')} t/m³ (surface–below 1 m) ${fuenteYCita(dens[0])} ÷ ${fmtVol(carga.valor)} kg per IPEx reference mission ${fuenteYCita(carga)}</div>`;
 }
 

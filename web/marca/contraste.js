@@ -56,4 +56,7 @@ export const PAREJAS = [
   { uso: 'portfolio "test this in a lab" and Compare best cell over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
   { uso: 'unlisted chip and environment legend notes over a bright planet', texto: TENUE(PANEL_PEOR), fondo: PANEL_PEOR },
   { uso: 'Compare table first column (opaque deep blue)', texto: 'white', fondo: 'deep-blue' },
+  { uso: 'terrain viewer: selected segment and pressed button', texto: 'white', fondo: 'electric-blue' },
+  { uso: 'terrain viewer: card, controls and labels over bright terrain', texto: 'white', fondo: PANEL_PEOR },
+  { uso: 'terrain viewer: "Plant" and "Drill here" hint label on its white pill', texto: 'electric-blue', fondo: 'white' },
 ];

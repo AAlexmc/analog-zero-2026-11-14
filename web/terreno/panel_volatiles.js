@@ -61,7 +61,7 @@ export function capaHielo(t, umbral_K) {
   };
 }
 
-const ETIQUETA = { temp_max: 'MAX TEMPERATURE', sombra: 'PERMANENT SHADOW', iluminacion: 'MEAN ILLUMINATION', hielo: 'SURFACE ICE', pendiente: 'SLOPE' };
+const ETIQUETA = { temp_max: 'Max temperature', sombra: 'Permanent shadow', iluminacion: 'Mean illumination', hielo: 'Surface ice', pendiente: 'Slope' };
 const CAPA = { temp_max: 'temp_max', sombra: 'sombra_permanente', iluminacion: 'iluminacion', hielo: 'temp_max', pendiente: null };
 
 // Lectura de un punto y plan de TRIDENT. luna = false: solo la lectura (lo que el sitio puede reproducir).
@@ -155,7 +155,7 @@ export const fmtV = {
 // ---------- Pantalla ----------
 const COLOR_HIELO = [0.72, 0.5, 1.0];
 const CAPA_HIELO = '_hielo_estable';
-const CUERPO = { luna: 'MOON', tierra: 'EARTH', marte: 'MARS' };
+const CUERPO = { luna: 'Moon', tierra: 'Earth', marte: 'Mars' };
 const lat = (v) => (Number.isFinite(v) ? `${Math.abs(v).toFixed(4)}° ${v < 0 ? 'S' : 'N'}` : '—');
 const lon = (v) => (Number.isFinite(v) ? `${Math.abs(v).toFixed(4)}° ${v < 0 ? 'W' : 'E'}` : '—');
 
@@ -181,7 +181,7 @@ export function crearVolatiles(p, ctx) {
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'perforar';
+  btn.className = 'perforar marca-boton secundario';
   btn.textContent = 'Drill here';
   btn.title = 'Click a point of the terrain to read it and plan a TRIDENT drill hole there';
   btn.setAttribute('aria-pressed', 'false');
@@ -197,7 +197,7 @@ export function crearVolatiles(p, ctx) {
   lienzo.appendChild(tarjeta);
   const capaM = document.createElement('div');
   capaM.className = 'perf-capa';
-  capaM.innerHTML = '<div class="perf-marca" hidden title="Drill point: click to show its card"><span class="pin"></span><span class="rot">DRILL</span></div>';
+  capaM.innerHTML = '<div class="perf-marca" hidden title="Drill point: click to show its card"><span class="pin"></span><span class="rot">Drill</span></div>';
   lienzo.appendChild(capaM);
   const marca = capaM.firstElementChild;
   marca.addEventListener('click', () => { V.abierta = true; p.sel = null; ctx.refrescarPlantado(); pintar(); });
@@ -239,11 +239,11 @@ export function crearVolatiles(p, ctx) {
     const extra = [`${h.celdas.toLocaleString('en-US')} of ${h.total.toLocaleString('en-US')} cells`];
     if (h.pct_sombra !== null) extra.push(`${fmtV.pct(h.pct_sombra)} also in permanent shadow`);
     if (h.sin_dato) extra.push(`${h.sin_dato.toLocaleString('en-US')} cells without data`);
-    return `<div data-v="leyenda-hielo"><span class="et"><i class="muestra-hielo"></i>STABLE ICE · max temperature ≤ ${esc(u.valor)} K</span>
+    return `<div data-v="leyenda-hielo"><span class="et"><i class="muestra-hielo"></i>Stable ice · max temperature ≤ ${esc(u.valor)} K</span>
       <div><span class="num" data-v="pct-hielo" data-pct="${h.pct}">${fmtV.pct(h.pct)}</span> of this terrain <span class="tenue">(${extra.join('; ')})</span></div>
       <div class="tenue">the surface temperature allows stable ice; it does not show that ice is present</div>
-      <div><span class="et">THRESHOLD</span> ${esc(u.ref.texto ?? '')} · ${cita(u.ref)}</div>
-      <div class="recorte"><span class="et">TEMPERATURE</span> ${enlaceCapa(e.meta.capas.temp_max)}</div></div>`;
+      <div><span class="et">Threshold</span> ${esc(u.ref.texto ?? '')} · ${cita(u.ref)}</div>
+      <div class="recorte"><span class="et">Temperature</span> ${enlaceCapa(e.meta.capas.temp_max)}</div></div>`;
   }
 
   // ---------- DRILL HERE ----------
@@ -253,7 +253,7 @@ export function crearVolatiles(p, ctx) {
     if (si) { ctx.modoPlantar(p, null); ctx.elegirHerramienta(p, 'navegar'); }
     p.el.classList.toggle('plantando', si);
     aviso.hidden = !si;
-    if (si) aviso.innerHTML = '<span class="et">DRILL HERE</span> click the terrain · Esc cancels';
+    if (si) aviso.innerHTML = '<span class="et">Drill here</span> click the terrain · Esc cancels';
   }
   btn.addEventListener('click', () => elegir(!V.eligiendo));
   const cv = e.renderer.domElement;
@@ -289,10 +289,10 @@ export function crearVolatiles(p, ctx) {
       const supera = P.supera_profundidad_max === null ? '<span class="tenue">no cited drill class</span>' : P.supera_profundidad_max ? `yes: deeper than the ${esc(T.profundidad.valor)} m class` : 'no';
       const pot = T.rotacion && T.percusion ? `${esc(T.rotacion.valor)} W rotary + ${esc(T.percusion.valor)} W percussive` : '<span class="tenue">not public</span>';
       const masa = T.masa ? `${T.masa.op === '<' ? '< ' : ''}${esc(T.masa.valor)} kg` : '<span class="tenue">not public</span>';
-      plan = `<dl><dt>BITES</dt><dd class="num" data-v="bocados" data-valor="${P.bocados}">${P.bocados} × ${esc(P.bocado_cm)} cm${ult}</dd>
-        <dt>BEYOND DRILL CLASS</dt><dd data-v="supera">${supera}</dd>
-        <dt>POWER</dt><dd class="num" data-v="potencia">${pot}</dd>
-        <dt>MASS</dt><dd class="num" data-v="masa-taladro">${masa}</dd></dl>
+      plan = `<dl><dt>Bites</dt><dd class="num" data-v="bocados" data-valor="${P.bocados}">${P.bocados} × ${esc(P.bocado_cm)} cm${ult}</dd>
+        <dt>Beyond drill class</dt><dd data-v="supera">${supera}</dd>
+        <dt>Power</dt><dd class="num" data-v="potencia">${pot}</dd>
+        <dt>Mass</dt><dd class="num" data-v="masa-taladro">${masa}</dd></dl>
         <div class="tenue nota-o">bite ${cita(T.bocado?.ref)}${T.rotacion ? ` · power ${cita(T.rotacion.ref)}` : ''}${T.masa ? ` · mass ${cita(T.masa.ref)}` : ''}</div>`;
     }
     const he = x.hielo_esperado;
@@ -300,27 +300,27 @@ export function crearVolatiles(p, ctx) {
       ? `<div data-v="hielo-esperado">${esc(he.texto)} · ${cita(he.ref)}${he.lugar ? ` · place ${cita(he.lugar)}` : ''}</div>
         ${he.rango ? `<div class="tenue nota-o" data-v="agua-total">total water, ice plus vapour, at the same impact: ${esc(he.rango.ref.valor.join('–'))} wt% ${cita(he.rango.ref)}</div>` : ''}`
       : '<div class="tenue">no cited ice concentration in the catalogue</div>';
-    return `<div class="et">READING AT THIS POINT</div>${filasLectura(x)}
+    return `<div class="et">Reading at this point</div>${filasLectura(x)}
       <div class="tenue nota-o" data-v="nota-hielo">${esc(x.nota)}</div>
       <div class="como">${fuentes}</div>
-      <div class="et">TRIDENT DRILL PLAN</div>
-      <label class="fila-o"><span class="et">DEPTH</span><span><input type="number" data-v="prof" min="0" step="0.1" value="${Number.isFinite(prof) ? prof : ''}"> m</span></label>
+      <div class="et">TRIDENT drill plan</div>
+      <label class="fila-o"><span class="et">Depth</span><span><input type="number" data-v="prof" min="0" step="0.1" value="${Number.isFinite(prof) ? prof : ''}"> m</span></label>
       <div class="tenue nota-o"><span class="propio">own parameter</span> · default: ${T.profundidad ? `drill class ${esc(T.profundidad.valor)} m ${cita(T.profundidad.ref)}` : 'no cited drill class: enter one'}</div>
       ${plan}
       ${x.no_medido.map((r) => `<div class="no-medido" data-v="nm-${r.k}">${esc(r.texto)}</div>`).join('')}
-      <div class="et">ICE EXPECTED</div>${esperado}`;
+      <div class="et">Ice expected</div>${esperado}`;
   }
 
   function cuerpoTierra(x) {
     const q = ctx.paneles.find((o) => o !== p && o.escena?.meta.cuerpo === 'luna' && o.volatiles?.lectura());
     const xl = q?.volatiles.lectura() ?? null;
     const noEns = V.D.trident.eq?.no_ensayable_tierra ?? [];
-    return `<div class="et">WHAT THIS SITE CAN REPRODUCE</div>
-      <table class="comp"><thead><tr><th></th>${xl ? `<th>MOON · ${esc(q.escena.meta.id)}</th>` : ''}<th>EARTH · here</th></tr></thead><tbody>
+    return `<div class="et">What this site can reproduce</div>
+      <table class="comp"><thead><tr><th></th>${xl ? `<th>Moon · ${esc(q.escena.meta.id)}</th>` : ''}<th>Earth · here</th></tr></thead><tbody>
       ${x.lectura.map((r) => `<tr data-v="${r.k}"><td>${r.et}</td>${xl ? `<td class="num">${esc(xl.lectura.find((y) => y.k === r.k)?.texto ?? '—')}</td>` : ''}<td class="${r.estado === 'medido' ? 'num' : 'tenue'}" data-estado="${r.estado}">${esc(r.texto)}</td></tr>`).join('')}</tbody></table>
       ${xl ? `<div class="tenue nota-o" data-v="luna-celda">Moon reading at cell ${xl.fila},${xl.col} of the Moon panel</div>` : '<div class="tenue nota-o" data-v="sin-luna">drill on the Moon panel to compare</div>'}
       <div class="tenue nota-o">no equivalence between Moon and Earth values is computed</div>
-      <div class="et">NOT TESTABLE ON EARTH (catalogue) · TRIDENT</div>
+      <div class="et">Not testable on Earth (catalogue) · TRIDENT</div>
       ${noEns.length ? noEns.map((y) => `<div class="no-ens">${esc(y.texto ?? '')} · ${cita(y)}</div>`).join('') : '<div class="tenue">No public source states what cannot be tested on Earth for this drill.</div>'}`;
   }
 
@@ -332,7 +332,7 @@ export function crearVolatiles(p, ctx) {
     if (!V.x || !V.abierta) { tarjeta.hidden = true; tarjeta.innerHTML = ''; return; }
     const x = V.x, l = e.leer(V.perf.fila, V.perf.col);
     tarjeta.hidden = false;
-    tarjeta.innerHTML = `<div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · DRILL HERE</span><button type="button" data-v="cerrar" title="Close (the mark stays)">×</button></div>
+    tarjeta.innerHTML = `<div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · drill here</span><button type="button" data-v="cerrar" title="Close (the mark stays)">×</button></div>
       <div class="lugar num">${lat(l.lat)} ${lon(l.lon)} · cell ${V.perf.fila},${V.perf.col}</div>
       ${!x.evaluable ? `<div class="sin-ruta" data-v="no-evaluable">${esc(x.motivo)}</div>` : luna ? cuerpoLuna(x) : cuerpoTierra(x)}
       <div class="botones"><button type="button" data-v="quitar">Remove</button><span class="tenue">removes the drill mark</span></div>`;
@@ -366,7 +366,7 @@ export function crearVolatiles(p, ctx) {
     if (!cont) return;
     if (eq?.id !== 'planta_agua' || !V.D) { cont.innerHTML = ''; return; }
     if (!luna) {
-      cont.innerHTML = `<div class="et">WATER PLANT</div><div class="tenue" data-v="planta-tierra">the water, regolith and propellant figures are for the lunar plant (ice in lunar regolith) · stable surface ice on this terrain: ${NO_MEDIBLE}</div>`;
+      cont.innerHTML = `<div class="et">Water plant</div><div class="tenue" data-v="planta-tierra">the water, regolith and propellant figures are for the lunar plant (ice in lunar regolith) · stable surface ice on this terrain: ${NO_MEDIBLE}</div>`;
       return;
     }
     const D = V.D, F = V.F, i = item.fila * n + item.col;
@@ -379,36 +379,36 @@ export function crearVolatiles(p, ctx) {
     if (h.planta) {
       const pl = h.planta, iv = pl.intervalo_kg, ex = h.excavacion, c = ex.central;
       const exc = c.evaluable
-        ? `<dt>EXCAVATION</dt><dd class="num" data-v="horas" data-valor="${c.horas}">${fmt.horas(c.horas)} · ${fmt.dias(c.dias_tierra)} d</dd>
-          ${ex.min?.evaluable ? `<dt>RANGE</dt><dd class="num" data-v="horas-rango" data-min="${ex.min.horas}" data-max="${ex.max.horas}">${fmt.horas(ex.min.horas)} – ${fmt.horas(ex.max.horas)}</dd>` : ''}
-          ${c.misiones !== null ? `<dt>${nom} MISSIONS</dt><dd class="num" data-v="misiones" data-valor="${c.misiones}">${fmt.veces(c.misiones)}</dd>` : ''}
-          <dt>CALENDAR</dt>${c.calendario_dias !== null ? `<dd class="num" data-v="calendario" data-valor="${c.calendario_dias}">${fmt.dias(c.calendario_dias)} d</dd>` : `<dd class="tenue" data-v="calendario">${esc(c.motivoCalendario)}</dd>`}`
-        : `<dt>EXCAVATION</dt><dd class="tenue" data-v="horas">not given: ${esc(c.motivo)}</dd>`;
-      agua = `<dl><dt>REGOLITH</dt><dd class="num" data-v="regolito" data-valor="${pl.regolito_kg}">${fmt.masa(pl.regolito_kg)}</dd>
-          <dt>RANGE</dt>${iv ? `<dd class="num" data-v="regolito-rango" data-min="${iv.min}" data-max="${iv.max}">${fmt.masa(iv.min)} – ${fmt.masa(iv.max)}</dd>` : `<dd class="tenue" data-v="regolito-rango">no cited range</dd>`}</dl>
+        ? `<dt>Excavation</dt><dd class="num" data-v="horas" data-valor="${c.horas}">${fmt.horas(c.horas)} · ${fmt.dias(c.dias_tierra)} d</dd>
+          ${ex.min?.evaluable ? `<dt>Range</dt><dd class="num" data-v="horas-rango" data-min="${ex.min.horas}" data-max="${ex.max.horas}">${fmt.horas(ex.min.horas)} – ${fmt.horas(ex.max.horas)}</dd>` : ''}
+          ${c.misiones !== null ? `<dt>${nom} missions</dt><dd class="num" data-v="misiones" data-valor="${c.misiones}">${fmt.veces(c.misiones)}</dd>` : ''}
+          <dt>Calendar</dt>${c.calendario_dias !== null ? `<dd class="num" data-v="calendario" data-valor="${c.calendario_dias}">${fmt.dias(c.calendario_dias)} d</dd>` : `<dd class="tenue" data-v="calendario">${esc(c.motivoCalendario)}</dd>`}`
+        : `<dt>Excavation</dt><dd class="tenue" data-v="horas">not given: ${esc(c.motivo)}</dd>`;
+      agua = `<dl><dt>Regolith</dt><dd class="num" data-v="regolito" data-valor="${pl.regolito_kg}">${fmt.masa(pl.regolito_kg)}</dd>
+          <dt>Range</dt>${iv ? `<dd class="num" data-v="regolito-rango" data-min="${iv.min}" data-max="${iv.max}">${fmt.masa(iv.min)} – ${fmt.masa(iv.max)}</dd>` : `<dd class="tenue" data-v="regolito-rango">no cited range</dd>`}</dl>
         <div class="tenue nota-o">regolith = water ÷ (ice ${esc(D.hielo.pct)} % by mass × extraction ${esc(Math.round(D.eficiencia.valor * 100))} %) · ice: LCROSS ${cita(D.hielo.ref)}, measured in Cabeus crater: <b>NOT MEASURED HERE</b> · extraction ${cita(D.eficiencia.ref)}${D.agua_rango ? ` · range with the LCROSS total water ${esc(D.agua_rango.ref.valor.join('–'))} wt% (ice plus vapour) ${cita(D.agua_rango.ref)}` : ''}</div>
         <dl>${exc}</dl>
-        <div class="tenue nota-o">excavation = regolith ÷ (${nr} × ${F.ritmo_kg_h ? `${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited rate'}), in hours and Earth days of continuous work · <span class="supuesto">assumed</span> ${nr} ${nom} (ROBOTS)${F.mision_kg ? ` · missions = regolith ÷ ${fmt.masa(F.mision_kg.valor)} ${cita(F.mision_kg.ref)}` : ''} · calendar = excavation ÷ mean illumination at this cell (LOLA) · <span class="propio">own estimate</span>: robots work only while lit</div>
+        <div class="tenue nota-o">excavation = regolith ÷ (${nr} × ${F.ritmo_kg_h ? `${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited rate'}), in hours and Earth days of continuous work · <span class="supuesto">assumed</span> ${nr} ${nom} (robots)${F.mision_kg ? ` · missions = regolith ÷ ${fmt.masa(F.mision_kg.valor)} ${cita(F.mision_kg.ref)}` : ''} · calendar = excavation ÷ mean illumination at this cell (LOLA) · <span class="propio">own estimate</span>: robots work only while lit</div>
         ${h.no_medido.map((r) => `<div class="no-medido" data-v="${r.k}">${esc(r.texto)}</div>`).join('')}`;
     } else agua = `<div class="sin-ruta" data-v="sin-planta">${esc(h.motivo)}</div>`;
     let pot = '';
     if (h.energia) {
       const en = h.energia;
-      pot = `<dl><dt>SOLAR TOWERS</dt>${en.torres !== null ? `<dd class="num" data-v="torres" data-valor="${en.torres}">${en.torres} × ${esc(D.torre_kw.valor)} kW</dd>` : `<dd class="tenue" data-v="torres">${esc(en.motivo_torres)}</dd>`}
-          <dt>WITH THIS LIGHT</dt>${en.torres_con_luz !== null ? `<dd class="num" data-v="torres-luz" data-valor="${en.torres_con_luz}">${en.torres_con_luz} <span class="tenue">at illumination ${fmt.frac(luz)}</span></dd>` : `<dd class="tenue" data-v="torres-luz">${esc(h.motivo_luz ?? en.motivo_torres_con_luz)}</dd>`}
-          <dt>REACTORS</dt>${en.reactores !== null ? `<dd class="num" data-v="reactores" data-valor="${en.reactores}">${en.reactores} × ${esc(D.reactor_kwe.valor)} kWe</dd>` : `<dd class="tenue" data-v="reactores">${esc(en.motivo_reactores)}</dd>`}</dl>
+      pot = `<dl><dt>Solar towers</dt>${en.torres !== null ? `<dd class="num" data-v="torres" data-valor="${en.torres}">${en.torres} × ${esc(D.torre_kw.valor)} kW</dd>` : `<dd class="tenue" data-v="torres">${esc(en.motivo_torres)}</dd>`}
+          <dt>With this light</dt>${en.torres_con_luz !== null ? `<dd class="num" data-v="torres-luz" data-valor="${en.torres_con_luz}">${en.torres_con_luz} <span class="tenue">at illumination ${fmt.frac(luz)}</span></dd>` : `<dd class="tenue" data-v="torres-luz">${esc(h.motivo_luz ?? en.motivo_torres_con_luz)}</dd>`}
+          <dt>Reactors</dt>${en.reactores !== null ? `<dd class="num" data-v="reactores" data-valor="${en.reactores}">${en.reactores} × ${esc(D.reactor_kwe.valor)} kWe</dd>` : `<dd class="tenue" data-v="reactores">${esc(en.motivo_reactores)}</dd>`}</dl>
         <div class="tenue nota-o">${D.potencia_kw.valor} kW ÷ unit, rounded up${D.torre_kw ? ` · tower ${cita(D.torre_kw.ref)}` : ''}${D.reactor_kwe ? ` · reactor ${cita(D.reactor_kwe.ref)}` : ''} · ${esc(en.nota_torre)} · with this light: <span class="propio">own estimate</span>, towers at this cell's mean illumination · <span class="supuesto">assumed</span>: ${esc(en.nota_reactor)}</div>`;
     } else pot = `<div class="tenue" data-v="sin-energia">${esc(h.motivo_energia)}</div>`;
     const pr = h.propelente;
-    const prop = pr ? `<dl><dt>O₂ · STOICHIOMETRY</dt><dd class="num" data-v="o2" data-valor="${pr.o2_kg}">${fmtV.t1(pr.o2_kg)}</dd>
-        <dt>H₂ · STOICHIOMETRY</dt><dd class="num" data-v="h2" data-valor="${pr.h2_kg}">${fmtV.t1(pr.h2_kg)}</dd>
-        <dt>O₂ · SOURCE</dt><dd class="num" data-v="o2-fuente" data-valor="${h.o2.fuente_kg}">${fmtV.t1(h.o2.fuente_kg)}</dd></dl>
+    const prop = pr ? `<dl><dt>O₂ · stoichiometry</dt><dd class="num" data-v="o2" data-valor="${pr.o2_kg}">${fmtV.t1(pr.o2_kg)}</dd>
+        <dt>H₂ · stoichiometry</dt><dd class="num" data-v="h2" data-valor="${pr.h2_kg}">${fmtV.t1(pr.h2_kg)}</dd>
+        <dt>O₂ · source</dt><dd class="num" data-v="o2-fuente" data-valor="${h.o2.fuente_kg}">${fmtV.t1(h.o2.fuente_kg)}</dd></dl>
       <div class="tenue nota-o">2 H₂O → 2 H₂ + O₂ with IUPAC atomic masses (own calculation) · source O₂ ${cita(O2_FUENTE)}</div>
       <div class="aviso-o2" data-v="aviso-o2">${esc(h.o2.aviso)}</div>` : '';
-    cont.innerHTML = `<div class="et">WATER PLANT · ice, regolith, power, propellant</div>
+    cont.innerHTML = `<div class="et">Water plant · ice, regolith, power, propellant</div>
       <div class="hielo-celda ${hc.estado}" data-v="hielo-celda" data-estado="${hc.estado}">${hc.html}</div>
-      ${D.produccion ? `<dl><dt>WATER</dt><dd class="num" data-v="agua" data-valor="${D.produccion.agua_kg}">${fmtV.t1(D.produccion.agua_kg)} in ${esc(D.produccion.dias)} d</dd>
-        ${D.potencia_kw ? `<dt>POWER</dt><dd class="num" data-v="potencia-planta" data-valor="${D.potencia_kw.valor}">${esc(D.potencia_kw.valor)} kW</dd>` : ''}</dl>
+      ${D.produccion ? `<dl><dt>Water</dt><dd class="num" data-v="agua" data-valor="${D.produccion.agua_kg}">${fmtV.t1(D.produccion.agua_kg)} in ${esc(D.produccion.dias)} d</dd>
+        ${D.potencia_kw ? `<dt>Power</dt><dd class="num" data-v="potencia-planta" data-valor="${D.potencia_kw.valor}">${esc(D.potencia_kw.valor)} kW</dd>` : ''}</dl>
         <div class="tenue nota-o">NASA baseline ${cita(D.produccion.ref)}${D.potencia_kw ? ` · ${esc(D.potencia_kw.ref.texto ?? '')} ${cita(D.potencia_kw.ref)}` : ''}</div>` : ''}
       ${agua}${pot}${prop}`;
   }

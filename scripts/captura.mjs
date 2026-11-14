@@ -266,7 +266,7 @@ try {
   // Punto 7: en estereográfica polar el sol se rotula como longitud y recorre el día lunar.
   const rotSol = await pag.$eval('.panel[data-lado=b] .mandos', (m) => m.textContent);
   const botonDia = await pag.$('.panel[data-lado=b] [data-a=dia]');
-  if (!/SUN LON/.test(rotSol) || !botonDia) falla('polar Moon panel should label the sun control SUN LON and offer the lunar-day sweep');
+  if (!/Sun longitude/.test(rotSol) || !botonDia) falla('polar Moon panel should label the sun control "Sun longitude" and offer the lunar-day sweep');
   else {
     const az0 = await pag.$eval('.panel[data-lado=b] [data-sol=az]', (i) => +i.value);
     await botonDia.click();
@@ -396,7 +396,7 @@ try {
     });
     const claseCursor = await pag3.evaluate((x) => { const e = window.__az.paneles[0].escena; return e.meta.capas.agua.clases[String(e.capas.agua[x.f * e.n + x.c])]; }, pa[0]);
     if (ui.lectura !== claseCursor) falla(`${id}: bottom bar should read "${claseCursor}" over water, reads ${JSON.stringify(ui.lectura)}`); else ok(`${id}: bottom bar over water reads "${ui.lectura}"`);
-    if (!/WATER/.test(ui.leyenda ?? '') || ui.enlace !== ui.url) falla(`${id}: legend has no water entry linked to its source (${JSON.stringify({ leyenda: ui.leyenda, enlace: ui.enlace })})`); else ok(`${id}: legend "${ui.leyenda.slice(0, 120)}"`);
+    if (!/Water/.test(ui.leyenda ?? '') || ui.enlace !== ui.url) falla(`${id}: legend has no water entry linked to its source (${JSON.stringify({ leyenda: ui.leyenda, enlace: ui.enlace })})`); else ok(`${id}: legend "${ui.leyenda.slice(0, 120)}"`);
     if (ui.boton) falla(`${id}: water is always tinted, it should not also be a LAYER button`);
     if (!ui.notas || !ui.notas.includes(ui.metaNotas)) falla(`${id}: meta.notas not shown on the terrain card (${JSON.stringify(ui.notas)})`); else ok(`${id}: meta.notas on the card (${ui.notas.length} chars)`);
     await pag3.mouse.move(5, 5);
