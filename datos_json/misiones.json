@@ -75,8 +75,8 @@
           "en_lista_de_partida": true,
           "valor_texto": "Annual UVB dose 3.5-5 kWh/m2 on the Coastal Range (open review, citing Cordero et al. 2018); NASA page only says \"intense ultraviolet radiation\"",
           "fuente": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2021.810426/full",
-          "cita": "the Atacama is known for having the highest UV radiation on Earth, with annual UVB doses ranging from 3.5 to 5 kWh/m 2 on the Coastal Range of the Atacama",
-          "verificado": false,
+          "cita": "the Atacama is known for having the highest UV radiation on Earth, with annual UVB doses ranging from 3.5 to 5",
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "No global UV layer in our set (insolacion_kwh_m2_dia is total shortwave, not UV); UV exposure only roughly tracks insolation and altitude"
@@ -867,9 +867,9 @@
           "lon": -89.6833,
           "coordenadas_fuente": null,
           "anos": "2007",
-          "fuente": "https://webarchive.library.unt.edu/eot2008/20090117104120/http:/ti.arc.nasa.gov/projects/haughton_field/details.php",
-          "cita": "For the Haughton Crater surveys, K10 will carry two non-contact survey instruments: (1) the CRUX ground-penetrating radar (to characterize subsurface structure)",
-          "verificado": false
+          "fuente": "https://ntrs.nasa.gov/api/citations/20090026331/downloads/20090026331.pdf?attachment=true",
+          "cita": "K10 Black was equipped with the JPL CRUX ground-penetrating radar (GPR)",
+          "verificado": true
         },
         {
           "nombre": "Ground-penetrating radar surveys of ice buried by tephra",
@@ -1044,9 +1044,9 @@
           "nombre": "Basaltic lava flow",
           "en_lista_de_partida": true,
           "valor_texto": null,
-          "fuente": "https://appel.nasa.gov/?p=365689",
-          "cita": "The Black Point Lava Flow, north of Flagstaff, Arizona, stretches approximately two miles wide, a thick trail of black basaltic lava that flowed east for miles",
-          "verificado": false,
+          "fuente": "https://eol.jsc.nasa.gov/Collections/EarthObservatory/articles/BlackPointLavaFlowArizona.htm",
+          "cita": "The otherworldly footprint of black basaltic lava creates a striking landscape at Black Point Lava Flow in northern Arizona",
+          "verificado": true,
           "parametros": [
             "litologia_glim"
           ],
@@ -1086,9 +1086,9 @@
           "nombre": "Many lava caves",
           "en_lista_de_partida": true,
           "valor_texto": null,
-          "fuente": "https://nasa-braille.org/?p=227",
+          "fuente": "https://www.nasa-braille.org/about-braille/braille-dictionary",
           "cita": "The park was chosen by the BRAILLE team because of its many lava caves.",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "No global layer of lava tubes."
@@ -1098,9 +1098,9 @@
           "nombre": "Little sunlight inside caves",
           "en_lista_de_partida": false,
           "valor_texto": null,
-          "fuente": "https://nasa-braille.org/?p=227",
+          "fuente": "https://www.nasa-braille.org/about-braille/braille-dictionary",
           "cita": "The lava tubes are considered LLEs because microbes within them have minimal access to sunlight.",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "Surface sunlight layers say nothing about light inside caves."
@@ -1278,7 +1278,7 @@
           "valor_texto": "5- to 15-min OWLT",
           "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
           "cita": "Do these capabilities remain enabling and enhancing as communication latency increases from 5- to 15-min OWLT?",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "The delay is set by the test, not by the place."
@@ -1288,7 +1288,7 @@
           "nombre": "Chemically altered basalt",
           "en_lista_de_partida": true,
           "valor_texto": null,
-          "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238",
+          "fuente": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6442238/fullTextXML",
           "cita": "how microbial communities and habitability correlate with physical and geochemical characteristics of chemically altered basalt environments in Mars-analog terrestrial sites",
           "verificado": false,
           "parametros": [
@@ -1303,8 +1303,8 @@
           "en_lista_de_partida": false,
           "valor_texto": null,
           "fuente": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237",
-          "cita": "the Kilauea Volcano 1969–1974 flows on the Big Island of Hawai‘i (early Mars analog)",
-          "verificado": false,
+          "cita": "the Kilauea Volcano 1969-1974 flows on the Big Island of Hawai'i (early Mars analog)",
+          "verificado": true,
           "parametros": [
             "litologia_glim",
             "rugosidad_tan"
@@ -1339,28 +1339,28 @@
           "verificado": true
         },
         {
-          "nombre": "ISRU analog mission",
-          "organismo": "NASA with the Canadian Space Agency",
+          "nombre": "ISRU analogue field tests",
+          "organismo": "NORCAT with CSA, DLR and NASA (PISCES program)",
           "sitio": "mauna_kea",
           "sitio_texto": null,
           "lat": 19.82056,
           "lon": -155.46806,
           "coordenadas_fuente": null,
-          "anos": "2012",
-          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
-          "cita": "The 2012 ISRU analog mission is a collaboration between NASA and its partners, primarily the Canadian Space Agency (CSA) with help from the University of Hawaii",
-          "verificado": false
+          "anos": "2010 and 2012",
+          "fuente": "https://ntrs.nasa.gov/citations/20140008708",
+          "cita": "on the Mauna Kea volcano in Hawai'i was coordinated by the Northern Centre for Advanced Technology (NORCAT) in collaboration with the Canadian Space Agency (CSA)",
+          "verificado": true
         }
       ],
       "caracteristicas": [
         {
           "id": "ceniza_volcanica",
-          "nombre": "Volcanic ash deposits",
+          "nombre": "Fine-grained volcanic material",
           "en_lista_de_partida": true,
           "valor_texto": null,
-          "fuente": "https://webarchive.library.unt.edu/web/20130221205815/http://www.nasa.gov/exploration/analogs/isru/index.html",
-          "cita": "Demonstrations will be conducted on the side of Mauna Kea, in some of Hawaii’s volcanic ash deposits, which provide geologic terrain and composition similar to what scientists expect to find on the moon, an asteroid, or Mars.",
-          "verificado": false,
+          "fuente": "https://ntrs.nasa.gov/citations/20140008708",
+          "cita": "The fine-grained, volcanic nature of the material is a suitable lunar and martian analogue",
+          "verificado": true,
           "parametros": [
             "litologia_glim"
           ],
@@ -1372,9 +1372,9 @@
           "nombre": "Basalt, iron oxides and clays",
           "en_lista_de_partida": true,
           "valor_texto": null,
-          "fuente": "https://core.ac.uk/works/15260970",
+          "fuente": "https://ntrs.nasa.gov/citations/20110008363",
           "cita": "Preliminary results show that the sediments change from dry, organic-poor, poorly-sorted volcaniclastic sand on the surface, containing basalt, iron oxides and clays",
-          "verificado": false,
+          "verificado": true,
           "parametros": [],
           "medido": false,
           "motivo": "No global mineralogy layer."
