@@ -11,7 +11,8 @@ const sello = (propio) => (propio ? el('span', { className: 'marca-chip propio',
 
 function celda(e) {
   if (!e) return el('td', { className: 'vacia', textContent: '—' });
-  return el('td', {}, el('span', { textContent: e.texto ?? 'not public' }), ' ', sello(e.propio), e.url ? el('br') : null, enlace(e.url, 'Open the source'));
+  return el('td', {}, el('span', { textContent: e.texto ?? 'not public' }), ' ', sello(e.propio),
+    e.aviso ? el('span', { className: 'aviso', textContent: e.aviso }) : null, e.url && !e.aviso ? el('br') : null, enlace(e.url, 'Open the source'));
 }
 
 function tabla(lista, seccion) {
