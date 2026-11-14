@@ -15,28 +15,28 @@
               "unidad": "m",
               "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
               "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
-              "verificado": false
+              "verificado": true
             },
             "ancho": {
               "valor": 1.9,
               "unidad": "m",
               "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
               "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
-              "verificado": false
+              "verificado": true
             },
             "alto": {
               "valor": 2,
               "unidad": "m",
               "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
               "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
-              "verificado": false
+              "verificado": true
             },
             "masa": {
               "valor": 220,
               "unidad": "kg",
               "fuente": "https://frc.ri.cmu.edu/atacama/robotics.php",
               "cita": "Height: 2m Width: 1.9m Length: 2.9m Weight: 220kg",
-              "verificado": false
+              "verificado": true
             }
           },
           "limites": [],
@@ -101,7 +101,7 @@
               "unidad": "ft",
               "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
               "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
-              "verificado": false,
+              "verificado": true,
               "nota": "Internal size of the main habitation area."
             },
             "ancho": {
@@ -109,7 +109,7 @@
               "unidad": "ft",
               "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
               "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
-              "verificado": false,
+              "verificado": true,
               "nota": "Internal size of the main habitation area."
             },
             "alto": {
@@ -117,7 +117,7 @@
               "unidad": "ft",
               "fuente": "https://ntrs.nasa.gov/api/citations/20090029953/downloads/20090029953.pdf",
               "cita": "had internal dimensions of 16 feet x 24 feet x 8 feet when fully inflated",
-              "verificado": false,
+              "verificado": true,
               "nota": "Internal size of the main habitation area."
             },
             "masa": null
@@ -152,7 +152,7 @@
               "unidad": "lb",
               "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
               "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
-              "verificado": false,
+              "verificado": true,
               "nota": "Mass of the 2007 K10 rovers, without payload."
             }
           },
@@ -227,7 +227,7 @@
             "uso": {
               "fuente": "https://github.com/nasa/NASA-3D-Resources",
               "cita": "These assets are free and without copyright.",
-              "verificado": false
+              "verificado": true
             },
             "lleva_insignia": null,
             "copiado": null,
@@ -237,7 +237,7 @@
               "motivo": "No public model of the Lunar Electric Rover itself; the Space Exploration Vehicle is the concept that grew out of it.",
               "fuente": "https://en.wikipedia.org/wiki/Space_Exploration_Vehicle",
               "cita": "The concept evolved from the Lunar Electric Rover (LER) concept",
-              "verificado": false
+              "verificado": true
             }
           }
         }
@@ -276,7 +276,7 @@
               "unidad": "ft",
               "fuente": "https://science.nasa.gov/earth/earth-observatory/living-the-mars-life-on-mauna-loa-92630/",
               "cita": "With a diameter of 36 feet (10 meters), the ground floor has just 878 square feet",
-              "verificado": false,
+              "verificado": true,
               "nota": "Diameter of the round dome."
             },
             "ancho": {
@@ -284,7 +284,7 @@
               "unidad": "ft",
               "fuente": "https://science.nasa.gov/earth/earth-observatory/living-the-mars-life-on-mauna-loa-92630/",
               "cita": "With a diameter of 36 feet (10 meters), the ground floor has just 878 square feet",
-              "verificado": false,
+              "verificado": true,
               "nota": "Diameter of the round dome."
             },
             "alto": null,
@@ -298,7 +298,7 @@
               "unidad": "mph",
               "fuente": "https://intentsmag.com/2015/06/01/life-on-mars/",
               "cita": "The structural limit of the habitat is in the range of 70 mph",
-              "verificado": false,
+              "verificado": true,
               "nota": "Own criterion: a structural wind limit, compared with the 95th percentile wind of a place. The source gives a rough figure."
             }
           ],
@@ -346,7 +346,7 @@
               "unidad": "lb",
               "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
               "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
-              "verificado": false,
+              "verificado": true,
               "nota": "Mass of the 2007 K10 rovers, without payload."
             }
           },
@@ -372,7 +372,7 @@
               "unidad": "lb",
               "fuente": "https://www.astronomy.com/space-exploration/robots-practice-for-moon-survey/",
               "cita": "Each of the four-wheel-drive machines weighs 165 pounds and can carry a payload up to 110 pounds.",
-              "verificado": false,
+              "verificado": true,
               "nota": "Mass of the 2007 K10 rovers, without payload."
             }
           },
@@ -423,7 +423,7 @@
               "unidad": "°C",
               "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
               "cita": "Operating temperature 0 to 40°C",
-              "verificado": false
+              "verificado": true
             },
             {
               "parametro": "t_max_k",
@@ -432,7 +432,7 @@
               "unidad": "°C",
               "fuente": "https://unavco.knowledgebase.co/assets/801/ILRIS_Spec.pdf",
               "cita": "Operating temperature 0 to 40°C",
-              "verificado": false
+              "verificado": true
             }
           ],
           "modelo3d": null
@@ -495,7 +495,7 @@
               "unidad": "ft",
               "fuente": "https://www.pbssocal.org/socal-focus/a-walk-in-the-mojave-nasa-tests-mars-rover-on-desert-dunes",
               "cita": "Curiosity (and Scarecrow, for that matter) is about ten feet long",
-              "verificado": false
+              "verificado": true
             },
             "ancho": null,
             "alto": null,
@@ -504,7 +504,7 @@
               "unidad": "lb",
               "fuente": "https://www.pbssocal.org/socal-focus/a-walk-in-the-mojave-nasa-tests-mars-rover-on-desert-dunes",
               "cita": "Scarecrow's handlers pared its weight down to around 750 pounds",
-              "verificado": false
+              "verificado": true
             }
           },
           "limites": [
@@ -528,7 +528,7 @@
             "uso": {
               "fuente": "https://github.com/nasa/NASA-3D-Resources",
               "cita": "These assets are free and without copyright.",
-              "verificado": false
+              "verificado": true
             },
             "lleva_insignia": null,
             "copiado": null,
