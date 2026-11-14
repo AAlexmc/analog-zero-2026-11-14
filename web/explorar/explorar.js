@@ -7,7 +7,8 @@ import { formatoValor, celsius, partesSup } from '../analogos/metricas.js';
 import { montarSitio, rotuloRango } from '../sitio/panel.js';
 import { engancharRelieve } from '../relieve/enganche.js';
 import { leerEstado, conMision } from '../analogos/misiones.js';
-import { montarMision, pintarFicha } from '../analogos/mision_panel.js';
+import { montarMision, pintarFicha, montarMes } from '../analogos/mision_panel.js';
+import { leerMes, conMes } from '../analogos/meses.js';
 
 // Vista inicial (propia): la Luna algo desde el sur para que se vea el polo; Marte de cara a Syrtis–Jezero.
 const VISTA0 = { moon: { lat: -38, lon: 0 }, mars: { lat: 15, lon: 72 } };
@@ -20,10 +21,13 @@ const V = (az.vista = { listo: false, errores: [], textura: null });
 const oyentes = new Set();
 let punto = null;
 let activa = null;
+// Mes de la búsqueda («When»): aquí solo se elige y viaja en la URL a resultados.
+let mes = leerMes(q);
 az.explorar = {
   mundo: idMundo,
   get punto() { return punto ? { lat: punto.lat, lon: punto.lon } : null; },
   get mision() { return activa; },
+  get mes() { return mes; },
   alCambiar(cb) { oyentes.add(cb); return () => oyentes.delete(cb); },
 };
 
@@ -91,13 +95,14 @@ async function montarPasoMision(m, ponerBuscar) {
   activa = leerEstado(q, misiones, indice, sitios);
   const pintar = () => { pintarFicha({ activa, P, sitios }); ponerBuscar(); };
   montarMision({ misiones, indice, sitios, mundo: m.id, activa, alCambiar: (a) => { activa = a; pintar(); } });
+  montarMes({ mes, alCambiar: (x) => { mes = x; ponerBuscar(); } });
   pintar();
   V.mision = 'ok';
 }
 
 async function montar(m) {
   let hrefBuscar = null;
-  const ponerBuscar = () => { if (hrefBuscar) $('buscar').href = conMision(hrefBuscar, activa); };
+  const ponerBuscar = () => { if (hrefBuscar) $('buscar').href = conMes(conMision(hrefBuscar, activa), mes); };
   const misionP = montarPasoMision(m, ponerBuscar).catch((e) => { V.mision = 'error'; V.errores.push(String(e?.message ?? e)); });
   engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: m.id, alCambiar: az.explorar.alCambiar, punto: () => punto && { lat: punto.lat, lon: punto.lon, titulo: `${punto.sug?.nombre ?? 'Your pin'} · ${formatoLatLon(punto.lat, punto.lon).texto}` } });
   const caja = $('sugerencias');

@@ -188,4 +188,50 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .leyenda .sin-comparar { width: 14px; height: 12px; border-radius: 3px; background: var(--deep-blue); border: 1px solid var(--white); margin-left: 10px; flex: none; }
 
 .tarjeta .resumen { margin: 0 0 8px; font-size: 13px; }
+
+/* Mes («When»): estado de la descarga, chip del mes activo, tiras de 12 meses y pestaña Calendar. El texto nunca va sobre la rampa. */
+.mes-estado { margin: 0 0 10px; font-size: 14px; color: var(--neon-yellow); }
+.mes-estado.cargando { color: var(--white); }
+.mes-estado.cargando::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--neon-yellow); animation: latido 1s infinite alternate; }
+@media (prefers-reduced-motion: reduce) { .mes-estado.cargando::after { animation: none; } }
+.mes-activo { margin: -6px 0 12px; }
+.mes-activo .marca-chip { border-color: var(--neon-yellow); }
+.ver-meses { font-size: 14px; padding: 10px 16px; min-height: 44px; margin: -4px 0 12px; }
+.tiras-escala { margin: -4px 0 12px; font-size: 13px; }
+.tira-caja { margin: 0 0 10px; }
+.tira { list-style: none; margin: 0 0 4px; padding: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; max-width: 320px; }
+.tira .mes { display: grid; gap: 2px; justify-items: center; }
+.tira .casilla { display: block; width: 100%; height: 16px; border-radius: 3px; }
+.tira .casilla.sin { border: 1px solid var(--white); box-sizing: border-box; }
+.tira .activo .casilla { outline: 2px solid var(--white); outline-offset: 1px; }
+.tira .inicial { font: 400 10px/1 var(--mono); color: var(--texto-tenue); }
+.tira .activo .inicial { color: var(--white); font-weight: 700; }
+.tira-linea { margin: 0; font-size: 13px; color: var(--texto-tenue); }
+.tira-linea.activo { color: var(--white); }
+.mes-nota { margin: 0 0 10px; font-size: 14px; padding-left: 10px; border-left: 3px solid var(--neon-yellow); }
+.tabla-comparar th small.mes-fila { display: block; font-size: 11px; font-weight: 400; color: var(--texto-tenue); }
+#calendario .racha { margin: 0 0 12px; font-size: 14px; }
+.plan .plan-mandos { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 10px; align-items: center; margin: 4px 0 10px; }
+.plan .plan-mandos .mision-rotulo { margin: 0; font-weight: 700; font-size: 13px; }
+.plan select { box-sizing: border-box; width: 100%; font: 15px/1.2 var(--cuerpo); color: var(--white); background: var(--deep-blue); border: 2px solid var(--linea); border-radius: 10px; padding: 8px 12px; min-height: 44px; }
+.plan select:hover { border-color: var(--white); }
+.plan select:focus-visible { border-color: var(--neon-yellow); outline: none; }
+.plan .plan-frase { font-size: 15px; color: var(--white); margin: 0 0 10px; }
+.plan .plan-frase.mover { padding-left: 10px; border-left: 3px solid var(--neon-yellow); }
+.plan .marca-boton { font-size: 14px; padding: 10px 16px; min-height: 44px; margin: 0 0 6px; }
+.tabla-calendario { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+.tabla-calendario th, .tabla-calendario td { padding: 6px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--linea); }
+.tabla-calendario thead th { font-weight: 700; }
+.tabla-calendario thead small { display: block; font-size: 11px; font-weight: 400; color: var(--texto-tenue); }
+.tabla-calendario td strong, .tabla-calendario td .coords, .tabla-calendario td .pct { display: block; }
+.tabla-calendario td .coords { font-size: 12px; white-space: nowrap; }
+.tabla-calendario td.aqui { white-space: nowrap; }
+.tabla-calendario td.mover.si { color: var(--neon-yellow); font-weight: 700; }
+.tabla-calendario tr.actual th { box-shadow: inset 3px 0 0 var(--neon-yellow); }
+#calendario .tabla-scroll { margin: 0 0 14px; }
+#calendario .aviso-mes { color: var(--neon-yellow); }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .pestanas { gap: 2px; }
+  .pestanas button { padding: 10px 4px; font-size: 15px; }
+}
 .tabla-comparar td.objetivo small { display: block; font-family: var(--cuerpo); font-size: 11px; color: var(--texto-tenue); }

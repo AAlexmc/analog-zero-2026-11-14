@@ -30,6 +30,7 @@
   <div class="mision" id="mision-caja" hidden>
     <label class="mision-rotulo" for="mision">Mission objective</label>
     <select id="mision"><option value="">All parameters (no mission)</option></select>
+    <div class="mes-caja"><label class="mision-rotulo" for="mes">When</label><select id="mes"><option value="">Whole year (average)</option></select></div>
     <form class="mision-nueva" id="mision-nueva" hidden>
       <label class="mision-rotulo" for="mision-titulo">Mission title</label>
       <input type="text" id="mision-titulo" maxlength="60" autocomplete="off">
@@ -43,6 +44,7 @@
     </form>
     <div class="mision-ficha" id="mision-ficha" hidden></div>
   </div>
+  <p class="mes-estado" id="mes-estado" role="status" hidden></p>
   <div class="entorno" id="entorno" hidden>
     <p class="entorno-linea" id="entorno-linea"></p>
     <details class="como" id="entorno-como">
@@ -57,10 +59,14 @@
     <button type="button" role="tab" id="tab-lugares" aria-controls="lugares" aria-selected="true">Places</button>
     <button type="button" role="tab" id="tab-metricas" aria-controls="metricas" aria-selected="false">Metrics</button>
     <button type="button" role="tab" id="tab-cartera" aria-controls="cartera" aria-selected="false">Portfolio</button>
+    <button type="button" role="tab" id="tab-calendario" aria-controls="calendario" aria-selected="false">Calendar</button>
   </div>
+  <p class="mes-activo" id="mes-activo" hidden><span class="marca-chip" id="mes-activo-chip"></span></p>
   <section id="lugares" role="tabpanel" aria-labelledby="tab-lugares" hidden>
     <h1 class="marca-titulo titulo">Most similar places on Earth</h1>
     <p class="unlisted-resumen" id="unlisted" hidden></p>
+    <button type="button" class="marca-boton secundario ver-meses" id="ver-meses" hidden>Show how these places change through the year</button>
+    <p class="tenue tiras-escala" id="tiras-escala" hidden></p>
     <ol class="lista" id="lista"></ol>
     <details class="parciales" id="parciales" hidden>
       <summary>Partly compared places</summary>
@@ -80,6 +86,7 @@
     <ol class="lista" id="lista-cartera"></ol>
     <section class="bloque sin-cubrir" id="sin-cubrir"><h3>What no place on Earth covers</h3></section>
   </section>
+  <section id="calendario" role="tabpanel" aria-labelledby="tab-calendario" hidden></section>
   <p class="credito" id="credito"></p>
 </aside>
 <div class="mandos" id="mandos" hidden>

@@ -5,11 +5,12 @@ import { crearGlobo } from '../explorar/globo.js';
 import { formatoLatLon } from '../explorar/geo.js';
 import { cargar } from '../buscar/motor.js';
 import { enlaceTerreno } from '../mapa/estado.js';
-import { CORTES, NO_COMPARADO, NO_COMPARADO_MISION, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview } from './metricas.js';
+import { CORTES, NO_COMPARADO, NO_COMPARADO_MISION, agrupar, fmtPct, formatoValor, masCercano, lineaContexto, fraseParcial, terrenoDelPunto, minMax, pintarMapa, partesSup, RADIO_CONTEXTO_KM, sitiosConCoordenadas, fraseUnlisted, letra, nombreCorto, titularCartera, fraseSinCubrir, reglaCartera, lineaEntorno, comoSabemos, COLORES_CLASE, pintarClases, tablaComparar, lineaDistancia, textoComponentes, enlaceWorldview, colorRampa, SIN_COMPARAR } from './metricas.js';
 import { engancharRelieve } from '../relieve/enganche.js';
 import { paisDe } from './paises.js';
 import { resumenLugar, lineaResumen, leerEstado, conMision, opcionesBusqueda, frasesNoUsados } from './misiones.js';
-import { montarMision, pintarFicha as fichaMision } from './mision_panel.js';
+import { montarMision, pintarFicha as fichaMision, montarMes } from './mision_panel.js';
+import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, rachas, planRepetir, moverEnMes, fraseRepetir, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from './meses.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -71,14 +72,50 @@ async function montar() {
   const objetivo = M.leerPunto(mundo, lat, lon);
   // Objetivo de misión (misiones.js): elige los parámetros de la búsqueda; sin misión, los de siempre.
   let activa = leerEstado(q, misiones, M.indice, sitios);
-  // «Back to the globe» y «Pick another place» vuelven con la misión puesta.
-  const enlacesVolver = () => { const h = conMision(volver, activa); $('volver').href = h; $('otro').href = h; };
+  // Mes («When», docs/metrica-analogos.md «Meses»): null = año entero. tiras: los 12 meses ya se enseñan en las tarjetas.
+  let mes = leerMes(q), tiras = false;
+  const cargados = new Set();
+  const opcs = () => (mes === null ? opcionesBusqueda(activa) : { ...opcionesBusqueda(activa), mes });
+  const idsUso = () => idsMensuales(opcionesBusqueda(activa), M.indice);
+  const mesesListos = () => idsUso().every((id) => cargados.has(id));
+  const avisoMes = (texto, cargando = false) => { $('mes-estado').hidden = !texto; $('mes-estado').textContent = texto ?? ''; $('mes-estado').classList.toggle('cargando', cargando); };
+  // Baja solo los ficheros mensuales que usa la búsqueda; sin red o sin fichero → false y aviso llano.
+  async function asegurarMeses(texto) {
+    const faltan = idsUso().filter((id) => !cargados.has(id));
+    if (!faltan.length) return true;
+    avisoMes(texto, true);
+    $('mes').disabled = true;
+    A.mesEstado = 'cargando';
+    try {
+      await M.cargarMeses(faltan);
+      faltan.forEach((id) => cargados.add(id));
+      avisoMes(null);
+      A.mesEstado = 'ok';
+      return true;
+    } catch (e) {
+      A.mesFallo = String(e?.message ?? e);
+      A.mesEstado = 'fallo';
+      avisoMes(mes === null ? 'Could not download the climate month by month. Try again later.' : 'Could not download the climate for that month. Showing the whole year.');
+      return false;
+    } finally {
+      $('mes').disabled = false;
+      A.mesesCargados = [...cargados];
+    }
+  }
+  if (mes !== null && !(await asegurarMeses("Loading this month's climate…"))) {
+    mes = null;
+    history.replaceState(history.state, '', `${location.pathname}?${escribirMes(new URLSearchParams(location.search), null)}`);
+  }
+  tiras = mes !== null;
+  A.mes = mes;
+  // «Back to the globe» y «Pick another place» vuelven con la misión y el mes puestos.
+  const enlacesVolver = () => { const h = conMes(conMision(volver, activa), mes); $('volver').href = h; $('otro').href = h; };
   enlacesVolver();
   const corto = (id) => nombreCorto(id, P);
   const rotuloRef = () => (activa?.tipo === 'nueva' ? 'Test site' : 'NASA test site');
-  let r = M.buscar(objetivo, opcionesBusqueda(activa));
+  let r = M.buscar(objetivo, opcs());
   let r0 = r;
-  let cart = M.cartera(objetivo, opcionesBusqueda(activa));
+  let cart = M.cartera(objetivo, opcs());
   A.r = r;
   A.cartera = cart;
   A.mision = activa;
@@ -217,6 +254,44 @@ async function montar() {
   }
   pintarCartera();
 
+  // Tira de 12 meses en cada tarjeta (con los meses cargados): rampa de la capa de similitud, una escala para todas las tiras.
+  function tira(perfil, esc) {
+    const den = esc && esc.max > esc.min ? esc.max - esc.min : 1;
+    const ol = el('ol', { className: 'tira' }, ...perfil.map((p) => {
+      const v = p.similitud_pct;
+      const li = el('li', { className: `mes${p.mes === mes ? ' activo' : ''}`, title: etiquetaMes(p) },
+        el('span', { className: `casilla${v === null ? ' sin' : ''}`, style: `background:${v === null || !esc ? SIN_COMPARAR : `rgb(${colorRampa((v - esc.min) / den).join(',')})`}` }),
+        el('span', { className: 'inicial', textContent: MESES_CORTO[p.mes - 1][0] }));
+      li.setAttribute('aria-label', etiquetaMes(p));
+      li.lastChild.setAttribute('aria-hidden', 'true');
+      if (p.mes === mes) li.setAttribute('aria-current', 'true');
+      li.dataset.mes = p.mes;
+      return li;
+    }));
+    ol.setAttribute('aria-label', 'Match month by month');
+    return el('div', { className: 'tira-caja' }, ol,
+      el('p', { className: 'tira-linea', textContent: lineaMejorPeor(perfil) ?? 'No monthly data here.' }),
+      mes !== null ? el('p', { className: 'tira-linea activo', textContent: lineaMesActivo(perfil, mes) }) : null);
+  }
+  function ponerTiras() {
+    const ver = (mes !== null || tiras) && mesesListos();
+    document.querySelectorAll('.tira-caja').forEach((t) => t.remove());
+    $('ver-meses').hidden = ver || !(r.resultados.length || r.parciales.length || cart.lugares.length);
+    $('tiras-escala').hidden = true;
+    A.tiras = ver;
+    if (!ver) return;
+    const o = opcionesBusqueda(activa);
+    const tarjetas = [...document.querySelectorAll('#lista > .tarjeta, #lista-parciales > .tarjeta, #lista-cartera > .tarjeta')];
+    const perfiles = tarjetas.map((t) => { const x = listaDe(t.dataset.lista)[Number(t.dataset.k)]; return M.perfilMensual(objetivo, { lat: x.lat, lon: x.lon }, o); });
+    const esc = escalaTiras(perfiles);
+    tarjetas.forEach((t, i) => t.querySelector('.acciones').before(tira(perfiles[i], esc)));
+    if (esc) {
+      $('tiras-escala').hidden = false;
+      $('tiras-escala').textContent = `Month strips: colours as in the similarity layer, from the lowest (${fmtPct(esc.min)}) to the highest (${fmtPct(esc.max)}) monthly match of these places.`;
+    }
+  }
+  ponerTiras();
+
   // Números (Places, Metrics) o letras (Portfolio) sobre el globo, colocados en cada fotograma.
   let numeros = [];
   const crearNumeros = () => {
@@ -231,7 +306,7 @@ async function montar() {
   crearNumeros();
 
   // Avanzado: el mismo top 5 con la métrica por componentes (los parámetros que van juntos cuentan una vez).
-  $('avanzado').hidden = !M.clases || !!activa;
+  $('avanzado').hidden = !M.clases || !!activa || mes !== null;
   if (M.clases) $('avanzado-texto').replaceChildren(...textoComponentes(M.clases).map((t) => el('p', { textContent: t })));
   let rComp = null;
   $('por-componentes').addEventListener('change', () => {
@@ -244,6 +319,7 @@ async function montar() {
     A.r = r;
     A.porComponentes = $('por-componentes').checked;
     pintarLista();
+    ponerTiras();
     crearNumeros();
     elegir('resultados', 0);
   });
@@ -339,11 +415,12 @@ async function montar() {
     letras.forEach((b, i) => b.setAttribute('aria-current', String(lista === 'cartera' && i === k)));
     G?.mirar(lugarSel(), A.listo ? Math.min(G.camara.position.length(), 2) : undefined);
     if (lista !== 'cartera') { A.metSel = { lista, k }; pintarMetricas(); }
+    if ($('panel').dataset.pestana === 'calendario') pintarCalendario();
   }
 
   function verPestana(id) {
     $('panel').dataset.pestana = id;
-    for (const [t, s] of [['tab-lugares', 'lugares'], ['tab-metricas', 'metricas'], ['tab-cartera', 'cartera']]) {
+    for (const [t, s] of [['tab-lugares', 'lugares'], ['tab-metricas', 'metricas'], ['tab-cartera', 'cartera'], ['tab-calendario', 'calendario']]) {
       $(t).setAttribute('aria-selected', String(s === id));
       $(s).hidden = s !== id;
     }
@@ -351,11 +428,13 @@ async function montar() {
     // El globo sigue a la pestaña: la cartera enseña sus letras; al volver, el lugar de Metrics.
     if (id === 'cartera' && A.sel?.lista !== 'cartera' && cart.lugares.length) elegir('cartera', 0);
     else if (id !== 'cartera' && A.sel?.lista === 'cartera' && A.metSel) elegir(A.metSel.lista, A.metSel.k);
+    if (id === 'calendario') pintarCalendario();
     G?.pedir();
   }
   $('tab-lugares').addEventListener('click', () => verPestana('lugares'));
   $('tab-metricas').addEventListener('click', () => verPestana('metricas'));
   $('tab-cartera').addEventListener('click', () => verPestana('cartera'));
+  $('tab-calendario').addEventListener('click', () => verPestana('calendario'));
 
   const fuente = (lado, f) => {
     if (!f) return null;
@@ -365,9 +444,11 @@ async function montar() {
     const p = P[x.id], d = x.desviacion_pct;
     const det = el('details', { className: 'fila' });
     det.dataset.id = x.id;
+    // Con mes: la Tierra de un parámetro mensual lleva el mes; el punto de la Luna/Marte sigue en su valor anual.
+    const mensual = mes !== null && !!r.mensuales?.includes(x.id);
     const valores = el('dl', { className: 'valores' },
-      el('dt', { textContent: x.origen_objetivo === 'referencia' ? rotuloRef() : NOMBRES[mundo] }), el('dd', {}, ...conSup(formatoValor(x.valor_objetivo, p.unidad, p))),
-      el('dt', { textContent: 'Earth' }), el('dd', {}, ...conSup(formatoValor(x.valor_tierra, p.unidad, p))));
+      el('dt', { textContent: x.origen_objetivo === 'referencia' ? `${rotuloRef()}${mensual ? `, ${nombreMes(mes)}` : ''}` : `${NOMBRES[mundo]}${mes !== null ? ' (year average)' : ''}` }), el('dd', {}, ...conSup(formatoValor(x.valor_objetivo, p.unidad, p))),
+      el('dt', { textContent: mensual ? `Earth, ${nombreMes(mes)}` : 'Earth' }), el('dd', {}, ...conSup(formatoValor(x.valor_tierra, p.unidad, p))));
     valores.children[1].dataset.v = 'objetivo'; valores.children[3].dataset.v = 'tierra';
     const desv = el('span', { className: 'desv', textContent: d === null ? 'no data' : `${fmtPct(d)} off` });
     desv.dataset.v = 'desv';
@@ -395,8 +476,10 @@ async function montar() {
       el('p', { className: 'tenue', textContent: 'Each cell: the Earth value and how far off it is. The closest place in each row is marked.' }));
     det.addEventListener('toggle', () => { A.compararAbierto = det.open; });
     const filas = tablaComparar(r.resultados, activa ? r.usados : reproducibles).map((f) => {
-      const tr = el('tr', {}, el('th', { scope: 'row', textContent: nombreCorto(f.id, P), title: P[f.id].nombre }),
-        el('td', { className: 'objetivo' }, ...conSup(formatoValor(f.objetivo, P[f.id].unidad, P[f.id])), P[f.id].solo_tierra ? el('small', { textContent: rotuloRef() }) : null),
+      const mensual = mes !== null && !!r.mensuales?.includes(f.id);
+      const rotuloObj = P[f.id].solo_tierra ? `${rotuloRef()}${mensual ? `, ${nombreMes(mes)}` : ''}` : mes !== null ? 'year average' : null;
+      const tr = el('tr', {}, el('th', { scope: 'row', title: P[f.id].nombre }, nombreCorto(f.id, P), mensual ? el('small', { className: 'mes-fila', textContent: `Earth: ${nombreMes(mes)}` }) : null),
+        el('td', { className: 'objetivo' }, ...conSup(formatoValor(f.objetivo, P[f.id].unidad, P[f.id])), rotuloObj ? el('small', { textContent: rotuloObj }) : null),
         ...f.celdas.map((c) => el('td', { className: c.mejor ? 'mejor' : '', title: c.mejor ? `Closest of the ${n}` : '' },
           el('span', { className: 'valor' }, ...conSup(formatoValor(c.valor, P[f.id].unidad, P[f.id]))),
           el('span', { className: 'desv', textContent: c.desv === null ? 'no data' : `${fmtPct(c.desv)} off` }))));
@@ -441,6 +524,9 @@ async function montar() {
       el('p', { className: 'met-lugar' }, num, sep(), el('span', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto })),
       total,
       el('p', { className: 'met-que', textContent: `Average of the ${x.comparados} parameters we could compare${x.comparados < x.de ? ` (of ${x.de})` : ''}. Our own metric — not a probability.` }),
+      mes !== null ? el('p', { className: 'mes-nota', textContent: r.mensuales?.length
+        ? `Earth in ${nombreMes(mes)}: ${r.mensuales.map(corto).join(', ')} are ${nombreMes(mes)} values (the average ${nombreMes(mes)} of many years). The rest, and your point ${EN[mundo]}, are year averages.`
+        : `Earth in ${nombreMes(mes)}: none of these parameters has a monthly version, so this is the whole-year match.` }) : null,
       el('details', { className: 'como' }, el('summary', { textContent: 'How we measure' }),
         el('p', {}, 'For each parameter: ', el('code', { textContent: 'deviation % = min(100, |f(Earth) − f(your point)| / (f(max) − f(min)) × 100)' }), '.'),
         el('p', { textContent: `f is the scale of the parameter: logarithmic for ${logaritmicos.join(', ')}; plain for the rest. [min, max] is the range from the 1st to the 99th percentile of Earth land and of the Moon and Mars.` }),
@@ -464,15 +550,26 @@ async function montar() {
   // Ficha de la misión elegida (mision_panel.js) con lo que el motor no pudo usar.
   const pintarFicha = () => fichaMision({ activa, P, sitios, avisos: activa ? frasesNoUsados(r, activa, corto) : [] });
 
-  // Al cambiar de misión se recalcula todo lo que sale de la búsqueda; el tipo de entorno no depende de ella.
+  // Mes activo: chip y título de Places; sin mes, como siempre.
+  function rotularMes() {
+    $('mes-activo').hidden = mes === null;
+    $('mes-activo-chip').textContent = mes === null ? '' : `Earth in ${nombreMes(mes)}`;
+    $('lugares').querySelector('h1').textContent = mes === null ? 'Most similar places on Earth' : `Most similar places on Earth in ${nombreMes(mes)}`;
+  }
+  rotularMes();
+
+  // Al cambiar de misión o de mes se recalcula todo lo que sale de la búsqueda; el tipo de entorno no depende de ella.
   function repintar() {
-    const o = opcionesBusqueda(activa);
+    const o = opcs();
+    A.mes = mes;
+    rotularMes();
+    calCache = null;
     r0 = r = M.buscar(objetivo, o);
     cart = M.cartera(objetivo, o);
     rComp = null;
     $('por-componentes').checked = false;
     A.porComponentes = false;
-    $('avanzado').hidden = !M.clases || !!activa;
+    $('avanzado').hidden = !M.clases || !!activa || mes !== null;
     A.r = r; A.cartera = cart; A.mision = activa;
     $('estado').hidden = !!r.resultados.length;
     if (!r.resultados.length) $('estado').textContent = activa ? 'No place on Earth could be compared with these parameters.' : 'No place on Earth could be compared with this point.';
@@ -481,6 +578,7 @@ async function montar() {
     $('parciales').hidden = !r.parciales.length;
     $('lista-parciales').replaceChildren(...r.parciales.map((x, k) => tarjeta(x, k, 'parciales')));
     pintarCartera();
+    ponerTiras();
     crearNumeros();
     crearLetras();
     if (capa) { G.escena.remove(capa); capa.geometry.dispose(); capa.material.map.dispose(); capa.material.dispose(); capa = null; A.capaLienzo = null; }
@@ -494,11 +592,104 @@ async function montar() {
     A.sel = null; A.metSel = null;
     if (r.resultados.length) elegir('resultados', 0); else pintarMetricas();
     if ($('panel').dataset.pestana === 'cartera' && cart.lugares.length) elegir('cartera', 0);
+    if ($('panel').dataset.pestana === 'calendario') pintarCalendario();
     G?.pedir();
   }
+  // Misión o mes nuevos: con mes (o tiras ya puestas) baja antes lo que falte; si falla, vuelve al año entero. Sin descargas, repinta en el acto.
+  let turnoMes = 0;
+  async function aplicar() {
+    const t = ++turnoMes;
+    if ((mes !== null || tiras) && !mesesListos()) {
+      const ok = await asegurarMeses(mes !== null ? "Loading this month's climate…" : 'Loading the climate month by month…');
+      if (t !== turnoMes) return;
+      if (!ok) { mes = null; tiras = false; selMes.poner(null); enlacesVolver(); }
+    }
+    if (mes !== null) tiras = true;
+    repintar();
+  }
   // Selector y formulario «New mission» (mision_panel.js).
-  montarMision({ misiones, indice: M.indice, sitios, mundo, activa, alCambiar: (a) => { activa = a; enlacesVolver(); repintar(); } });
+  montarMision({ misiones, indice: M.indice, sitios, mundo, activa, alCambiar: (a) => { activa = a; enlacesVolver(); aplicar(); } });
+  const selMes = montarMes({ mes, alCambiar: (m) => { mes = m; avisoMes(null); enlacesVolver(); aplicar(); } });
   pintarFicha();
+  // «Show how these places change through the year»: baja los meses y pinta las tiras; el ranking no cambia.
+  $('ver-meses').addEventListener('click', async () => {
+    $('ver-meses').disabled = true;
+    const ok = await asegurarMeses('Loading the climate month by month…');
+    $('ver-meses').disabled = false;
+    if (!ok) return;
+    tiras = true;
+    ponerTiras();
+  });
+
+  // Calendar: el lugar elegido mes a mes, el mejor lugar de la Tierra de cada mes y el plan de repetición.
+  let calCache = null;
+  const plan = { inicio: null, despues: 6 };
+  const selector = (id, opciones, valor, cambiar) => {
+    const s = el('select', { id }, ...opciones.map(([v, t]) => el('option', { value: String(v), textContent: t })));
+    s.value = String(valor);
+    s.addEventListener('change', () => cambiar(Number(s.value)));
+    return s;
+  };
+  async function pintarCalendario() {
+    const caja = $('calendario'), x = lugarSel();
+    if (!x) { caja.replaceChildren(el('p', { className: 'tenue', textContent: 'Pick a place in the list first.' })); return; }
+    if (!mesesListos()) {
+      caja.replaceChildren(el('p', { className: 'tenue', textContent: 'Loading the climate month by month…' }));
+      const ok = await asegurarMeses('Loading the climate month by month…');
+      if (!ok) { caja.replaceChildren(el('p', { className: 'aviso-mes', textContent: 'Could not download the climate month by month. Try again later.' })); return; }
+      tiras = true;
+      ponerTiras();
+      if ($('panel').dataset.pestana === 'calendario') pintarCalendario();
+      return;
+    }
+    const o = opcionesBusqueda(activa);
+    const clave = JSON.stringify([o, x.lat, x.lon]);
+    if (calCache?.clave !== clave) calCache = { clave, cal: M.calendario(objetivo, { ...o, lugar: { lat: x.lat, lon: x.lon } }), per: M.perfilMensual(objetivo, { lat: x.lat, lon: x.lon }, o) };
+    const { cal, per } = calCache;
+    A.calendario = { lat: x.lat, lon: x.lon, filas: cal };
+    const donde = (f) => `${formatoLatLon(f.lat, f.lon).texto}${pais(f) ? ` (${pais(f)})` : ''}`;
+    plan.inicio ??= mes ?? 1;
+    const p = planRepetir(cal, plan.inicio, plan.despues);
+    const frase = fraseRepetir(p, p.repeticion.mejor ? donde(p.repeticion.mejor) : '');
+    A.plan = { ...p, frase };
+    const ir = p.mover && p.repeticion.mejor ? el('button', { type: 'button', className: 'marca-boton secundario', id: 'plan-ir', textContent: `Show the best place in ${nombreMes(p.repeticion.mes)} on the globe`,
+      onclick: () => { A.planIr = { lat: p.repeticion.mejor.lat, lon: p.repeticion.mejor.lon }; G?.mirar(A.planIr); } }) : null;
+    const rs = rachas(per, MARGEN);
+    const numSel = A.sel.lista === 'resultados' ? `Place ${A.sel.k + 1}` : A.sel.lista === 'cartera' ? `Portfolio place ${letra(A.sel.k)}` : 'Partly compared place';
+    const filas = cal.map((f) => {
+      const mv = moverEnMes(f);
+      const mejor = f.similitud_pct === null ? el('td', { className: 'tenue', textContent: 'none comparable' })
+        : f.relevo === false ? el('td', {}, el('strong', { textContent: 'This place' }), el('span', { className: 'pct marca-num', textContent: fmtPct(f.similitud_pct) }))
+          : el('td', {}, pais(f) ? el('strong', { textContent: pais(f) }) : null, el('span', { className: 'marca-num coords', textContent: formatoLatLon(f.lat, f.lon).texto }), el('span', { className: 'pct marca-num', textContent: fmtPct(f.similitud_pct) }));
+      mejor.dataset.v = 'mejor';
+      const tr = el('tr', { className: f.mes === mes ? 'actual' : '' }, el('th', { scope: 'row', textContent: MESES_CORTO[f.mes - 1], title: MESES_LARGO[f.mes - 1] }),
+        el('td', { className: 'marca-num aqui', textContent: fmtPct(f.en_lugar_pct) }), mejor,
+        el('td', { className: `mover${mv ? ' si' : ''}`, textContent: mv === null ? '—' : mv ? 'Yes' : 'No' }));
+      tr.dataset.mes = f.mes;
+      return tr;
+    });
+    caja.replaceChildren(
+      el('h1', { className: 'marca-titulo titular', textContent: 'Month by month' }),
+      el('p', { className: 'met-lugar' }, numSel, ...(pais(x) ? [sep(), pais(x)] : []), sep(), el('span', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto })),
+      rs.length ? el('p', { className: 'racha', textContent: `Within ${MARGEN} points of its best month: ${rs.map((s) => s.texto).join(', ')} (own threshold).` }) : null,
+      el('section', { className: 'bloque plan', id: 'plan' }, el('h3', { textContent: 'Repeat a test later' }),
+        el('div', { className: 'plan-mandos' },
+          el('label', { className: 'mision-rotulo', htmlFor: 'plan-inicio', textContent: 'First test in' }),
+          selector('plan-inicio', MESES_LARGO.map((n, k) => [k + 1, n]), plan.inicio, (v) => { plan.inicio = v; pintarCalendario(); }),
+          el('label', { className: 'mision-rotulo', htmlFor: 'plan-despues', textContent: 'Repeat after' }),
+          selector('plan-despues', Array.from({ length: 11 }, (_, k) => [k + 1, `${k + 1} month${k ? 's' : ''}`]), plan.despues, (v) => { plan.despues = v; pintarCalendario(); })),
+        el('p', { className: `plan-frase${p.mover ? ' mover' : ''}`, id: 'plan-frase', textContent: frase }),
+        ir,
+        el('p', { textContent: `Move = this place is more than ${MARGEN} points below the best place on Earth that month (own threshold).` })),
+      el('div', { className: 'tabla-scroll' }, el('table', { className: 'tabla-calendario' },
+        el('thead', {}, el('tr', {}, el('th', { scope: 'col', textContent: 'Month' }), el('th', { scope: 'col', textContent: 'This place' }), el('th', { scope: 'col', textContent: 'Best place on Earth' }),
+          el('th', { scope: 'col' }, 'Move?', el('small', { textContent: `own threshold: ${MARGEN} points` })))),
+        el('tbody', {}, ...filas))),
+      el('section', { className: 'bloque limites' }, el('h3', { textContent: 'Limits' }),
+        el('p', { textContent: `Your point ${EN[mundo]} keeps its year-average value in every month: season is not compared with season.` }),
+        el('p', { textContent: 'Earth months are climatology: the average month of many years (NASA POWER), not one particular year.' }),
+        el('p', { textContent: 'Snow on the ground is not measured: a snowy place in winter counts with its temperature and light, without the snow.' })));
+  }
 
   verPestana('lugares');
   if (r.resultados.length) elegir('resultados', 0);

@@ -1,7 +1,8 @@
-// Objetivo de misión en pantalla: selector, formulario «New mission» y ficha. Lo usan la pantalla del mundo y resultados, con los mismos ids.
+// Objetivo de misión en pantalla: selector, formulario «New mission», ficha y mes («When»). Lo usan la pantalla del mundo y resultados, con los mismos ids.
 import { CORTES, nombreCorto } from './metricas.js';
 import { formatoLatLon } from '../explorar/geo.js';
 import { ID_NUEVA, comparables, elegible, textoOpcion, noMedidas, sitiosReferencia, validarNueva, activaDeCatalogo, activaNueva, escribirEstado } from './misiones.js';
+import { MESES_LARGO, escribirMes } from './meses.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...hijos) => { const e = Object.assign(document.createElement(tag), props); e.append(...hijos.filter((h) => h !== null && h !== undefined)); return e; };
@@ -102,4 +103,17 @@ export function montarMision({ misiones, indice, sitios, mundo, activa, alCambia
   });
   rellenarNueva(actual?.tipo === 'nueva' ? actual : null);
   $('mision-caja').hidden = false;
+}
+
+// Selector «When» del mismo bloque: alCambiar(mes) con la URL ya al día; null = año entero. poner(mes) lo cambia desde fuera sin avisar.
+export function montarMes({ mes, alCambiar }) {
+  const s = $('mes');
+  s.append(...MESES_LARGO.map((n, k) => el('option', { value: String(k + 1), textContent: n })));
+  s.value = mes ? String(mes) : '';
+  const poner = (m) => {
+    s.value = m ? String(m) : '';
+    history.replaceState(history.state, '', `${location.pathname}?${escribirMes(new URLSearchParams(location.search), m)}`);
+  };
+  s.addEventListener('change', () => { const m = s.value ? Number(s.value) : null; poner(m); alCambiar(m); });
+  return { poner };
 }
