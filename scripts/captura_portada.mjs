@@ -203,9 +203,11 @@ try {
   await pag.waitForURL(/\/explorar\/index\.html\?mundo=moon$/);
   await listoVista(pag);
   await quieta(pag);
-  const v0 = await pag.evaluate(() => ({ titulo: document.getElementById('nombre-mundo').textContent, textura: window.__az.vista.textura, chips: [...document.querySelectorAll('.sugerencia')].map((b) => b.textContent), mundo: window.__az.explorar.mundo, punto: window.__az.explorar.punto, credito: document.getElementById('credito').textContent }));
-  if (v0.titulo !== 'Moon' || v0.textura !== 'ok' || v0.mundo !== 'moon' || v0.punto !== null || !/^South pole/.test(v0.chips[0])) falla(`Moon view: ${JSON.stringify(v0)}`);
-  else ok(`"Explore the Moon" opens the Moon view; chips: ${v0.chips.join(' | ')}`);
+  // Con criterios de sitio, la chincheta empieza en el mejor sitio calculado (captura_sitio.mjs lo compara con node); sin ellos, sin chincheta.
+  const v0 = await pag.evaluate(() => ({ titulo: document.getElementById('nombre-mundo').textContent, textura: window.__az.vista.textura, chips: [...document.querySelectorAll('.sugerencia')].map((b) => b.textContent), mundo: window.__az.explorar.mundo, punto: window.__az.explorar.punto, auto: window.__az.vista.sitio?.r?.mejor ?? null, credito: document.getElementById('credito').textContent }));
+  const pinInicial = v0.auto ? v0.punto?.lat === v0.auto.lat && v0.punto?.lon === v0.auto.lon : v0.punto === null;
+  if (v0.titulo !== 'Moon' || v0.textura !== 'ok' || v0.mundo !== 'moon' || !pinInicial || !/^South pole/.test(v0.chips[0])) falla(`Moon view: ${JSON.stringify(v0)}`);
+  else ok(`"Explore the Moon" opens the Moon view; pin ${v0.auto ? `on the computed best spot ${formatoLatLon(v0.punto.lat, v0.punto.lon).texto}` : 'not placed'}; chips: ${v0.chips.join(' | ')}`);
   const texL = await texturaEnSuSitio(pag, 'moon', rejilla(-80, 60, -80, 80, 7));
   if (!(texL.n >= 40 && texL.r > 0.6 && texL.r - texL.rGiro > 0.3)) falla(`Moon texture placement: ${JSON.stringify(texL)}`);
   else ok(`Moon: screen vs texture luminance r = ${texL.r.toFixed(3)} over ${texL.n} points (texture turned 180°: r = ${texL.rGiro.toFixed(3)})`);
@@ -222,8 +224,8 @@ try {
   const camTras = await pag.evaluate(() => window.__az.vista.camara.position.toArray());
   const giro = new THREE.Vector3(...camAntes).angleTo(new THREE.Vector3(...camTras)) / THREE.MathUtils.DEG2RAD;
   let p = await leerPunto(pag);
-  if (!(giro > 5) || p.punto !== null) falla(`drag: turned ${giro.toFixed(1)}°, pin ${JSON.stringify(p.punto)} (should turn and drop no pin)`);
-  else ok(`drag of 175 px turns the globe ${giro.toFixed(1)}° and drops no pin`);
+  if (!(giro > 5) || JSON.stringify(p.punto) !== JSON.stringify(v0.punto)) falla(`drag: turned ${giro.toFixed(1)}°, pin ${JSON.stringify(p.punto)} (should turn and leave the pin where it was, ${JSON.stringify(v0.punto)})`);
+  else ok(`drag of 175 px turns the globe ${giro.toFixed(1)}° and does not move the pin`);
 
   const cg2 = await centroGlobo(pag);
   const clic = { x: Math.round(cg2.x + 70), y: Math.round(cg2.y + 55) };

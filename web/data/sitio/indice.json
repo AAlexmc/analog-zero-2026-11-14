@@ -1,0 +1,297 @@
+{
+ "formato": "float32 little-endian, row 0 at the top, NaN = no data, longitude east positive",
+ "mundos": {
+  "moon": {
+   "ambito": "NASA looks within 6° of the south pole. We search that area on real terrain.",
+   "ambito_cita": {
+    "texto": "Each of these regions is located within six degrees of latitude of the lunar South Pole",
+    "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+   },
+   "rejilla": {
+    "tipo": "polar",
+    "n": 1024,
+    "m_por_px": 292.96875,
+    "lat": "moon/lat.f32",
+    "lon": "moon/lon.f32",
+    "georef": {
+     "tipo": "estereo_polar",
+     "polo": "sur",
+     "radio_m": 1737400.0,
+     "x0_m": -149853.515625,
+     "y0_m": 149853.515625
+    }
+   },
+   "criterios": [
+    {
+     "id": "iluminacion",
+     "nombre": "Sunlight",
+     "tipo": "peso",
+     "sentido": "mas",
+     "unidad": "fraction of time",
+     "capa": "moon/iluminacion.f32",
+     "limite": null,
+     "cita": {
+      "texto": "Access to sunlight is critical for a long-term stay at the Moon because it provides a power source and minimizes temperature variations.",
+      "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+     },
+     "definicion": "Share of time with any part of the Sun visible, mean over the 293 m cell (LOLA average illumination, 60 m, resampled to 146 m)",
+     "aviso": "NASA gives no minimum share of sunlight. Averaging over the cell lowers narrow sunlit ridges: the best 60 m pixels of the source reach higher values than any cell here.",
+     "fuente_dato": {
+      "texto": "LRO LOLA average solar illumination 85S-90S 60 m/px, AVGVISIB_85S_060M_201608 (fraction of hourly steps over 18.6 years with any part of the Sun visible); Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF"
+     }
+    },
+    {
+     "id": "pendiente_deg",
+     "nombre": "Terrain slope",
+     "tipo": "peso",
+     "sentido": "menos",
+     "unidad": "deg",
+     "capa": "moon/pendiente_deg.f32",
+     "limite": null,
+     "cita": {
+      "texto": "You want to land in the flattest area possible, since you don't want the landing vehicle to tip over",
+      "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/"
+     },
+     "definicion": "Slope of each 146 m pixel of the LOLA height map (central differences, same formula as the terrain viewer), mean over the 293 m cell",
+     "aviso": "NASA gives no maximum slope. A mean over 293 m hides steeper patches and boulders.",
+     "fuente_dato": {
+      "texto": "LRO LOLA LDEM_85S_20M (PDS Geosciences Node)",
+      "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/ldem_85s_20m.img"
+     }
+    },
+    {
+     "id": "dist_sombra_km",
+     "nombre": "Distance to permanent shadow (water ice)",
+     "tipo": "peso",
+     "sentido": "menos",
+     "unidad": "km",
+     "capa": "moon/dist_sombra_km.f32",
+     "limite": null,
+     "cita": {
+      "texto": "it must offer easy access to areas of complete darkness that hold water ice.",
+      "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/"
+     },
+     "definicion": "Straight-line distance from each 146 m pixel to the nearest permanently shadowed pixel, mean over the 293 m cell; measured on the polar stereographic plane (scale error under 0.3 % within 6°)",
+     "aviso": "Shadow outside the 300 km square is not counted, so near its edges the distance can be too long. Permanent shadow is where water ice can last, not proof that there is ice. NASA gives no distance.",
+     "fuente_dato": {
+      "texto": "LRO LOLA permanently shadowed regions 85S-90S 60 m/px, LPSR_85S_060M_201608; Mazarico et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030",
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_85S_060M_201608.TIF"
+     }
+    }
+   ],
+   "informativos": [
+    {
+     "id": "temp_max_k",
+     "nombre": "Highest surface temperature of the year",
+     "unidad": "K",
+     "capa": "moon/temp_max_k.f32",
+     "definicion": "Mean over the 293 m cell",
+     "fuente_dato": {
+      "texto": "LRO Diviner Polar Resource Product DLRE_PRP_SOUTH (annual maximum surface temperature, thermal model fit to first mapping year, triangular mesh on Kaguya topography); Paige et al., LRO DLRE LEVEL 5 PRP V2.0, NASA Planetary Data System, LRO-L-DLRE-5-PRP-V2.0, 2018",
+      "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab"
+     },
+     "aviso": "Shown for information: not a NASA site criterion."
+    }
+   ],
+   "no_medidos": [
+    {
+     "nombre": "Line of sight to Earth for communications",
+     "cita": {
+      "texto": "If Artemis III employs a Direct-to-Earth (DTE) communication architecture, regions with greater Earth visibility are preferred.",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20250011660/downloads/AIIIUpdateLPSC2026.docx.txt"
+     },
+     "motivo": "no layer in this version"
+    },
+    {
+     "nombre": "Science potential",
+     "cita": {
+      "texto": "Factors in the selection process included science potential, launch window availability, terrain suitability, communication capabilities with Earth, and lighting conditions.",
+      "fuente": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+     },
+     "motivo": "no layer in this version"
+    },
+    {
+     "nombre": "Launch window availability",
+     "cita": {
+      "texto": "Specific landing sites are tightly coupled to the timing of the launch window, so multiple regions ensure flexibility to launch throughout the year.",
+      "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/"
+     },
+     "motivo": "depends on the mission date, not on the place alone"
+    },
+    {
+     "nombre": "Boulders, craters and rough ground",
+     "cita": {
+      "texto": "including impact craters, block populations, and rough or highly variable terrain",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20250011660/downloads/AIIIUpdateLPSC2026.docx.txt"
+     },
+     "motivo": "no boulder or small-crater layer; the slope layer is a mean over 293 m cells"
+    },
+    {
+     "nombre": "Landing area at least 1 km from the habitat",
+     "cita": {
+      "texto": "The landing area, ideally, should be separated from other base camp features — such as the habitat or solar panels — by at least half a mile, or 1 kilometer.",
+      "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/"
+     },
+     "motivo": "a layout rule inside the base, not a property of one point"
+    }
+   ]
+  },
+  "mars": {
+   "ambito": "Mars has no chosen site yet. These are NASA's published limits for a human landing zone.",
+   "rejilla": {
+    "tipo": "equirrectangular",
+    "ancho": 720,
+    "alto": 360,
+    "paso_deg": 0.5,
+    "lat0": 89.75,
+    "lon0": -179.75
+   },
+   "criterios": [
+    {
+     "id": "lat_abs_deg",
+     "nombre": "Latitude",
+     "tipo": "limite",
+     "sentido": null,
+     "unidad": "deg",
+     "capa": "mars/lat_abs_deg.f32",
+     "limite": {
+      "op": "<=",
+      "valor": 50,
+      "origen": "cita",
+      "valor_en_cita": "50 deg"
+     },
+     "cita": {
+      "texto": "Preliminary latitude boundaries set at +/- 50 degrees",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160002370/downloads/20160002370.pdf"
+     },
+     "definicion": "Absolute latitude of the cell centre",
+     "aviso": "NASA calls this latitude boundary preliminary.",
+     "fuente_dato": {
+      "texto": "Position of the 0.5° grid cell",
+      "url": null
+     }
+    },
+    {
+     "id": "altitud_m",
+     "nombre": "Elevation (MOLA)",
+     "tipo": "limite",
+     "sentido": null,
+     "unidad": "m",
+     "capa": "mars/altitud_m.f32",
+     "limite": {
+      "op": "<",
+      "valor": 2000,
+      "origen": "cita",
+      "valor_en_cita": "2 km"
+     },
+     "cita": {
+      "texto": "(b) less than +2 kilometers altitude (Mars Orbiter Laser Altimeter (MOLA) reference)",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "definicion": "Mean of the 64 MOLA MEGDR pixels in the 0.5° cell, height above the areoid (MOLA reference)",
+     "aviso": "Where the MOLA laser has no shot the MEGDR value is interpolated, as its label says.",
+     "fuente_dato": {
+      "texto": "MGS MOLA MEGDR, 16 pixels/degree, height above the areoid. “Each sample represents median observed topography within a 0.0625 by 0.0625 degree area.” “Topography is the planetary radius minus the areoid radius at a given longitude and latitude.”",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img"
+     }
+    },
+    {
+     "id": "pendiente_5km_deg",
+     "nombre": "Terrain slope",
+     "tipo": "limite",
+     "sentido": null,
+     "unidad": "deg",
+     "capa": "mars/pendiente_5km_deg.f32",
+     "limite": {
+      "op": "<",
+      "valor": 10,
+      "origen": "cita",
+      "valor_en_cita": "10 deg"
+     },
+     "cita": {
+      "texto": "an area of approximately 25 square kilometers within which the terrain is generally level (slopes less than ~10 degrees)",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "definicion": "95th percentile over the 0.5° cell of the slope between neighbouring MEGDR pixels (north-south step 3.70 km; east-west step of round(1/cos latitude) pixels, about the same length)",
+     "aviso": "Measured over steps of about 3.7 km, not over NASA's 25 km² landing area itself; slopes at the scale of a lander are not seen, and interpolated pixels look smoother than the real ground.",
+     "fuente_dato": {
+      "texto": "MGS MOLA MEGDR, 16 pixels/degree, height above the areoid. “Each sample represents median observed topography within a 0.0625 by 0.0625 degree area.” “Topography is the planetary radius minus the areoid radius at a given longitude and latitude.”",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img"
+     }
+    },
+    {
+     "id": "hidrogeno_neutrones",
+     "nombre": "Hydrogen near the surface (water indicator)",
+     "tipo": "peso",
+     "sentido": "menos",
+     "unidad": "counts/s",
+     "capa": "mars/hidrogeno_neutrones.f32",
+     "limite": null,
+     "cita": {
+      "texto": "The raw material can be in the form of ice, ice/regolith mix, or hydrated minerals, and the top of the raw material deposit should be as close to the surface as possible.",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "definicion": "Epithermal neutron count rate of the 0.5° cell measured by Mars Odyssey; fewer neutrons means more hydrogen in the top of the soil",
+     "aviso": "An indicator of hydrogen, not an amount of water: it does not tell ice from hydrated minerals, nor give tonnes or depth. Only the first 25.7 days of mapping; in the far north seasonal CO₂ frost hid the hydrogen at that time. No data at 89.25° and 89.75° north and south.",
+     "fuente_dato": {
+      "texto": "Mars Odyssey Neutron Spectrometer, epithermal neutron flux, 0.5° cells (Feldman et al. 2002, Science 297, 75-78). “The figures are maps of thermal, epithermal, and fast neutron flux measured by the Neutron Spectrometer over the first 25.7 days of mapping.” “Soil enriched by hydrogen is indicated by the deep blue colors on the map, which show a low intensity of epithermal neutrons.”",
+      "url": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.tab",
+      "citas": [
+       {
+        "texto": "The figures are maps of thermal, epithermal, and fast neutron flux measured by the Neutron Spectrometer over the first 25.7 days of mapping.",
+        "fuente": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.lbl"
+       },
+       {
+        "texto": "Epithermal neutron flux for the given 0.5 by 0.5 degree area, in counts per second.",
+        "fuente": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.lbl"
+       },
+       {
+        "texto": "Soil enriched by hydrogen is indicated by the deep blue colors on the map, which show a low intensity of epithermal neutrons.",
+        "fuente": "https://science.nasa.gov/photojournal/global-map-of-epithermal-neutrons/"
+       },
+       {
+        "texto": "Hydrogen in the far north is hidden at this time beneath a layer of carbon dioxide frost (dry ice).",
+        "fuente": "https://science.nasa.gov/photojournal/global-map-of-epithermal-neutrons/"
+       }
+      ]
+     }
+    }
+   ],
+   "no_medidos": [
+    {
+     "nombre": "Thick fine dust (very low thermal inertia, high albedo)",
+     "cita": {
+      "texto": "does not contain thick deposits of fine-grained dust (e.g., extremely low thermal inertia and high albedo).",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "motivo": "no layer in this version; NASA gives no number"
+    },
+    {
+     "nombre": "Landing hazards: craters, dunes, chaotic terrain",
+     "cita": {
+      "texto": "significantly devoid of landing hazards (e.g., large and/or closely concentrated craters, mountainous terrain, broken/jumbled/chaotic terrain, extensive dune fields, etc.)",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "motivo": "no hazard layer; the slope layer is at 3.7 km pixels"
+    },
+    {
+     "nombre": "Water resource less than 3 km from the processing plant",
+     "cita": {
+      "texto": "The raw material must be located less than 3 kilometers from the ISRU processing plant and power infrastructure",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "motivo": "the neutron map shows hydrogen in 0.5° cells, not tonnes of water nor distances of 3 km"
+    },
+    {
+     "nombre": "Science potential",
+     "cita": {
+      "texto": "Noachian and/or Hesperian rocks in stratigraphic context that have high likelihood of containing trapped atmospheric gasses.",
+      "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf"
+     },
+     "motivo": "no layer in this version"
+    }
+   ]
+  }
+ }
+}

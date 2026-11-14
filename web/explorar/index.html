@@ -6,6 +6,7 @@
 <title>Analog Zero · Pick a place</title>
 <link rel="stylesheet" href="../marca/marca.css">
 <link rel="stylesheet" href="explorar.css">
+<link rel="stylesheet" href="../sitio/sitio.css">
 <script type="importmap">
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
@@ -21,10 +22,25 @@
 </header>
 <aside class="marca-panel panel" id="panel">
   <h1 class="marca-titulo mundo" id="nombre-mundo">&nbsp;</h1>
+  <section class="sitio" id="sitio" hidden>
+    <details class="criterios" id="criterios" open>
+      <summary class="marca-subtitulo"><span class="num-paso marca-num">1</span> What makes a good base site?</summary>
+      <p class="ambito" id="ambito"></p>
+      <div class="lista-criterios" id="lista-criterios"></div>
+      <p class="tenue pesos-propios" id="pesos-propios" hidden>Own weights: NASA lists the criteria, not how much each one weighs.</p>
+      <details class="no-medidos" id="no-medidos" hidden>
+        <summary>NASA also considers (not measured here)</summary>
+        <ul id="no-medidos-lista"></ul>
+      </details>
+    </details>
+    <button type="button" class="marca-boton grande calcular" id="calcular">Find the best spot</button>
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
   <section class="paso" data-paso="1">
     <h2 class="marca-subtitulo"><span class="num-paso marca-num">1</span> Pick a place</h2>
     <p>Tap the globe, or start here:</p>
   </section>
+  <div class="sugerencias" id="sugerencias" role="group" aria-label="Suggested places"></div>
   <section class="paso" data-paso="2" hidden>
     <h2 class="marca-subtitulo"><span class="num-paso marca-num">2</span> Find its twin on Earth</h2>
     <p class="nombre-punto" id="nombre-punto"></p>
@@ -34,15 +50,14 @@
       <dl id="ambiente-valores"></dl>
     </div>
     <a class="marca-boton grande" id="buscar" href="#">Find Earth analogs <span aria-hidden="true">→</span></a>
-    <p class="tenue">Tap somewhere else to move the pin.</p>
   </section>
   <section class="paso" data-paso="sin-mundo" hidden>
     <h2 class="marca-subtitulo">We don't have that world yet.</h2>
     <a class="marca-boton grande" href="../index.html">Back to all worlds</a>
   </section>
-  <div class="sugerencias" id="sugerencias" role="group" aria-label="Suggested places"></div>
   <p class="credito" id="credito"></p>
 </aside>
+<div class="opciones" id="opciones" role="group" aria-label="Other good spots"></div>
 <button type="button" class="marca-boton secundario reiniciar" id="reiniciar">Reset view</button>
 <p class="pista" id="pista"><span>Drag to turn</span><span>Scroll or pinch to zoom</span><span>Tap to drop a pin</span></p>
 <script type="module" src="explorar.js"></script>

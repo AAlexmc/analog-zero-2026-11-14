@@ -1,0 +1,267 @@
+{
+ "descripcion": "Criteria NASA names for choosing a base or crewed landing site on the Moon (south pole) and Mars, and the sources of the layers that measure them (web/data/sitio). Each entry carries a literal quotation checked against its source by scripts/verificar_citas.py. A number is used only if the quotation gives it.",
+ "clases": {
+  "nasa": "NASA source",
+  "no_nasa": "published source outside NASA"
+ },
+ "mundos": {
+  "moon": {
+   "criterios": [
+    {
+     "id": "polo_6deg",
+     "uso": "ambito",
+     "nombre": "Within 6° of the south pole",
+     "valor": 6,
+     "unidad": "deg of latitude",
+     "organismo": "NASA (news release, Artemis III candidate regions)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/",
+     "cita": "Each of these regions is located within six degrees of latitude of the lunar South Pole",
+     "verificado": true
+    },
+    {
+     "id": "iluminacion",
+     "uso": "capa",
+     "nombre": "Sunlight",
+     "valor": null,
+     "unidad": null,
+     "organismo": "NASA (news release, Artemis III candidate regions)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/",
+     "cita": "Access to sunlight is critical for a long-term stay at the Moon because it provides a power source and minimizes temperature variations.",
+     "verificado": true,
+     "nota": "NASA gives no minimum share of sunlight; the 6.5 days in the same release are the length of one mission, not a threshold for the layer"
+    },
+    {
+     "id": "pendiente_deg",
+     "uso": "capa",
+     "nombre": "Terrain slope",
+     "valor": null,
+     "unidad": null,
+     "organismo": "NASA (Artemis Base Camp article)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/",
+     "cita": "You want to land in the flattest area possible, since you don't want the landing vehicle to tip over",
+     "verificado": true,
+     "nota": "NASA publishes no maximum slope for the base or the lander"
+    },
+    {
+     "id": "dist_sombra_km",
+     "uso": "capa",
+     "nombre": "Distance to permanent shadow (water ice)",
+     "valor": null,
+     "unidad": null,
+     "organismo": "NASA (Artemis Base Camp article)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/",
+     "cita": "it must offer easy access to areas of complete darkness that hold water ice.",
+     "verificado": true,
+     "nota": "NASA publishes no distance"
+    }
+   ],
+   "no_medidos": [
+    {
+     "id": "comunicacion_tierra",
+     "nombre": "Line of sight to Earth for communications",
+     "organismo": "NASA (LPSC abstract, Artemis III regions update)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20250011660/downloads/AIIIUpdateLPSC2026.docx.txt",
+     "cita": "If Artemis III employs a Direct-to-Earth (DTE) communication architecture, regions with greater Earth visibility are preferred.",
+     "verificado": true,
+     "motivo": "no layer in this version"
+    },
+    {
+     "id": "valor_cientifico",
+     "nombre": "Science potential",
+     "organismo": "NASA (news release, Artemis III regions update)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/",
+     "cita": "Factors in the selection process included science potential, launch window availability, terrain suitability, communication capabilities with Earth, and lighting conditions.",
+     "verificado": true,
+     "motivo": "no layer in this version"
+    },
+    {
+     "id": "ventana_lanzamiento",
+     "nombre": "Launch window availability",
+     "organismo": "NASA (news release, Artemis III candidate regions)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/",
+     "cita": "Specific landing sites are tightly coupled to the timing of the launch window, so multiple regions ensure flexibility to launch throughout the year.",
+     "verificado": true,
+     "motivo": "depends on the mission date, not on the place alone"
+    },
+    {
+     "id": "rocas_crateres",
+     "nombre": "Boulders, craters and rough ground",
+     "organismo": "NASA (LPSC abstract, Artemis III regions update)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20250011660/downloads/AIIIUpdateLPSC2026.docx.txt",
+     "cita": "including impact craters, block populations, and rough or highly variable terrain",
+     "verificado": true,
+     "motivo": "no boulder or small-crater layer; the slope layer is a mean over 293 m cells"
+    },
+    {
+     "id": "separacion_aterrizaje",
+     "nombre": "Landing area at least 1 km from the habitat",
+     "organismo": "NASA (Artemis Base Camp article)",
+     "clase": "nasa",
+     "fuente": "https://www.nasa.gov/humans-in-space/nasas-artemis-base-camp-on-the-moon-will-need-light-water-elevation/",
+     "cita": "The landing area, ideally, should be separated from other base camp features — such as the habitat or solar panels — by at least half a mile, or 1 kilometer.",
+     "verificado": true,
+     "motivo": "a layout rule inside the base, not a property of one point"
+    }
+   ]
+  },
+  "mars": {
+   "criterios": [
+    {
+     "id": "lat_abs_deg",
+     "uso": "capa",
+     "nombre": "Latitude",
+     "valor": 50,
+     "unidad": "deg",
+     "organismo": "NASA (Bussey and Hoffman, human landing sites workshop slides)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160002370/downloads/20160002370.pdf",
+     "cita": "Preliminary latitude boundaries set at +/- 50 degrees",
+     "verificado": true
+    },
+    {
+     "id": "altitud_m",
+     "uso": "capa",
+     "nombre": "Elevation (MOLA)",
+     "valor": 2,
+     "unidad": "km",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "(b) less than +2 kilometers altitude (Mars Orbiter Laser Altimeter (MOLA) reference)",
+     "verificado": true
+    },
+    {
+     "id": "pendiente_5km_deg",
+     "uso": "capa",
+     "nombre": "Terrain slope",
+     "valor": 10,
+     "unidad": "deg",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "an area of approximately 25 square kilometers within which the terrain is generally level (slopes less than ~10 degrees)",
+     "verificado": true
+    },
+    {
+     "id": "hidrogeno_neutrones",
+     "uso": "capa",
+     "nombre": "Hydrogen near the surface (water indicator)",
+     "valor": null,
+     "unidad": null,
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference, Appendix B)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "The raw material can be in the form of ice, ice/regolith mix, or hydrated minerals, and the top of the raw material deposit should be as close to the surface as possible.",
+     "verificado": true,
+     "nota": "the numbers NASA gives for this resource (> 100 t of water, < 3 km from the plant) cannot be read from a neutron map"
+    }
+   ],
+   "no_medidos": [
+    {
+     "id": "polvo_inercia_albedo",
+     "nombre": "Thick fine dust (very low thermal inertia, high albedo)",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "does not contain thick deposits of fine-grained dust (e.g., extremely low thermal inertia and high albedo).",
+     "verificado": true,
+     "motivo": "no layer in this version; NASA gives no number"
+    },
+    {
+     "id": "peligros_aterrizaje",
+     "nombre": "Landing hazards: craters, dunes, chaotic terrain",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "significantly devoid of landing hazards (e.g., large and/or closely concentrated craters, mountainous terrain, broken/jumbled/chaotic terrain, extensive dune fields, etc.)",
+     "verificado": true,
+     "motivo": "no hazard layer; the slope layer is at 3.7 km pixels"
+    },
+    {
+     "id": "cantidad_agua",
+     "nombre": "Water resource less than 3 km from the processing plant",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference, Appendix B)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "The raw material must be located less than 3 kilometers from the ISRU processing plant and power infrastructure",
+     "verificado": true,
+     "motivo": "the neutron map shows hydrogen in 0.5° cells, not tonnes of water nor distances of 3 km"
+    },
+    {
+     "id": "valor_cientifico",
+     "nombre": "Science potential",
+     "organismo": "NASA (Bussey and Hoffman, IEEE Aerospace Conference, Appendix A)",
+     "clase": "nasa",
+     "fuente": "https://ntrs.nasa.gov/api/citations/20160001040/downloads/20160001040.pdf",
+     "cita": "Noachian and/or Hesperian rocks in stratigraphic context that have high likelihood of containing trapped atmospheric gasses.",
+     "verificado": true,
+     "motivo": "no layer in this version"
+    }
+   ]
+  }
+ },
+ "fuentes_dato": [
+  {
+   "id": "megdr_mediana",
+   "nombre": "MOLA MEGDR 16 pixels/degree",
+   "organismo": "NASA PDS Geosciences Node (MGS MOLA MEGDR label)",
+   "clase": "nasa",
+   "fuente": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.lbl",
+   "cita": "Each sample represents median observed topography within a 0.0625 by 0.0625 degree area.",
+   "verificado": true
+  },
+  {
+   "id": "megdr_areoide",
+   "nombre": "MOLA MEGDR 16 pixels/degree",
+   "organismo": "NASA PDS Geosciences Node (MGS MOLA MEGDR label)",
+   "clase": "nasa",
+   "fuente": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.lbl",
+   "cita": "Topography is the planetary radius minus the areoid radius at a given longitude and latitude.",
+   "verificado": true
+  },
+  {
+   "id": "odyssey_ns_etiqueta",
+   "nombre": "Mars Odyssey Neutron Spectrometer, epithermal neutron flux",
+   "organismo": "NASA PDS Geosciences Node (Mars Odyssey GRS special product label)",
+   "clase": "nasa",
+   "fuente": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.lbl",
+   "cita": "The figures are maps of thermal, epithermal, and fast neutron flux measured by the Neutron Spectrometer over the first 25.7 days of mapping.",
+   "verificado": true
+  },
+  {
+   "id": "odyssey_ns_columna",
+   "nombre": "Mars Odyssey Neutron Spectrometer, epithermal neutron flux",
+   "organismo": "NASA PDS Geosciences Node (Mars Odyssey GRS special product label)",
+   "clase": "nasa",
+   "fuente": "https://pds-geosciences.wustl.edu/ody/urn-nasa-pds-odyssey_grs_special/data/ns_epithermal_020917.lbl",
+   "cita": "Epithermal neutron flux for the given 0.5 by 0.5 degree area, in counts per second.",
+   "verificado": true
+  },
+  {
+   "id": "odyssey_hidrogeno_bajo",
+   "nombre": "Low epithermal neutrons mean hydrogen",
+   "organismo": "NASA/JPL Photojournal PIA03800",
+   "clase": "nasa",
+   "fuente": "https://science.nasa.gov/photojournal/global-map-of-epithermal-neutrons/",
+   "cita": "Soil enriched by hydrogen is indicated by the deep blue colors on the map, which show a low intensity of epithermal neutrons.",
+   "verificado": true
+  },
+  {
+   "id": "odyssey_escarcha_norte",
+   "nombre": "Seasonal CO2 frost hides hydrogen in the far north",
+   "organismo": "NASA/JPL Photojournal PIA03800",
+   "clase": "nasa",
+   "fuente": "https://science.nasa.gov/photojournal/global-map-of-epithermal-neutrons/",
+   "cita": "Hydrogen in the far north is hidden at this time beneath a layer of carbon dioxide frost (dry ice).",
+   "verificado": true
+  }
+ ]
+}

@@ -135,6 +135,7 @@ async function montar() {
       G.escena.add(capa);
     }
     if (capa) capa.visible = on;
+    G?.pedir();
     $('leyenda').hidden = !on || !mm;
     if (mm) { $('ley-min').textContent = fmtPct(mm.min); $('ley-max').textContent = fmtPct(mm.max); }
     A.capa = on;

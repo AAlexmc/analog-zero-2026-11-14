@@ -48,4 +48,7 @@ export const PAREJAS = [
   { uso: 'global map canvas labels on their deep blue halo', texto: 'white', fondo: mezclar('deep-blue', 0.9, 'white') },
   { uso: 'synthetic-data banner, lighter stripe', texto: 'deep-blue', fondo: mezclar('white', 0.78, 'deep-blue') },
   { uso: 'global map breaking value in the data flower (red petal beside it)', texto: 'neon-yellow', fondo: PANEL_PEOR },
+  { uso: 'base site box: "NASA says" link and met-limit tick over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
+  { uso: 'base site box: NASA quote and limit number field', texto: 'white', fondo: 'deep-blue' },
+  { uso: 'base site box: option markers on the globe, normal and hover', texto: 'deep-blue', fondo: 'neon-yellow' },
 ];

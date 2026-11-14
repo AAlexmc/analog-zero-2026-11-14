@@ -111,30 +111,58 @@ export function crearGlobo({ canvas, panel, mundo, vista0, inicial = null, alCli
     return { x: r.left + ((w.x + 1) / 2) * r.width, y: r.top + ((1 - w.y) / 2) * r.height, visible };
   }
 
+  // Se dibuja solo si algo cambia: gesto (con su inercia), giro animado, textura, chincheta o tamaño. Pestaña oculta: nada.
   const alDibujar = new Set();
+  let pedido = 0, fotogramas = 0;
+  const previa = new THREE.Vector3();
+  function pedir() {
+    if (pedido || document.hidden) return;
+    pedido = requestAnimationFrame(dibujar);
+  }
   function dibujar(ahora = performance.now()) {
+    if (pedido) cancelAnimationFrame(pedido);
+    pedido = 0;
     medir();
+    let sigue = false;
     if (anim) {
       const k = Math.min(1, (ahora - anim.t0) / anim.dur);
       anim.f(1 - (1 - k) ** 3);
-      if (k >= 1) anim = null;
+      if (k >= 1) anim = null; else sigue = true;
     }
     controles.rotateSpeed = Math.max(0.12, Math.min(1, (camara.position.length() - 1) / (distancia0 - 1)));
+    previa.copy(camara.position);
     controles.update();
+    if (camara.position.distanceToSquared(previa) > 1e-12) sigue = true;
+    // Inercia ya invisible (< 1e-6 de radio): se descarta el resto para que no mueva la cámara en el próximo dibujo.
+    else { controles._sphericalDelta.set(0, 0, 0); controles._panOffset.set(0, 0, 0); }
     if (marcador.visible) marcador.scale.setScalar(tamMarcador());
     renderer.render(escena, camara);
+    fotogramas++;
     for (const cb of alDibujar) cb();
+    if (sigue) pedir();
   }
+  controles.addEventListener('change', pedir);
+  texturaLista.then(pedir);
+  new ResizeObserver(pedir).observe(canvas);
+  new ResizeObserver(pedir).observe(panel);
+  window.addEventListener('resize', pedir);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { pedir(); return; }
+    cancelAnimationFrame(pedido);
+    pedido = 0;
+  });
   medir();
-  renderer.setAnimationLoop(dibujar);
+  pedir();
 
   return {
-    camara, controles, escena, renderer, malla, texturaLista, mirar, latLonDePixel, aPantalla, dibujar,
+    camara, controles, escena, renderer, malla, texturaLista, latLonDePixel, aPantalla, dibujar, pedir,
+    mirar: (objetivo, dist) => { mirar(objetivo, dist); pedir(); },
     alDibujar: (cb) => { alDibujar.add(cb); return () => alDibujar.delete(cb); },
     animando: () => !!anim,
+    fotogramas: () => fotogramas,
     distancia0: () => distancia0,
-    reiniciar: () => mirar(vista0 ?? { lat: 0, lon: 0 }, distancia0),
-    ponerMarcador: (lat, lon) => situarMarcador(marcador, latLonAVector(lat, lon), tamMarcador()),
+    reiniciar: () => { mirar(vista0 ?? { lat: 0, lon: 0 }, distancia0); pedir(); },
+    ponerMarcador: (lat, lon) => { situarMarcador(marcador, latLonAVector(lat, lon), tamMarcador()); pedir(); },
     camaraJSON: () => ({ proyInv: camara.projectionMatrixInverse.elements.slice(), mundo: camara.matrixWorld.elements.slice(), ancho: canvas.clientWidth, alto: canvas.clientHeight }),
   };
 }

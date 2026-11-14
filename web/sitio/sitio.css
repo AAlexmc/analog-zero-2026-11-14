@@ -1,0 +1,73 @@
+/* Recuadro «What makes a good base site?» dentro del panel de la vista del mundo. Solo colores de marca.css. */
+.panel.con-sitio { width: 380px; }
+.panel.con-sitio .mundo { font-size: 36px; margin-bottom: 12px; }
+.sitio { margin: 0 0 16px; }
+.criterios > summary {
+  list-style: none; cursor: pointer; font-size: 19px; line-height: 1.2; margin: 0 0 6px; display: flex; align-items: center; gap: 10px; min-height: 44px;
+}
+.criterios > summary::-webkit-details-marker { display: none; }
+.criterios > summary::after { content: "▾"; margin-left: auto; color: var(--texto-tenue); font-size: 16px; transition: transform .15s; }
+.criterios:not([open]) > summary::after { transform: rotate(-90deg); }
+.criterios > summary:focus-visible { outline: 2px solid var(--neon-yellow); outline-offset: 2px; border-radius: 6px; }
+.ambito { margin: 0 0 6px; font-size: 13px; line-height: 1.35; color: var(--texto-tenue); }
+
+.criterio { border-top: 1px solid var(--linea); padding: 6px 0 4px; }
+.criterio .cab, .no-medidos .cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.criterio .nombre { font: 700 15px/1.25 var(--cuerpo); }
+.nasa {
+  flex: none; font: 400 13px/1 var(--cuerpo); color: var(--neon-yellow); background: none; border: 0; padding: 6px 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.nasa:hover, .nasa:focus-visible { outline: none; text-decoration-thickness: 2px; }
+.nasa[aria-expanded="true"] { text-decoration: none; }
+.limite { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 14px; }
+.limite input[type="checkbox"] { width: 20px; height: 20px; margin: 0; accent-color: var(--neon-yellow); }
+.limite input[type="number"] {
+  width: 84px; box-sizing: border-box; padding: 4px 8px; font-size: 15px; color: var(--white); background: var(--deep-blue);
+  border: 1px solid var(--linea); border-radius: 8px;
+}
+.limite input[type="number"]:focus-visible { outline: 2px solid var(--neon-yellow); outline-offset: 1px; }
+.limite input[type="number"]:disabled { opacity: .5; }
+.criterio .nota, .no-medidos .nota { display: block; font-size: 13px; color: var(--texto-tenue); margin-top: 2px; }
+.criterio .nota:empty { display: none; }
+.peso { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--texto-tenue); }
+.peso input[type="range"] { width: 100%; min-width: 0; height: 32px; margin: 0; accent-color: var(--neon-yellow); cursor: pointer; }
+.cita { margin: 6px 0 4px; padding: 8px 12px; border-left: 3px solid var(--neon-yellow); background: var(--deep-blue); border-radius: 0 8px 8px 0; font-size: 13px; }
+.cita[hidden] { display: none; }
+.cita blockquote { margin: 0 0 6px; font-style: italic; }
+.cita p { margin: 0 0 4px; }
+.cita a { color: var(--white); text-underline-offset: 3px; }
+.pesos-propios { margin: 8px 0 6px; font-size: 13px !important; }
+.no-medidos { margin: 4px 0 6px; font-size: 14px; }
+.no-medidos > summary { cursor: pointer; color: var(--texto-tenue); padding: 6px 0; }
+.no-medidos ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.no-medidos li { border-top: 1px solid var(--linea); padding: 6px 0; }
+
+.sitio .calcular { width: 100%; justify-content: center; margin: 10px 0 10px; }
+.resultado p { margin: 0 0 6px; font-size: 14px; }
+.resultado .r-titulo { font-size: 16px; }
+.resultado .r-valores { line-height: 1.5; }
+.resultado .marca { font-weight: 700; }
+.resultado .marca.cumple { color: var(--neon-yellow); }
+.resultado .marca.no-cumple { color: var(--white); }
+.resultado .r-aptas { font-size: 13px; }
+.resultado .sep { color: var(--texto-tenue); margin-right: .2em; }
+.panel.con-sitio .paso .nombre-punto, .panel.con-sitio .paso .coords { display: none; }
+
+.opciones { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+.opciones button {
+  position: absolute; left: 0; top: 0; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: auto; cursor: pointer; padding: 0;
+  font: 700 13px/1 var(--mono); color: var(--deep-blue); background: var(--white); border: 2px solid var(--deep-blue); box-shadow: 0 0 0 2px var(--white);
+}
+.opciones button:hover, .opciones button:focus-visible { background: var(--neon-yellow); box-shadow: 0 0 0 2px var(--neon-yellow); outline: none; }
+.opciones button[hidden] { display: none; }
+
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .panel.con-sitio { width: auto; }
+  .panel.con-sitio .mundo { font-size: 30px; margin-bottom: 8px; }
+  /* Hoja inferior: «Find Earth analogs» queda fijo al pie de la hoja aunque el contenido no quepa. */
+  .panel.con-sitio .paso[data-paso="2"]:not([hidden]) { display: contents; }
+  .panel.con-sitio #buscar { position: sticky; bottom: 0; z-index: 2; margin-bottom: 0; box-shadow: 0 0 0 8px var(--deep-blue), 0 18px 0 8px var(--deep-blue); }
+  .criterios > summary { font-size: 18px; }
+  .sitio .calcular { margin: 6px 0 8px; }
+}

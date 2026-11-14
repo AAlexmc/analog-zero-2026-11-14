@@ -125,8 +125,14 @@ async function montar3D() {
     camara.updateProjectionMatrix();
   }
   const reducir = reducirMovimiento();
-  let antes = performance.now();
+  let antes = performance.now(), ultimo = -Infinity, sAntes = NaN, texAntes = -1;
+  P.fotogramas = 0;
+  // Giro lento a ≤ 30 fps; desplazamiento, tamaño y texturas al momento; sin giro (movimiento reducido) solo si algo cambia.
   function dibujar(ahora = performance.now()) {
+    const s0 = posicion(), nTex = Object.keys(P.texturas).length;
+    const cambio = s0 !== sAntes || nTex !== texAntes || canvas.clientWidth !== ancho || canvas.clientHeight !== alto;
+    if (!cambio && (reducir || ahora - ultimo < 1000 / 30 - 1)) return;
+    ultimo = ahora; sAntes = s0; texAntes = nTex;
     medir();
     const dt = Math.min(0.1, (ahora - antes) / 1000); antes = ahora;
     const H = 2 * camara.position.z * Math.tan((camara.fov * RAD) / 2), W = H * camara.aspect;
@@ -144,11 +150,13 @@ async function montar3D() {
     estrellas.position.y = s * 0.6;
     P.planeta = grupos.findIndex((g, i) => Math.abs(s - i) < 0.5) >= 0 ? ['moon', 'mars', 'more'][Math.round(s)] : null;
     renderer.render(escena, camara);
+    P.fotogramas++;
   }
   P.camara = camara;
   P.grupos = grupos;
   P.dibujar = dibujar;
   renderer.setAnimationLoop(dibujar);
+  document.addEventListener('visibilitychange', () => renderer.setAnimationLoop(document.hidden ? null : dibujar));
   await Promise.all(esperas);
   await document.fonts.ready;
   P.listo = true;

@@ -4,6 +4,7 @@ import { formatoLatLon, normLon } from './geo.js';
 import { crearGlobo } from './globo.js';
 import { cargar } from '../buscar/motor.js';
 import { formatoValor, celsius, partesSup } from '../analogos/metricas.js';
+import { montarSitio, rotuloRango } from '../sitio/panel.js';
 
 // Vista inicial (propia): la Luna algo desde el sur para que se vea el polo; Marte de cara a Syrtis–Jezero.
 const VISTA0 = { moon: { lat: -38, lon: 0 }, mars: { lat: 15, lon: 72 } };
@@ -81,15 +82,17 @@ async function montar(m) {
   }
 
   const canvas = $('globo');
-  const fijarPunto = (lat, lon, sug = null) => {
-    punto = { lat, lon: lon > -180 && lon <= 180 ? lon : normLon(lon), sugerencia: sug?.id ?? null };
+  let sitio = null;
+  // origen = {rango} si el punto es el mejor sitio calculado o una alternativa.
+  const fijarPunto = (lat, lon, sug = null, origen = null) => {
+    punto = { lat, lon: lon > -180 && lon <= 180 ? lon : normLon(lon), sugerencia: sug?.id ?? null, sug };
     const f = formatoLatLon(punto.lat, punto.lon);
     $('lat').textContent = f.lat; $('lon').textContent = f.lon;
-    $('nombre-punto').textContent = sug ? sug.nombre : 'Your pin';
+    $('nombre-punto').textContent = sug ? sug.nombre : origen ? rotuloRango(origen.rango) : 'Your pin';
     const cifra = (v) => (sug ? String(v) : v.toFixed(4));
     $('buscar').href = `../analogos/index.html?mundo=${encodeURIComponent(m.id)}&lat=${cifra(punto.lat)}&lon=${cifra(punto.lon)}${sug ? `&nombre=${encodeURIComponent(sug.nombre)}` : ''}`;
     caja.querySelectorAll('.sugerencia').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === punto.sugerencia)));
-    caja.dataset.titulo = 'Or try one of these:';
+    caja.dataset.titulo = 'Move the pin: tap the globe or try one of these:';
     verPaso(2);
     $('pista').hidden = true;
     const u = new URL(location.href);
@@ -97,6 +100,7 @@ async function montar(m) {
     history.replaceState(null, '', u);
     V.ponerMarcador?.(punto.lat, punto.lon);
     pintarAmbiente(m.id, punto.lat, punto.lon);
+    sitio?.alPunto(punto, sug, origen);
     for (const cb of oyentes) { try { cb(az.explorar.punto); } catch (e) { V.errores.push(String(e.message ?? e)); } }
   };
   V.fijarPunto = fijarPunto;
@@ -107,23 +111,32 @@ async function montar(m) {
   const sugInicial = inicial && m.sugerencias.find((s) => Math.abs(s.lat - inicial.lat) < 1e-4 && Math.abs(s.lon - inicial.lon) < 1e-4);
   const fijarInicial = () => (sugInicial ? fijarPunto(sugInicial.lat, sugInicial.lon, sugInicial) : fijarPunto(inicial.lat, inicial.lon));
 
+  let G = null;
+  const sitioP = montarSitio({
+    mundo: m, V,
+    punto: () => punto && { lat: punto.lat, lon: punto.lon, sug: punto.sug },
+    ir: (s, rango, girar) => { fijarPunto(s.lat, s.lon, null, { rango }); if (girar) G?.mirar(s); },
+  }).then((x) => { sitio = x; if (G) x?.conGlobo(G); return x; }, (e) => { V.errores.push(String(e.message ?? e)); return null; });
+
   if (!webglDisponible()) {
     document.body.classList.add('sin-webgl');
     $('pista').textContent = 'This browser cannot draw the 3D globe. Pick one of the places below.';
     if (inicial) fijarInicial();
+    await (await sitioP)?.inicial;
     V.listo = true;
     return;
   }
 
-  const G = crearGlobo({ canvas, panel: $('panel'), mundo: m, vista0: VISTA0[m.id], inicial, alClic: (lat, lon) => fijarPunto(lat, lon) });
+  G = crearGlobo({ canvas, panel: $('panel'), mundo: m, vista0: VISTA0[m.id], inicial, alClic: (lat, lon) => fijarPunto(lat, lon) });
   V.ponerMarcador = G.ponerMarcador;
   irA = (s) => { fijarPunto(s.lat, s.lon, s); G.mirar(s); };
   V.reiniciar = G.reiniciar;
   $('reiniciar').addEventListener('click', V.reiniciar);
-  Object.assign(V, { camara: G.camara, controles: G.controles, latLonDePixel: G.latLonDePixel, animando: G.animando, aPantalla: G.aPantalla, camaraJSON: G.camaraJSON });
+  Object.assign(V, { camara: G.camara, controles: G.controles, latLonDePixel: G.latLonDePixel, animando: G.animando, aPantalla: G.aPantalla, camaraJSON: G.camaraJSON, fotogramas: G.fotogramas, mirar: G.mirar });
   if (inicial) fijarInicial();
   G.dibujar();
   V.textura = await G.texturaLista;
+  await (await sitioP)?.inicial;
   await document.fonts.ready;
   V.listo = true;
 }
