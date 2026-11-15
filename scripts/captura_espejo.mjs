@@ -1,6 +1,7 @@
 // Equipo espejo en el visor (Chromium): (a) plantar en la Luna planta el gemelo en la Tierra a los mismos metros del centro;
 // (b) las dos fichas dicen qué coincide, qué no y qué no se puede medir, y lo que la Tierra no reproduce con su fuente;
-// (c) quitar uno quita el otro; (d) tras recargar siguen emparejados; (e) con «Mirror equipment» apagado no hay gemelo.
+// (c) quitar uno quita el otro; (d) tras recargar siguen emparejados; (e) con «Mirror equipment» apagado no hay gemelo;
+// (f) «Drill here» también se refleja.
 // Uso: node scripts/captura_espejo.mjs
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -114,6 +115,17 @@ try {
   [ta, tb] = [await lista(0), await lista(1)];
   comprobar(ta.length === 2 && tb.length === 1 && tb[0].equipo === 'viper', '(e) back on: planting on Earth plants the twin on the Moon', `(e) on again: earth ${ta.length} moon ${JSON.stringify(tb)}`);
   await pag.screenshot({ path: join(SALIDA, 'e-tierra-a-luna.png') });
+
+  // (f) «Drill here» en la Luna pone el punto también en la Tierra, a los mismos metros del centro
+  await pag.waitForFunction(() => window.__az.paneles.every((p) => p.volatiles?.V.D), null, { timeout: 30000 });
+  await pag.click('.panel[data-lado=b] .perforar');
+  const cb = await pag.locator('.panel[data-lado=b] .lienzo canvas').first().boundingBox();
+  await pag.mouse.click(cb.x + cb.width / 2 - 70, cb.y + cb.height / 2 + 50);
+  await pag.waitForTimeout(500);
+  const perf = await pag.evaluate(() => window.__az.paneles.map((p) => ({ perf: p.volatiles.V.perf, tarjeta: !p.el.querySelector('.perforacion').hidden, bocados: p.el.querySelector('.perforacion [data-v=secuencia]')?.dataset.bocados ?? null })));
+  const espPerf = perf[1].perf && celdaEspejo({ n: geo[1].n, m: geo[1].m }, { n: geo[0].n, m: geo[0].m, alturas }, perf[1].perf.fila, perf[1].perf.col);
+  comprobar(espPerf && perf[0].perf?.fila === espPerf.fila && perf[0].perf?.col === espPerf.col && perf.every((x) => x.tarjeta && x.bocados === '10'), `(f) drilling on the Moon also set the drill point on Earth (cell ${perf[0].perf?.fila},${perf[0].perf?.col}), both cards with the 10-bite sequence`, `(f) drill twin: ${JSON.stringify(perf)} vs ${JSON.stringify(espPerf)}`);
+  await pag.screenshot({ path: join(SALIDA, 'f-perforar-gemelo.png') });
   await pag.evaluate(() => { for (const k of Object.keys(localStorage)) if (k.startsWith('analog-zero.planted.')) localStorage.removeItem(k); });
 } catch (e) {
   fallos.push(`script: ${e.message}`); console.error(e);

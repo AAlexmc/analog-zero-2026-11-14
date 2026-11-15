@@ -134,7 +134,7 @@ test('drill card: warm cell says too warm; NaN cell says no data; both keep the 
   assert.ok(w.plan && n.plan);
 });
 
-test('drill plan: TRIDENT 1 m in 10 cm bites = planPerforacion; time, energy and subsurface ice are NOT MEASURED; LCROSS ice is from another place', () => {
+test('drill plan: TRIDENT 1 m in 10 cm bites = planPerforacion; cutting time from the published feed; time between bites and subsurface ice are NOT MEASURED; LCROSS ice is from another place', () => {
   const x = tarjetaPerforacion({ t: sintetico(), fila: 0, col: 0, luna: true, D });
   const p = planPerforacion({ profundidad_m: 1, bocado_cm: 10, profundidad_max_m: 1 });
   assert.equal(x.plan.bocados, p.bocados);
@@ -144,10 +144,22 @@ test('drill plan: TRIDENT 1 m in 10 cm bites = planPerforacion; time, energy and
   assert.equal(x.plan.horas, null);
   assert.equal(x.plan.energia_wh, null);
   const nm = Object.fromEntries(x.no_medido.map((r) => [r.k, r.texto]));
-  assert.match(nm.horas, /NOT MEASURED/);
-  assert.match(nm.horas, /drilling rate/);
-  assert.match(nm.energia, /NOT MEASURED/);
+  assert.match(nm.horas, /time between bites.*NOT MEASURED/);
+  assert.equal(nm.energia, undefined);
   assert.match(nm.subsuelo, /NOT MEASURED/);
+  assert.equal(D.trident.avance.valor, 1.25);
+  assert.equal(D.trident.wob.valor, 100);
+  assert.equal(x.secuencia.pasos.length, 10);
+  assert.equal(x.secuencia.pasos[0].corte_s, 80);
+  assert.equal(x.secuencia.corte_s, 800);
+  assert.ok(Math.abs(x.secuencia.energia_max_wh - (400 * 800) / 3600) < 1e-9);
+  const tierra = tarjetaPerforacion({ t: sintetico(), fila: 0, col: 0, luna: false, D });
+  assert.equal(tierra.secuencia.corte_s, 800);
+  assert.equal(tierra.plan, null);
+  const sinAvance = tarjetaPerforacion({ t: sintetico(), fila: 0, col: 0, luna: true, D: { ...D, trident: { ...D.trident, avance: null } } });
+  assert.equal(sinAvance.secuencia, null);
+  assert.match(sinAvance.no_medido.find((r) => r.k === 'horas').texto, /drilling time: NOT MEASURED/);
+  assert.match(sinAvance.no_medido.find((r) => r.k === 'energia').texto, /NOT MEASURED/);
   assert.equal(x.hielo_esperado.valor, 5.6);
   assert.match(x.hielo_esperado.texto, /not measured here/);
   assert.match(x.hielo_esperado.texto, /Cabeus/);

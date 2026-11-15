@@ -1,6 +1,6 @@
 // Volátiles en pantalla: capa de hielo estable, herramienta DRILL HERE y bloque de la planta de agua en la hoja.
 // Cálculo con volatiles.js; cifras con cita de obra.json y equipo.json. Lo que no tiene cita se rotula.
-import { hieloEstable, lecturaPunto, planPerforacion, plantaAgua, energia, propelente, M_H2, M_H2O } from './volatiles.js';
+import { hieloEstable, lecturaPunto, planPerforacion, secuenciaPerforacion, plantaAgua, energia, propelente, M_H2, M_H2O } from './volatiles.js';
 import { constante, cifraCitada, tiempoFlota, defectosFlota, SUPUESTOS, fmt } from './panel_obra.js';
 import { cargarCatalogo } from './datos.js';
 
@@ -40,6 +40,8 @@ export function defectosVolatiles(obra, equipos) {
       rotacion: conRef(cifraCitada(tri, 'potencia_rotacion_w')),
       percusion: conRef(cifraCitada(tri, 'potencia_percusion_w')),
       masa: masa ? { valor: masa.valor, op: masa.op ?? null, ref: masa } : null,
+      avance: conRef(cifraCitada(tri, 'avance_mm_s')),
+      wob: conRef(cifraCitada(tri, 'peso_sobre_broca_tipico_n')),
     },
     torre_kw: conRef(cifraCitada(eq('torre_solar'), 'potencia_honeybee_lamps_kw')),
     reactor_kwe: conRef(cifraCitada(eq('reactor_fision'), 'potencia_estudio_2022_kwe')),
@@ -85,15 +87,21 @@ export function tarjetaPerforacion({ t, fila, col, luna, D, profundidad_m = null
     fila_('hielo', hv, (v) => (v === 'si' ? `temperature allows stable surface ice (≤ ${u} K)` : `too warm for stable surface ice (> ${u} K)`)),
     fila_('pendiente', l.pendiente_deg, (v) => `${v.toFixed(1)}°`),
   ];
-  const out = { evaluable: true, motivo: null, fila: l.fila, col: l.col, umbral_K: u, lectura, hielo: l.hielo_superficie, nota: l.nota, plan: null, hielo_esperado: null, no_medido: [] };
-  if (!luna) return out;
+  const out = { evaluable: true, motivo: null, fila: l.fila, col: l.col, umbral_K: u, lectura, hielo: l.hielo_superficie, nota: l.nota, plan: null, secuencia: null, hielo_esperado: null, no_medido: [] };
   const T = D.trident, prof = profundidad_m ?? T.profundidad?.valor ?? null;
+  // El taladro trabaja igual en los dos mundos: la secuencia vale para la Luna y para el ensayo en la Tierra.
+  if (T.bocado && T.avance && positivo(prof)) {
+    out.secuencia = secuenciaPerforacion({ profundidad_m: prof, bocado_cm: T.bocado.valor, avance_mm_s: T.avance.valor, potencia_w: T.rotacion && T.percusion ? T.rotacion.valor + T.percusion.valor : null });
+  }
+  if (!luna) return out;
   out.plan = T.bocado && positivo(prof)
     ? planPerforacion({ profundidad_m: prof, bocado_cm: T.bocado.valor, profundidad_max_m: T.profundidad?.valor })
     : { evaluable: false, motivo: 'no cited bite size or depth for TRIDENT in the catalogue' };
   out.no_medido = [
-    { k: 'horas', texto: 'drilling time: NOT MEASURED (the catalogue gives no TRIDENT drilling rate: time per bite)' },
-    { k: 'energia', texto: 'drilling energy: NOT MEASURED (needs the drilling time)' },
+    ...(out.secuencia
+      ? [{ k: 'horas', texto: 'time between bites (pulling the drill up, brushing the cuttings out, reading them): NOT MEASURED (not published)' }]
+      : [{ k: 'horas', texto: 'drilling time: NOT MEASURED (the catalogue gives no TRIDENT drilling rate: time per bite)' },
+        { k: 'energia', texto: 'drilling energy: NOT MEASURED (needs the drilling time)' }]),
     { k: 'subsuelo', texto: 'ice below the surface here: NOT MEASURED (no subsurface data on this terrain)' },
   ];
   if (D.hielo) {
@@ -265,15 +273,66 @@ export function crearVolatiles(p, ctx) {
     V.perf = { fila: Math.min(n - 1, Math.max(0, Math.round(g.fila))), col: Math.min(n - 1, Math.max(0, Math.round(g.col))) };
     elegir(false);
     V.abierta = true;
+    V.bocado = 0;
     p.sel = null;
     ctx.refrescarPlantado();
     pintar();
+    ctx.alPerforar?.(p, V.perf);
   }, { capture: true });
   window.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && V.eligiendo) { ev.stopImmediatePropagation(); elegir(false); }
   }, true);
 
   const lectura = () => (V.perf && V.x?.evaluable ? V.x : null);
+
+  // ---------- Cómo perfora TRIDENT: bocado a bocado ----------
+  const tiempo = (s) => (s < 60 ? `${Math.round(s)} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`);
+  const listaCitada = (v, ordenada) => `<${ordenada ? 'ol' : 'ul'} class="perf-lista">${v.map((y) => `<li>${y.lugar ? `<b>${esc(y.lugar)}</b> · ` : ''}${esc(y.texto ?? '')} · ${cita(y)}</li>`).join('')}</${ordenada ? 'ol' : 'ul'}>`;
+  function bloqueOperacion(x) {
+    const T = V.D.trident, eq = T.eq ?? {}, S = x.secuencia;
+    const op = eq.operacion ?? [], mide = eq.mide ?? [], ens = eq.ensayos_tierra ?? [];
+    const sec = S ? `<div class="perf-sec" data-v="secuencia" data-bocados="${S.pasos.length}">
+        <div class="perf-hoyo" role="img" aria-label="Hole drilled bite by bite">${S.pasos.map((b) => `<i data-k="${b.k}" title="bite ${b.k}: ${b.desde_cm.toFixed(0)}–${b.hasta_cm.toFixed(0)} cm"></i>`).join('')}</div>
+        <div class="perf-paso" data-v="sec-paso" aria-live="polite"></div>
+      </div>
+      <div class="botones"><button type="button" data-v="sec-play">▶ Run the drill</button><button type="button" data-v="sec-sig">Next bite</button><button type="button" data-v="sec-cero">Reset</button></div>
+      <dl><dt>Cutting time</dt><dd class="num" data-v="corte" data-valor="${S.corte_s}">${tiempo(S.corte_s)}</dd>
+        ${S.energia_max_wh !== null ? `<dt>Energy while cutting</dt><dd class="num" data-v="energia-corte" data-valor="${S.energia_max_wh}">≤ ${S.energia_max_wh.toFixed(1)} Wh</dd>` : ''}
+        ${T.wob ? `<dt>Push on the bit</dt><dd class="num" data-v="wob">≤ ${esc(T.wob.valor)} N</dd>` : ''}</dl>
+      <div class="tenue nota-o">cutting time = depth ÷ feed of ${esc(T.avance.valor)} mm/s ${cita(T.avance.ref)} (own arithmetic): cutting only${S.energia_max_wh !== null ? ' · energy = both actuators at their full rating for that time, an upper bound' : ''}${T.wob ? ` · push ${cita(T.wob.ref)}` : ''}</div>`
+      : '<div class="tenue" data-v="sin-secuencia">no cited feed speed or bite size for TRIDENT in the catalogue</div>';
+    return `<div class="et">How TRIDENT drills this hole</div>${sec}
+      ${op.length ? `<details class="perf-det" data-v="operacion"><summary>The real sequence, step by step (${op.length})</summary>${listaCitada(op, true)}</details>` : ''}
+      ${mide.length ? `<details class="perf-det" data-v="mide"><summary>What the drill itself measures (${mide.length})</summary>${listaCitada(mide, false)}</details>` : ''}
+      ${ens.length ? `<details class="perf-det" data-v="ensayos"${luna ? '' : ' open'}><summary>Already tried on Earth (${ens.length})</summary>${listaCitada(ens, false)}</details>` : ''}`;
+  }
+  function pintarPaso() {
+    const S = V.x?.secuencia, caja = tarjeta.querySelector('[data-v=secuencia]');
+    if (!S || !caja) return;
+    const k = Math.min(V.bocado ?? 0, S.pasos.length), b = S.pasos[k - 1];
+    caja.querySelectorAll('.perf-hoyo i').forEach((i) => i.classList.toggle('hecho', +i.dataset.k <= k));
+    caja.dataset.bocado = k;
+    caja.querySelector('[data-v=sec-paso]').innerHTML = !b
+      ? `Footpad pressed on the ground. ${S.pasos.length} bites to go.`
+      : `<b>Bite ${b.k} of ${S.pasos.length}</b> · <span class="num">${b.desde_cm.toFixed(0)}–${b.hasta_cm.toFixed(0)} cm</span> · cutting <span class="num">${tiempo(b.corte_s)}</span> (<span class="num">${tiempo(b.acumulado_s)}</span> so far) · drill pulled up, cuttings brushed onto the surface and read${k === S.pasos.length ? ' · <b>hole done</b>' : ''}`;
+    tarjeta.querySelector('[data-v=sec-sig]').disabled = k >= S.pasos.length;
+  }
+  function pararTaladro() { clearInterval(V.tTaladro); V.tTaladro = null; const b = tarjeta.querySelector('[data-v=sec-play]'); if (b) b.textContent = '▶ Run the drill'; }
+  function engancharSecuencia() {
+    const S = V.x?.secuencia;
+    if (!S || !tarjeta.querySelector('[data-v=secuencia]')) return;
+    V.bocado = Math.min(V.bocado ?? 0, S.pasos.length);
+    tarjeta.querySelector('[data-v=sec-sig]').addEventListener('click', () => { pararTaladro(); V.bocado = Math.min(S.pasos.length, (V.bocado ?? 0) + 1); pintarPaso(); });
+    tarjeta.querySelector('[data-v=sec-cero]').addEventListener('click', () => { pararTaladro(); V.bocado = 0; pintarPaso(); });
+    tarjeta.querySelector('[data-v=sec-play]').addEventListener('click', (ev) => {
+      if (V.tTaladro) { pararTaladro(); return; }
+      if (V.bocado >= S.pasos.length) V.bocado = 0;
+      ev.currentTarget.textContent = '❚❚ Pause';
+      V.tTaladro = setInterval(() => { V.bocado++; pintarPaso(); if (V.bocado >= S.pasos.length) pararTaladro(); }, 700);
+      pintarPaso();
+    });
+    pintarPaso();
+  }
 
   function filasLectura(x) {
     return `<dl class="lect-v">${x.lectura.map((r) => `<dt>${r.k === 'hielo' ? '<i class="muestra-hielo"></i>' : ''}${r.et}</dt><dd class="${r.estado === 'medido' ? 'num' : 'tenue'}" data-v="${r.k}" data-estado="${r.estado}" data-valor="${r.valor === null ? '' : esc(String(r.valor))}">${esc(r.texto)}</dd>`).join('')}</dl>`;
@@ -307,6 +366,7 @@ export function crearVolatiles(p, ctx) {
       <label class="fila-o"><span class="et">Depth</span><span><input type="number" data-v="prof" min="0" step="0.1" value="${Number.isFinite(prof) ? prof : ''}"> m</span></label>
       <div class="tenue nota-o"><span class="propio">own parameter</span> · default: ${T.profundidad ? `drill class ${esc(T.profundidad.valor)} m ${cita(T.profundidad.ref)}` : 'no cited drill class: enter one'}</div>
       ${plan}
+      ${bloqueOperacion(x)}
       ${x.no_medido.map((r) => `<div class="no-medido" data-v="nm-${r.k}">${esc(r.texto)}</div>`).join('')}
       <div class="et">Ice expected</div>${esperado}`;
   }
@@ -320,6 +380,7 @@ export function crearVolatiles(p, ctx) {
       ${x.lectura.map((r) => `<tr data-v="${r.k}"><td>${r.et}</td>${xl ? `<td class="num">${esc(xl.lectura.find((y) => y.k === r.k)?.texto ?? '—')}</td>` : ''}<td class="${r.estado === 'medido' ? 'num' : 'tenue'}" data-estado="${r.estado}">${esc(r.texto)}</td></tr>`).join('')}</tbody></table>
       ${xl ? `<div class="tenue nota-o" data-v="luna-celda">Moon reading at cell ${xl.fila},${xl.col} of the Moon panel</div>` : '<div class="tenue nota-o" data-v="sin-luna">drill on the Moon panel to compare</div>'}
       <div class="tenue nota-o">no equivalence between Moon and Earth values is computed</div>
+      ${bloqueOperacion(x)}
       <div class="et">Not testable on Earth (catalogue) · TRIDENT</div>
       ${noEns.length ? noEns.map((y) => `<div class="no-ens">${esc(y.texto ?? '')} · ${cita(y)}</div>`).join('') : '<div class="tenue">No public source states what cannot be tested on Earth for this drill.</div>'}`;
   }
@@ -329,6 +390,7 @@ export function crearVolatiles(p, ctx) {
     if (luna) for (const q of ctx.paneles) if (q !== p && q.volatiles?.V.abierta) q.volatiles.pintar();
     e.sucio = true;
     dibujar();
+    pararTaladro();
     if (!V.x || !V.abierta) { tarjeta.hidden = true; tarjeta.innerHTML = ''; return; }
     const x = V.x, l = e.leer(V.perf.fila, V.perf.col);
     tarjeta.hidden = false;
@@ -339,6 +401,15 @@ export function crearVolatiles(p, ctx) {
     tarjeta.querySelector('[data-v=cerrar]').addEventListener('click', () => { V.abierta = false; pintar(); });
     tarjeta.querySelector('[data-v=quitar]').addEventListener('click', () => { V.perf = null; V.abierta = false; pintar(); });
     tarjeta.querySelector('[data-v=prof]')?.addEventListener('change', (ev) => { const v = +ev.target.value; if (v > 0) V.prof = v; pintar(); });
+    engancharSecuencia();
+  }
+
+  // Punto de perforación puesto desde fuera (el gemelo del otro panel): sin volver a avisar.
+  function perforarEn(fila, col) {
+    V.perf = { fila: Math.min(n - 1, Math.max(0, Math.round(fila))), col: Math.min(n - 1, Math.max(0, Math.round(col))) };
+    V.abierta = true;
+    V.bocado = 0;
+    pintar();
   }
 
   function dibujar() {
@@ -413,5 +484,5 @@ export function crearVolatiles(p, ctx) {
       ${agua}${pot}${prop}`;
   }
 
-  return { V, leyenda, dibujar, hoja, pintar, lectura };
+  return { V, leyenda, dibujar, hoja, pintar, lectura, perforarEn };
 }

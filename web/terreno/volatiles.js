@@ -144,6 +144,22 @@ export function planPerforacion(e = {}) {
   };
 }
 
+// Bocado a bocado al avance publicado. Solo el tiempo cortando: subir, cepillar el material y leerlo entre bocados no
+// está publicado. potencia_w (opcional) da un tope de energía: esa potencia durante todo el corte.
+export function secuenciaPerforacion({ profundidad_m, bocado_cm, avance_mm_s, potencia_w = null } = {}) {
+  if (![profundidad_m, bocado_cm, avance_mm_s].every((v) => typeof v === 'number' && Number.isFinite(v) && v > 0)) return null;
+  const total_cm = profundidad_m * 100, n = techo(total_cm / bocado_cm), conP = typeof potencia_w === 'number' && potencia_w > 0;
+  if (!Number.isFinite(n) || n > 10000) return null;
+  const pasos = [];
+  let acumulado_s = 0;
+  for (let k = 0; k < n; k++) {
+    const desde_cm = k * bocado_cm, hasta_cm = Math.min(total_cm, desde_cm + bocado_cm), corte_s = ((hasta_cm - desde_cm) * 10) / avance_mm_s;
+    acumulado_s += corte_s;
+    pasos.push({ k: k + 1, desde_cm, hasta_cm, corte_s, acumulado_s });
+  }
+  return { pasos, corte_s: acumulado_s, energia_max_wh: conP ? (potencia_w * acumulado_s) / 3600 : null };
+}
+
 export function plantaAgua(e = {}) {
   const mal = revisar(e, [['agua_kg', 'nn'], ['dias', 'pos'], ['fraccion_hielo', 'frac'], ['eficiencia', 'frac'], ['fraccion_min', 'frac', true], ['fraccion_max', 'frac', true]]);
   if (mal) return mal;

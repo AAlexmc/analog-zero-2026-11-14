@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { M_H2O, M_O2, M_H2, hieloEstable, lecturaPunto, planPerforacion, plantaAgua, energia, propelente, excavacionParaAgua } from '../terreno/volatiles.js';
+import { M_H2O, M_O2, M_H2, hieloEstable, lecturaPunto, planPerforacion, plantaAgua, energia, propelente, excavacionParaAgua, secuenciaPerforacion } from '../terreno/volatiles.js';
 import { planFlota } from '../terreno/obra.js';
 
 const RAD = Math.PI / 180;
@@ -361,4 +361,18 @@ test('excavation for water: bad regolith or fleet input names its field', () => 
   noEvaluable(excavacionParaAgua({ regolito_kg: 1000, ...FLOTA, n_robots: 1.5 }), 'n_robots');
   noEvaluable(excavacionParaAgua({ regolito_kg: 1000, ...FLOTA, fraccion_luz: 2 }), 'fraccion_luz');
   noEvaluable(excavacionParaAgua(), 'regolito_kg');
+});
+
+test('drill sequence: each bite takes its length over the feed speed; the last bite may be shorter', () => {
+  const s = secuenciaPerforacion({ profundidad_m: 1, bocado_cm: 10, avance_mm_s: 1.25, potencia_w: 400 });
+  assert.equal(s.pasos.length, 10);
+  assert.deepEqual([s.pasos[0].desde_cm, s.pasos[0].hasta_cm, s.pasos[0].corte_s], [0, 10, 80]);
+  assert.equal(s.pasos[9].acumulado_s, 800);
+  assert.equal(s.corte_s, 800);
+  assert.ok(Math.abs(s.energia_max_wh - 88.888888) < 1e-5);
+  const corto = secuenciaPerforacion({ profundidad_m: 0.25, bocado_cm: 10, avance_mm_s: 2 });
+  assert.equal(corto.pasos.length, 3);
+  assert.ok(Math.abs(corto.pasos[2].hasta_cm - 25) < 1e-9 && Math.abs(corto.pasos[2].corte_s - 25) < 1e-9);
+  assert.equal(corto.energia_max_wh, null);
+  for (const mal of [{}, { profundidad_m: 1, bocado_cm: 10 }, { profundidad_m: 0, bocado_cm: 10, avance_mm_s: 1 }, { profundidad_m: 1, bocado_cm: 10, avance_mm_s: NaN }, { profundidad_m: 1e9, bocado_cm: 1, avance_mm_s: 1 }]) assert.equal(secuenciaPerforacion(mal), null);
 });

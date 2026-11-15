@@ -682,6 +682,17 @@ function plantarGemelo(p, item) {
   return gemelo;
 }
 
+// «Drill here» en un panel pone también el punto en el otro, a los mismos metros del centro.
+function perforarGemelo(p, perf) {
+  const q = estado.espejo ? otroPanel(p) : null;
+  if (!q?.volatiles) return;
+  const r = celdaEspejo({ n: p.escena.n, m: p.escena.m }, { n: q.escena.n, m: q.escena.m, alturas: q.escena.mostradas }, perf.fila, perf.col);
+  if (!r) return;
+  q.sel = null;
+  q.volatiles.perforarEn(r.fila, r.col);
+  refrescarPlantado();
+}
+
 function plantarEn(p, id, fila, col) {
   const item = p.plantados.plantar(id, fila, col);
   crearMarca(p, item);
@@ -1247,7 +1258,7 @@ async function iniciar() {
       crearEquipo(p);
       p.rutas = crearRutas(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, elegirHerramienta, modoPlantar, refrescarPlantado });
       p.obra = crearObra(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, trasCambio, refrescarPlantado });
-      p.volatiles = crearVolatiles(p, { catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, refrescarPlantado, modoPlantar, elegirHerramienta, leyenda, paneles: estado.paneles });
+      p.volatiles = crearVolatiles(p, { catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, refrescarPlantado, modoPlantar, elegirHerramienta, leyenda, paneles: estado.paneles, alPerforar: perforarGemelo });
       p.base = crearBase(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, quitarPlantado, refrescarPlantado, evaluar, LECTURA, VARIABLE, OP, paneles: estado.paneles, alternarAmpliado, modoPlantar, elegirHerramienta });
       p.el.querySelector('.ampliar').disabled = false;
       // Las fichas (equipo, perforación) se abren en el panel lateral, bajo las acciones, no sobre el terreno.

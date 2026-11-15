@@ -33,3 +33,12 @@
 .vol-hoja .hielo-celda.si { border-left-color: var(--hielo); }
 .vol-hoja .hielo-celda.no { border-left: 3px dashed var(--ambar); }
 .vol-hoja .aviso-o2 { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(234, 254, 7, .08); }
+
+/* Secuencia de TRIDENT */
+.perf-sec { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; margin: 4px 0; }
+.perf-hoyo { display: grid; gap: 1px; border: 1px solid var(--linea); border-top: 3px solid var(--blanco); padding: 1px; }
+.perf-hoyo i { display: block; height: 9px; background: transparent; }
+.perf-hoyo i.hecho { background: var(--ambar); }
+.perf-paso { font-size: 13px; }
+.perf-det summary { cursor: pointer; font-size: 13px; }
+.perf-lista { margin: 4px 0 4px 18px; padding: 0; font-size: 12px; display: grid; gap: 4px; }
