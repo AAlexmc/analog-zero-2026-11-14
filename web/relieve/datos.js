@@ -5,6 +5,7 @@ import {
   urlTesela, zoomPara, decodificarTerrarium, rejillaLocal, remuestrear, teselasVentana, muestraMercator,
   muestraEquirect, filasEquirect, muestraPolo, filasPolo, leerI16, fuenteRelieve,
 } from './calculo.js';
+import { decodificarPng } from './png.js';
 
 const DATOS = new URL('../data/', import.meta.url);
 // Las teselas se piden sin cookies ni referer: solo la URL de la tesela.
@@ -63,7 +64,9 @@ async function tierra(g) {
     if (plantilla === URL_TERRARIUM) origenes.push(r.headers.get('x-amz-meta-x-imagery-sources') ?? '');
     const blob = await r.blob();
     bytes += blob.size;
-    return [`${t.x}/${t.y}`, await pixeles(blob)];
+    // La altura no pasa por canvas (ver png.js); la imagen sí: ahí un bit de ruido no se ve.
+    const exacto = plantilla === URL_TERRARIUM && typeof DecompressionStream !== 'undefined';
+    return [`${t.x}/${t.y}`, exacto ? (await decodificarPng(await blob.arrayBuffer())).rgba : await pixeles(blob)];
   };
   let alt, img;
   try {
