@@ -1127,7 +1127,7 @@ function comparacion(p, item, eq, evs) {
     const c = compararRequisito(qq, el, et);
     const mg = c.margen === null ? '' : ` title="within ± ${esc(cantidad(c.margen, qq.unidad, decimales(qq.unidad)))} of the Moon value counts as reproduced (own threshold)"`;
     return `<tr class="lec-${c.lectura}"><td>${esc(VARIABLE[qq.variable] ?? qq.variable)}${qq.variable === 'temp_k' ? ` ${esc(OP[qq.op] ?? qq.op)}` : ''}</td><td class="num">${esc(cantidad(c.luna, qq.unidad, decimales(qq.unidad)))}</td><td class="num">${esc(cantidad(c.tierra, qq.unidad, decimales(qq.unidad)))}</td>
-      <td${mg}>${esc(LECTURA[c.lectura])}${c.motivo ? `<div class="motivo">${esc(c.motivo)}</div>` : ''}</td></tr>`;
+      <td${mg}>${esc(LECTURA[c.lectura])}${c.motivo ? `<div class="motivo solo-fondo">${esc(c.motivo)}</div>` : ''}</td></tr>`;
   }).join('');
   const margenes = [...new Set(evs.map((r) => r.req.variable))].filter((v) => MARGEN[v]).map((v) => `${VARIABLE[v] ?? v} ± max(${MARGEN[v].abs}, ${Math.round(MARGEN[v].rel * 100)} %)`).join(' · ');
   const bases = evs.some((r) => r.req.variable === 'pendiente_deg') ? notaBasesPendiente(luna ? p.escena.m : q.escena.m, luna ? q.escena.m : p.escena.m) : null;

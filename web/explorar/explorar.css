@@ -7,23 +7,23 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   box-sizing: border-box; padding: 24px 24px 22px;
 }
 .panel .mundo { font-size: 44px; margin: 0 0 18px; }
-.paso h2, .mision > h2 { font-size: 21px; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
+.paso h2, .mision > h2 { font-size: 23px; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
 .paso p { margin: 0 0 14px; }
-.num-paso { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--neon-yellow); color: var(--neon-yellow); font-size: 14px; font-weight: 700; box-sizing: border-box; }
-.nombre-punto { font: 700 17px/1.3 var(--cuerpo); }
+.num-paso { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--neon-yellow); color: var(--neon-yellow); font-size: 17px; font-weight: 700; box-sizing: border-box; }
+.nombre-punto { font: 700 20px/1.3 var(--cuerpo); }
 .nombre-punto:empty { display: none; }
 .coords { display: flex; flex-direction: column; font-size: 26px; line-height: 1.25; margin-bottom: 18px !important; }
 .paso .marca-boton.grande { width: 100%; justify-content: center; box-sizing: border-box; text-decoration: none; display: inline-flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-.tenue { color: var(--texto-tenue); font-size: 14px; }
+.tenue { color: var(--texto-tenue); font-size: 17px; }
 
 .sugerencias { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.sugerencias::before { content: attr(data-titulo); flex-basis: 100%; font-size: 13px; color: var(--texto-tenue); }
+.sugerencias::before { content: attr(data-titulo); flex-basis: 100%; font-size: 16px; color: var(--texto-tenue); }
 .sugerencias:not([data-titulo])::before { display: none; }
 .sugerencia {
-  font: 700 15px/1.2 var(--cuerpo); color: var(--white); background: rgba(7, 23, 63, .6); text-align: left;
+  font: 700 18px/1.2 var(--cuerpo); color: var(--white); background: rgba(7, 23, 63, .6); text-align: left;
   border: 1px solid var(--linea); border-radius: 18px; padding: 10px 14px; cursor: pointer; min-height: 44px;
 }
-.sugerencia small { display: block; font-weight: 400; font-size: 13px; color: var(--neon-yellow); margin-top: 2px; }
+.sugerencia small { display: block; font-weight: 400; font-size: 16px; color: var(--neon-yellow); margin-top: 2px; }
 .sugerencia:hover, .sugerencia:focus-visible { border-color: var(--neon-yellow); outline: none; }
 .sugerencia[aria-pressed="true"] { border: 2px solid var(--neon-yellow); padding: 9px 13px; }
 .sugerencia.base { flex-basis: 100%; }
@@ -31,35 +31,35 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .reiniciar { position: fixed; z-index: 10; top: 84px; right: clamp(16px, 3vw, 40px); background: rgba(7, 23, 63, .72) !important; }
 .pista {
   position: fixed; z-index: 5; bottom: 22px; left: calc(50% + 190px); transform: translateX(-50%); margin: 0; white-space: nowrap;
-  font-size: 14px; color: var(--white); background: rgba(7, 23, 63, .72); border: 1px solid var(--linea); border-radius: 999px; padding: 8px 16px;
+  font-size: 17px; color: var(--white); background: rgba(7, 23, 63, .72); border: 1px solid var(--linea); border-radius: 999px; padding: 8px 16px;
 }
 .pista[hidden] { display: none; }
 .pista span + span::before { content: "·"; margin: 0 10px; color: var(--texto-tenue); }
-.credito { margin: 18px 0 0; font-size: 12px; color: var(--texto-tenue); }
+.credito { margin: 18px 0 0; font-size: 15px; color: var(--texto-tenue); }
 .explorar.sin-mundo #globo, .explorar.sin-mundo .reiniciar, .explorar.sin-mundo .pista { display: none; }
 
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   .panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 50vh; border-radius: 18px 18px 0 0; padding: 16px 18px 18px; border-bottom: 0; }
   .panel .mundo { font-size: 30px; margin-bottom: 8px; }
-  .paso h2, .mision > h2 { font-size: 18px; }
+  .paso h2, .mision > h2 { font-size: 21px; }
   .paso p { margin-bottom: 10px; }
-  .coords { flex-direction: row; gap: 14px; font-size: 19px; margin-bottom: 12px !important; }
+  .coords { flex-direction: row; gap: 14px; font-size: 21px; margin-bottom: 12px !important; }
   .sugerencias { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
   .sugerencias::before { display: none; }
   .sugerencia, .sugerencia.base { flex: 0 0 auto; white-space: nowrap; }
-  .reiniciar { top: 68px; right: 12px; padding: 10px 16px; font-size: 14px; }
-  .pista { left: 50%; bottom: auto; top: 118px; font-size: 13px; white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box; }
+  .reiniciar { top: 68px; right: 12px; padding: 10px 16px; font-size: 17px; }
+  .pista { left: 50%; bottom: auto; top: 118px; font-size: 16px; white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box; }
   .pista span:nth-child(2) { display: none; }
-  .credito { margin-top: 10px; font-size: 11px; }
+  .credito { margin-top: 10px; font-size: 14px; }
 }
 .ambiente { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--linea); border-radius: 12px; }
-.ambiente h3 { font: 700 14px/1.2 var(--cuerpo); margin: 0 0 8px; color: var(--texto-tenue); }
-.ambiente dl { display: grid; grid-template-columns: auto auto; gap: 4px 14px; margin: 0; font-size: 14px; }
+.ambiente h3 { font: 700 17px/1.2 var(--cuerpo); margin: 0 0 8px; color: var(--texto-tenue); }
+.ambiente dl { display: grid; grid-template-columns: auto auto; gap: 4px 14px; margin: 0; font-size: 17px; }
 .ambiente dd { margin: 0; text-align: right; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   .ambiente { padding: 8px 12px; margin-bottom: 12px; }
   .ambiente h3 { display: none; }
-  .ambiente dl { grid-template-columns: auto auto auto auto; font-size: 13px; gap: 2px 10px; }
+  .ambiente dl { grid-template-columns: auto auto auto auto; font-size: 16px; gap: 2px 10px; }
 }
 .ambiente sup { font-size: .7em; line-height: 0; }
 /* El botón del paso siguiente no se esconde: queda pegado al pie del panel aunque crezca lo de arriba. */

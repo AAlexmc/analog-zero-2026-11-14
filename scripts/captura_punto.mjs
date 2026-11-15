@@ -125,7 +125,10 @@ try {
   await pag.waitForFunction(() => window.__az.paneles.every((p) => !p.escena || p.volatiles?.V.D), null, { timeout: 30000 });
   await pag.click('.panel[data-lado=b] .perforar');
   const cb = await pag.locator('.panel[data-lado=b] .lienzo canvas').first().boundingBox();
-  await pag.mouse.click(cb.x + cb.width / 2 + 30, cb.y + cb.height * 0.7);
+  // Se pulsa suelo libre: un punto del lienzo que no tape la marca ni el rótulo de lo ya plantado.
+  const libre = await pag.evaluate((cb) => { for (const [dx, ky] of [[30, 0.7], [-120, 0.7], [140, 0.75], [-60, 0.85], [90, 0.6]]) { const x = cb.x + cb.width / 2 + dx, y = cb.y + cb.height * ky; if (document.elementFromPoint(x, y)?.tagName === 'CANVAS') return { x, y }; } return null; }, cb);
+  if (!libre) throw new Error('(e) no free spot on the Mars canvas to drill');
+  await pag.mouse.click(libre.x, libre.y);
   await pag.waitForTimeout(600);
   const perf = await pag.evaluate(() => window.__az.paneles.map((p) => ({ perf: !!p.volatiles.V.perf, t: p.el.querySelector('.perforacion').textContent.replace(/\s+/g, ' ').trim(), bocados: p.el.querySelector('.perforacion [data-v=secuencia]')?.dataset.bocados })));
   comprobar(perf[1].perf && perf[0].perf && /^Mars · /.test(perf[1].t) && /Reading at this point/.test(perf[1].t) && !/Earth · here|Not testable on Earth|Ice expected/.test(perf[1].t) && perf[1].bocados === '10', '(e) drill card on Mars: its reading and the TRIDENT sequence, no Earth or lunar-ice wording; Earth got its twin point', `(e) drill on Mars: ${JSON.stringify(perf).slice(0, 500)}`);

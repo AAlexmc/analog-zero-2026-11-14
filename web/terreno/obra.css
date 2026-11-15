@@ -3,15 +3,15 @@
 .obra:empty { display: none; }
 .obra .params, .obra-pad .params { display: flex; flex-direction: column; gap: 2px; }
 .obra .fila-o, .obra-pad .fila-o { flex-direction: row; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-.obra input[type=number], .obra-pad input[type=number] { font: 11px var(--mono); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); padding: 3px 4px; width: 72px; }
-.nota-o { font-size: 10px; }
+.obra input[type=number], .obra-pad input[type=number] { font: 14px var(--mono); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); padding: 3px 4px; width: 72px; }
+.nota-o { font-size: 13px; }
 .supuesto, .propio { color: var(--ambar); letter-spacing: .06em; }
 .obra dl, .obra-pad dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 4px 0; }
-.obra dt, .obra-pad dt { font-size: 10px; letter-spacing: .12em; color: var(--tenue); }
+.obra dt, .obra-pad dt { font-size: 13px; letter-spacing: .12em; color: var(--tenue); }
 .obra dd, .obra-pad dd { margin: 0; text-align: right; }
 .obra .pide { border-left: 3px solid var(--ambar); padding: 3px 6px; background: rgba(234, 254, 7, .08); }
 .obra dl.primera dd { color: var(--blanco); font-weight: 600; }
-.no-medido { font-size: 10px; border: 1px dashed var(--tenue); padding: 3px 5px; color: var(--tenue); }
+.no-medido { font-size: 13px; border: 1px dashed var(--tenue); padding: 3px 5px; color: var(--tenue); }
 .obra .aplicada, .obra-pad .aplicada { border-top: 1px solid var(--linea); padding-top: 4px; }
 .obra-pad { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid var(--linea); padding-top: 5px; }
 .obra-pad:empty { display: none; }

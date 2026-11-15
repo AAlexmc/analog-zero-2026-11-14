@@ -35,14 +35,14 @@
 }
 
 .marca-fondo { background: var(--deep-blue); background-image: var(--degradado); background-attachment: fixed; color: var(--texto); }
-.marca-cuerpo { font-family: var(--cuerpo); font-size: 16px; line-height: 1.45; }
+.marca-cuerpo { font-family: var(--cuerpo); font-size: 19px; line-height: 1.45; }
 .marca-titulo { font-family: var(--titulo); font-weight: 900; letter-spacing: .01em; line-height: 1.05; }
 .marca-subtitulo { font-family: var(--titulo); font-weight: 700; }
 .marca-num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .marca-acento { color: var(--acento); }
 
 .marca-boton {
-  font: 700 15px/1 var(--cuerpo); color: var(--deep-blue); background: var(--white);
+  font: 700 18px/1 var(--cuerpo); color: var(--deep-blue); background: var(--white);
   border: 2px solid var(--white); border-radius: 999px; padding: 12px 22px; cursor: pointer;
 }
 .marca-boton:hover, .marca-boton:focus-visible { background: var(--neon-yellow); border-color: var(--neon-yellow); outline: none; }
@@ -51,9 +51,9 @@
 .marca-boton:disabled { opacity: .45; cursor: not-allowed; }
 
 .marca-panel { background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio); }
-.marca-chip { display: inline-block; font: 700 12px/1 var(--cuerpo); letter-spacing: .06em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--linea); border-radius: 999px; }
-.marca-boton.grande { font-size: 18px; padding: 18px 30px; min-height: 56px; }
-.marca-sin-3d { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; pointer-events: none; padding: 10px 16px; background: var(--white); color: var(--deep-blue); font: 700 14px/1.35 var(--cuerpo); text-align: center; }
+.marca-chip { display: inline-block; font: 700 15px/1 var(--cuerpo); letter-spacing: .06em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--linea); border-radius: 999px; }
+.marca-boton.grande { font-size: 21px; padding: 18px 30px; min-height: 56px; }
+.marca-sin-3d { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; pointer-events: none; padding: 10px 16px; background: var(--white); color: var(--deep-blue); font: 700 17px/1.35 var(--cuerpo); text-align: center; }
 
 .marca-barra {
   position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 20px;
@@ -62,27 +62,27 @@
 }
 .marca-barra.en-flujo { position: relative; flex: none; }
 .marca-barra a.marca-enlace.actual { color: var(--white); font-weight: 700; }
-.marca-barra .marca-nombre { font: 900 19px/1 var(--titulo); letter-spacing: .02em; color: var(--white); text-decoration: none; }
+.marca-barra .marca-nombre { font: 900 21px/1 var(--titulo); letter-spacing: .02em; color: var(--white); text-decoration: none; }
 .marca-barra .hueco { flex: 1; }
 /* Logo del concurso: ficheros del kit oficial, sin tocar (blanco sobre el azul de la web; negro sobre papel en el informe). */
-.marca-barra .marca-concurso { flex: none; height: 28px; width: auto; }
+.marca-barra .marca-concurso { flex: none; height: 34px; width: auto; }
 .portada > .marca-concurso { position: fixed; left: clamp(16px, 4vw, 40px); bottom: 22px; z-index: 10; height: 60px; width: auto; pointer-events: none; }
 @media (max-width: 900px) { .marca-barra .marca-concurso { display: none; } .portada > .marca-concurso { height: 40px; bottom: 14px; } }
-.marca-barra a.marca-enlace { font-size: 14px; color: var(--texto-tenue); text-decoration: none; }
+.marca-barra a.marca-enlace { font-size: 17px; color: var(--texto-tenue); text-decoration: none; }
 .marca-barra a.marca-enlace:hover, .marca-barra a.marca-enlace:focus-visible { color: var(--neon-yellow); outline: none; }
 .marca-barra a.marca-enlace.volver { color: var(--white); font-weight: 700; }
 .marca-barra .corto { display: none; }
 :root[data-modo="simple"] .solo-fondo { display: none !important; }
 :root:not([data-modo="simple"]) .solo-simple { display: none !important; }
-.nota-modo { font-size: 13px; color: var(--texto-tenue); }
+.nota-modo { font-size: 16px; color: var(--texto-tenue); }
 body > .nota-modo { margin: 6px clamp(16px, 4vw, 40px) 0; }
 .marca-modo { display: inline-flex; flex: none; border: 1px solid var(--linea); border-radius: 999px; overflow: hidden; }
-.marca-modo button { font: 700 12px/1 var(--cuerpo); color: var(--texto-tenue); background: transparent; border: 0; padding: 2px 9px; cursor: pointer; white-space: nowrap; }
+.marca-modo button { font: 700 15px/1 var(--cuerpo); color: var(--texto-tenue); background: transparent; border: 0; padding: 2px 9px; cursor: pointer; white-space: nowrap; }
 /* Sin sitio en la línea (móvil y visor de terreno, cuya barra ya va llena): pestaña colgada bajo la barra, sin cambiar su altura. */
 .marca-barra.en-flujo .marca-modo { position: absolute; top: 100%; right: clamp(16px, 4vw, 40px); z-index: 1; background: var(--deep-blue); border-top: 0; border-radius: 0 0 8px 8px; }
 @media (max-width: 760px) { .marca-barra .marca-modo { position: absolute; top: 100%; right: clamp(16px, 4vw, 40px); background: var(--deep-blue); border-top: 0; border-radius: 0 0 8px 8px; } }
-.marca-barra.en-flujo .marca-idioma { right: calc(clamp(16px, 4vw, 40px) + 136px); }
-@media (max-width: 760px) { .marca-barra .marca-idioma { right: calc(clamp(16px, 4vw, 40px) + 136px); } }
+.marca-barra.en-flujo .marca-idioma { right: calc(clamp(16px, 4vw, 40px) + 176px); }
+@media (max-width: 760px) { .marca-barra .marca-nombre { font-size: 19px; } .marca-barra a.marca-enlace { font-size: 14px; } .marca-modo button { font-size: 12px; } .marca-barra .marca-idioma { right: calc(clamp(16px, 4vw, 40px) + 136px); } }
 .marca-modo button[aria-pressed="true"] { color: var(--deep-blue); background: var(--white); }
 .marca-modo button[aria-pressed="false"]:hover, .marca-modo button[aria-pressed="false"]:focus-visible { color: var(--neon-yellow); outline: none; }
 .marca-modo button[aria-pressed="true"]:focus-visible { outline: 2px solid var(--neon-yellow); outline-offset: -2px; }
