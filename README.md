@@ -8,7 +8,9 @@ Before a base goes to the Moon or Mars, it has to be rehearsed on Earth. Analog 
 
 [![The same base laid out on an Earth place and on the lunar south pole, with the Sun moving through the day](docs/media/base-on-two-worlds.gif)](docs/media/in-depth/04-base-on-two-worlds.mp4)
 
-**Watch:** [the 30-second pitch](docs/media/analog-zero-pitch.mp4) · [seven short clips, one per feature](#see-it-in-depth) · **Run it:** [one command, no build](#open-it)
+**Try it now, in your browser: https://aalexmc.github.io/analog-zero-2026-11-14/** (nothing to install; a computer with a recent browser works best)
+
+**Watch:** [the 30-second pitch](docs/media/analog-zero-pitch.mp4) · [seven short clips, one per feature](#see-it-in-depth) · **Run it yourself:** [one command, no build](#open-it)
 
 ## Where it stands out
 
@@ -55,6 +57,10 @@ Every clip is a screen recording of the running app on real data, cut to under 4
 - **0** servers, accounts or build steps: it is a static site.
 
 ## Open it
+
+Online: https://aalexmc.github.io/analog-zero-2026-11-14/ (the `web/` folder of this repository, published as it is).
+
+On your own computer:
 
 ```
 python3 -m http.server 8080 -d web
