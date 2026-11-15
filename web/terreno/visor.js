@@ -16,6 +16,7 @@ import { crearCerca, capaModelos, catalogoModelos, medidaTexto } from './modelo3
 import { volumenPublicado } from './modelos_generados.js';
 import { PREFIJO, equiposDeMision, formaPublicada, medidaForma, sustitutoDe, limitesDe, textoPendiente } from './equipo_mision.js';
 import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM } from './lugar.js';
+import { crearDia } from './panel_dia.js';
 import { celdaEspejo, textoDesplazamiento, filasEspejo, resumenEspejo, MARGEN_SOL_DEG, MARGEN_LUZ_FRAC } from './espejo.js';
 
 const qs = new URLSearchParams(location.search);
@@ -279,15 +280,15 @@ function crearMandos(p) {
     leyenda(p);
   }));
   let pendiente = false;
-  const solInput = () => {
+  const solInput = (cual = 'az') => {
     const az = +el.querySelector('[data-sol=az]').value, ev = +el.querySelector('[data-sol=el]').value;
     el.querySelector('[data-v=az]').textContent = txtAz(az);
     el.querySelector('[data-v=el]').textContent = `${ev.toFixed(1)}°`;
     if (pendiente) return;
     pendiente = true;
-    requestAnimationFrame(() => { pendiente = false; p.escena.setSol(az, ev); leyenda(p); });
+    requestAnimationFrame(() => { pendiente = false; p.escena.setSol(az, ev); leyenda(p); estado.dia?.manual(p, cual); });
   };
-  el.querySelectorAll('[data-sol]').forEach((i) => i.addEventListener('input', solInput));
+  el.querySelectorAll('[data-sol]').forEach((i) => i.addEventListener('input', () => solInput(i.dataset.sol)));
   const dia = el.querySelector('[data-a=dia]');
   dia?.addEventListener('click', () => {
     if (p.dia) { cancelAnimationFrame(p.dia); p.dia = null; dia.setAttribute('aria-pressed', 'false'); return; }
@@ -829,6 +830,7 @@ function refrescarPlantado() {
     p.rutas?.refrescar();
     p.escena.sucio = true;
   }
+  estado.dia?.refrescar();
 }
 
 function filaRequisito(r, meta) {
@@ -978,11 +980,10 @@ function pintarHojaMision(p, hoja, item, q) {
 
 // Mismo equipo en el otro mundo: qué coincide, qué no y qué no se puede medir; con la Tierra delante, lo que no reproduce.
 const MUNDO = { luna: 'moon', tierra: 'earth', marte: 'mars' };
-const luzEn = (x, it) => x.escena.sol.el > 0 && x.escena.datosSombra[it.fila * x.escena.n + it.col] === 255;
 function ladoEspejo(x, it) {
   const e = x.escena, i = it.fila * e.n + it.col, capas = {};
   for (const k of ['iluminacion', 'temp_max']) if (e.capas[k]) capas[k] = e.capas[k][i];
-  return { cuerpo: CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, pendiente: medidasDe(x, it).pendiente_deg, sol: { el: e.sol.el, luz: luzEn(x, it) }, dia: x.dia?.de(it) ?? null, capas };
+  return { cuerpo: CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, pendiente: medidasDe(x, it).pendiente_deg, sol: { el: e.sol.el, luz: e.conSol(it.fila, it.col) }, dia: estado.dia?.de(x, it) ?? null, capas };
 }
 
 function noReproducible(a, b) {
@@ -1262,6 +1263,8 @@ async function iniciar() {
     }
   });
   enlazarCamaras();
+  const mesUrl = /^([1-9]|1[0-2])$/.test(MES ?? '') ? +MES : null;
+  estado.dia = crearDia(document.getElementById('dia'), { paneles: estado.paneles, esc, nombreCorto, CUERPO, mes: mesUrl, alCambiar: refrescarPlantado });
   refrescarPlantado();
   const solo = [pa, pb].find((p) => p.id && p.id === sel.solo);
   if (solo?.escena) alternarAmpliado(solo, true);

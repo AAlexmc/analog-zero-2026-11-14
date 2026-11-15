@@ -243,7 +243,7 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 }
 
 /* Equipo espejo */
-.aviso-espejo { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); z-index: 4; max-width: calc(100% - 24px); padding: 7px 14px; border-radius: var(--radio); background: var(--blanco); color: var(--fondo); font-size: 13px; }
+.aviso-espejo { position: absolute; left: 10px; bottom: 8px; z-index: 4; max-width: min(46%, 300px); padding: 7px 14px; border-radius: var(--radio); background: var(--blanco); color: var(--fondo); font-size: 13px; }
 .aviso-espejo[hidden] { display: none; }
 .espejo { margin: 10px 0; padding-top: 8px; border-top: 1px solid var(--linea); }
 .resumen-espejo { display: grid; gap: 4px; margin: 6px 0 8px; font-size: 13px; }
@@ -252,3 +252,28 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 .resumen-espejo .r-distinto { border-left-color: var(--rojo); }
 .comp tr.esp-distinto td:last-child b { color: var(--rojo); }
 #espejo[hidden] { display: none; }
+
+/* Recorrido del día */
+.dia { flex: none; margin: 10px 12px 0; padding: 8px 14px; border: 1px solid var(--linea); border-radius: var(--radio); background: var(--panel); display: grid; gap: 6px; }
+.dia[hidden] { display: none; }
+.dia-mandos { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.dia-mandos .marca-subtitulo { margin: 0; font-size: 16px; }
+.dia-mandos [data-a=play] { min-width: 150px; }
+.dia-mandos [data-a=hora] { width: clamp(140px, 22vw, 360px); }
+.dia-mandos select { font: 700 13px/1 var(--sans); color: var(--blanco); background: var(--fondo); border: 1px solid var(--linea); border-radius: 999px; padding: 6px 10px; }
+.dia-mandos [hidden] { display: none; }
+.dia-fuentes { font-size: 12px; flex: 1 1 260px; }
+.dia-lecturas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; font-size: 13px; }
+.dia-lectura[hidden] { display: none; }
+.dia-texto { display: flex; flex-wrap: wrap; gap: 0 14px; }
+.dia-noche { color: var(--ambar); }
+.dia-tira { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 3px; }
+.dia-tira[hidden] { display: none; }
+.dia-tira .celdas { display: inline-grid; grid-template-columns: repeat(24, 9px); gap: 1px; }
+.dia-tira .celdas i { height: 14px; border: 1px solid var(--linea); background: transparent; }
+.dia-tira .celdas i.sol { background: var(--ambar); border-color: var(--ambar); }
+.dia-tira .celdas i.sombra { background: var(--prusia); }
+.dia-tira .celdas i.ahora { outline: 2px solid var(--blanco); outline-offset: 1px; }
+body[data-unico] .dia-lecturas, body[data-ampliado] .dia-lecturas { grid-template-columns: 1fr; }
+body[data-ampliado=a] .dia-lectura[data-lado=b], body[data-ampliado=b] .dia-lectura[data-lado=a] { display: none; }
+@media (max-width: 760px) { .dia-lecturas { grid-template-columns: 1fr; } .dia-fuentes { display: none; } }

@@ -274,10 +274,50 @@ export function crearCerca() {
 
 // ---------- Capa sobre el terreno ----------
 // extra(equipo) (opcional) → {fichero} o {generado: {base, tam, clase}} para equipo que no está en el catálogo (misiones).
+// Sombra de un equipo: cinta sobre el suelo, del ancho de su caja visto desde el sol y de largo alto ÷ tan(altura del sol);
+// sigue el relieve y se corta donde el terreno sube por encima del rayo. No es la silueta del equipo.
+const SEG_SOMBRA = 40;
+const matSombra = new THREE.MeshBasicMaterial({ color: 0x07173f, transparent: true, opacity: 0.62, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+function crearSombra() {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array((SEG_SOMBRA + 1) * 6), 3));
+  const idx = [];
+  for (let j = 0; j < SEG_SOMBRA; j++) { const a = 2 * j; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  geo.setIndex(idx);
+  const m = new THREE.Mesh(geo, matSombra);
+  m.frustumCulled = false;
+  return m;
+}
+
+// Devuelve el largo dibujado en km (0 si el terreno la corta al pie), o null si no hay sol sobre el equipo.
+function trazarSombra(malla, escena, it, centro, y, tam, fx) {
+  // Solo a escala real: con los modelos ampliados la cinta cruzaría medio mapa.
+  malla.visible = fx === 1 && escena.conSol(it.fila, it.col);
+  if (!malla.visible) return null;
+  const u = escena.uniforms.uSol.value, hn = Math.hypot(u.x, u.z) || 1, dx = -u.x / hn, dz = -u.z / hn;
+  const tanE = Math.tan(escena.sol.el * Math.PI / 180), H = (tam.y * fx) / 1000;
+  const medio = ((Math.abs(tam.x * dz) + Math.abs(tam.z * dx)) * fx) / 2000;
+  const L = Math.min(H / tanE, escena.ladoKm * 2), eps = 0.00003 * fx;
+  const pos = malla.geometry.attributes.position;
+  let ultimo = 0, corte = false;
+  for (let j = 0; j <= SEG_SOMBRA; j++) {
+    const s = corte ? ultimo : (L * j) / SEG_SOMBRA, px = centro.x + dx * s, pz = centro.z + dz * s;
+    const g = escena.alturaSuelo(px, pz);
+    if (!corte && j > 0 && (!Number.isFinite(g) || g > y + H - s * tanE + eps)) { corte = true; j--; continue; }
+    if (!corte) ultimo = s;
+    for (const [k, lado] of [[0, -1], [1, 1]]) {
+      const x = px - dz * medio * lado, z = pz + dx * medio * lado, gy = escena.alturaSuelo(x, z);
+      pos.setXYZ(2 * j + k, x, (Number.isFinite(gy) ? gy : Number.isFinite(g) ? g : y) + eps, z);
+    }
+  }
+  pos.needsUpdate = true;
+  return ultimo;
+}
+
 export function capaModelos(escena, lienzo, extra = null) {
   const grupo = new THREE.Group();
-  const sol = new THREE.DirectionalLight(0xffffff, 2.2);
-  escena.escena.add(grupo, new THREE.HemisphereLight(0xdfe8f0, 0x30363d, 2), sol, sol.target);
+  const sol = new THREE.DirectionalLight(0xffffff, 2.2), ambiente = new THREE.HemisphereLight(0xdfe8f0, 0x30363d, 2);
+  escena.escena.add(grupo, ambiente, sol, sol.target);
   const nota = document.createElement('div');
   nota.className = 'nota-modelos';
   nota.hidden = true;
@@ -288,11 +328,13 @@ export function capaModelos(escena, lienzo, extra = null) {
   function sincronizar(lista) {
     if (lista.length && !cat.lista) catalogoModelos().then(() => { escena.sucio = true; });
     const vivos = new Set(lista.map((it) => it.uid));
-    for (const [uid, x] of inst) if (!vivos.has(uid)) { if (x.obj) grupo.remove(x.obj); inst.delete(uid); }
+    for (const [uid, x] of inst) if (!vivos.has(uid)) { if (x.obj) grupo.remove(x.obj); if (x.sombra) { grupo.remove(x.sombra); x.sombra.geometry.dispose(); } inst.delete(uid); }
+    sol.intensity = escena.sol.el > 0 ? 2.2 : 0;
+    ambiente.intensity = 2 * escena.luzDia;
     factor = factorAmpliacion(escena.camara.position.distanceTo(escena.controles.target) * 1000);
     sol.position.copy(escena.uniforms.uSol.value).multiplyScalar(100);
     const fallos = new Set(), clases = new Set();
-    let hay = 0, cargando = 0, cambio = false, topados = 0;
+    let hay = 0, cargando = 0, cambio = false, topados = 0, sombras = 0;
     for (const it of lista) {
       const ex = extra?.(it.equipo) ?? null;
       const m = ex ? (ex.fichero ? { fichero: ex.fichero } : null) : modeloDe(cat.lista, it.equipo);
@@ -325,7 +367,14 @@ export function capaModelos(escena, lienzo, extra = null) {
       const df = (tam.z / 2) * fx / escena.m, dc = (tam.x / 2) * fx / escena.m;
       const centro = escena.mundoDePixel(it.fila, it.col);
       const y = Math.max(centro.y, ...[[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([a, b]) => escena.mundoDePixel(it.fila + a * df, it.col + b * dc).y));
-      const pos = `${centro.x},${y},${centro.z},${fx}`;
+      const pos = `${centro.x},${y},${centro.z},${fx}`, luz = `${pos}|${escena.sol.az}|${escena.sol.el}|${escena.versionAlturas}`;
+      if (luz !== x.luz) {
+        x.luz = luz;
+        if (!x.sombra) { x.sombra = crearSombra(); grupo.add(x.sombra); }
+        x.sombra_km = trazarSombra(x.sombra, escena, it, centro, y, tam, fx);
+        cambio = true;
+      }
+      if (x.sombra?.visible) sombras++;
       if (pos === x.pos) continue;
       x.pos = pos;
       x.obj.position.set(centro.x, y, centro.z);
@@ -337,6 +386,7 @@ export function capaModelos(escena, lienzo, extra = null) {
     if (clases.has('esquematico')) partes.push('schematics: built from published dimensions');
     if (clases.has('concepto')) partes.push('concepts: own design');
     if (clases.has('volumen')) partes.push('boxes and domes: published size, not the real shape');
+    if (sombras) partes.push('equipment shadows: a strip as wide as the item, height ÷ tan(Sun height) long, not its outline');
     if (cargando) partes.push('loading 3D model…');
     for (const f of fallos) partes.push(`3D model failed to load: ${f}`);
     if (lista.length && cat.error) partes.push(cat.error);
@@ -351,6 +401,7 @@ export function capaModelos(escena, lienzo, extra = null) {
     instancias: () => [...inst].map(([uid, x]) => ({
       uid, equipo: x.equipo, fichero: x.fichero, generado: x.generado, enEscena: x.obj?.parent === grupo, factor, estado: x.fichero ? cargas.get(x.fichero)?.estado : 'ok',
       mallas: x.obj ? (() => { let k = 0; x.obj.traverse((o) => { if (o.isMesh) k++; }); return k; })() : 0,
+      sombra: x.sombra ? { visible: x.sombra.visible, dibujada_m: x.sombra.visible ? (x.sombra_km * 1000) / factorModelo(factor, x.fichero ? cargas.get(x.fichero)?.datos?.tam : x.tam) : null } : null,
       pos: x.obj ? x.obj.position.toArray() : null, tam: (x.fichero ? cargas.get(x.fichero)?.datos?.tam : x.tam)?.toArray() ?? null,
     })),
     nota: () => (nota.hidden ? null : nota.textContent),

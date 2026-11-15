@@ -36,7 +36,7 @@ const colorTal = (hex) => new THREE.Color().setHex(hex, THREE.LinearSRGBColorSpa
 
 const FS = /* glsl */`
 uniform sampler2D uAlt, uSombra, uCapa, uAgua, uImg;
-uniform float uN, uM, uGain, uAmb, uZmin, uZmax, uCurva, uRkm;
+uniform float uN, uM, uGain, uAmb, uZmin, uZmax, uCurva, uRkm, uDia;
 uniform vec3 uSol;
 uniform int uModo, uCapaModo, uHayAgua;
 uniform vec2 uCapaRango;
@@ -107,6 +107,7 @@ void main() {
     float w = fwidth(length(vXZ - uPincel.xy));
     col = mix(col, BLA, 1.0 - smoothstep(0.0, 1.5 * w, r));
   }
+  col *= uDia;
   if (uNieblaD.z > 0.0) col = mix(col, uNiebla, uNieblaD.z * smoothstep(uNieblaD.x, uNieblaD.y, vDist));
   gl_FragColor = vec4(col, 1.0);
 }`;
@@ -176,7 +177,7 @@ export class Escena {
       uZmin: { value: r.min }, uZmax: { value: r.max }, uCurva: { value: intervaloBonito(Math.max(r.max - r.min, 1) / 20) }, uRkm: { value: meta.georef.radio_m / 1000 },
       uSol: { value: new THREE.Vector3(0, 1, 0) }, uModo: { value: 0 }, uCapaModo: { value: 0 },
       uCapaRango: { value: new THREE.Vector2(0, 1) }, uCapaColor: { value: new THREE.Vector3(1, 1, 1) }, uPincel: { value: new THREE.Vector3(0, 0, -1) },
-      uNiebla: { value: colorTal(BLANCO) }, uNieblaD: { value: new THREE.Vector3(0, 1, 0) },
+      uNiebla: { value: colorTal(BLANCO) }, uNieblaD: { value: new THREE.Vector3(0, 1, 0) }, uDia: { value: 1 },
     };
     const seg = Math.min(n - 1, 1023);
     const geo = new THREE.PlaneGeometry(L, L, seg, seg);
@@ -207,6 +208,7 @@ export class Escena {
     this.cielo.visible = false;
     this.escena.add(this.cielo);
     this.conBruma = aire;
+    this.luzDia = 1;
     this.suelo = null;
     this.teclas = new Set();
     this.#ratonSuelo();
@@ -227,6 +229,7 @@ export class Escena {
       d[2 * i] = ok ? v : this.relleno; d[2 * i + 1] = ok ? 1 : 0;
     }
     this.tAlt.needsUpdate = true;
+    this.versionAlturas = (this.versionAlturas ?? 0) + 1;
     this.geoRayo = null;
     this.sucio = true;
   }
@@ -252,15 +255,38 @@ export class Escena {
 
   setModo(m) { this.uniforms.uModo.value = MODOS[m]; this.sucio = true; }
 
+  // el <= 0: el sol está bajo el horizonte y nada recibe luz directa. Con aire, el cielo y el suelo se apagan entre
+  // 0° y −6° (crepúsculo civil; el reparto de esa luz es criterio propio, no una medida).
   setSol(az, el) {
     this.sol = { az, el };
-    const a = az * Math.PI / 180, e = el * Math.PI / 180;
+    const a = az * Math.PI / 180, e = Math.max(el, 0) * Math.PI / 180;
     this.uniforms.uSol.value.set(Math.cos(e) * Math.sin(a), Math.sin(e), -Math.cos(e) * Math.cos(a));
     this.uniforms.uGain.value = 1 / Math.sin(Math.min(e + 20 * Math.PI / 180, Math.PI / 2));
+    const k = this.conBruma ? Math.min(1, Math.max(0, (el + 6) / 6)) : 1;
+    this.luzDia = this.conBruma ? 0.25 + 0.75 * k : 1;
+    this.uniforms.uDia.value = this.luzDia;
+    if (this.conBruma) {
+      const noche = colorTal(AZUL_PROFUNDO), u = this.cielo.material.uniforms;
+      u.uArriba.value.copy(noche).lerp(colorTal(AZUL_YONDER), k);
+      u.uHorizonte.value.copy(noche).lerp(colorTal(BLANCO), k);
+      this.uniforms.uNiebla.value.copy(u.uHorizonte.value);
+    }
     this.recalcularSombras();
   }
 
+  // Luz directa en la celda: hay sol sobre el horizonte y el relieve no lo tapa.
+  conSol(fila, col) { return this.sol.el > 0 && this.datosSombra[Math.round(fila) * this.n + Math.round(col)] === 255; }
+
+  fraccionConSol() {
+    if (!(this.sol.el > 0)) return 0;
+    let k = 0, t = 0;
+    const a = this.mostradas, d = this.datosSombra;
+    for (let i = 0; i < d.length; i++) if (Number.isFinite(a[i])) { t++; if (d[i] === 255) k++; }
+    return t ? k / t : NaN;
+  }
+
   recalcularSombras() {
+    if (!(this.sol.el > 0)) { this.datosSombra.fill(0); this.tSombra.needsUpdate = true; this.sucio = true; return; }
     const h = sobrePlanoTangente(this.mostradas, this.n, this.m, this.meta.georef.radio_m);
     this.datosSombra.set(sombras(h, this.n, this.m, this.sol.az, this.sol.el));
     this.tSombra.needsUpdate = true;
