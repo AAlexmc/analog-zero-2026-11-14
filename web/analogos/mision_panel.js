@@ -1,7 +1,7 @@
 // Objetivo de misión en pantalla: selector, formulario «New mission», ficha y mes («When»). Lo usan la pantalla del mundo y resultados, con los mismos ids.
 import { CORTES, nombreCorto } from './metricas.js';
 import { formatoLatLon } from '../explorar/geo.js';
-import { ID_NUEVA, comparables, elegible, textoOpcion, noMedidas, sitiosReferencia, validarNueva, activaDeCatalogo, activaNueva, escribirEstado } from './misiones.js';
+import { ID_NUEVA, comparables, elegible, textoOpcion, misionesDe, noMedidas, sitiosReferencia, validarNueva, activaDeCatalogo, activaNueva, escribirEstado } from './misiones.js';
 import { MESES_LARGO, escribirMes } from './meses.js';
 
 const $ = (id) => document.getElementById(id);
@@ -58,7 +58,8 @@ export function montarMision({ misiones, indice, sitios, mundo, activa, alCambia
   let actual = activa;
   const P = Object.fromEntries(comparables(indice).map((p) => [p.id, p]));
   const guardarUrl = () => history.replaceState(history.state, '', `${location.pathname}?${escribirEstado(new URLSearchParams(location.search), actual)}`);
-  $('mision').append(...misiones.filter((m) => m.id !== ID_NUEVA).map((m) => el('option', { value: m.id, textContent: textoOpcion(m, mundo, indice), disabled: !elegible(m, indice) })),
+  // Solo las misiones de este mundo; una de otro mundo que llegue en la URL se queda, rotulada.
+  $('mision').append(...misionesDe(misiones, mundo, actual?.id).filter((m) => m.id !== ID_NUEVA).map((m) => el('option', { value: m.id, textContent: textoOpcion(m, mundo, indice), disabled: !elegible(m, indice) })),
     el('option', { value: ID_NUEVA, textContent: 'New mission…' }));
   $('mision').value = actual?.id ?? '';
   $('nueva-punto-titulo').textContent = `Compared with your point ${EN[mundo]}`;

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ID_NUEVA, TITULO_MAX, parametrosDe, referenciaDe, noMedidas, elegible, textoOpcion, resumenLugar, lineaResumen, validarNueva, sitiosReferencia, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, conMision, opcionesBusqueda, frasesNoUsados } from '../analogos/misiones.js';
+import { misionesDe, ID_NUEVA, TITULO_MAX, parametrosDe, referenciaDe, noMedidas, elegible, textoOpcion, resumenLugar, lineaResumen, validarNueva, sitiosReferencia, activaDeCatalogo, activaNueva, leerEstado, escribirEstado, conMision, opcionesBusqueda, frasesNoUsados } from '../analogos/misiones.js';
 import { formatoValor, NOMBRE_CORTO, nombreCorto } from '../analogos/metricas.js';
 
 const leer = (r) => JSON.parse(readFileSync(new URL(r, import.meta.url), 'utf8'));
@@ -35,7 +35,19 @@ test('a mission with no public source (or nothing we can measure) is listed but 
   assert.equal(textoOpcion(sintetica({ caracteristicas: [caracteristica([], false)] }), 'mars', INDICE), 'Synthetic — nothing we can measure');
 });
 
-test('option text: missions for the other world stay selectable with "— Moon only" / "— Mars only"', () => {
+test('each world lists only its own missions; one from the other world is kept only if it is the active one', () => {
+  const ids = (mundo, conservar) => misionesDe(CATALOGO, mundo, conservar).map((m) => m.id);
+  const luna = ids('moon'), marte = ids('mars');
+  assert.ok(luna.includes('habitats_inflables') && !marte.includes('habitats_inflables'));
+  assert.ok(marte.includes('biomarcadores') && !luna.includes('biomarcadores'));
+  assert.ok(luna.includes('georradar_hielo') && marte.includes('georradar_hielo'));
+  for (const m of CATALOGO) assert.ok(luna.includes(m.id) || marte.includes(m.id), `${m.id} is offered somewhere`);
+  assert.ok(luna.length < CATALOGO.length && marte.length < CATALOGO.length);
+  assert.deepEqual(ids('moon', 'biomarcadores').filter((x) => !luna.includes(x)), ['biomarcadores']);
+  assert.deepEqual(misionesDe([{ id: 'x' }, { id: 'y', cuerpo: [] }], 'moon').map((m) => m.id), ['x', 'y']);
+});
+
+test('option text: a mission of the other world that is still listed says "— Moon only" / "— Mars only"', () => {
   assert.equal(textoOpcion(mision('biomarcadores'), 'mars', INDICE), 'Life-detection instruments');
   assert.equal(textoOpcion(mision('biomarcadores'), 'moon', INDICE), 'Life-detection instruments — Mars only');
   assert.equal(textoOpcion(mision('habitats_inflables'), 'mars', INDICE), 'Inflatable habitat testing — Moon only');

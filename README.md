@@ -15,7 +15,8 @@ Then open http://localhost:8080. The site is static: no build step, no account a
 ## The tour, in five steps
 
 1. **Pick a world.** The Moon or Mars, on the home page.
-2. **Pick a mission objective.** A kind of test NASA runs at Earth analog sites (21 in `web/data/misiones.json`), or «New mission» with a title and parameters of your own.
+2. **Pick a mission objective.** A kind of test NASA runs at Earth analog sites (21 in `web/data/misiones.json`; each world lists only its own), or «New mission» with a title and parameters of your own.
+   - **Where the test fits:** spots A–E on the globe are the places on that world most like NASA's Earth test site for the mission, on the parameters that world has measured (the analog search run backwards); the pin goes to A.
    - **When:** next to the mission, a month or the whole year. With a month, or with «Show how these places change through the year», each place shows its match in each of the 12 months (`docs/metrica-analogos.md`, «Meses»).
    - **Calendar** tab: for the chosen place, its match each month, the best place on Earth that month, and the mission's equipment against its published limits. «Repeat a test later» takes a first month and a gap, and says «Stay» or «Move the test», and where to.
 3. **Place a point.**

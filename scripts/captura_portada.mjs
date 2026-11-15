@@ -349,7 +349,8 @@ try {
   else ok(`mobile view: bar links, panel, Reset view, hint and "Find Earth analogs" inside 390×844 without overlaps; pin at ${sPm.x.toFixed(0)},${sPm.y.toFixed(0)} above the panel (top ${pnl.top.toFixed(0)})`);
   await mov.screenshot({ path: join(SALIDA, '13-movil-polo-sur.png') });
   const t0 = await mov.evaluate(() => window.__az.vista.camara.position.toArray());
-  await mov.touchscreen.tap(195, 330);
+  // Lejos del botón «… spots here · zoom in», que cae bajo la chincheta.
+  await mov.touchscreen.tap(120, 205);
   await mov.waitForTimeout(150);
   const pTap = await leerPunto(mov);
   const t1 = await mov.evaluate(() => window.__az.vista.camara.position.toArray());

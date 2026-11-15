@@ -9,6 +9,8 @@ import { engancharRelieve } from '../relieve/enganche.js';
 import { leerEstado, conMision } from '../analogos/misiones.js';
 import { montarMision, pintarFicha, montarMes } from '../analogos/mision_panel.js';
 import { leerMes, conMes } from '../analogos/meses.js';
+import { nombreCorto } from '../analogos/metricas.js';
+import { puntosDeMision, frasesPuntos, distanciaKm } from './mision_puntos.js';
 
 // Vista inicial (propia): la Luna algo desde el sur para que se vea el polo; Marte de cara a Syrtis–Jezero.
 const VISTA0 = { moon: { lat: -38, lon: 0 }, mars: { lat: 15, lon: 72 } };
@@ -81,7 +83,7 @@ if (!mundo) {
 }
 
 // Paso ① «Mission objective»: aquí solo se elige; la búsqueda la hace resultados. Sin misiones.json o sin índice no sale.
-async function montarPasoMision(m, ponerBuscar) {
+async function montarPasoMision(m, ponerBuscar, alMision) {
   const fallo = (e) => { V.errores.push(String(e?.message ?? e)); };
   const json = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}: ${url}`); return r.json(); });
   V.mision = 'cargando';
@@ -94,16 +96,18 @@ async function montarPasoMision(m, ponerBuscar) {
   const P = Object.fromEntries([...indice.parametros, ...(indice.parametros_tierra ?? [])].map((p) => [p.id, p]));
   activa = leerEstado(q, misiones, indice, sitios);
   const pintar = () => { pintarFicha({ activa, P, sitios }); ponerBuscar(); };
-  montarMision({ misiones, indice, sitios, mundo: m.id, activa, alCambiar: (a) => { activa = a; pintar(); } });
+  V.parametros = P;
+  montarMision({ misiones, indice, sitios, mundo: m.id, activa, alCambiar: (a) => { activa = a; pintar(); alMision(true); } });
   montarMes({ mes, alCambiar: (x) => { mes = x; ponerBuscar(); } });
   pintar();
   V.mision = 'ok';
+  alMision(false);
 }
 
 async function montar(m) {
   let hrefBuscar = null;
   const ponerBuscar = () => { if (hrefBuscar) $('buscar').href = conMes(conMision(hrefBuscar, activa), mes); };
-  const misionP = montarPasoMision(m, ponerBuscar).catch((e) => { V.mision = 'error'; V.errores.push(String(e?.message ?? e)); });
+  const misionP = montarPasoMision(m, ponerBuscar, (cambio) => puntosMision(cambio)).catch((e) => { V.mision = 'error'; V.errores.push(String(e?.message ?? e)); });
   engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: m.id, alCambiar: az.explorar.alCambiar, punto: () => punto && { lat: punto.lat, lon: punto.lon, titulo: `${punto.sug?.nombre ?? 'Your pin'} · ${formatoLatLon(punto.lat, punto.lon).texto}` } });
   const caja = $('sugerencias');
   for (const s of m.sugerencias) {
@@ -122,10 +126,11 @@ async function montar(m) {
   let sitio = null;
   // origen = {rango} si el punto es el mejor sitio calculado o una alternativa.
   const fijarPunto = (lat, lon, sug = null, origen = null) => {
-    punto = { lat, lon: lon > -180 && lon <= 180 ? lon : normLon(lon), sugerencia: sug?.id ?? null, sug };
+    // auto = lo puso un cálculo (mejor sitio o punto de misión), no la mano: otro cálculo puede moverlo.
+    punto = { lat, lon: lon > -180 && lon <= 180 ? lon : normLon(lon), sugerencia: sug?.id ?? null, sug, auto: !!origen, mision: origen?.mision ?? null };
     const f = formatoLatLon(punto.lat, punto.lon);
     $('lat').textContent = f.lat; $('lon').textContent = f.lon;
-    $('nombre-punto').textContent = sug ? sug.nombre : origen ? rotuloRango(origen.rango) : 'Your pin';
+    $('nombre-punto').textContent = sug ? sug.nombre : origen?.nombre ?? (origen ? rotuloRango(origen.rango) : 'Your pin');
     const cifra = (v) => (sug ? String(v) : v.toFixed(4));
     hrefBuscar = `../analogos/index.html?mundo=${encodeURIComponent(m.id)}&lat=${cifra(punto.lat)}&lon=${cifra(punto.lon)}${sug ? `&nombre=${encodeURIComponent(sug.nombre)}` : ''}`;
     ponerBuscar();
@@ -140,8 +145,71 @@ async function montar(m) {
     pintarAmbiente(m.id, punto.lat, punto.lon);
     sitio?.alPunto(punto, sug, origen);
     for (const cb of oyentes) { try { cb(az.explorar.punto); } catch (e) { V.errores.push(String(e.message ?? e)); } }
+    colocarMision?.();
   };
   V.fijarPunto = fijarPunto;
+
+  // ---------- Puntos de la misión (A–E): dónde se parece este mundo al sitio de ensayo de NASA ----------
+  const cajaPts = $('mision-puntos'), capaPts = $('opciones-mision');
+  let turnoPts = 0, colocarMision = null, marcasPts = [];
+  // Si los puntos de la misión caben en un trozo pequeño del globo (la Luna: todos junto al polo), se amplía hasta que
+  // ocupen media pantalla; nunca se aleja.
+  const distanciaMision = () => {
+    const ps = V.misionPuntos?.puntos ?? [];
+    let ang = 0;
+    for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) ang = Math.max(ang, distanciaKm(ps[i], ps[j], 1));
+    const alto = canvas.clientHeight;
+    if (!(ang > 0) || !alto) return undefined;
+    const d = 1 + (ang * (alto / 2)) / Math.tan((G.camara.fov * Math.PI) / 360) / (0.45 * alto);
+    return d < G.camara.position.length() ? Math.max(G.controles.minDistance, d) : undefined;
+  };
+  const irMision = (p, girar) => {
+    fijarPunto(p.lat, p.lon, null, { mision: p.letra, nombre: `Mission spot ${p.letra}` });
+    if (girar && G) { const d = distanciaMision(); G.mirar(p, d, d ? 88 : undefined); }
+  };
+  function pintarPuntosMision(res) {
+    const f = frasesPuntos(res, { corto: (id) => nombreCorto(id, V.parametros ?? {}).toLowerCase(), en: m.id === 'moon' ? 'on the Moon' : `on ${m.nombre}` });
+    cajaPts.hidden = !f;
+    marcasPts = [];
+    capaPts.replaceChildren();
+    if (!f) { cajaPts.replaceChildren(); return; }
+    const el = (tag, props, ...h) => { const e = Object.assign(document.createElement(tag), props); e.append(...h); return e; };
+    const botones = res.puntos.map((p) => {
+      const b = el('button', { type: 'button', className: 'punto-mision' }, el('span', { className: 'letra marca-num', textContent: p.letra }), el('span', { className: 'marca-num', textContent: formatoLatLon(p.lat, p.lon).texto }), el('span', { className: 'tenue', textContent: `${p.similitud_pct.toFixed(p.similitud_pct > 99.95 ? 0 : 1)} % alike` }));
+      b.dataset.letra = p.letra;
+      b.setAttribute('aria-pressed', String(punto?.mision === p.letra));
+      b.addEventListener('click', () => irMision(p, true));
+      return b;
+    });
+    cajaPts.replaceChildren(el('h3', { textContent: f.titulo }), ...f.lineas.map((t) => el('p', { textContent: t })), ...(botones.length ? [el('div', { className: 'lista-puntos' }, ...botones)] : []), ...(f.nota ? [el('p', { className: 'tenue', textContent: f.nota })] : []));
+    marcasPts = res.puntos.map((p) => {
+      const b = el('button', { type: 'button', textContent: p.letra, title: `Mission spot ${p.letra}` });
+      b.dataset.letra = p.letra;
+      b.addEventListener('click', () => irMision(p, false));
+      return { p, b };
+    });
+    capaPts.replaceChildren(...marcasPts.map((x) => x.b));
+    colocarMision?.();
+    G?.pedir();
+  }
+  async function puntosMision(cambio) {
+    const yo = ++turnoPts;
+    V.misionPuntos = { estado: 'calculando', puntos: [] };
+    if (!activa) { V.misionPuntos = { estado: 'sin_mision', puntos: [] }; pintarPuntosMision(V.misionPuntos); return; }
+    cajaPts.hidden = false;
+    cajaPts.replaceChildren(Object.assign(document.createElement('p'), { className: 'tenue', textContent: 'Looking for where this test fits…' }));
+    const [M, s] = await Promise.all([motorP, sitioP]);
+    if (yo !== turnoPts) return;
+    if (!M) { V.misionPuntos = { estado: 'sin_motor', puntos: [] }; cajaPts.hidden = true; return; }
+    try {
+      const res = await puntosDeMision({ M, mundo: { id: m.id, radio_km: m.radio_km }, activa, separacion_km: s?.separacion_km ?? 1000, ambito: s?.ambito ?? null, apta: s ? s.apta : null, limites: !!s?.hayLimites });
+      if (yo !== turnoPts) return;
+      V.misionPuntos = res;
+      pintarPuntosMision(res);
+      // Al elegir misión, la chincheta va a su primer punto si no la puso la mano.
+      if (cambio && res.puntos.length && (!punto || punto.auto)) irMision(res.puntos[0], true);
+    } catch (e) { V.errores.push(String(e?.message ?? e)); V.misionPuntos = { estado: 'error', puntos: [] }; cajaPts.hidden = true; }
+  }
 
   let irA = (s) => fijarPunto(s.lat, s.lon, s);
   const latQ = Number(q.get('lat')), lonQ = Number(q.get('lon'));
@@ -152,9 +220,11 @@ async function montar(m) {
   let G = null;
   const sitioP = montarSitio({
     mundo: m, V,
+    // Si cambian los límites del paso 2, los puntos de la misión se vuelven a filtrar con ellos.
+    alCalcular: () => { if (activa && V.misionPuntos && V.misionPuntos.estado !== 'calculando') puntosMision(false); },
     punto: () => punto && { lat: punto.lat, lon: punto.lon, sug: punto.sug },
     ir: (s, rango, girar) => { fijarPunto(s.lat, s.lon, null, { rango }); if (girar) G?.mirar(s); },
-  }).then((x) => { sitio = x; if (G) x?.conGlobo(G); return x; }, (e) => { V.errores.push(String(e.message ?? e)); return null; });
+  }).then((x) => { sitio = x; V.sitioApi = x; if (G) x?.conGlobo(G); return x; }, (e) => { V.errores.push(String(e.message ?? e)); return null; });
 
   if (!webglDisponible()) {
     document.body.classList.add('sin-webgl');
@@ -168,6 +238,16 @@ async function montar(m) {
 
   G = crearGlobo({ canvas, panel: $('panel'), mundo: m, vista0: VISTA0[m.id], inicial, alClic: (lat, lon) => fijarPunto(lat, lon) });
   V.ponerMarcador = G.ponerMarcador;
+  colocarMision = () => {
+    const pr = $('panel').getBoundingClientRect(), pin = punto && G.aPantalla(punto.lat, punto.lon);
+    for (const { p, b } of marcasPts) {
+      const q = G.aPantalla(p.lat, p.lon);
+      b.hidden = punto?.mision === p.letra || !q.visible || q.y < 72 || (q.x > pr.left - 14 && q.x < pr.right + 14 && q.y > pr.top - 14 && q.y < pr.bottom + 14) || (pin?.visible && Math.hypot(pin.x - q.x, pin.y - q.y) < 20);
+      if (!b.hidden) b.style.transform = `translate(${q.x.toFixed(1)}px, ${q.y.toFixed(1)}px)`;
+    }
+    cajaPts.querySelectorAll('.punto-mision').forEach((b) => b.setAttribute('aria-pressed', String(punto?.mision === b.dataset.letra)));
+  };
+  G.alDibujar(colocarMision);
   irA = (s) => { fijarPunto(s.lat, s.lon, s); G.mirar(s); };
   V.reiniciar = G.reiniciar;
   $('reiniciar').addEventListener('click', V.reiniciar);

@@ -34,3 +34,17 @@
 .mision-ficha .ref { padding-left: 10px; border-left: 3px solid var(--white); }
 .mision-ficha .aviso { color: var(--neon-yellow); }
 .mision-ficha .marca-boton { font-size: 13px; padding: 8px 14px; }
+
+/* Puntos de la misión en la Luna o Marte (pantalla del mundo) */
+.mision-puntos { margin: 10px 0 0; padding: 10px 12px; border: 1px solid var(--linea); border-left: 3px solid var(--neon-yellow); border-radius: 10px; }
+.mision-puntos[hidden] { display: none; }
+.mision-puntos h3 { margin: 0 0 6px; font: 700 15px/1.25 var(--titulo); }
+.mision-puntos p { margin: 0 0 8px; }
+.lista-puntos { display: grid; gap: 6px; margin: 0 0 8px; }
+.punto-mision { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: 13px/1.2 var(--cuerpo); color: var(--white); background: transparent; border: 1px solid var(--linea); border-radius: 10px; padding: 6px 10px; min-height: 36px; cursor: pointer; }
+.punto-mision:hover, .punto-mision:focus-visible { border-color: var(--neon-yellow); outline: none; }
+.punto-mision[aria-pressed=true] { background: var(--electric-blue); border-color: var(--white); }
+.punto-mision .letra { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--deep-blue); background: var(--white); box-shadow: 0 0 0 3px var(--neon-yellow); margin: 3px; }
+.punto-mision .tenue { margin-left: auto; }
+/* Letras: blancas como los números del paso 2, con aro amarillo para distinguirlas. */
+.opciones.de-mision button { box-shadow: 0 0 0 4px var(--neon-yellow); }

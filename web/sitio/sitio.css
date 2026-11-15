@@ -61,6 +61,7 @@
 }
 .opciones button:hover, .opciones button:focus-visible { background: var(--neon-yellow); box-shadow: 0 0 0 2px var(--neon-yellow); outline: none; }
 .opciones button[hidden] { display: none; }
+.opciones button.juntos { width: auto; height: auto; margin: 0 0 0 -13px; padding: 5px 10px; border-radius: 999px; font: 700 12px/1 var(--sans, sans-serif); white-space: nowrap; }
 
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   .panel.con-sitio { width: auto; }

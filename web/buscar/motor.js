@@ -576,5 +576,47 @@ export async function cargar(base = '../data/cuerpos/', leer = fetchBinario) {
     return out;
   }
 
-  return { indice, leerPunto, desviacion, buscar, tierra, clases, claseDe, cartera, conMeses, cargarMeses, perfilMensual, calendario };
+  // Búsqueda al revés: celdas de `cuerpo` (la Luna o Marte) más parecidas a unos valores de referencia (p. ej. los del
+  // sitio de la Tierra donde NASA hace un ensayo), con los parámetros de `ids` que ese cuerpo tiene en capa. Misma
+  // desviación que buscar(), media simple. filtro(lat, lon) descarta celdas antes de ordenar.
+  function parecidosEnCuerpo(cuerpo, valoresRef, ids, { maximo = 3000, filtro = null, empate_pct = 0.5 } = {}) {
+    if (!indice.cuerpos[cuerpo]) throw new Error(`cuerpo desconocido: ${cuerpo}`);
+    const usados = [], sin_capa = [], sin_referencia = [];
+    for (const id of ids) {
+      const e = params.get(id);
+      if (!e) throw new Error(`parámetro desconocido: ${id}`);
+      const r = e.p.capas?.[cuerpo];
+      if (!r) sin_capa.push(id);
+      else if (!finito(valoresRef?.[id])) sin_referencia.push(id);
+      else usados.push({ id, e, capa: capas.get(r), fo: e.cat ? valoresRef[id] : e.f(valoresRef[id]) });
+    }
+    const vacio = { usados: usados.map((u) => u.id), sin_capa, sin_referencia, candidatos: [], celdas: 0, empatadas: 0 };
+    if (!usados.length) return vacio;
+    const orden = [];
+    const sim = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      let s = 0, ok = true;
+      for (const u of usados) {
+        const v = u.capa[i];
+        if (v !== v) { ok = false; break; }
+        s += u.e.cat ? (v === u.fo ? 0 : 100) : Math.min(100, (Math.abs(u.e.f(v) - u.fo) / u.e.den) * 100);
+      }
+      if (!ok) continue;
+      if (filtro) { const q = latLonDeCelda(R, Math.floor(i / g.ancho), i % g.ancho); if (!filtro(q.lat, q.lon)) continue; }
+      sim[i] = 100 - s / usados.length;
+      orden.push(i);
+    }
+    if (!orden.length) return vacio;
+    orden.sort((a, b) => sim[b] - sim[a] || a - b);
+    const mejor = sim[orden[0]];
+    let empatadas = 0;
+    while (empatadas < orden.length && sim[orden[empatadas]] >= mejor - empate_pct) empatadas++;
+    const candidatos = orden.slice(0, maximo).map((i) => {
+      const valores = Object.fromEntries(usados.map((u) => [u.id, u.capa[i]]));
+      return { ...latLonDeCelda(R, Math.floor(i / g.ancho), i % g.ancho), i, similitud_pct: sim[i], valores };
+    });
+    return { ...vacio, candidatos, celdas: orden.length, empatadas };
+  }
+
+  return { indice, leerPunto, desviacion, buscar, tierra, clases, claseDe, cartera, conMeses, cargarMeses, perfilMensual, calendario, parecidosEnCuerpo };
 }

@@ -15,6 +15,9 @@ export const parametrosDe = (mision, indice) => enOrden((mision.caracteristicas 
 
 export const elegible = (mision, indice) => mision.respaldo !== 'no_encontrado' && parametrosDe(mision, indice).length > 0;
 
+// Misiones que se ofrecen para un mundo: las que NASA liga a él (o a ninguno); `conservar` = id que se deja aunque sea de otro.
+export const misionesDe = (misiones, mundo, conservar = null) => misiones.filter((m) => !(m.cuerpo ?? []).length || m.cuerpo.includes(mundo) || m.id === conservar);
+
 export function textoOpcion(mision, mundo, indice) {
   if (mision.respaldo === 'no_encontrado') return `${mision.nombre} — no public NASA source found`;
   if (!elegible(mision, indice)) return `${mision.nombre} — nothing we can measure`;

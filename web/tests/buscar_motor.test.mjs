@@ -890,3 +890,39 @@ test('real data: with monthly layers in the index, the default outputs keep both
   h2.update(JSON.stringify({ ...e, valores: Object.fromEntries(Object.entries(e.valores).filter(([k]) => !idsT.includes(k))) }));
   assert.equal(h2.digest('hex'), '287c142cee58e60a34074cefa094e3c881297a9ccee7c33d177595fc063c89ec');
 });
+
+test('reverse search: cells of another world most like a set of reference values, on the parameters that world has', async () => {
+  const M = await cargar('base/', sintetico());
+  const r = M.parecidosEnCuerpo('moon', { a: 150.3, b: 50, c: 5 }, ['a', 'b', 'c']);
+  assert.deepEqual(r.usados, ['a', 'b']);
+  assert.deepEqual(r.sin_capa, ['c']);
+  assert.deepEqual(r.sin_referencia, []);
+  assert.equal(r.celdas, N);
+  // moon/a = 150 + col/1000: column 300 is the exact match on every row; the first row wins the tie.
+  assert.deepEqual([r.candidatos[0].lat, r.candidatos[0].lon], [lat(0), lon(300)]);
+  assert.ok(Math.abs(r.candidatos[0].similitud_pct - 100) < 1e-3);
+  assert.ok(Math.abs(r.candidatos[0].valores.a - 150.3) < 1e-4 && r.candidatos[0].valores.b === 50);
+  for (let k = 1; k < r.candidatos.length; k++) assert.ok(r.candidatos[k].similitud_pct <= r.candidatos[k - 1].similitud_pct);
+  // The whole synthetic Moon is within 0.5 points of the best: all of it ties, and the result says so.
+  assert.equal(r.empatadas, N);
+  assert.equal(r.candidatos.length, 3000);
+  const polo = M.parecidosEnCuerpo('moon', { a: 150.3, b: 50 }, ['a', 'b'], { filtro: (la) => la <= -84, maximo: 10 });
+  assert.equal(polo.candidatos.length, 10);
+  assert.ok(polo.candidatos.every((c) => c.lat <= -84));
+  assert.deepEqual([polo.candidatos[0].lat, polo.candidatos[0].lon], [-84.25, lon(300)]);
+  assert.equal(polo.celdas, 12 * 720);
+});
+
+test('reverse search without anything to compare returns no candidates and says why; unknown names throw', async () => {
+  const M = await cargar('base/', sintetico());
+  const soloTierra = M.parecidosEnCuerpo('moon', { c: 5 }, ['c']);
+  assert.deepEqual([soloTierra.usados, soloTierra.sin_capa, soloTierra.candidatos, soloTierra.celdas], [[], ['c'], [], 0]);
+  const sinRef = M.parecidosEnCuerpo('moon', { a: null }, ['a']);
+  assert.deepEqual([sinRef.usados, sinRef.sin_referencia, sinRef.candidatos.length], [[], ['a'], 0]);
+  // Mars has no layer for a or b in the synthetic index.
+  assert.deepEqual(M.parecidosEnCuerpo('mars', { a: 1, b: 2 }, ['a', 'b']).sin_capa, ['a', 'b']);
+  assert.throws(() => M.parecidosEnCuerpo('venus', {}, ['a']), /cuerpo desconocido/);
+  assert.throws(() => M.parecidosEnCuerpo('moon', {}, ['zz']), /parámetro desconocido/);
+  const nada = M.parecidosEnCuerpo('moon', { a: 150 }, ['a'], { filtro: () => false });
+  assert.deepEqual([nada.usados, nada.candidatos.length, nada.celdas], [['a'], 0, 0]);
+});

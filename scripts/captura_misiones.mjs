@@ -11,7 +11,7 @@ import { chromium } from 'playwright';
 import { cargar } from '../web/buscar/motor.js';
 import { formatoLatLon } from '../web/explorar/geo.js';
 import { fmtPct, formatoValor as formatoValorSup, planoSup, minMax, pintarMapa, nombreCorto, titularCartera, letra } from '../web/analogos/metricas.js';
-import { parametrosDe, referenciaDe, noMedidas, textoOpcion, resumenLugar, lineaResumen, activaDeCatalogo, activaNueva, opcionesBusqueda, frasesNoUsados, conMision } from '../web/analogos/misiones.js';
+import { misionesDe, parametrosDe, referenciaDe, noMedidas, textoOpcion, resumenLugar, lineaResumen, activaDeCatalogo, activaNueva, opcionesBusqueda, frasesNoUsados, conMision } from '../web/analogos/misiones.js';
 import { contraste } from '../web/marca/contraste.js';
 import { ORIGENES_EXTERNOS } from '../web/relieve/calculo.js';
 
@@ -186,7 +186,7 @@ try {
   const lista0 = await leerLugares(pag);
   compararLugares('no mission (Jezero 18.38 N 77.58 E)', lista0, r0.resultados, false);
   const sel0 = await pag.evaluate(() => ({ valor: document.getElementById('mision').value, opciones: [...document.getElementById('mision').options].map((o) => ({ v: o.value, t: o.textContent, d: o.disabled })), ficha: document.getElementById('mision-ficha').hidden, url: location.search, avanzado: document.getElementById('avanzado').hidden }));
-  const quieroOpc = [{ v: '', t: 'All parameters (no mission)', d: false }, ...CATALOGO.map((m) => ({ v: m.id, t: textoOpcion(m, 'mars', M.indice), d: m.respaldo === 'no_encontrado' || !parametrosDe(m, M.indice).length })), { v: 'nueva', t: 'New mission…', d: false }];
+  const quieroOpc = [{ v: '', t: 'All parameters (no mission)', d: false }, ...misionesDe(CATALOGO, 'mars').map((m) => ({ v: m.id, t: textoOpcion(m, 'mars', M.indice), d: m.respaldo === 'no_encontrado' || !parametrosDe(m, M.indice).length })), { v: 'nueva', t: 'New mission…', d: false }];
   if (sel0.valor !== '' || !sel0.ficha || JSON.stringify(sel0.opciones) !== JSON.stringify(quieroOpc)) falla(`selector at start: ${JSON.stringify(sel0)}`);
   else ok(`selector: ${sel0.opciones.map((o) => `${o.t}${o.d ? ' [disabled]' : ''}`).join(' | ')}`);
   await pag.screenshot({ path: join(SALIDA, '00-sin-mision.png') });
@@ -274,23 +274,23 @@ try {
   await pag.screenshot({ path: join(SALIDA, '05-biomarcadores-portfolio.png') });
 
   // ---------- b. Otra misión del catálogo: con o sin sitio de referencia, según el catálogo ----------
-  await elegirMision(pag, 'habitats_inflables');
+  await elegirMision(pag, 'eva_con_retardo');
   await quieta(pag);
-  const aH = activaDeCatalogo(mision('habitats_inflables'), M.indice, SITIOS);
+  const aH = activaDeCatalogo(mision('eva_con_retardo'), M.indice, SITIOS);
   const { r: rH } = nodo(aH);
   const fH = await leerFicha(pag);
   const estH = await pag.evaluate(() => ({ sinRef: window.__az.analogos.r.sin_referencia, pestana: document.getElementById('panel').dataset.pestana, sel: window.__az.analogos.sel, opcion: document.getElementById('mision').selectedOptions[0].textContent }));
   const refH = aH.referencia;
   const quieroRefH = refH ? `Earth-only parameters are compared with NASA's test site: ${refH.nombre} (${formatoLatLon(refH.lat, refH.lon).texto})` : 'No test site with coordinates: Earth-only parameters are not used.';
-  if (fH.ref !== quieroRefH || JSON.stringify(fH.avisos) !== JSON.stringify(frasesNoUsados(rH, aH, corto)) || JSON.stringify(estH.sinRef) !== JSON.stringify(rH.sin_referencia) || estH.opcion !== 'Inflatable habitat testing — Moon only') falla(`habitats_inflables: ${JSON.stringify({ ref: fH.ref, avisos: fH.avisos, estH })}`);
-  else ok(`habitats_inflables (${refH ? 'with a test site' : 'no coordinates'}): "${fH.ref}" · "${fH.avisos.join(' ')}" · option "${estH.opcion}"`);
+  if (fH.ref !== quieroRefH || JSON.stringify(fH.avisos) !== JSON.stringify(frasesNoUsados(rH, aH, corto)) || JSON.stringify(estH.sinRef) !== JSON.stringify(rH.sin_referencia) || estH.opcion !== 'Spacewalks with signal delay') falla(`eva_con_retardo: ${JSON.stringify({ ref: fH.ref, avisos: fH.avisos, estH })}`);
+  else ok(`eva_con_retardo (${refH ? 'with a test site' : 'no coordinates'}): "${fH.ref}" · "${fH.avisos.join(' ')}" · option "${estH.opcion}"`);
   if (estH.pestana !== 'cartera' || estH.sel?.lista !== 'cartera') falla(`after switching on Portfolio the globe should show place A: ${JSON.stringify(estH)}`);
   await ver(pag, 'lugares');
-  compararLugares('habitats_inflables places', await leerLugares(pag), rH.resultados, true);
+  compararLugares('eva_con_retardo places', await leerLugares(pag), rH.resultados, true);
   await ver(pag, 'metricas');
   const metH = await leerMetricas(pag);
-  compararMetricas('habitats_inflables Metrics place 1', metH, rH.resultados[0], 'NASA test site');
-  if (!refH && metH.some((f) => P[f.id].solo_tierra)) falla(`habitats_inflables: Earth-only row in Metrics ${metH.map((f) => f.id)}`);
+  compararMetricas('eva_con_retardo Metrics place 1', metH, rH.resultados[0], 'NASA test site');
+  if (!refH && metH.some((f) => P[f.id].solo_tierra)) falla(`eva_con_retardo: Earth-only row in Metrics ${metH.map((f) => f.id)}`);
   await ver(pag, 'lugares');
   await pag.screenshot({ path: join(SALIDA, '06-habitats-sin-referencia.png') });
 
@@ -445,7 +445,7 @@ try {
     const r = b.getBoundingClientRect(), p = document.getElementById('panel').getBoundingClientRect();
     return { dentro: r.top >= p.top - 0.5 && r.bottom <= p.bottom + 0.5 && r.bottom <= innerHeight + 0.5 && r.height >= 44, r: [r.top, r.bottom].map(Math.round), p: [p.top, p.bottom].map(Math.round) };
   }, sel);
-  const quieroOpcMundo = (mundo) => [{ v: '', t: 'All parameters (no mission)', d: false }, ...CATALOGO.map((m) => ({ v: m.id, t: textoOpcion(m, mundo, M.indice), d: m.respaldo === 'no_encontrado' || !parametrosDe(m, M.indice).length })), { v: 'nueva', t: 'New mission…', d: false }];
+  const quieroOpcMundo = (mundo) => [{ v: '', t: 'All parameters (no mission)', d: false }, ...misionesDe(CATALOGO, mundo).map((m) => ({ v: m.id, t: textoOpcion(m, mundo, M.indice), d: m.respaldo === 'no_encontrado' || !parametrosDe(m, M.indice).length })), { v: 'nueva', t: 'New mission…', d: false }];
 
   // a + e. Luna sin misión: el paso ① va primero, los deslizadores no se ven hasta abrir los criterios y «Find Earth analogs» lleva la URL de siempre.
   const pw = await pagina(1440, 900, 'Moon world view');
@@ -506,12 +506,12 @@ try {
   else ok(`results start with the mission (${resB.url}); "Back to the globe" and "Pick another place" → ${resB.volver}`);
   compararLugares('results from the world view, biomarcadores', await leerLugares(pm), rB.resultados, true);
   // Cambiar de misión en resultados actualiza los dos enlaces de vuelta.
-  await elegirMision(pm, 'habitats_inflables');
+  await elegirMision(pm, 'ruedas_en_arena');
   const volH = await pm.evaluate(() => [document.getElementById('volver').getAttribute('href'), document.getElementById('otro').getAttribute('href')]);
   await elegirMision(pm, '');
   const vol0 = await pm.evaluate(() => [document.getElementById('volver').getAttribute('href'), document.getElementById('otro').getAttribute('href')]);
   const base = `../explorar/index.html?mundo=mars&lat=${J.lat}&lon=${J.lon}`;
-  if (volH.some((h) => h !== conMision(base, aH)) || vol0.some((h) => h !== base)) falla(`back links after switching: ${JSON.stringify({ volH, vol0 })}`);
+  if (volH.some((h) => h !== conMision(base, activaDeCatalogo(mision('ruedas_en_arena'), M.indice, SITIOS))) || vol0.some((h) => h !== base)) falla(`back links after switching: ${JSON.stringify({ volH, vol0 })}`);
   else ok(`back links follow the mission picked on the results page: ${volH[0]} → (no mission) ${vol0[0]}`);
   await elegirMision(pm, 'biomarcadores');
   await quieta(pm);

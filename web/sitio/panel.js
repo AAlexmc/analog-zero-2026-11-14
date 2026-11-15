@@ -43,7 +43,7 @@ function crearCalculo(indice, id, base, radio_km) {
 }
 
 // ir(sitio, rango, girar): mover la chincheta a un sitio calculado. punto(): chincheta actual {lat, lon, sug} o null.
-export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V }) {
+export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V, alCalcular = null }) {
   const S = (V.sitio = { estado: 'cargando', r: null, ajustes: null, aj: null, rango: null, propio: null, ms: null });
   const caja = $('sitio'), boton = $('calcular'), salida = $('resultado');
   caja.hidden = false;
@@ -151,23 +151,52 @@ export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V
       b.addEventListener('click', () => ir(s, k + 1, false));
       return b;
     });
-    opciones.replaceChildren(...marcas);
+    opciones.replaceChildren(...marcas, juntar);
     G?.pedir();
   }
   let G = null;
+  // Distancia de cámara (en radios) a la que los dos sitios más juntos quedan a unos 36 px: lo justo para que no se pisen
+  // (de lejos, en la Luna, caen todos en el mismo punto) sin perder de vista a los demás.
+  const distanciaParaSeparar = () => {
+    const c = G.camara, alto = G.renderer.domElement.clientHeight || window.innerHeight, ss = sitios(), rad = Math.PI / 180;
+    const pxPorRadio = (alto / 2) / Math.tan((c.fov * Math.PI) / 360);
+    let minimo = Infinity;
+    for (let i = 0; i < ss.length; i++) for (let j = i + 1; j < ss.length; j++) {
+      const a = ss[i], b = ss[j];
+      const h = Math.sin(((b.lat - a.lat) * rad) / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(((b.lon - a.lon) * rad) / 2) ** 2;
+      minimo = Math.min(minimo, 2 * Math.asin(Math.sqrt(h)));
+    }
+    if (!Number.isFinite(minimo)) minimo = sep.km / mundo.radio_km;
+    return Math.max(G.controles.minDistance, Math.min(G.distancia0(), 1 + (minimo * pxPorRadio) / 36));
+  };
+  const juntar = el('button', { type: 'button', className: 'juntos', hidden: true });
+  juntar.addEventListener('click', () => { const s = sitios()[(S.rango ?? 1) - 1] ?? sitios()[0]; if (s && G) G.mirar(s, distanciaParaSeparar(), 88); });
   const colocarMarcas = () => {
     if (!G) return;
+    if (!juntar.isConnected) opciones.append(juntar);
     const p = $('panel').getBoundingClientRect(), pin = punto(), qp = pin && G.aPantalla(pin.lat, pin.lon);
-    // Uno que pisa la chincheta o a otro ya puesto se oculta hasta que se amplía (en la Luna caen todos juntos de lejos).
+    // Uno que pisa la chincheta o a otro ya puesto se oculta hasta que se amplía (en la Luna caen todos juntos de lejos);
+    // un botón junto al grupo dice cuántos faltan y amplía hasta separarlos.
     const puestos = qp?.visible ? [qp] : [];
+    let pisados = 0, donde = null;
     sitios().forEach((s, k) => {
       const b = marcas[k], q = G.aPantalla(s.lat, s.lon);
-      b.hidden = S.rango === k + 1 || !q.visible || q.y < 72 || (q.x > p.left - 14 && q.x < p.right + 14 && q.y > p.top - 14 && q.y < p.bottom + 14)
-        || puestos.some((o) => Math.hypot(o.x - q.x, o.y - q.y) < 28);
+      const fuera = S.rango === k + 1 || !q.visible || q.y < 72 || (q.x > p.left - 14 && q.x < p.right + 14 && q.y > p.top - 14 && q.y < p.bottom + 14);
+      const pisa = !fuera && puestos.some((o) => Math.hypot(o.x - q.x, o.y - q.y) < 28);
+      b.hidden = fuera || pisa;
+      if (pisa) { pisados++; donde ??= q; }
       if (b.hidden) return;
       puestos.push(q);
       b.style.transform = `translate(${q.x.toFixed(1)}px, ${q.y.toFixed(1)}px)`;
     });
+    juntar.hidden = !pisados;
+    S.pisados = pisados;
+    if (pisados) {
+      // «+N more» si ya se ve alguno (o la chincheta es uno de ellos); si no, «N spots here».
+      juntar.textContent = S.rango || puestos.length > (qp?.visible ? 1 : 0) ? `+${pisados} more · zoom in` : `${pisados} spots here · zoom in`;
+      juntar.title = `${pisados} more ${pisados === 1 ? 'spot is' : 'spots are'} hidden here because they overlap at this zoom`;
+      juntar.style.transform = `translate(${donde.x.toFixed(1)}px, ${(donde.y + 30).toFixed(1)}px)`;
+    }
   };
 
   const linea = (cls, ...hijos) => el('p', { className: cls }, ...hijos);
@@ -238,6 +267,7 @@ export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V
       Object.assign(S, { r, ms, ajustes });
       S.n = (S.n ?? 0) + 1;
       ponerMarcas();
+      try { alCalcular?.(); } catch (e) { V.errores?.push(String(e?.message ?? e)); }
       if (r.mejor && mover()) { ir(r.mejor, 1, true); return; }
       const p = punto();
       if (p) alPunto(p, p.sug, null); else pintar();
@@ -254,15 +284,26 @@ export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V
     const k = origen?.rango ?? (sug ? null : rangoDe(p.lat, p.lon));
     if (k) { S.rango = k; S.propio = null; pintar(); return; }
     S.rango = null;
-    S.propio = { lat: p.lat, lon: p.lon, nombre: sug ? sug.nombre : null, v: undefined };
+    S.propio = { lat: p.lat, lon: p.lon, nombre: sug ? sug.nombre : origen?.nombre ?? null, v: undefined };
     pintar();
     evaluarPropio();
   }
 
   const inicial = calcular(() => !punto());
+  // Zona que se puntúa, a grandes rasgos (rejilla polar: hasta la esquina del recorte); el corte fino lo da apta().
+  const g = D.rejilla, colatMax = g.tipo === 'polar' ? (((g.n * g.m_por_px) / 2) * Math.SQRT2) / g.georef.radio_m / (Math.PI / 180) : null;
   return {
     alPunto,
     inicial,
-    conGlobo(g) { G = g; G.alDibujar(colocarMarcas); },
+    conGlobo(g2) { G = g2; G.alDibujar(colocarMarcas); },
+    separacion_km: sep.km,
+    hayLimites: criterios.some(esLimite),
+    ambito: colatMax === null ? null : (lat) => (g.georef.polo === 'sur' ? lat <= -90 + colatMax : lat >= 90 - colatMax),
+    // Dentro de la zona puntuada y cumple todos los límites activos del paso 2 (con los ajustes de ahora).
+    async apta(lat, lon) {
+      const v = await calc.valores(lat, lon, structuredClone(aj));
+      if (!v || criterios.every((c) => !Number.isFinite(v.valores[c.id]))) return false;
+      return Object.values(v.cumple ?? {}).every((x) => x === true);
+    },
   };
 }

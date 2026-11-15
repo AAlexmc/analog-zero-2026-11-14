@@ -72,6 +72,10 @@ La búsqueda de análogos pasa a elegirse por **objetivo de misión**: un tipo d
 | `caracteristicas[].parametros` | ids de la lista de abajo; `[]` si ninguno vale |
 | `caracteristicas[].medido` | `false` si `parametros` está vacío; entonces `motivo` dice por qué en inglés |
 
+## Qué hace la web con `cuerpo` y con el sitio de ensayo
+- El selector de cada mundo solo ofrece las misiones cuyo `cuerpo` lo incluye (o vacío); una de otro mundo que llegue en la URL se queda en la lista con «— Moon only» / «— Mars only» (`misionesDe`, `textoOpcion`).
+- Puntos de la misión (pantalla del mundo, `web/explorar/mision_puntos.js` + `parecidosEnCuerpo` del motor): búsqueda al revés. Se leen en la Tierra los valores del sitio de ensayo (primera campaña con coordenadas) y se ordenan las celdas del mundo por parecido medio en los parámetros de la misión que ese mundo tiene en capa. Se toman los cinco primeros que pasan el paso 2 (zona puntuada y límites de NASA activos) y distan al menos lo mismo que los sitios de base (Luna 15 km, Marte 1 000 km). Es criterio propio y se rotula «Own metric, year averages». Lo que el mundo no tiene (lluvia, roca, viento…) se lista como «Earth only»; lo que no tiene valor en el sitio de ensayo, como «not used». Aviso de empate cuando al menos el 5 % de las celdas queda a medio punto de la mejor.
+
 ## Parámetros a los que se puede asignar
 Comparados con el punto de la Luna o de Marte: `rugosidad_tan`, `relieve_m`, `t_max_k`, `t_min_k`, `t_media_k`, `insolacion_kwh_m2_dia`, `ndvi_max`, `precip_mm_ano`.
 

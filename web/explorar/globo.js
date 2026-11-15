@@ -28,17 +28,19 @@ export function crearGlobo({ canvas, panel, mundo, vista0, inicial = null, alCli
   controles.enableDamping = true;
   controles.dampingFactor = 0.09;
   controles.minDistance = 1.25;
-  const tamMarcador = () => 0.012 * camara.position.length();
+  // Mismo tamaño en pantalla a cualquier distancia: de cerca no tapa lo que tiene al lado.
+  const tamMarcador = () => 0.0156 * Math.max(0.05, camara.position.length() - 1);
 
-  const dirDe = ({ lat, lon }) => {
-    const v = latLonAVector(Math.max(-LAT_VISTA_MAX, Math.min(LAT_VISTA_MAX, lat)), lon);
+  // latMax: de cerca hace falta mirar casi desde encima del polo, o lo que hay junto a él se sale de la pantalla.
+  const dirDe = ({ lat, lon }, latMax = LAT_VISTA_MAX) => {
+    const v = latLonAVector(Math.max(-latMax, Math.min(latMax, lat)), lon);
     return new THREE.Vector3(v.x, v.y, v.z);
   };
   let distancia0 = 3.6;
   const reducir = reducirMovimiento();
   let anim = null;
-  function mirar(objetivo, dist = camara.position.length()) {
-    const a = camara.position.clone().normalize(), b = dirDe(objetivo);
+  function mirar(objetivo, dist = camara.position.length(), latMax = LAT_VISTA_MAX) {
+    const a = camara.position.clone().normalize(), b = dirDe(objetivo, latMax);
     const d0 = camara.position.length();
     if (reducir || a.lengthSq() === 0) { anim = null; camara.position.copy(b.multiplyScalar(dist)); controles.update(); return; }
     const qa = new THREE.Quaternion(), qb = new THREE.Quaternion().setFromUnitVectors(a, b), qt = new THREE.Quaternion();
@@ -156,7 +158,7 @@ export function crearGlobo({ canvas, panel, mundo, vista0, inicial = null, alCli
 
   return {
     camara, controles, escena, renderer, malla, texturaLista, latLonDePixel, aPantalla, dibujar, pedir,
-    mirar: (objetivo, dist) => { mirar(objetivo, dist); pedir(); },
+    mirar: (objetivo, dist, latMax) => { mirar(objetivo, dist, latMax); pedir(); },
     alDibujar: (cb) => { alDibujar.add(cb); return () => alDibujar.delete(cb); },
     animando: () => !!anim,
     fotogramas: () => fotogramas,
