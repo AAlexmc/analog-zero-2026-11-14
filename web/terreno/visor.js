@@ -108,7 +108,7 @@ function crearPanel(lado) {
       <section class="seccion"><h3 class="marca-subtitulo">Explore</h3>
         <div class="acciones"><button type="button" class="suelo marca-boton" aria-pressed="false" disabled>Ground view</button><button type="button" class="ver-paleta marca-boton secundario" aria-pressed="false" disabled>Equipment</button><button type="button" class="ampliar marca-boton secundario" disabled>Expand</button></div>
         <div class="sec-suelo" hidden>
-          <p class="tenue">Drag to look around. Arrow keys or W/S walk, A/D turn, the mouse wheel steps 2 m.</p>
+          <p class="tenue"><span class="solo-fondo">Drag to look around. Arrow keys or W/S walk, A/D turn, the mouse wheel steps 2 m.</span><span class="solo-simple">Drag to look around. Arrow keys walk.</span></p>
           <div class="botones"><button type="button" data-s="izquierda" title="Turn left 15°">◀ Turn</button><button type="button" data-s="adelante">Forward 5 m</button><button type="button" data-s="atras">Back 5 m</button><button type="button" data-s="derecha" title="Turn right 15°">Turn ▶</button></div>
         </div>
       </section>
@@ -118,7 +118,8 @@ function crearPanel(lado) {
     </aside>
     <div class="lienzo"><div class="rotulos"></div>
       <div class="marcas"><svg class="huellas"></svg></div>
-      <div class="pildora-suelo" hidden></div>
+      <div class="pildora-suelo solo-fondo" hidden></div>
+      <div class="pildora-suelo-corta solo-simple" hidden></div>
       <div class="aviso-plantar" hidden></div>
       <div class="aviso-espejo" role="status" hidden></div>
     </div>
@@ -158,6 +159,9 @@ function mostrarError(p, msg) {
   estado.errores.push(msg);
 }
 
+// Modo Simple: el crédito de la imagen sin detalles; el tinte conserva que no es una imagen del lugar.
+const imagenCorta = (t) => (/^Ground colour: one tint/.test(t) ? 'Ground colour: one tint, not an image of this place.' : t.split(/ \(|, /)[0]);
+
 function rellenarTarjeta(p, datos) {
   const m = datos.meta, h = m.capas.altura;
   const notas = [...datos.notas];
@@ -172,8 +176,8 @@ function rellenarTarjeta(p, datos) {
     </div>
     ${m.dinamico ? `<div class="muestreo solo-fondo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
     ${m.punto ? `<div class="muestreo solo-fondo" data-muestreo-punto>${esc(textoPunto(m))}</div>` : ''}
-    ${m.imagen ? `<div class="fuente" data-imagen>${esc(m.imagen.texto)}</div>` : ''}
-    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico || m.punto ? ' · built live in your browser, not stored' : ''}</div>
+    ${m.imagen ? `<div class="fuente solo-fondo" data-imagen>${esc(m.imagen.texto)}</div><div class="fuente solo-simple">${esc(imagenCorta(m.imagen.texto))}</div>` : ''}
+    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}<span class="solo-fondo">${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico || m.punto ? ' · built live in your browser, not stored' : ''}</span></div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
     ${m.notas ? `<details class="notas-meta solo-fondo"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
     ${m.creditos?.length ? `<details class="notas-meta"><summary class="et">Credits</summary><div class="tenue" data-creditos>${m.creditos.map(esc).join(' · ')}</div></details>` : ''}`;
@@ -237,11 +241,13 @@ function alternarSuelo(p, forzar) {
   b.textContent = si ? 'Overview' : 'Ground view';
   b.setAttribute('aria-pressed', String(si));
   p.el.querySelector('.sec-suelo').hidden = !si;
-  const pild = p.el.querySelector('.pildora-suelo');
+  const pild = p.el.querySelector('.pildora-suelo'), corta = p.el.querySelector('.pildora-suelo-corta');
   pild.hidden = !si;
+  corta.hidden = !si;
   if (si) {
     const s = e.estadoSuelo();
     pild.textContent = `Ground view · eye ${s.ojo_m.toFixed(1)} m above the ground · vertical 1× (true scale) · ${e.conBruma ? 'light haze added for depth (own choice)' : 'no haze: no air'}${Number.isFinite(pt?.rumbo) ? ` · facing ${Math.round(pt.rumbo)}°, where the land rises most in this window` : ''}`;
+    corta.textContent = `Ground view · eye at ${s.ojo_m.toFixed(1)} m${e.conBruma ? ' · haze added (own choice)' : ''}`;
   }
 }
 
@@ -278,8 +284,8 @@ function crearMandos(p) {
       ${polar && luna ? '<button type="button" data-a="dia" aria-pressed="false" title="Sweeps the subsolar longitude through 360° in 20 s at the current elevation">Lunar day ▶</button>' : ''}</div>
     <div class="leyenda"></div>`;
   p.modo = 'relieve'; p.capa = null; p.rangoCapa = null;
-  // «Generate simulation» (&vista=suelo) entra con el color real de la imagen.
-  if (p.escena.imagen && qs.get('vista') === 'suelo') {
+  // «Generate simulation» (&vista=aerea; &vista=suelo si se entra de pie) abre con el color real de la imagen.
+  if (p.escena.imagen && ['suelo', 'aerea'].includes(qs.get('vista'))) {
     p.modo = 'satelite';
     p.escena.setModo('satelite');
     el.querySelectorAll('[data-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.modo === 'satelite')));
@@ -331,10 +337,10 @@ function leyenda(p) {
   const e = p.escena, partes = [];
   if (p.modo === 'satelite') {
     partes.push(e.meta.imagen?.tinte
-      ? `<span class="et" data-leyenda="tinte">Tinted · one average colour of this world × light from the sun above, on the real elevation · cast shadows computed from the DEM · not an image of this place</span>`
-      : `<span class="et" data-leyenda="satelite">Satellite · NASA Blue Marble colour × light from the sun above, on the real elevation · cast shadows computed from the DEM · nothing added</span>`);
+      ? `<span class="et" data-leyenda="tinte">Tinted<span class="solo-fondo"> · one average colour of this world × light from the sun above, on the real elevation · cast shadows computed from the DEM</span> · not an image of this place</span>`
+      : `<span class="et" data-leyenda="satelite">Satellite · NASA Blue Marble colour<span class="solo-fondo"> × light from the sun above, on the real elevation · cast shadows computed from the DEM</span> · nothing added</span>`);
   } else if (p.modo === 'relieve') {
-    partes.push(`<span class="et">Relief · cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span>`);
+    partes.push(`<span class="et">Relief · <span class="solo-fondo">cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span><span class="solo-simple">shadows cast by the terrain</span></span>`);
   } else if (p.modo === 'cota') {
     partes.push(`<span class="et">Elevation · contours every ${e.uniforms.uCurva.value} m</span><div class="bar" style="background:${RAMPA_BASE}"></div>
       <div class="ext num"><span>${fmt(e.zmin, 0)} m</span><span>${fmt(e.zmax, 0)} m</span></div>`);
@@ -707,7 +713,7 @@ function plantarGemelo(p, item) {
   guardarPlantado(p);
   guardarPlantado(q);
   const av = q.el.querySelector('.aviso-espejo');
-  av.textContent = `Also planted here: ${nombreCorto(item.equipo)} · ${textoDesplazamiento(r, hayPolar(p, q))}, as on ${CUERPO[p.escena.meta.cuerpo] ?? 'the other panel'}${r.recortado ? ' (clamped to this window)' : ''}${r.movido ? ' (moved to the nearest cell with elevation data)' : ''}`;
+  av.innerHTML = `Also planted here: ${esc(nombreCorto(item.equipo))}<span class="solo-fondo"> · ${esc(textoDesplazamiento(r, hayPolar(p, q)))}, as on ${esc(CUERPO[p.escena.meta.cuerpo] ?? 'the other panel')}${r.recortado ? ' (clamped to this window)' : ''}${r.movido ? ' (moved to the nearest cell with elevation data)' : ''}</span>`;
   av.hidden = false;
   clearTimeout(q.tEspejo);
   q.tEspejo = setTimeout(() => { av.hidden = true; }, 8000);
@@ -917,7 +923,7 @@ function filaRequisito(r, meta) {
   else if (r.estado === 'rompe') ver = `<b class="v-rompe">BREAKS</b> <span class="num">by ${r.cota ? 'at least ' : ''}${esc(cantidad(r.exceso, q.unidad, dec))}</span>`;
   else if (r.estado === 'cota_inferior') ver = `<b class="v-cota">LOWER BOUND ONLY</b> <span class="motivo">· at least ${esc(cantidad(r.valor, q.unidad, dec))}${r.notaCota ? ` ${esc(r.notaCota)}` : ''}: cannot confirm</span>`;
   else if (r.estado === 'sin_limite') ver = `<b class="v-nm">NO LIMIT</b> <span class="motivo">${esc(r.motivo)}</span>`;
-  else ver = `<b class="v-nm">NOT MEASURED HERE</b> <span class="motivo">· ${esc(r.motivo)}</span>`;
+  else ver = `<b class="v-nm">NOT MEASURED HERE</b> <span class="motivo solo-fondo">· ${esc(r.motivo)}</span>`;
   const c = r.capa && meta.capas[r.capa], uc = c && urlSegura(c.url);
   const capa = c ? ` · ${uc ? `<a href="${esc(uc)}" target="_blank" rel="noopener" title="${esc(c.fuente)}">${esc(hostDe(uc))}</a>` : `<span title="${esc(c.fuente)}">layer source</span>`}` : '';
   return `<div class="req ${r.estado}" data-var="${esc(q.variable)}">
@@ -945,17 +951,17 @@ function pintarHoja(p) {
   const cifras = eq.cifras ?? [];
   hoja.hidden = false;
   hoja.innerHTML = `
-    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
+    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)}<span class="solo-fondo"> · ${esc(e.meta.id)}</span> · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
     <h3>${esc(eq.nombre)}</h3>
     ${med.agua >= 1 ? `<div class="aviso-agua" data-a="agua">On water —${esc(claseAgua(e.meta, med.agua))} in the ${enlaceAgua(e.meta)}: not ground</div>` : ''}
-    <div class="tenue">${esc(eq.estado ?? '')}${eq.origen ? ' · own concept' : ''}</div>
-    <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(cota, 1)} m${retocada ? (e.verOriginal ? ' (original view; this cell is retouched)' : ' (retouched)') : ''} · cell ${item.fila},${item.col}</div>
+    <div class="tenue${eq.origen ? '' : ' solo-fondo'}"><span class="solo-fondo">${esc(eq.estado ?? '')}${eq.origen ? ' · ' : ''}</span>${eq.origen ? 'own concept' : ''}</div>
+    <div class="lugar num"><span class="solo-fondo">${fmtLat(l.lat)} ${fmtLon(l.lon)} · </span>elev ${fmt(cota, 1)} m${retocada ? (e.verOriginal ? ' (original view; this cell is retouched)' : ' (retouched)') : ''}<span class="solo-fondo"> · cell ${item.fila},${item.col}</span></div>
     ${h ? `<div class="tenue solo-fondo">footprint ${h.forma === 'rect' ? `${h.largo_m} × ${h.ancho_m} m` : `hexagon ${h.entre_caras_m} m across flats`} (${esc(h.cifra.texto ?? h.cifra.nombre)}) · drawn to scale when zoomed in</div>` : ''}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
     ${bloqueEspejo(p, item, (eq.requisitos ?? []).filter((r) => r.variable === 'pendiente_deg' && Number.isFinite(r.valor)).map((r) => ({ parametro: 'pendiente_grados', tipo: r.op === '>=' || r.op === '>' ? 'min' : 'max', valor: r.valor })))}
     <div class="cerca"></div>
-    <div class="et">Requirements · value here vs design limit</div>
-    ${evs.length ? evs.map((r) => filaRequisito(r, e.meta)).join('') : '<div class="tenue">The catalogue has no public design limit for this system.</div>'}
+    <div class="et">Requirements<span class="solo-fondo"> · value here vs design limit</span></div>
+    ${evs.length ? evs.map((r) => filaRequisito(r, e.meta)).join('') : '<div class="tenue"><span class="solo-fondo">The catalogue has no public design limit for this system.</span><span class="solo-simple">No published design limit.</span></div>'}
     <div class="obra-pad"></div>
     <div class="vol-hoja"></div>
     ${comparacion(p, item, eq, evs)}
@@ -1045,10 +1051,10 @@ function pintarHojaMision(p, hoja, item, q) {
       ${f.citas.map((c) => `<div class="dim solo-fondo">${esc(c.etiqueta)} <span class="num">${esc(c.valor)} ${esc(c.unidad)}${c.unidad === 'm' ? '' : ` (${c.m.toFixed(2)} m)`}</span> · ${fuenteYCita(c, 'source')}${c.nota ? ` <span class="tenue">${esc(c.nota)}</span>` : ''}</div>`).join('')}
       ${f.supuesto ? `<div class="supuesto-mision">${esc(f.supuesto)}</div>` : ''}`;
   hoja.innerHTML = `
-    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
+    <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)}<span class="solo-fondo"> · ${esc(e.meta.id)}</span> · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
     <h3>${esc(q.nombre)}</h3>
     <div class="tenue">Equipment of this mission${q.campana ? ` · ${esc(q.campana)}` : ''}</div>
-    <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(l.cota, 1)} m · cell ${item.fila},${item.col}</div>
+    <div class="lugar num"><span class="solo-fondo">${fmtLat(l.lat)} ${fmtLon(l.lon)} · </span>elev ${fmt(l.cota, 1)} m<span class="solo-fondo"> · cell ${item.fila},${item.col}</span></div>
     ${forma}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
     ${fichaLimites(q, l.pendiente, e.m, null) || '<div class="tenue">No published operating limits in the catalogue.</div>'}
@@ -1072,7 +1078,7 @@ function noReproducible(a, b) {
   return `<div class="et">Cannot be reproduced on Earth</div>${ps.map((q) => {
     const va = q.constante?.[ma], vb = q.constante?.[mb], fa = q.fuentes?.[ma], fb = q.fuentes?.[mb];
     const enl = (f, t) => (urlSegura(f?.url) ? `<a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(f.cita ? `“${f.cita}”` : f.texto ?? '')}">${esc(t)}</a>` : esc(t));
-    const cifra = Number.isFinite(va) && Number.isFinite(vb) ? ` <span class="num">${esc(va)} ${esc(q.unidad)}</span> on ${enl(fa, CUERPO[a.escena.meta.cuerpo])}, <span class="num">${esc(vb)} ${esc(q.unidad)}</span> on ${enl(fb, 'Earth')}` : fa?.texto ? ` ${enl(fa, fa.texto.length <= 90 ? fa.texto : `${CUERPO[a.escena.meta.cuerpo]} source`)}` : '';
+    const cifra = Number.isFinite(va) && Number.isFinite(vb) ? ` <span class="num">${esc(va)} ${esc(q.unidad)}</span> on ${enl(fa, CUERPO[a.escena.meta.cuerpo])}, <span class="num">${esc(vb)} ${esc(q.unidad)}</span> on ${enl(fb, 'Earth')}` : fa?.texto ? `<span class="solo-fondo"> ${enl(fa, fa.texto.length <= 90 ? fa.texto : `${CUERPO[a.escena.meta.cuerpo]} source`)}</span>` : '';
     return `<div class="no-ens" data-no-repro="${esc(q.id)}"><b>${esc(q.nombre)}</b>${cifra}</div>`;
   }).join('')}`;
 }
@@ -1097,7 +1103,7 @@ function bloqueEspejo(p, item, limites) {
     <div class="resumen-espejo">${R.map(([k, t]) => `<div data-r="${k}" class="r-${k}"><b>${t}</b> ${r[k].length ? esc(r[k].join(' · ')) : '<span class="tenue">nothing</span>'}</div>`).join('')}</div>
     <table class="comp solo-fondo"><thead><tr><th></th><th>${esc(a.cuerpo)}</th><th>${esc(b.cuerpo)}</th><th>Reading</th></tr></thead><tbody>
     ${filas.map((f) => `<tr class="esp-${f.lectura}" data-fila="${esc(f.id)}"><td>${esc(f.nombre)}</td><td class="num">${esc(f.a)}</td><td class="num">${esc(f.b)}</td><td><b>${TXT[f.lectura]}</b>${f.nota ? `<div class="motivo">${esc(f.nota)}</div>` : ''}</td></tr>`).join('')}</tbody></table>
-    <div class="tenue solo-simple">matches = within our own margin (own threshold, not from a source).</div>
+    <div class="tenue solo-simple">matches = within our own margin (own threshold).</div>
     <div class="tenue solo-fondo">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${conDia ? '' : ' Sun and light are compared once “Day” above is running: until then each Sun is just where its Display slider puts it.'}${sinDia ? ' Sunlit share of the day: still being worked out.' : ''}${conDia && hayPolar(xa, xb) ? ' On a lunar polar window the Sun height is the one set in Display.' : ''}</div>
     ${noReproducible(xa, xb)}</section>`;
 }
@@ -1109,9 +1115,9 @@ function comparacion(p, item, eq, evs) {
   const otroNombre = CUERPO[q.escena.meta.cuerpo];
   const noEns = eq.no_ensayable_tierra ?? [];
   const lista = noEns.length
-    ? noEns.map((x) => `<div class="no-ens"><b>${esc(FACTOR[x.factor] ?? x.factor ?? '')}</b> ${esc(x.texto ?? '')}<span class="solo-fondo"> · ${fuenteYCita(x)}</span></div>`).join('')
-    : '<div class="tenue">No public source states what cannot be tested on Earth for this system.</div>';
-  const cab = `<div class="et">Moon vs Earth · ${esc(luna ? p.escena.meta.id : q.escena.meta.id)} vs ${esc(luna ? q.escena.meta.id : p.escena.meta.id)}</div>`;
+    ? noEns.map((x) => `<div class="no-ens"><b>${esc(FACTOR[x.factor] ?? x.factor ?? '')}</b> <span class="solo-fondo">${esc(x.texto ?? '')} · ${fuenteYCita(x)}</span></div>`).join('')
+    : '<div class="tenue"><span class="solo-fondo">No public source states what cannot be tested on Earth for this system.</span><span class="solo-simple">No public source for this system.</span></div>';
+  const cab = `<div class="et">Moon vs Earth<span class="solo-fondo"> · ${esc(luna ? p.escena.meta.id : q.escena.meta.id)} vs ${esc(luna ? q.escena.meta.id : p.escena.meta.id)}</span></div>`;
   if (!otro) return `${cab}<div class="tenue">plant a ${esc(nombreCorto(item.equipo))} on the ${esc(otroNombre)} panel to compare</div><div class="et">Not testable on Earth (catalogue)</div>${lista}`;
   const evsOtro = evaluar(q, otro);
   const filas = evs.map((r, k) => {
@@ -1127,7 +1133,7 @@ function comparacion(p, item, eq, evs) {
   const bases = evs.some((r) => r.req.variable === 'pendiente_deg') ? notaBasesPendiente(luna ? p.escena.m : q.escena.m, luna ? q.escena.m : p.escena.m) : null;
   return `${cab}${evs.length ? `<table class="comp"><thead><tr><th></th><th>Moon</th><th>Earth</th><th>Reading</th></tr></thead><tbody>${filas}</tbody></table>
     ${bases ? `<div class="motivo solo-fondo" data-nota="bases">${esc(bases)}</div>` : ''}
-    <div class="tenue solo-simple">reproduced = within our own margin (own threshold, not from a source).</div>
+    <div class="tenue solo-simple">reproduced = within our own margin (own threshold).</div>
     <div class="tenue solo-fondo">reproduced = Earth within a margin of the Moon value; own threshold, not from a source: ${esc(margenes)}</div>` : ''}
     <div class="et">Not testable on Earth (catalogue)</div>${lista}`;
 }
@@ -1254,6 +1260,19 @@ function enlazarCamaras() {
   document.getElementById('exag-v').textContent = '1.0× true scale';
 }
 
+// El navegador soltó el dibujo 3D de un panel (pasa con dibujo por software): se dice en el panel en vez de dejarlo vacío.
+function avisoContexto(p, perdido) {
+  let av = p.el.querySelector('.aviso-3d');
+  if (!perdido) { av?.remove(); return; }
+  if (av) return;
+  av = document.createElement('div');
+  av.className = 'aviso-3d';
+  av.setAttribute('role', 'alert');
+  av.innerHTML = '<p>The browser dropped the 3D drawing of this panel. It is redrawn as soon as the browser gives it back.</p><button type="button" class="marca-boton">Reload the page</button>';
+  av.querySelector('button').addEventListener('click', () => location.reload());
+  p.el.querySelector('.lienzo').append(av);
+}
+
 function bucle() {
   for (const p of estado.paneles) {
     if (p.escena && p.el.offsetParent !== null && p.escena.dibujar()) trasDibujar(p);
@@ -1328,12 +1347,14 @@ async function iniciar() {
   if (lados.length === 2 && Math.abs(lados[0] - lados[1]) > 1e-6) notaEsc.textContent = `extents differ (${lados[0]} km vs ${lados[1]} km) · shown at the same horizontal scale`;
   else if (lados.length === 2) notaEsc.textContent = `same horizontal scale · ${lados[0]} km each`;
   notaEsc.title = notaEsc.textContent;
+  if (lados.length === 2) document.getElementById('nota-escala-corta').textContent = `Same scale · ${Math.abs(lados[0] - lados[1]) > 1e-6 ? `${lados[0]} km and ${lados[1]} km` : `${lados[0]} km each`}`;
   [pa, pb].forEach((p, i) => {
     const d = res[i];
     if (!d) return;
     try {
       p.bytesAltura = d.bytesAltura;
       p.escena = new Escena(p.el.querySelector('.lienzo'), d, ladoVista);
+      p.escena.alContexto = (perdido) => avisoContexto(p, perdido);
       rellenarTarjeta(p, d);
       crearMandos(p);
       crearRotulos(p);
@@ -1373,6 +1394,8 @@ async function iniciar() {
   // «Generate simulation» entra de pie en el lugar de la Tierra (&vista=suelo), no en vista aérea.
   if (qs.get('vista') === 'suelo' && pa.escena?.meta.dinamico) alternarSuelo(pa, true);
   if (qs.get('vista') === 'suelo' && pb.escena?.meta.punto) alternarSuelo(pb, true);
+  // &vista=aerea: los dos mundos desde arriba con el mismo encuadre, cada uno centrado en lo elegido (el lugar; el punto).
+  if (qs.get('vista') === 'aerea' && LUGAR) for (const p of [pa, pb]) if (p.escena) p.escena.encuadrar(LUGAR.lado_km / 2, centroBase(p));
   requestAnimationFrame(bucle);
   estado.listo = true;
 }

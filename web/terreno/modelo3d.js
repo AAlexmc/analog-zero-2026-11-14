@@ -221,8 +221,8 @@ export function crearCerca() {
       if (!gl) iniciarGL();
       aviso.hidden = true;
       pie.innerHTML = `<div><b class="rotulo-generado">${esc(gen.titulo)}</b> · <span class="num">${esc(medidaTexto(gen.medida))}</span> <span class="tenue">(length × width × height)</span></div>
-      <div>${esc(gen.linea)}</div>
-      <div class="tenue">${esc(txtPend)} · grid 1 m · figure 1.8 m · drag to orbit · not an official NASA model</div>`;
+      <div class="solo-fondo">${esc(gen.linea)}</div>
+      <div class="tenue">${esc(txtPend)}<span class="solo-fondo"> · grid 1 m · figure 1.8 m · drag to orbit</span> · not an official NASA model</div>`;
       construir(gen, pend);
       return;
     }
@@ -243,7 +243,7 @@ export function crearCerca() {
     aviso.textContent = estado.estado === 'error' ? `3D model failed to load: ${estado.error}` : 'loading 3D model…';
     pie.innerHTML = `<div><b>${esc(r.titulo)}</b> · <span class="num">${esc(r.medida)}</span> <span class="tenue">(length × width × height)</span></div>
       ${r.sustituto ? `<div class="sustituto">${esc(r.sustituto)}</div>` : ''}
-      <div class="tenue">${esc(txtPend)} · grid 1 m · figure 1.8 m · drag to orbit · Credit: NASA${m.fuente_url ? ` · <a href="${esc(m.fuente_url)}" target="_blank" rel="noopener">science.nasa.gov</a>` : ''}</div>`;
+      <div class="tenue">${esc(txtPend)}<span class="solo-fondo"> · grid 1 m · figure 1.8 m · drag to orbit</span> · Credit: NASA${m.fuente_url ? ` · <a href="${esc(m.fuente_url)}" target="_blank" rel="noopener">science.nasa.gov</a>` : ''}</div>`;
     construir(estado.estado === 'ok' ? estado.datos : null, pend);
   }
 
@@ -319,9 +319,13 @@ export function capaModelos(escena, lienzo, extra = null) {
   const sol = new THREE.DirectionalLight(0xffffff, 2.2), ambiente = new THREE.HemisphereLight(0xdfe8f0, 0x30363d, 2);
   escena.escena.add(grupo, ambiente, sol, sol.target);
   const nota = document.createElement('div');
-  nota.className = 'nota-modelos';
+  nota.className = 'nota-modelos solo-fondo';
   nota.hidden = true;
-  lienzo.appendChild(nota);
+  // Versión corta para el modo Simple: los mismos avisos, sin detalle.
+  const corta = document.createElement('div');
+  corta.className = 'nota-modelos solo-simple';
+  corta.hidden = true;
+  lienzo.append(nota, corta);
   const inst = new Map();
   let factor = 1;
 
@@ -393,7 +397,18 @@ export function capaModelos(escena, lienzo, extra = null) {
     for (const f of fallos) partes.push(`3D model failed to load: ${f}`);
     if (lista.length && cat.error) partes.push(cat.error);
     const txt = partes.join(' · ');
-    if (nota.textContent !== txt) { nota.textContent = txt; nota.hidden = !txt; nota.classList.toggle('con-error', fallos.size > 0 || !!(lista.length && cat.error)); }
+    if (nota.textContent !== txt) {
+      nota.textContent = txt; nota.hidden = !txt; nota.classList.toggle('con-error', fallos.size > 0 || !!(lista.length && cat.error));
+      const cortas = [];
+      if (hay) cortas.push(factor === 1 ? '3D models at true scale' : `3D models ×${factor}, not to scale`);
+      if (clases.has('concepto')) cortas.push('concepts: own design');
+      if (clases.has('volumen')) cortas.push('boxes and domes: not the real shape');
+      if (sombras) cortas.push('equipment shadows: not its outline');
+      if (cargando) cortas.push('loading 3D model…');
+      for (const f of fallos) cortas.push(`3D model failed to load: ${f}`);
+      if (lista.length && cat.error) cortas.push(cat.error);
+      corta.textContent = cortas.join(' · '); corta.hidden = !cortas.length; corta.classList.toggle('con-error', nota.classList.contains('con-error'));
+    }
     if (cambio) escena.sucio = true;
   }
 

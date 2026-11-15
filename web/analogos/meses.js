@@ -88,6 +88,16 @@ export function fraseRepetir(plan, donde) {
   return `${ahora}; the best place then is ${donde}, ${fmtPct(b.mejor.pct)}. Move the test.`;
 }
 
+// Versión corta para el modo Simple: mismas cifras y mismo veredicto.
+export function fraseRepetirCorta(plan, donde) {
+  const { primero: a, repeticion: b } = plan;
+  const v = (x) => (x === null ? 'no data' : fmtPct(x));
+  const inicio = `${nombreMes(a.mes)}: ${v(a.pct)}. ${nombreMes(b.mes)}: ${v(b.pct_aqui)}.`;
+  if (b.pct_aqui === null) return inicio;
+  if (!b.mejor) return `${inicio} No other place to compare.`;
+  return plan.mover ? `${inicio} Best then: ${donde}, ${fmtPct(b.mejor.pct)}. Move the test.` : `${inicio} Stay.`;
+}
+
 // Tira de 12 meses de una tarjeta.
 export function lineaMejorPeor(perfil) {
   const mp = mejorYPeor(perfil);

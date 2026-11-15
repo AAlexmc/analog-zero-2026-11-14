@@ -27,6 +27,7 @@ export function leerLugar(search) {
 // Enlace al visor (relativo a la raíz de la web) con el lugar de la Tierra y, al lado, el terreno lunar del catálogo que
 // contiene el punto elegido o, si no hay, el terreno del punto hecho en el momento (punto = {mundo: 'moon'|'mars', lat, lon});
 // sin ninguno de los dos el lugar se abre solo. Con terreno del catálogo el punto viaja igual: la base se centra en él.
+// vista=aerea: los dos mundos desde arriba, centrados en el lugar y en el punto (vista=suelo entra de pie en el lugar).
 export function enlaceSimulacion({ lat, lon, nombre = null, lunar = null, punto = null }) {
   const q = new URLSearchParams({ lugar: `${lat.toFixed(4)},${lon.toFixed(4)}` });
   if (nombre) q.set('nombre', nombre);
@@ -34,7 +35,7 @@ export function enlaceSimulacion({ lat, lon, nombre = null, lunar = null, punto 
   if (lunar) q.set('b', lunar);
   if (conPunto) { q.set('punto', `${punto.lat.toFixed(4)},${punto.lon.toFixed(4)}`); q.set('mundo', punto.mundo); }
   else if (!lunar) q.set('solo', 'lugar');
-  q.set('vista', 'suelo');
+  q.set('vista', 'aerea');
   return `terreno/index.html?${q.toString()}`;
 }
 

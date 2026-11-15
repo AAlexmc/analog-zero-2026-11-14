@@ -44,19 +44,19 @@ const lista = (xs) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(',
 export function frasesPuntos(res, { corto, en }) {
   if (!res || res.estado === 'sin_mision') return null;
   const titulo = `Where ${en} this test fits`;
-  if (res.estado === 'sin_referencia') return { titulo, lineas: ['This mission has no test site with coordinates, so there is nothing to look for here.'], nota: null };
+  if (res.estado === 'sin_referencia') return { titulo, lineas: ['This mission has no test site with coordinates, so there is nothing to look for here.'], nota: null, corta: 'This mission has no test site with coordinates.' };
   const soloTierra = [res.sin_capa.length ? `Earth only, not ${en}: ${lista(res.sin_capa.map(corto))}.` : null,
     res.sin_referencia?.length ? `No value at the test site, so not used: ${lista(res.sin_referencia.map(corto))}.` : null].filter(Boolean).join(' ') || null;
   const donde = res.conLimites ? ", among those that meet NASA's limits in step 2" : res.conZona ? ', inside the area searched in step 2' : '';
   if (res.estado === 'sin_parametros') {
-    return { titulo, lineas: [`Every parameter of this mission is Earth only (${lista(res.sin_capa.map(corto))}): there is nothing ${en} to rank.`, 'The numbered spots come from step 2, not from the mission.'], nota: null };
+    return { titulo, lineas: [`Every parameter of this mission is Earth only (${lista(res.sin_capa.map(corto))}): there is nothing ${en} to rank.`, 'The numbered spots come from step 2, not from the mission.'], nota: null, corta: 'Every parameter of this mission is Earth only.' };
   }
   const con = lista(res.usados.map(corto));
-  if (res.estado === 'sin_lugar') return { titulo, lineas: [`No place ${en}${res.conLimites ? " that meets NASA's limits in step 2" : res.conZona ? ' inside the area searched in step 2' : ''} could be compared in ${con}.`], nota: soloTierra };
+  if (res.estado === 'sin_lugar') return { titulo, lineas: [`No place ${en}${res.conLimites ? " that meets NASA's limits in step 2" : res.conZona ? ' inside the area searched in step 2' : ''} could be compared in ${con}.`], nota: soloTierra, corta: `No place ${en} could be compared.` };
   const n = res.puntos.length;
   const lineas = [`${n === 1 ? `${LETRAS[0]} on the globe: the place` : `${LETRAS[0]}–${LETRAS[n - 1]} on the globe: the places`} ${en} most like ${res.ref.nombre}, where NASA ran this test, in ${con}${donde}. Own metric, year averages.`];
   if (res.puntos.length < LETRAS.length) lineas.push(`Only ${res.puntos.length} ${res.puntos.length === 1 ? 'place' : 'places'} far enough apart.`);
   // Criterio propio: se avisa cuando al menos 1 de cada 20 celdas comparadas empata con la mejor.
   if (res.celdas > 0 && res.empatadas / res.celdas >= 0.05) lineas.push(`${Math.round((100 * res.empatadas) / res.celdas)} % of the grid cells compared ${en} are within half a point of the best: with ${res.usados.length === 1 ? 'one parameter' : 'these parameters'}, much of it looks alike, and these are ${n} of them spread apart.`);
-  return { titulo, lineas, nota: soloTierra };
+  return { titulo, lineas, nota: soloTierra, corta: null };
 }

@@ -1,6 +1,8 @@
 // Botón «Generate report» del visor y su vista previa: recoge los datos (recoger.js), arma el HTML (informe.js) y lo enseña en un
 // <iframe sandbox srcdoc> que es exactamente el fichero que se descarga. Aquí solo la pantalla.
-import { recoger, parecidoDe } from './recoger.js';
+import { recoger, parecidoDe, parecidoDeBusqueda } from './recoger.js';
+import { leerEstado, opcionesBusqueda } from '../analogos/misiones.js';
+import { leerMes, idsMensuales, nombreMes } from '../analogos/meses.js';
 import { construirInforme } from './informe.js';
 
 const ESPERA_MS = 90000;
@@ -18,7 +20,8 @@ export function crearInforme(boton, ctx) {
   document.body.appendChild(dlg);
   const $ = (s) => dlg.querySelector(s), marco = $('iframe');
   const U = { html: null, nombre: null, segundosMotor: null, trabajando: false };
-  let motor = null;
+  let motor = null, logo = null;
+  const leerLogo = () => (logo ??= fetch(new URL('../marca/space-apps-negro.svg', import.meta.url)).then((r) => (r.ok ? r.text() : '')).catch(() => ''));
   const aviso = (t) => { $('[data-v=estado]').textContent = t; };
   const botones = (si) => { $('[data-a=descargar]').disabled = !si; $('[data-a=imprimir]').disabled = !si; };
 
@@ -40,7 +43,25 @@ export function crearInforme(boton, ctx) {
       motor ??= import('../buscar/motor.js').then((m) => m.cargar(new URL('../data/cuerpos/', import.meta.url).href));
       const M = await motor;
       U.segundosMotor = (performance.now() - t0) / 1000;
-      return parecidoDe(M, mundo, lugar);
+      // Con misión o mes en la dirección, la misma búsqueda que hizo la página de resultados; si no se puede repetir, se dice.
+      const q = new URLSearchParams(location.search), mes = leerMes(q);
+      let activa = null, motivo = null;
+      if (q.get('mision')) {
+        const json = (f) => fetch(new URL(`../data/${f}`, import.meta.url)).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}: ${f}`); return r.json(); });
+        try { const [m, s] = await Promise.all([json('misiones.json'), json('sitios_ensayo.json')]); activa = leerEstado(q, m.misiones ?? [], M.indice, s.sitios ?? []); } catch (e) { motivo = `the mission catalogue could not be read (${e.message})`; }
+        if (!activa && !motivo) motivo = 'the mission in the address is not in the catalogue';
+      }
+      if (!activa && mes === null && !motivo) return parecidoDe(M, mundo, lugar);
+      if (!motivo) {
+        try {
+          const opciones = opcionesBusqueda(activa);
+          if (mes !== null) await M.cargarMeses(idsMensuales(opciones, M.indice));
+          const b = parecidoDeBusqueda(M, mundo, lugar, { opciones, mes, mes_nombre: nombreMes(mes), mision: activa ? { id: activa.id, titulo: activa.titulo, parametros: activa.parametros.length, referencia: activa.referencia?.nombre ?? null, ampliada: !!activa.ampliada } : null });
+          if (b) return b;
+          motivo = 'this place is not among the places that search returns';
+        } catch (e) { motivo = `that search could not be repeated here (${e.message})`; }
+      }
+      return { ...parecidoDe(M, mundo, lugar), sin_busqueda: motivo };
     } catch (e) {
       motor = null;
       return { motivo: `The global layers could not be read here (${e.message}).` };
@@ -57,6 +78,7 @@ export function crearInforme(boton, ctx) {
     });
     if (d.mundo) d.enlace_resultados = new URL(`../analogos/index.html?mundo=${encodeURIComponent(d.mundo.clave)}&lat=${d.mundo.lat.toFixed(4)}&lon=${d.mundo.lon.toFixed(4)}`, location.href).href;
     d.parecido = await parecido(d.mundo, d.lugar);
+    d.logo_svg = await leerLogo();
     return d;
   }
 

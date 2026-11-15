@@ -181,7 +181,7 @@ async function montar(m) {
       b.addEventListener('click', () => irMision(p, true));
       return b;
     });
-    cajaPts.replaceChildren(el('h3', { textContent: f.titulo }), ...f.lineas.map((t) => el('p', { textContent: t, className: botones.length ? 'solo-fondo' : '' })), ...(botones.length ? [el('div', { className: 'lista-puntos' }, ...botones)] : []), ...(f.nota ? [el('p', { className: 'tenue solo-fondo', textContent: f.nota })] : []));
+    cajaPts.replaceChildren(el('h3', { textContent: f.titulo }), ...f.lineas.map((t) => el('p', { textContent: t, className: botones.length || f.corta ? 'solo-fondo' : '' })), ...(f.corta ? [el('p', { className: 'solo-simple', textContent: f.corta })] : []), ...(botones.length ? [el('div', { className: 'lista-puntos' }, ...botones)] : []), ...(f.nota ? [el('p', { className: 'tenue solo-fondo', textContent: f.nota })] : []));
     marcasPts = res.puntos.map((p) => {
       const b = el('button', { type: 'button', textContent: p.letra, title: `Mission spot ${p.letra}` });
       b.dataset.letra = p.letra;

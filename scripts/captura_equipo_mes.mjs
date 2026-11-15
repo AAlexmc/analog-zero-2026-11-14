@@ -17,7 +17,7 @@ import { contraste } from '../web/marca/contraste.js';
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas', 'equipo_mes');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
 
 const fallos = [];
 const falla = (m) => { fallos.push(m); console.error(`FAIL ${m}`); };

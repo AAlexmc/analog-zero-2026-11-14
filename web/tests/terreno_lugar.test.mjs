@@ -215,7 +215,7 @@ test('simulation link: the Earth place goes with the lunar terrain of the target
   assert.equal(q.get('lugar'), '75.2500,-84.2500');
   assert.equal(q.get('b'), 'shackleton_borde');
   assert.equal(q.get('solo'), null);
-  assert.equal(q.get('vista'), 'suelo');
+  assert.equal(q.get('vista'), 'aerea', 'the simulation opens from above: standing 2 m above the ground nothing could be made out');
   assert.deepEqual(leerLugar(`?${con.split('?')[1]}`), { lat: 75.25, lon: -84.25, nombre: 'Place 2 · 75.25° N, 84.25° W', lado_km: 10 });
   const sin = new URLSearchParams(enlaceSimulacion({ lat: -24.0883, lon: -69.9946 }).split('?')[1]);
   assert.equal(sin.get('solo'), 'lugar');
@@ -245,7 +245,7 @@ test('simulation link: catalogue Moon terrain with the point inside it, else the
   assert.deepEqual([conLunar.get('punto'), conLunar.get('mundo'), conLunar.get('solo')], ['-89.0000,3.0000', 'moon', null], 'the point travels with the catalogue terrain: the base is centred on it');
   assert.equal(q(enlaceSim2({ lat: 1, lon: 2, lunar: 'shackleton' })).get('punto'), null);
   const marte = q(enlaceSim2({ lat: 1, lon: 2, punto: { mundo: 'mars', lat: 18.44, lon: 77.45 } }));
-  assert.deepEqual([marte.get('punto'), marte.get('mundo'), marte.get('solo'), marte.get('vista')], ['18.4400,77.4500', 'mars', null, 'suelo']);
+  assert.deepEqual([marte.get('punto'), marte.get('mundo'), marte.get('solo'), marte.get('vista')], ['18.4400,77.4500', 'mars', null, 'aerea']);
   assert.deepEqual(leerPunto(`?${marte}`), { mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 });
   for (const sin of [{}, { punto: { mundo: 'venus', lat: 1, lon: 2 } }, { punto: { mundo: 'mars', lat: NaN, lon: 2 } }]) assert.equal(q(enlaceSim2({ lat: 1, lon: 2, ...sin })).get('solo'), 'lugar');
 });

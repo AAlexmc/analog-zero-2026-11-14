@@ -61,7 +61,8 @@ try {
   const barra = await pag.evaluate(() => {
     const b = document.querySelector('.marca-barra'), boton = document.getElementById('informe'), en = document.getElementById('enlazar');
     const caja = (e) => e.getBoundingClientRect();
-    const hijos = () => [...b.children].filter((e) => e.offsetParent !== null && caja(e).width > 0).map((e) => { const r = caja(e); return { id: e.id || e.className, top: r.top, bottom: r.bottom }; });
+    // El hueco flexible no cuenta: con el botón puede quedarse en cero de ancho.
+    const hijos = () => [...b.children].filter((e) => !e.classList.contains('hueco') && e.offsetParent !== null && caja(e).width > 0).map((e) => { const r = caja(e); return { id: e.id || e.className, top: r.top, bottom: r.bottom }; });
     const con = { alto: caja(b).height, hijos: hijos() };
     boton.style.display = 'none';
     const sin = { alto: caja(b).height, hijos: hijos() };
@@ -200,6 +201,27 @@ try {
     comprobar(pr.modo === 'prioridad' && pr.n > 0 && pr.igual && pr.ltv.num === 1 && /^Your first need: placed first/.test(pr.ltv.regla) && /pulled towards Lunar Terrain Vehicle, your first need/.test(pr.hab.regla), `(g) base by priority: the report numbers its ${pr.n} pieces like the markers and gives the rule the screen gives ("${pr.ltv.regla}")`, `(g) priority: ${JSON.stringify({ modo: pr.modo, n: pr.n, igual: pr.igual, ltv: [pr.ltv?.num, pr.ltv?.regla], hab: [pr.hab?.num, pr.hab?.regla] })}`);
     const rp = await informe();
     comprobar(/The mission objective and the month in the address are not applied in this table/.test(rp.sec.s8.texto) && /Around what you need most/.test(rp.sec.s2.texto), '(g) with a mission and a month in the address, section 8 says its table does not apply them; section 2 names the priority mode', `(g) s8: ${rp.sec.s8.texto.slice(0, 400)}`);
+    await pag.click('.inf-dialogo [data-a=cerrar]');
+    await limpiar();
+    // El lugar sale de la búsqueda con mes: la sección 8 da el puesto y las cifras de esa búsqueda.
+    const top = await pag.evaluate(async () => {
+      const { cargar } = await import('../buscar/motor.js'), { idsMensuales } = await import('../analogos/meses.js');
+      const M = await cargar(new URL('../data/cuerpos/', location.href).href);
+      await M.cargarMeses(idsMensuales({}, M.indice));
+      const x = M.buscar(M.leerPunto('mars', 18.38, 77.58), { mes: 1 }).resultados[0];
+      return { lat: x.lat, lon: x.lon, sim: x.similitud_pct, comparados: x.comparados, de: x.de, p0: x.parametros.find((q) => q.estado === 'ok' && q.similitud_pct !== null) };
+    });
+    await abrir(`?lugar=${top.lat.toFixed(4)}%2C${top.lon.toFixed(4)}&nombre=Place+1&punto=18.3800%2C77.5800&mundo=mars&mes=1`);
+    const rb = await informe();
+    const t8 = rb.sec.s8.texto.replace(/\s+/g, ' ');
+    comprobar(/Same search as the results page: every parameter that can be reproduced on Earth, Earth in January\./.test(t8) && t8.includes(`this place is number 1, with an overall match of ${top.sim.toFixed(1)} % over ${top.comparados} of ${top.de} parameters`) && t8.includes(`${top.p0.similitud_pct.toFixed(1)} %`) && /\* Earth value of January/.test(t8) && !/not applied in this table/.test(t8),
+      `(g) a place taken from the January search: section 8 repeats that search (number 1, ${top.sim.toFixed(1)} %, ${top.lat}, ${top.lon})`, `(g) s8 with month: expected ${JSON.stringify(top)} in: ${t8.slice(0, 700)}`);
+    const htmlB = await pag.evaluate(() => window.__az.informe.ultimo().html);
+    const sueltaB = await contexto.newPage();
+    await sueltaB.setViewportSize({ width: 1100, height: 1400 });
+    await sueltaB.setContent(htmlB);
+    await sueltaB.locator('#s8').screenshot({ path: join(SALIDA, 'g-s8-busqueda-mes.png') });
+    await sueltaB.close();
     await pag.click('.inf-dialogo [data-a=cerrar]');
     await limpiar();
   }

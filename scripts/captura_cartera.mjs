@@ -18,7 +18,7 @@ const formatoValor = (v, u) => planoSup(formatoValorSup(v, u));
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas', 'cartera');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
 const EXTERNOS = ['https://elevation-tiles-prod.s3.amazonaws.com', 'https://gibs.earthdata.nasa.gov'];
 
 const fallos = [];

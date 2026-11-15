@@ -14,7 +14,7 @@ import { medidasBase, separacionPistaDefecto, piezasBase, opcionesBase, aligerar
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas', 'base');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 // Criterio de la prueba (propio): una separación pista–hábitat mayor que el terreno de 10 km, para el caso sin solución.
 const SEP_IMPOSIBLE_M = 20000;
 

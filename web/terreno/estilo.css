@@ -26,6 +26,7 @@ u { text-decoration: none; color: var(--tenue); }
 .nota-escala { color: var(--tenue); font-size: 13px; }
 /* La barra va en una línea: la nota de escala cede sitio (entera en su title) y por debajo de 1500 px los mandos se aprietan. */
 .marca-barra .nota-escala { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 1500px) { .marca-barra .marca-concurso { display: none; } }
 @media (min-width: 761px) and (max-width: 1500px) {
   .marca-barra { gap: 12px; }
   .marca-barra .grupo input[type=range] { width: 70px; }
@@ -81,9 +82,9 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 .aviso-lugar[hidden] { display: none; }
 .muestreo { margin-top: 6px; font-size: 13px; padding-left: 8px; border-left: 3px solid var(--blue-yonder); }
 .marca-chip.vivo { margin-left: 6px; border-color: var(--blue-yonder); }
-.pildora-suelo { position: absolute; left: 10px; top: 10px; right: 10px; width: max-content; max-width: calc(100% - 20px); z-index: 2; padding: 6px 12px; border-radius: 999px;
+.pildora-suelo, .pildora-suelo-corta { position: absolute; left: 10px; top: 10px; right: 10px; width: max-content; max-width: calc(100% - 20px); z-index: 2; padding: 6px 12px; border-radius: 999px;
   background: var(--blanco); color: var(--fondo); font-size: 13px; font-weight: 700; }
-.pildora-suelo[hidden] { display: none; }
+.pildora-suelo[hidden], .pildora-suelo-corta[hidden] { display: none; }
 /* Fichas dentro del panel lateral, en el flujo, bajo las acciones. */
 .lado > .hoja, .lado > .paleta, .lado > .perforacion { position: static; inset: auto; width: auto; height: auto; max-height: none; flex: none; overflow: visible; }
 .lienzo canvas { display: block; width: 100%; height: 100%; touch-action: none; }
@@ -255,6 +256,8 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 /* Equipo espejo */
 .aviso-espejo { position: absolute; left: 10px; top: 96px; z-index: 4; pointer-events: none; max-width: min(46%, 300px); padding: 7px 14px; border-radius: var(--radio); background: var(--blanco); color: var(--fondo); font-size: 13px; }
 .aviso-espejo[hidden] { display: none; }
+.aviso-3d { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; background: var(--fondo); color: var(--blanco); font-size: 15px; }
+.aviso-3d p { margin: 0; max-width: 34ch; }
 .espejo { margin: 10px 0; padding-top: 8px; border-top: 1px solid var(--linea); }
 .resumen-espejo { display: grid; gap: 4px; margin: 6px 0 8px; font-size: 13px; }
 .resumen-espejo > div { padding: 5px 8px; border-left: 3px solid var(--linea); }

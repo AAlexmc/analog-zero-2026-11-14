@@ -1,6 +1,8 @@
 // Modo de lectura «Simple» / «In depth» en Chromium: en In depth (por defecto) .solo-fondo no cambia nada y .solo-simple
 // no se ve; en Simple ningún .solo-fondo se ve; la barra mide lo mismo en los dos modos y sin el conmutador; el modo
-// sigue al navegar y ?modo= manda; palabras visibles por pantalla en cada modo; móvil sin solapes; consola limpia.
+// sigue al navegar y ?modo= manda; palabras visibles por pantalla en cada modo; en Simple ningún bloque de texto pasa de
+// 14 palabras salvo créditos de licencia y avisos de error (también en el visor de una simulación con base, Day y vista
+// de suelo); móvil sin solapes; consola limpia.
 // Uso: node scripts/captura_modo.mjs
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -10,7 +12,7 @@ import { chromium } from 'playwright';
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary', '.wasm': 'application/wasm' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary', '.wasm': 'application/wasm' };
 const fallos = [];
 const comprobar = (cond, bien, mal) => { if (cond) console.log(`ok   ${bien}`); else { fallos.push(mal); console.error(`FAIL ${mal}`); } };
 
@@ -52,6 +54,7 @@ const PANTALLAS = [
   { id: 'mundo', url: 'explorar/index.html?mundo=moon&lat=-89.68643&lon=-162.9371', listo: () => window.__az?.vista?.listo === true },
   { id: 'resultados', url: `analogos/index.html?${JEZERO}`, listo: () => window.__az?.analogos?.listo === true, tras: async (pag) => { await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; }); } },
   { id: 'metricas', url: `analogos/index.html?${JEZERO}`, listo: () => window.__az?.analogos?.listo === true, tras: async (pag) => { await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; }); await pag.click('#tab-metricas'); await pag.waitForTimeout(200); } },
+  { id: 'cartera', url: `analogos/index.html?${JEZERO}`, listo: () => window.__az?.analogos?.listo === true, tras: async (pag) => { await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; }); await pag.click('#tab-cartera'); await pag.waitForTimeout(300); } },
   { id: 'calendario', url: `analogos/index.html?${JEZERO}`, listo: () => window.__az?.analogos?.listo === true, tras: async (pag) => { await pag.evaluate(() => { window.__az.analogos.autoTerreno = false; }); await pag.click('#tab-calendario'); await pag.waitForFunction(() => !!document.querySelector('#calendario h1'), null, { timeout: 60000 }); } },
   { id: 'visor', url: 'terreno/index.html', listo: () => window.__az?.listo === true, tras: plantarTorre },
   { id: 'mapa', url: 'mapa/index.html', listo: () => !document.querySelector('#hoja')?.textContent.includes('Loading'), tras: async (pag) => { await pag.waitForTimeout(800); } },
@@ -87,6 +90,73 @@ const medir = (pag) => pag.evaluate(() => {
   };
 });
 
+// Brevedad en Simple: bloques de texto visibles (fuera de botones y mandos) con más de MAX_PALABRAS palabras con letras.
+const MAX_PALABRAS = 14;
+// Excepciones justificadas: créditos que exige la licencia y avisos de error.
+const EXCEPCIONES = [
+  { re: /^Image: NASA|Credit: NASA|^Elevation data: Copernicus DEM|Contains modified Copernicus/, por: 'licence credit' },
+  { re: /could not load|failed to load|No connection|offline/i, por: 'error notice' },
+];
+const largos = (pag) => pag.evaluate((max) => {
+  const mando = 'button, select, option, input, textarea, label, summary, [role=button], [role=tab], .marca-modo, .marca-barra nav, canvas';
+  const bloque = (e) => { for (let x = e; x && x !== document.body; x = x.parentElement) { const d = getComputedStyle(x).display; if (!d.startsWith('inline') && d !== 'contents') return x; } return document.body; };
+  const grupos = new Map();
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = w.nextNode());) {
+    const t = n.textContent.replace(/\s+/g, ' ').trim();
+    const p = n.parentElement;
+    if (!t || !p || p.closest(`script, style, noscript, ${mando}`)) continue;
+    if (!p.checkVisibility({ checkOpacity: true, visibilityProperty: true })) continue;
+    const b = bloque(p);
+    grupos.set(b, `${grupos.get(b) ?? ''} ${t}`);
+  }
+  return [...grupos.values()].map((t) => t.trim()).filter((t) => (t.match(/\S*\p{L}\S*/gu) ?? []).length > max);
+}, MAX_PALABRAS);
+async function brevedad(pag, id) {
+  const ls = await largos(pag);
+  const malos = ls.filter((t) => !EXCEPCIONES.some((x) => x.re.test(t)));
+  for (const t of ls) console.log(`     ${malos.includes(t) ? 'LONG' : 'kept'} [${id}] ${t}`);
+  comprobar(!malos.length, `${id} simple: no visible text block over ${MAX_PALABRAS} words${ls.length ? ` (${ls.length} allowed exceptions)` : ''}`, `${id} simple: ${malos.length} text blocks over ${MAX_PALABRAS} words`);
+}
+
+// Visor desde una simulación: base generada, ficha abierta, Day en marcha y vista de suelo.
+const SIM = 'terreno/index.html?lugar=75.25,-84.25&nombre=Test+place&b=shackleton&punto=-89.5,120&mundo=moon&vista=aerea';
+const ESTADOS_SIM = [
+  { id: 'sim_base', paso: async (pag) => {
+    await pag.evaluate(() => window.__az.asentamiento.generar());
+    await pag.waitForFunction(() => window.__az.asentamiento.estado.trabajando === false, null, { timeout: 180000 });
+    await pag.waitForTimeout(900);
+    await pag.locator('.panel[data-lado=b] .marca .rot').first().click({ force: true });
+    await pag.waitForFunction(() => !document.querySelector('.panel[data-lado=b] .hoja')?.hidden, null, { timeout: 20000 });
+    await pag.mouse.move(5, 895);
+  } },
+  { id: 'sim_dia', paso: async (pag) => { await pag.evaluate(() => window.__az.dia.ir(9)); await pag.waitForFunction(() => window.__az.dia.listo(), null, { timeout: 120000 }); await pag.waitForTimeout(700); } },
+  { id: 'sim_suelo', paso: async (pag) => { await pag.click('.panel[data-lado=a] .suelo'); await pag.waitForTimeout(1500); } },
+];
+
+// Comprobaciones de cada pantalla en un modo (y brevedad en Simple).
+async function revisar(pag, id, modo) {
+  const m = await medir(pag);
+  comprobar(m.modo === modo, `${id} ${modo}: data-modo="${m.modo}"`, `${id} ${modo}: data-modo is "${m.modo}"`);
+  comprobar(m.grupo.rol === 'group' && m.grupo.etiqueta === 'Reading mode' && m.grupo.botones.map((b) => `${b.t}:${b.p}`).join() === (modo === 'simple' ? 'Simple:true,In depth:false' : 'Simple:false,In depth:true'),
+    `${id} ${modo}: switch ${m.grupo.botones.map((b) => `${b.t}${b.p === 'true' ? '*' : ''}`).join(' | ')}`, `${id} ${modo}: switch ${JSON.stringify(m.grupo)}`);
+  comprobar(Math.abs(m.alto - m.altoSin) < 0.5 && m.alto <= m.unaLinea + 0.5, `${id} ${modo}: bar ${m.alto.toFixed(1)} px = without the switch ${m.altoSin.toFixed(1)} px, one line (${m.unaLinea.toFixed(1)} px)`,
+    `${id} ${modo}: bar ${m.alto} px, without the switch ${m.altoSin} px, one line ${m.unaLinea} px`);
+  comprobar(m.ancho <= 1600, `${id} ${modo}: page ${m.ancho} px wide`, `${id} ${modo}: page ${m.ancho} px wide`);
+  if (modo === 'fondo') {
+    comprobar(!m.simpleVisibles.length, `${id} in depth: no .solo-simple visible`, `${id} in depth: .solo-simple visible: ${m.simpleVisibles.join(' | ')}`);
+    comprobar(!m.cambia.length, `${id} in depth: the ${m.fondoTotal} .solo-fondo look exactly as without the class`, `${id} in depth: .solo-fondo changes visibility: ${m.cambia.join(' | ')}`);
+  } else {
+    comprobar(!m.fondoVisibles.length, `${id} simple: none of the ${m.fondoTotal} .solo-fondo visible`, `${id} simple: .solo-fondo visible: ${m.fondoVisibles.join(' | ')}`);
+    // Sin nada que esconder, o en la portada (solo cambia una frase por su versión corta), no hay línea «switch to In depth».
+    const lineas = m.fondoTotal && id !== 'portada' ? 1 : 0;
+    comprobar(m.lineaModo.length === lineas, `${id} simple: ${lineas ? `one line "${m.lineaModo[0]}"` : 'nothing to hide, no "switch to In depth" line'}${m.simpleVisibles.length > m.lineaModo.length ? `; other .solo-simple: ${m.simpleVisibles.filter((t) => !m.lineaModo.includes(t)).join(' | ')}` : ''}`,
+      `${id} simple: ${m.lineaModo.length} "switch to In depth" lines: ${m.lineaModo.join(' | ')}`);
+  }
+  if (modo === 'simple') await brevedad(pag, id);
+  return m;
+}
+
 const tabla = [];
 try {
   // ---------- 1. Cada pantalla en los dos modos ----------
@@ -99,24 +169,8 @@ try {
       await pag.waitForFunction(s.listo, null, { timeout: 120000 });
       await s.tras?.(pag);
       await pag.waitForTimeout(250);
-      const m = await medir(pag);
+      const m = await revisar(pag, s.id, modo);
       fila[modo] = m;
-      comprobar(m.modo === modo, `${s.id} ${modo}: data-modo="${m.modo}"`, `${s.id} ${modo}: data-modo is "${m.modo}"`);
-      comprobar(m.grupo.rol === 'group' && m.grupo.etiqueta === 'Reading mode' && m.grupo.botones.map((b) => `${b.t}:${b.p}`).join() === (modo === 'simple' ? 'Simple:true,In depth:false' : 'Simple:false,In depth:true'),
-        `${s.id} ${modo}: switch ${m.grupo.botones.map((b) => `${b.t}${b.p === 'true' ? '*' : ''}`).join(' | ')}`, `${s.id} ${modo}: switch ${JSON.stringify(m.grupo)}`);
-      comprobar(Math.abs(m.alto - m.altoSin) < 0.5 && m.alto <= m.unaLinea + 0.5, `${s.id} ${modo}: bar ${m.alto.toFixed(1)} px = without the switch ${m.altoSin.toFixed(1)} px, one line (${m.unaLinea.toFixed(1)} px)`,
-        `${s.id} ${modo}: bar ${m.alto} px, without the switch ${m.altoSin} px, one line ${m.unaLinea} px`);
-      comprobar(m.ancho <= 1600, `${s.id} ${modo}: page ${m.ancho} px wide`, `${s.id} ${modo}: page ${m.ancho} px wide`);
-      if (modo === 'fondo') {
-        comprobar(!m.simpleVisibles.length, `${s.id} in depth: no .solo-simple visible`, `${s.id} in depth: .solo-simple visible: ${m.simpleVisibles.join(' | ')}`);
-        comprobar(!m.cambia.length, `${s.id} in depth: the ${m.fondoTotal} .solo-fondo look exactly as without the class`, `${s.id} in depth: .solo-fondo changes visibility: ${m.cambia.join(' | ')}`);
-      } else {
-        comprobar(!m.fondoVisibles.length, `${s.id} simple: none of the ${m.fondoTotal} .solo-fondo visible`, `${s.id} simple: .solo-fondo visible: ${m.fondoVisibles.join(' | ')}`);
-        // Sin nada que esconder (portada) no hay línea «switch to In depth»: no habría nada más que ver.
-        const lineas = m.fondoTotal ? 1 : 0;
-        comprobar(m.lineaModo.length === lineas, `${s.id} simple: ${lineas ? `one line "${m.lineaModo[0]}"` : 'nothing to hide, no "switch to In depth" line'}${m.simpleVisibles.length > m.lineaModo.length ? `; other .solo-simple: ${m.simpleVisibles.filter((t) => !m.lineaModo.includes(t)).join(' | ')}` : ''}`,
-          `${s.id} simple: ${m.lineaModo.length} "switch to In depth" lines: ${m.lineaModo.join(' | ')}`);
-      }
       await pag.screenshot({ path: join(SALIDA, `modo_${s.id}_${modo}.png`) });
       if (s.id === 'visor') {
         await pag.evaluate(() => document.querySelector('.panel[data-lado=b] .hoja').scrollIntoView({ block: 'start' }));
@@ -127,6 +181,37 @@ try {
     }
     tabla.push(fila);
     comprobar(fila.fondo.fondoTotal ? fila.simple.palabras < fila.fondo.palabras : fila.simple.palabras === fila.fondo.palabras, `${s.id}: ${fila.fondo.palabras} visible words in depth → ${fila.simple.palabras} simple`, `${s.id}: simple ${fila.simple.palabras} words, in depth ${fila.fondo.palabras}`);
+  }
+
+  // ---------- 1b. Visor desde una simulación, estado a estado ----------
+  {
+    const filas = ESTADOS_SIM.map((x) => ({ id: x.id }));
+    for (const modo of ['fondo', 'simple']) {
+      const ctx = await contexto(1600, 900, `sim ${modo}`);
+      const pag = await ctx.newPage();
+      await pag.goto(`${base}/${SIM}&modo=${modo}`);
+      await pag.waitForFunction(() => window.__az?.listo === true, null, { timeout: 180000 });
+      await pag.waitForTimeout(600);
+      for (const [i, x] of ESTADOS_SIM.entries()) {
+        await x.paso(pag);
+        filas[i][modo] = await revisar(pag, x.id, modo);
+        await pag.screenshot({ path: join(SALIDA, `modo_${x.id}_${modo}.png`) });
+        if (x.id === 'sim_base') {
+          await pag.evaluate(() => document.querySelector('.panel[data-lado=b] .hoja').scrollIntoView({ block: 'start' }));
+          await pag.waitForTimeout(200);
+          await pag.screenshot({ path: join(SALIDA, `modo_sim_ficha_${modo}.png`) });
+          await pag.evaluate(() => document.querySelector('.panel[data-lado=b] .hoja').scrollIntoView({ block: 'end' }));
+          await pag.waitForTimeout(200);
+          await pag.screenshot({ path: join(SALIDA, `modo_sim_ficha_pie_${modo}.png`) });
+          await pag.evaluate(() => window.scrollTo(0, 0));
+        }
+      }
+      await ctx.close();
+    }
+    for (const f of filas) {
+      tabla.push(f);
+      comprobar(f.simple.palabras < f.fondo.palabras, `${f.id}: ${f.fondo.palabras} visible words in depth → ${f.simple.palabras} simple`, `${f.id}: simple ${f.simple.palabras} words, in depth ${f.fondo.palabras}`);
+    }
   }
 
   // ---------- 2. Se cambia con el botón, sin recargar, y sigue al navegar ----------

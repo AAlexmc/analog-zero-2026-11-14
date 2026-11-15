@@ -12,7 +12,7 @@ import { obraCarretera, obraPlataforma, defectosFlota, fmt } from '../web/terren
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas', 'obra');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 // Criterio de la prueba (propio): diámetro de la plataforma de la pista en shackleton_borde (≥ 3 celdas de 9,8 m).
 const DIAMETRO_PISTA_M = 60;
 

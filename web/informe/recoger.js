@@ -76,6 +76,33 @@ export function parecidoDe(motor, mundo, lugar) {
   };
 }
 
+// Con misión o mes en la dirección: la misma búsqueda que la página de resultados (motor.buscar con sus opciones), y de ella
+// la ficha de este lugar. null si el lugar no está entre los que esa búsqueda devuelve: no hay cifra suya que copiar.
+export function parecidoDeBusqueda(motor, mundo, lugar, { opciones = {}, mes = null, mes_nombre = null, mision = null } = {}) {
+  const ind = motor.indice, P = new Map([...ind.parametros, ...(ind.parametros_tierra ?? [])].map((p) => [p.id, p]));
+  const r = motor.buscar(motor.leerPunto(mundo.clave, mundo.lat, mundo.lon), mes === null ? opciones : { ...opciones, mes });
+  let hit = null;
+  for (const lista of ['resultados', 'parciales']) {
+    const k = (r[lista] ?? []).findIndex((x) => Math.abs(x.lat - lugar.lat) < 0.01 && Math.abs(x.lon - lugar.lon) < 0.01);
+    if (k >= 0) { hit = { x: r[lista][k], puesto: k + 1, lista }; break; }
+  }
+  if (!hit) return null;
+  const mensuales = new Set(r.mensuales ?? []);
+  const fila = (q) => {
+    const p = P.get(q.id) ?? { id: q.id, nombre: q.id }, ref = q.origen_objetivo === 'referencia';
+    return { id: q.id, nombre: p.nombre, unidad: p.unidad, transformacion: p.transformacion ?? null, clases: p.clases ?? null, valor_mundo: num(q.valor_objetivo), valor_tierra: num(q.valor_tierra),
+      desviacion_pct: num(q.desviacion_pct), similitud_pct: num(q.similitud_pct), estado: q.estado, referencia: ref, mensual: mensuales.has(q.id), aviso: p.aviso ?? null,
+      fuentes: [ref ? null : p.fuentes?.[mundo.clave], p.fuentes?.earth].filter(Boolean).map((f) => ({ texto: f.texto ?? null, url: f.url ?? null, cita: f.cita ?? null, origen: f.origen ?? null })) };
+  };
+  const base = parecidoDe(motor, mundo, lugar);
+  return {
+    ...base, filas: hit.x.parametros.filter((q) => q.estado !== 'no_usado').map(fila),
+    celdas: { ...base.celdas, tierra: { fila: hit.x.fila, col: hit.x.col } },
+    busqueda: { mision, mes, mes_nombre, similitud_pct: num(hit.x.similitud_pct), comparados: num(hit.x.comparados), de: num(hit.x.de), puesto: hit.puesto, lista: hit.lista,
+      no_usados: hit.x.parametros.filter((q) => q.estado === 'no_usado').map((q) => P.get(q.id)?.nombre ?? q.id) },
+  };
+}
+
 const radioDePar = (par) => { const v = +String(par).slice(PAR_BASE.length).split(':')[0]; return fin(v) && v > 0 ? v : null; };
 
 function fuentesTerreno(meta) {

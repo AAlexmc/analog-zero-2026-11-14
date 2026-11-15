@@ -11,7 +11,7 @@ import { enlaceSimulacion } from '../terreno/lugar.js';
 import { paisDe } from './paises.js';
 import { resumenLugar, lineaResumen, leerEstado, conMision, opcionesBusqueda, frasesNoUsados } from './misiones.js';
 import { montarMision, pintarFicha as fichaMision, montarMes } from './mision_panel.js';
-import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, rachas, planRepetir, moverEnMes, fraseRepetir, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from './meses.js';
+import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, rachas, planRepetir, moverEnMes, fraseRepetir, fraseRepetirCorta, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from './meses.js';
 import { equiposDe, calendarioEquipo, idsMensualesEquipo, campanasCerca, fraseNasaAqui, fraseRepeticion, nombreTipo, fmtLimite, verUnidad, sujetoDe, esSuperficie } from './equipo_mes.js';
 
 const $ = (id) => document.getElementById(id);
@@ -128,6 +128,8 @@ async function montar() {
   $('entorno').hidden = !lineaE;
   if (lineaE) {
     $('entorno-linea').textContent = lineaE;
+    $('entorno-corta').textContent = A.clase.dentro ? `Within an Earth environment type: “${A.clase.rotulo}”.` : 'Earth has nothing quite like this.';
+    $('entorno-corta').classList.toggle('fuera', !A.clase.dentro);
     $('entorno-linea').classList.toggle('fuera', !A.clase.dentro);
     $('capa-clases').closest('label').hidden = !G;
     $('entorno-texto').replaceChildren(...comoSabemos(M.clases, A.clase).map((t) => el('p', { textContent: t })));
@@ -250,7 +252,7 @@ async function montar() {
     $('sin-cubrir').replaceChildren($('sin-cubrir').querySelector('h3'), ...[cart.sin_cubrir.length
       ? el('ul', {}, ...cart.sin_cubrir.map((s) => {
         const li = el('li', {}, el('strong', { textContent: `${P[s.id].nombre}. ` }),
-          el('span', { className: 'cerca', textContent: fraseSinCubrir(s, s.lat === null ? '' : `${formatoLatLon(s.lat, s.lon).texto}${pais(s) ? ` (${pais(s)})` : ''}`) }), ' ',
+          el('span', { className: 'cerca solo-fondo', textContent: fraseSinCubrir(s, s.lat === null ? '' : `${formatoLatLon(s.lat, s.lon).texto}${pais(s) ? ` (${pais(s)})` : ''}`) }), ' ',
           el('span', { className: 'lab', textContent: 'Test this in a lab or a chamber.' }));
         li.dataset.id = s.id;
         return li;
@@ -529,7 +531,8 @@ async function montar() {
     caja.replaceChildren(...[
       el('p', { className: 'met-lugar' }, num, sep(), el('span', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto })),
       total,
-      el('p', { className: 'met-que', textContent: `Average of the ${x.comparados} parameters we could compare${x.comparados < x.de ? ` (of ${x.de})` : ''}. Our own metric — not a probability.` }),
+      el('p', { className: 'met-que solo-fondo', textContent: `Average of the ${x.comparados} parameters we could compare${x.comparados < x.de ? ` (of ${x.de})` : ''}. Our own metric — not a probability.` }),
+      el('p', { className: 'met-que-simple solo-simple', textContent: `Average of ${x.comparados} parameters (own metric).` }),
       mes !== null ? el('p', { className: 'mes-nota solo-fondo', textContent: r.mensuales?.length
         ? `Earth in ${nombreMes(mes)}: ${r.mensuales.map(corto).join(', ')} are ${nombreMes(mes)} values (the average ${nombreMes(mes)} of many years). The rest, and your point ${EN[mundo]}, are year averages.`
         : `Earth in ${nombreMes(mes)}: none of these parameters has a monthly version, so this is the whole-year match.` }) : null,
@@ -547,7 +550,8 @@ async function montar() {
       grupo('medio', 'Partly similar', `deviation ${CORTES.cerca}–${CORTES.lejos} % (own cut-offs)`, g.medio, 'Nothing in between.'),
       g.sin.length ? grupo('sin', 'No Earth data here', 'not counted in the match', g.sin, '') : null,
       el('section', { className: 'bloque no-repro' }, el('h3', { textContent: 'Earth cannot reproduce this' }), el('ul', {}, ...noRepro),
-        el('p', { textContent: 'No place on Earth has this gravity or this air pressure, so there is no percentage here.' })),
+        el('p', { className: 'solo-fondo', textContent: 'No place on Earth has this gravity or this air pressure, so there is no percentage here.' }),
+        el('p', { className: 'solo-simple', textContent: 'No place on Earth has this gravity or air pressure.' })),
       el('section', { className: 'bloque no-comparado solo-fondo' }, el('h3', { textContent: 'Not compared yet' }), el('ul', {}, ...(activa ? NO_COMPARADO_MISION : NO_COMPARADO).map((t) => el('li', { textContent: t }))),
         el('p', { textContent: 'no global layer in this version' })),
     ].filter(Boolean));
@@ -768,7 +772,8 @@ async function montar() {
           selector('plan-inicio', MESES_LARGO.map((n, k) => [k + 1, n]), plan.inicio, (v) => { plan.inicio = v; pintarCalendario(); }),
           el('label', { className: 'mision-rotulo', htmlFor: 'plan-despues', textContent: 'Repeat after' }),
           selector('plan-despues', Array.from({ length: 11 }, (_, k) => [k + 1, `${k + 1} month${k ? 's' : ''}`]), plan.despues, (v) => { plan.despues = v; pintarCalendario(); })),
-        el('p', { className: `plan-frase${p.mover ? ' mover' : ''}`, id: 'plan-frase', textContent: frase }),
+        el('p', { className: `plan-frase solo-fondo${p.mover ? ' mover' : ''}`, id: 'plan-frase', textContent: frase }),
+        el('p', { className: `plan-frase solo-simple${p.mover ? ' mover' : ''}`, textContent: fraseRepetirCorta(p, p.repeticion.mejor ? donde(p.repeticion.mejor) : '') }),
         eqCal && fraseRepeticion(eqCal, p.repeticion.mes) ? el('p', { className: 'plan-equipo', id: 'plan-equipo', textContent: fraseRepeticion(eqCal, p.repeticion.mes) }) : null,
         ir,
         el('p', { className: 'solo-fondo', textContent: `Move = this place is more than ${MARGEN} points below the best place on Earth that month (own threshold).` })),
@@ -777,7 +782,7 @@ async function montar() {
         el('thead', {}, el('tr', {}, el('th', { scope: 'col', textContent: 'Month' }), el('th', { scope: 'col', textContent: 'This place' }), el('th', { scope: 'col', textContent: 'Best place on Earth' }),
           el('th', { scope: 'col' }, 'Move?', el('small', { className: 'solo-fondo', textContent: `own threshold: ${MARGEN} points` })))),
         el('tbody', {}, ...filas))),
-      el('p', { className: 'tenue solo-simple', textContent: 'Your point keeps its year-average value in every month. Snow on the ground is not measured.' }),
+      el('p', { className: 'tenue solo-simple', textContent: 'Your point uses its year average. Snow: not measured.' }),
       el('section', { className: 'bloque limites solo-fondo' }, el('h3', { textContent: 'Limits' }),
         el('p', { textContent: `Your point ${EN[mundo]} keeps its year-average value in every month: season is not compared with season.` }),
         el('p', { textContent: 'Earth months are climatology: the average month of many years (NASA POWER), not one particular year.' }),

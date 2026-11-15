@@ -7,6 +7,12 @@ const el = (tag, props = {}, ...hijos) => {
 };
 
 const enlace = (url, texto) => (url ? el('a', { href: url, target: '_blank', rel: 'noopener', textContent: texto }) : null);
+// Simple: solo el nombre del conjunto de datos (hasta la primera coma, paréntesis, dos puntos o punto y coma) y, si la licencia pide atribución, autor y licencia.
+function corto(t) {
+  if (!t) return 'not public';
+  const cc = t.match(/CC BY[\s\d.]*\d/), autor = t.match(/\.\s([A-Z][\w-]+),[^(]*\((\d{4})\)/);
+  return `${t.split(/,\s|\s\(|:\s|;\s/)[0]}${cc ? ` · ${autor ? `${autor[1]} et al. (${autor[2]}) · ` : ''}${cc[0]}` : ''}`;
+}
 const sello = (propio) => (propio ? el('span', { className: 'marca-chip propio', textContent: 'own computation' }) : null);
 
 function celda(e) {
@@ -31,7 +37,7 @@ function grupo(g) {
     el('p', { className: 'regla solo-fondo', textContent: `Rule: ${g.regla}.` }),
     g.fuentes.length
       ? el('ul', {}, g.fuentes.map((f) => el('li', {},
-        el('span', { className: 'texto', textContent: f.texto ?? 'not public' }), ' ', sello(f.propio), ' ', enlace(f.url, 'Open'),
+        el('span', { className: 'texto solo-fondo', textContent: f.texto ?? 'not public' }), el('span', { className: 'texto solo-simple', textContent: corto(f.texto) }), ' ', sello(f.propio), ' ', enlace(f.url, 'Open'),
         el('span', { className: 'usos solo-fondo', textContent: `Used for: ${f.usos.join(' · ')}` }))))
       : el('p', { className: 'vacio', textContent: 'No dataset of this tool comes from here.' }));
 }

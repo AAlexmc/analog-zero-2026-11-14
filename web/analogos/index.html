@@ -11,12 +11,14 @@
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
 <script type="module" src="../marca/modo.js"></script>
+<script type="module" src="../marca/idioma.js"></script>
 </head>
 <body class="marca-fondo marca-cuerpo analogos">
 <canvas id="globo" aria-label="Earth globe with the best matching places. Drag to turn, scroll or pinch to zoom."></canvas>
 <div class="numeros" id="numeros"></div>
 <header class="marca-barra">
   <a class="marca-nombre" href="../index.html">Analog Zero</a>
+  <img class="marca-concurso" src="../marca/space-apps-blanco.svg" alt="NASA Space Apps Challenge" width="561" height="221">
   <a class="marca-enlace volver" id="volver" href="../index.html"><span aria-hidden="true">←</span> <span class="largo">Back to the globe</span><span class="corto">Globe</span></a>
   <span class="hueco"></span>
   <a class="marca-enlace" href="../mapa/index.html"><span class="largo">Global map</span><span class="corto">Map</span></a>
@@ -47,7 +49,8 @@
   </div>
   <p class="mes-estado" id="mes-estado" role="status" hidden></p>
   <div class="entorno" id="entorno" hidden>
-    <p class="entorno-linea" id="entorno-linea"></p>
+    <p class="entorno-linea solo-fondo" id="entorno-linea"></p>
+    <p class="entorno-linea solo-simple" id="entorno-corta"></p>
     <details class="como" id="entorno-como">
       <summary>How we know</summary>
       <div class="solo-fondo" id="entorno-texto"></div>

@@ -144,6 +144,11 @@ export class Escena {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
     contenedor.appendChild(this.renderer.domElement);
+    // El navegador puede soltar el contexto 3D y devolverlo después: al volver se redibuja; quien monta el panel avisa (alContexto).
+    this.sinContexto = false;
+    this.alContexto = null;
+    this.renderer.domElement.addEventListener('webglcontextlost', () => { this.sinContexto = true; this.alContexto?.(true); });
+    this.renderer.domElement.addEventListener('webglcontextrestored', () => { this.sinContexto = false; this.sucio = true; this.alContexto?.(false); });
     const filtro = this.renderer.extensions.has('OES_texture_float_linear') ? THREE.LinearFilter : THREE.NearestFilter;
 
     const n = this.n;

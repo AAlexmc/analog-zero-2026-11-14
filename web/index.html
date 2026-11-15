@@ -10,9 +10,11 @@
 { "imports": { "three": "./lib/three/three.module.js", "three/addons/": "./lib/three/addons/" } }
 </script>
 <script type="module" src="marca/modo.js"></script>
+<script type="module" src="marca/idioma.js"></script>
 </head>
 <body class="marca-fondo marca-cuerpo portada">
 <canvas id="espacio" aria-hidden="true"></canvas>
+<img class="marca-concurso" src="marca/space-apps-blanco.svg" alt="NASA Space Apps Challenge" width="561" height="221">
 <header class="marca-barra">
   <a class="marca-nombre" href="index.html">Analog Zero</a>
   <span class="hueco"></span>
@@ -27,7 +29,7 @@
 <main class="secciones" id="secciones">
   <section class="seccion" id="moon" data-mundo="moon" aria-labelledby="t-moon">
     <div class="texto">
-      <p class="intro">Pick a spot on another world. We find the places on Earth most like it.</p>
+      <p class="intro"><span class="solo-fondo">Pick a spot on another world. We find the places on Earth most like it.</span><span class="solo-simple">Pick a spot. We find places on Earth like it.</span></p>
       <p class="numero marca-num"><span class="marca-acento">01</span> / 03</p>
       <h1 class="marca-titulo nombre" id="t-moon">Moon</h1>
       <p class="frase">Where NASA plans a permanent base: the south pole.</p>

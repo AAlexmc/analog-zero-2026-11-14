@@ -49,7 +49,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .met-lugar { margin: 0 0 2px; font-size: 14px; color: var(--texto-tenue); }
 .met-total { font: 900 54px/1 var(--titulo); margin: 4px 0 6px; }
 .met-total small { font: 700 20px/1 var(--cuerpo); margin-left: 6px; }
-.met-que { margin: 0 0 10px; font-size: 15px; }
+.met-que, .met-que-simple { margin: 0 0 10px; font-size: 15px; }
 .como { margin: 0 0 16px; font-size: 14px; }
 .como summary { cursor: pointer; font-weight: 700; color: var(--white); padding: 6px 0; }
 .como summary:focus-visible { outline: 2px solid var(--neon-yellow); }

@@ -68,3 +68,16 @@ test('mission spots: no mission, no test site, only Earth-side traits, or no pla
   const sinFiltro = await puntosDeMision({ M: motor(r), mundo: MARTE, activa: ACTIVA, separacion_km: 1000 });
   assert.equal(frasesPuntos(sinFiltro, { corto, en: 'on Mars' }).lineas[0], 'A on the globe: the place on Mars most like Dumont Dunes, California, where NASA ran this test, in roughness. Own metric, year averages.');
 });
+
+test('mission spots: one short line for Simple when there are no spots, none when there are', async () => {
+  const vacio = { usados: [], sin_capa: ['lluvia', 'roca'], sin_referencia: [], celdas: 0, empatadas: 0, candidatos: [] };
+  const sinRef = await puntosDeMision({ M: motor(vacio), mundo: MARTE, activa: { parametros: ['rug'], referencia: null }, separacion_km: 1000 });
+  assert.equal(frasesPuntos(sinRef, { corto, en: 'on Mars' }).corta, 'This mission has no test site with coordinates.');
+  const soloTierra = await puntosDeMision({ M: motor(vacio), mundo: MARTE, activa: { ...ACTIVA, parametros: ['lluvia', 'roca'] }, separacion_km: 1000 });
+  assert.equal(frasesPuntos(soloTierra, { corto, en: 'on Mars' }).corta, 'Every parameter of this mission is Earth only.');
+  const r = { usados: ['rug'], sin_capa: [], sin_referencia: [], celdas: 10, empatadas: 1, candidatos: [c(80, 0, 99)] };
+  const sinLugar = await puntosDeMision({ M: motor(r), mundo: MARTE, activa: ACTIVA, separacion_km: 1000, apta: async () => false, limites: true });
+  assert.equal(frasesPuntos(sinLugar, { corto, en: 'on Mars' }).corta, 'No place on Mars could be compared.');
+  const conPuntos = await puntosDeMision({ M: motor(r), mundo: MARTE, activa: ACTIVA, separacion_km: 1000 });
+  assert.equal(frasesPuntos(conPuntos, { corto, en: 'on Mars' }).corta, null);
+});

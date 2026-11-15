@@ -76,23 +76,23 @@ export function crearDia(caja, ctx) {
 
   function textoPanel(p, s) {
     const e = p.escena, cuerpo = CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, L = [];
-    if (!s) return `<b>${esc(cuerpo)}</b> · the Day control does not move the Sun on this terrain (set it by hand in Display)`;
-    if (s.tipo === 'tierra') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(S.hora)}</span> local solar time · ${MESES[S.mes - 1]} <span class="tenue">(Sun of day 15)</span>`);
+    if (!s) return `<b>${esc(cuerpo)}</b><span> · <span class="solo-fondo">the Day control does not move the Sun on this terrain (set it by hand in Display)</span><span class="solo-simple">Day does not move the Sun here.</span></span>`;
+    if (s.tipo === 'tierra') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(S.hora)}</span><span class="solo-fondo"> local solar time</span> · ${MESES[S.mes - 1]}<span class="solo-fondo"> <span class="tenue">(Sun of day 15)</span></span>`);
     else if (s.tipo === 'mundo') {
       const largo = e.meta.cuerpo === 'marte' ? `<span class="num">${DIA_MARTE_H.toFixed(2)} h</span>` : '<span class="num">29.53</span> Earth days';
-      L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(s.hora)}</span> local solar time of its own day, which lasts ${largo}${e.meta.cuerpo === 'luna' ? ' · Sun taken over the equator (own simplification)' : ''}`);
+      L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(s.hora)}</span><span class="solo-fondo"> local solar time of its own day, which lasts ${largo}</span>${e.meta.cuerpo === 'luna' ? ' · Sun taken over the equator (own simplification)' : ''}`);
     }
     else if (S.modo === 'mismo') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${S.hora.toFixed(1)} h</span> later: the Sun has gone <span class="num">${((360 * S.hora) / DIA_LUNAR_H).toFixed(1)}°</span> round the horizon`);
     else L.push(`<b>${esc(cuerpo)}</b> · Earth day <span class="num">${(s.horas / 24).toFixed(1)}</span> of <span class="num">29.53</span> of its own day`);
     const arriba = s.el > 0;
-    L.push(arriba ? `Sun <span class="num">${s.el.toFixed(1)}°</span> above the horizon${s.tipo !== 'polar' ? `, to the ${rumboTexto(s.az)} (<span class="num">${Math.round(s.az)}°</span>)` : ' (height set in Display: it changes with the season, not the hour)'}`
+    L.push(arriba ? `Sun <span class="num">${s.el.toFixed(1)}°</span> above the horizon${s.tipo !== 'polar' ? `, to the ${rumboTexto(s.az)} (<span class="num">${Math.round(s.az)}°</span>)` : '<span class="solo-fondo"> (height set in Display: it changes with the season, not the hour)</span><span class="solo-simple"> (set by hand)</span>'}`
       : `<span class="dia-noche">Sun <span class="num">${Math.abs(s.el).toFixed(1)}°</span> below the horizon: night</span>`);
     const f = e.fraccionConSol();
     L.push(`<span class="num">${Number.isFinite(f) ? Math.round(100 * f) : '—'} %</span> of this window in direct sunlight`);
     const g = seguido(p);
     if (g) {
       const con = e.conSol(g.it.fila, g.it.col), largo = con ? largoSombra(g.alto_m, s.el) : null;
-      L.push(`${esc(nombreCorto(g.it.equipo))}: ${con ? `<b>sunlit</b>${largo ? ` · on flat ground its shadow is <span class="num">${largo >= 1000 ? `${(largo / 1000).toFixed(1)} km` : `${largo.toFixed(largo < 10 ? 1 : 0)} m`}</span> long (it is <span class="num">${g.alto_m.toFixed(1)} m</span> tall)` : ''}` : `<b>${arriba ? 'in the shadow of the terrain' : 'in the dark'}</b>`}`);
+      L.push(`${esc(nombreCorto(g.it.equipo))}: ${con ? `<b>sunlit</b>${largo ? ` · on flat ground its shadow is <span class="num">${largo >= 1000 ? `${(largo / 1000).toFixed(1)} km` : `${largo.toFixed(largo < 10 ? 1 : 0)} m`}</span> long<span class="solo-fondo"> (it is <span class="num">${g.alto_m.toFixed(1)} m</span> tall)</span>` : ''}` : `<b>${arriba ? 'in the shadow of the terrain' : 'in the dark'}</b>`}`);
     }
     return L.map((t) => `<div>${t}</div>`).join('');
   }
@@ -102,7 +102,7 @@ export function crearDia(caja, ctx) {
       const d = caja.querySelector(`.dia-lectura[data-lado=${p.lado}]`);
       d.hidden = !p.escena;
       if (!p.escena) continue;
-      d.querySelector('.dia-texto').innerHTML = S.activo ? textoPanel(p, p.diaSol) : `<b>${esc(CUERPO[p.escena.meta.cuerpo] ?? '')}</b> · Sun set by hand in Display (${p.escena.sol.el.toFixed(1)}° high). Press Play or move the hour to follow the real Sun.`;
+      d.querySelector('.dia-texto').innerHTML = S.activo ? textoPanel(p, p.diaSol) : `<b>${esc(CUERPO[p.escena.meta.cuerpo] ?? '')}</b><span> · <span class="solo-fondo">Sun set by hand in Display (${p.escena.sol.el.toFixed(1)}° high). Press Play or move the hour to follow the real Sun.</span><span class="solo-simple">Sun set by hand. Press Play for the real Sun.</span></span>`;
       pintarTira(p, d.querySelector('.dia-tira'));
     }
   }
@@ -149,7 +149,7 @@ export function crearDia(caja, ctx) {
         const s = m.soles[k], c = (v >>> k) & 1 ? 'sol' : s.el > 0 ? 'sombra' : 'noche';
         return `<i class="${c}${k === ahora ? ' ahora' : ''}" title="${tipo(p) === 'tierra' ? `${horaTexto(k)}–${horaTexto(k + 1)}` : `step ${k + 1}`}: ${c === 'sol' ? 'sunlit' : c === 'sombra' ? 'in the shadow of the terrain' : 'night'}"></i>`;
       }).join('')}</span>
-      <span class="num">${bits(v)} of ${PASOS}</span> <span class="tenue">${paso} sunlit</span>`;
+      <span class="num">${bits(v)} of ${PASOS}</span> <span class="tenue">${paso === 'hours' ? paso : `<span class="solo-fondo">${paso}</span>`} sunlit</span>`;
   }
 
   // ---------- Aplicar la hora ----------

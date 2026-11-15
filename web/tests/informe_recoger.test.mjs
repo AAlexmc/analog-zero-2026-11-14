@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { estadistica, pendientes, histograma, tiraLuz, parecidoDe, recoger, BORDES_PENDIENTE } from '../informe/recoger.js';
+import { estadistica, pendientes, histograma, tiraLuz, parecidoDe, parecidoDeBusqueda, recoger, BORDES_PENDIENTE } from '../informe/recoger.js';
 import { evaluarEquipo, medirPunto } from '../terreno/evaluar.js';
 import { solTierra, solPolar } from '../terreno/sol.js';
 
@@ -202,4 +202,31 @@ test('pieces are numbered in the order they were placed, as on the markers; base
   assert.deepEqual(d.base.orden, ['Lunar Terrain Vehicle', 'Surface habitat']);
   const sinRes = recoger(ctxBase([panel('b', luna, lista)], { asentamiento: { estado: { res: null } } }));
   assert.deepEqual(sinRes.paneles[0].piezas.map((x) => x.num), [1, 2], 'restored: the place saved in the key');
+});
+
+test('similarity with a mission or a month: the figures are the ones the search of the results page gives for this place', () => {
+  const ind = { rejilla: { paso_deg: 0.5 }, metrica: { desviacion_pct: 'f' },
+    parametros: [{ id: 'a', nombre: 'Slope', unidad: 'deg', reproducible_en_tierra: true, fuentes: { moon: { texto: 'LOLA', url: 'https://example.org/a' }, earth: { texto: 'GLO', url: 'https://example.org/b' } } }, { id: 'b', nombre: 'Rain', unidad: 'mm', reproducible_en_tierra: true }, { id: 'g', nombre: 'Gravity', unidad: 'm/s2', reproducible_en_tierra: false }],
+    parametros_tierra: [{ id: 't', nombre: 'Aridity', unidad: '', solo_tierra: true, fuentes: { earth: { texto: 'CGIAR', url: 'https://example.org/t' } } }] };
+  const pedidas = [];
+  const ficha = (lat, lon, sim) => ({ lat, lon, fila: 3, col: 4, similitud_pct: sim, comparados: 2, de: 2, parametros: [
+    { id: 'a', valor_tierra: 4, valor_objetivo: 5, desviacion_pct: 20, similitud_pct: 80, estado: 'ok', origen_objetivo: 'punto' },
+    { id: 'b', valor_tierra: 0, valor_objetivo: 0, desviacion_pct: null, similitud_pct: null, estado: 'no_usado', origen_objetivo: 'punto' },
+    { id: 't', valor_tierra: 0.02, valor_objetivo: 0.03, desviacion_pct: 10, similitud_pct: 90, estado: 'ok', origen_objetivo: 'referencia' }] });
+  const motor = { indice: ind,
+    leerPunto: (c) => ({ fila: 1, col: 2, valores: c === 'earth' ? { a: 9, b: 1, g: 9.82 } : { a: 5, b: 0, g: 1.62 } }),
+    desviacion: () => 50,
+    buscar: (objetivo, opc) => { pedidas.push(opc); return { resultados: [ficha(10.25, 20.25, 88), ficha(-18.75, 12.75, 85)], parciales: [ficha(40.25, 0.25, 70)], mensuales: opc.mes ? ['t'] : [] }; } };
+  const mundo = { clave: 'moon', lat: -89, lon: 0 }, opciones = { parametros: ['a', 't'], referencia: { lat: -24, lon: -70 } };
+  const r = parecidoDeBusqueda(motor, mundo, { lat: -18.7500, lon: 12.7500 }, { opciones, mes: 7, mes_nombre: 'July', mision: { id: 'taladros', titulo: 'Drills', parametros: 2, referencia: 'Atacama' } });
+  assert.deepEqual(pedidas, [{ ...opciones, mes: 7 }], 'the options of the results page, with the month');
+  assert.deepEqual(r.filas.map((f) => [f.id, f.valor_mundo, f.valor_tierra, f.similitud_pct, f.referencia, f.mensual]), [['a', 5, 4, 80, false, false], ['t', 0.03, 0.02, 90, true, true]]);
+  assert.deepEqual(r.filas[1].fuentes.map((f) => f.url), ['https://example.org/t'], 'an Earth-only trait cites its Earth source only');
+  assert.deepEqual([r.busqueda.puesto, r.busqueda.lista, r.busqueda.similitud_pct, r.busqueda.mes, r.busqueda.no_usados], [2, 'resultados', 85, 7, ['Rain']]);
+  assert.deepEqual(r.celdas.tierra, { fila: 3, col: 4 });
+  assert.equal(r.no_reproducibles[0].nombre, 'Gravity');
+  const parcial = parecidoDeBusqueda(motor, mundo, { lat: 40.25, lon: 0.25 }, { opciones: {} });
+  assert.deepEqual([parcial.busqueda.puesto, parcial.busqueda.lista, parcial.busqueda.mes], [1, 'parciales', null]);
+  assert.deepEqual(pedidas.at(-1), {}, 'no month: the options go as they are');
+  assert.equal(parecidoDeBusqueda(motor, mundo, { lat: 0, lon: 0 }, { opciones }), null, 'a place that search does not return has no figure to copy');
 });

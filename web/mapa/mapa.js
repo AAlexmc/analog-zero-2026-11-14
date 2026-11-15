@@ -332,7 +332,7 @@ async function abrirHojaCond(fila, col) {
   $('hoja').innerHTML = `
     <div class="cab-hoja"><div><div class="et">Test conditions<span class="sep">·</span>${esc(c.eq.nombre)}</div>
       <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
-    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
+    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="solo-fondo"><span class="sep">·</span>row ${fila} col ${col}</span></div>
     <div class="tenue solo-fondo">${esc(c.man.rotulo ?? '')}</div>
     <div class="bloque"><h4>Design limits vs this place</h4>${filas.length
       ? `<div class="cond">${html}</div>`
@@ -426,9 +426,9 @@ function pintarValidacion() {
   else {
     const fallo = r.h1.veredicto === 'fallo';
     const ver = r.h1.veredicto ? `<span data-v="veredicto" class="val-titular${fallo ? ' v-rompe' : ''}">Pre-registered test ${fallo ? 'FAILED — read this ranking as exploratory' : esc(r.h1.veredicto)}</span>` : '';
-    linea = `${ver} <span class="val-cifras"><span data-v="h1">The ranking recovers ${b(r.h1.k)} of ${b(r.h1.n)} known analogs (baseline k₀ ${b(r.h1.k0)})</span>`
+    linea = `${ver} <span class="val-cifras"><span data-v="h1">The ranking recovers ${b(r.h1.k)} of ${b(r.h1.n)} known analogs<span class="solo-fondo"> (baseline k₀ ${b(r.h1.k0)})</span></span>`
       + `<span class="solo-fondo"><span class="sep">·</span><span data-v="h1s">combined score (H1-S) ${b(r.h1s.k)} of ${b(r.h1s.n)}${r.h1s.noEval ? ` (${b(r.h1s.noEval)} not evaluable)` : ''}</span><span class="sep">·</span><span data-v="h3">sign predictions (H3) ${b(r.h3.aciertos)} of ${b(r.h3.de)}</span></span>`
-      + `${frac ? `<span class="sep">·</span><span data-v="frac">${frac}</span>` : ''}</span> ${boton}`;
+      + `${frac ? `<span class="solo-fondo"><span class="sep">·</span><span data-v="frac">${frac}</span></span>` : ''}</span> ${boton}`;
   }
   const sombras = resumenSombras(estado.sombras);
   const ls = sombras.length
@@ -453,7 +453,7 @@ function pintarHojaVacia() {
   }
   const c = estado.candidatos?.[0];
   $('hoja').innerHTML = `<div><div class="et">Place sheet</div><h3>Pick a place</h3></div><p>Click any land cell to open its sheet.</p>`
-    + (c ? `<p class="tenue">Best candidate for this mission: <span class="num">${fmtLat(c.lat)} ${fmtLon(c.lon)}</span>, S <span class="num">${esc(c.S)}</span>.</p><button type="button" class="marca-boton" data-a="abrir-mejor">Open best candidate</button>` : '');
+    + (c ? `<p class="tenue">Best candidate for this mission: <span class="num">${fmtLat(c.lat)} ${fmtLon(c.lon)}</span><span class="solo-fondo">, S <span class="num">${esc(c.S)}</span></span>.</p><button type="button" class="marca-boton" data-a="abrir-mejor">Open best candidate</button>` : '');
   const bt = $('hoja').querySelector('[data-a=abrir-mejor]');
   if (bt) bt.addEventListener('click', () => { const k = celdaDeLatLon(estado.rejilla, c.lat, c.lon); abrirHoja(k.fila, k.col); });
 }
@@ -483,7 +483,7 @@ async function abrirHoja(fila, col) {
     const sd = puertas.filter((p) => p.estado === 'sin_dato');
     situacion = `<b>Not evaluable</b> — no rank: ${sd.length ? `no data for gate ${sd.map((p) => esc(p.texto ?? p.id)).join('; ')}` : `data coverage too low to rank this place (C ${esc(textoValor(cob, canC[0]))})`}`;
   }
-  const sTxt = est === 'evaluable' ? `<span class="num grande" data-v="S">${esc(textoValor(sV, canS[0]))}</span><span class="tenue">p5–p95 range <span class="num">${esc(textoValor(p5, canS[1]))}–${esc(textoValor(p95, canS[2]))}</span></span>`
+  const sTxt = est === 'evaluable' ? `<span class="num grande" data-v="S">${esc(textoValor(sV, canS[0]))}</span><span class="tenue solo-fondo">p5–p95 range <span class="num">${esc(textoValor(p5, canS[1]))}–${esc(textoValor(p95, canS[2]))}</span></span>`
     : '<span class="num grande">—</span><span class="tenue">not scored</span>';
 
   const ids = dimensionesConPeso(par);
@@ -514,7 +514,7 @@ async function abrirHoja(fila, col) {
   $('hoja').innerHTML = `
     <div class="cab-hoja"><div><div class="et">${esc(par.nombre_objetivo)}<span class="sep">·</span>${esc(par.mision)} ${esc(par.nombre_mision ?? '')}</div>
       <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
-    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
+    <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="solo-fondo"><span class="sep">·</span>row ${fila} col ${col}</span></div>
     <div class="tenue solo-fondo">cell ${esc(r.paso)}° (~${Math.floor(r.paso * KM_GRADO_ECUADOR)} km at the equator)${lugar ? `<span class="sep">·</span>known place within 1 cell` : ''}</div>${cerca}
     <div class="situacion">${situacion}</div>
     <div class="cifras"><div><span class="et">Similarity S</span>${sTxt}</div><div><span class="et">Data coverage C</span><span class="num grande" data-v="C">${esc(textoValor(cob, canC[0]))}</span></div></div>

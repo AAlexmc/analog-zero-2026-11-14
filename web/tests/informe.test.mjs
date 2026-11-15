@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { construirInforme, TITULO } from '../informe/informe.js';
+import { construirInforme, TITULO, logoSeguro } from '../informe/informe.js';
 import { recoger } from '../informe/recoger.js';
 import { evaluarEquipo, medirPunto } from '../terreno/evaluar.js';
 import { solTierra, solPolar } from '../terreno/sol.js';
@@ -134,4 +134,11 @@ test('colours used for text on the white page pass 4.5:1', () => {
   const marca = new Set(['#FFFFFF', '#07173F', '#0042A6', '#2E96F5', '#0960E1', '#E43700', '#8E1100', '#EAFE07']);
   for (const x of h.match(/#[0-9A-Fa-f]{6}\b/g)) assert.ok(marca.has(x.toUpperCase()), `colour ${x} not in the brand palette`);
   assert.doesNotMatch(h.split('<style>')[1].split('</style>')[0], /color:#E43700|color:#2E96F5|color:#EAFE07/, 'rocket red, blue yonder and neon yellow are never text colours on white');
+});
+
+test('contest logo: only a plain SVG gets into the report', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const negro = await readFile(new URL('../marca/space-apps-negro.svg', import.meta.url), 'utf8');
+  assert.equal(logoSeguro(negro), negro, 'the official file passes as it is');
+  for (const malo of [null, 12, 'text', '<p>x</p>', '<svg><script>alert(1)</script></svg>', '<svg onload="x()"></svg>', '<svg><a href="https://example.org">x</a></svg>', '<svg><image src="x"/></svg>', '<svg><foreignObject></foreignObject></svg>']) assert.equal(logoSeguro(malo), '');
 });

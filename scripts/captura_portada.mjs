@@ -12,7 +12,7 @@ import { decodificarPNG } from '../web/mapa/png.js';
 const RAIZ = resolve(new URL('..', import.meta.url).pathname);
 const WEB = join(RAIZ, 'web');
 const SALIDA = join(RAIZ, 'capturas', 'portada');
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
+const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
 const MUNDOS = JSON.parse(await readFile(join(WEB, 'data/cuerpos/mundos.json'), 'utf8')).mundos;
 const sug = (m, id) => MUNDOS.find((x) => x.id === m).sugerencias.find((s) => s.id === id);
 

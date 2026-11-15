@@ -278,9 +278,9 @@ export function crearAsentamiento(caja, ctx) {
     const lados = [pri, sec].filter(Boolean).map((p) => {
       const r = resumenBase(deBase(p).map((it) => ({ nombre: nombreCorto(it.equipo), rompe: rompe(p, it) })));
       if (!r.total) return `<b>${esc(cuerpo(p))}</b> <span class="tenue">no pieces planted</span>`;
-      return `<b>${esc(cuerpo(p))}</b> ${r.rompen ? `<span class="v-rompe">${r.rompen} break${r.rompen > 1 ? '' : 's'} a published limit</span> (${esc(r.nombres.join(', '))})` : 'no published limit broken'}`;
+      return `<b>${esc(cuerpo(p))}</b> ${r.rompen ? `<span class="v-rompe">${r.rompen} break${r.rompen > 1 ? '' : 's'} a published limit</span><span class="solo-fondo"> (${esc(r.nombres.join(', '))})</span>` : 'no published limit broken'}`;
     });
-    if (!S.aviso) est.innerHTML = `<span class="num">${hay.length}</span> pieces inside <span class="num">${radio ? radioTexto(radio) : '—'}</span> of ${esc(centro)}${S.modo === 'prioridad' ? ` · around <b>${esc(nombreCorto(S.orden[0]))}</b>` : ''} · ${lados.join(' · ')} · <span class="tenue solo-fondo">hover a piece to read it, click to open its sheet</span>`;
+    if (!S.aviso) est.innerHTML = `<span class="num">${hay.length}</span> pieces<span class="solo-fondo"> inside <span class="num">${radio ? radioTexto(radio) : '—'}</span> of ${esc(centro)}</span>${S.modo === 'prioridad' ? ` · around <b>${esc(nombreCorto(S.orden[0]))}</b>` : ''} · ${lados.join(' · ')}<span class="tenue solo-fondo"> · hover a piece to read it, click to open its sheet</span>`;
     det.hidden = false;
     const R = S.res;
     const fila = (it) => {

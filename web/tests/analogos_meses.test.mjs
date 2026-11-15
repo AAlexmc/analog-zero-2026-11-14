@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import { cargar } from '../buscar/motor.js';
-import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, mejorYPeor, rachas, planRepetir, moverEnMes, fraseRepetir, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from '../analogos/meses.js';
+import { MESES_CORTO, MESES_LARGO, MARGEN, nombreMes, leerMes, escribirMes, conMes, idsMensuales, mejorYPeor, rachas, planRepetir, moverEnMes, fraseRepetir, fraseRepetirCorta, lineaMejorPeor, lineaMesActivo, etiquetaMes, escalaTiras } from '../analogos/meses.js';
 import { opcionesBusqueda, activaDeCatalogo } from '../analogos/misiones.js';
 
 const leer = (r) => JSON.parse(readFileSync(new URL(r, import.meta.url), 'utf8'));
@@ -144,6 +144,23 @@ test('repeat plan sentence: move, stay, rise and missing data', () => {
   cal[0] = fila(1, 86, null);
   cal[1] = fila(2, 84, 84);
   assert.equal(fraseRepetir(planRepetir(cal, 1, 11, 3), donde), 'January here: cannot be compared (missing data). Eleven months later, in December, this place is at 84.0 % and holds (within 3 points of the best). Stay.');
+});
+
+test('short repeat plan sentence (Simple): same figures and verdict, fewer words', () => {
+  const cal = Array.from({ length: 12 }, (_, k) => fila(k + 1, 84, 84));
+  cal[0] = fila(1, 86, 86);
+  cal[6] = fila(7, 83.3, 78.2);
+  const donde = '18.25° S, 12.25° E (Namibia)';
+  assert.equal(fraseRepetirCorta(planRepetir(cal, 1, 6), donde), 'January: 86.0 %. July: 78.2 %. Best then: 18.25° S, 12.25° E (Namibia), 83.3 %. Move the test.');
+  cal[6] = fila(7, 83.3, 80);
+  assert.equal(fraseRepetirCorta(planRepetir(cal, 1, 6), donde), 'January: 86.0 %. July: 80.0 %. Stay.');
+  cal[1] = fila(2, 95, null);
+  assert.equal(fraseRepetirCorta(planRepetir(cal, 1, 1), donde), 'January: 86.0 %. February: no data.');
+  cal[1] = fila(2, null, 80);
+  assert.equal(fraseRepetirCorta(planRepetir(cal, 1, 1), donde), 'January: 86.0 %. February: 80.0 %. No other place to compare.');
+  cal[0] = fila(1, 86, null);
+  cal[1] = fila(2, 84, 84);
+  assert.equal(fraseRepetirCorta(planRepetir(cal, 1, 11, 3), donde), 'January: no data. December: 84.0 %. Stay.');
 });
 
 test('strip lines: best and worst with ties, and the active month against the best', () => {

@@ -113,6 +113,10 @@ export function tarjetaPerforacion({ t, fila, col, luna, D, profundidad_m = null
   return out;
 }
 
+// Modo Simple: el aviso sin sus explicaciones entre paréntesis («NOT MEASURED» se queda).
+const sinParentesis = (t) => String(t ?? '').replace(/ \((?:[^()]|\([^()]*\))*\)/g, '');
+const notaCorta = (t) => (/does not show (that )?ice is present/.test(t ?? '') ? 'This does not show ice is present.' : t);
+
 const t1 = (kg) => `${(kg / 1000).toFixed(1)} t`;
 
 // luz: iluminación media de la celda (null sin dato). F = defectosFlota.
@@ -356,18 +360,18 @@ export function crearVolatiles(p, ctx) {
     }
     const he = x.hielo_esperado;
     const esperado = he
-      ? `<div data-v="hielo-esperado">${esc(he.texto)} · ${cita(he.ref)}${he.lugar ? ` · place ${cita(he.lugar)}` : ''}</div>
+      ? `<div data-v="hielo-esperado"><span class="solo-fondo">${esc(he.texto)} · ${cita(he.ref)}${he.lugar ? ` · place ${cita(he.lugar)}` : ''}</span><span class="solo-simple">${esc(he.valor)} % water ice, measured at another site: not measured here</span></div>
         ${he.rango ? `<div class="tenue nota-o solo-fondo" data-v="agua-total">total water, ice plus vapour, at the same impact: ${esc(he.rango.ref.valor.join('–'))} wt% ${cita(he.rango.ref)}</div>` : ''}`
       : '<div class="tenue">no cited ice concentration in the catalogue</div>';
     return `<div class="et">Reading at this point</div>${filasLectura(x)}
-      <div class="tenue nota-o" data-v="nota-hielo">${esc(x.nota)}</div>
+      <div class="tenue nota-o" data-v="nota-hielo"><span class="solo-fondo">${esc(x.nota)}</span><span class="solo-simple">${esc(notaCorta(x.nota))}</span></div>
       <div class="como solo-fondo">${fuentes}</div>
       <div class="et">TRIDENT drill plan</div>
       <label class="fila-o"><span class="et">Depth</span><span><input type="number" data-v="prof" min="0" step="0.1" value="${Number.isFinite(prof) ? prof : ''}"> m</span></label>
       <div class="tenue nota-o"><span class="propio">own parameter</span> · default: ${T.profundidad ? `drill class ${esc(T.profundidad.valor)} m ${cita(T.profundidad.ref)}` : 'no cited drill class: enter one'}</div>
       ${plan}
       ${bloqueOperacion(x)}
-      ${x.no_medido.map((r) => `<div class="no-medido" data-v="nm-${r.k}">${esc(r.texto)}</div>`).join('')}
+      ${x.no_medido.map((r) => `<div class="no-medido" data-v="nm-${r.k}"><span class="solo-fondo">${esc(r.texto)}</span><span class="solo-simple">${esc(sinParentesis(r.texto))}</span></div>`).join('')}
       <div class="et">Ice expected</div>${esperado}`;
   }
 
@@ -397,8 +401,8 @@ export function crearVolatiles(p, ctx) {
     if (!V.x || !V.abierta) { tarjeta.hidden = true; tarjeta.innerHTML = ''; return; }
     const x = V.x, l = e.leer(V.perf.fila, V.perf.col);
     tarjeta.hidden = false;
-    tarjeta.innerHTML = `<div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · drill here</span><button type="button" data-v="cerrar" title="Close (the mark stays)">×</button></div>
-      <div class="lugar num">${lat(l.lat)} ${lon(l.lon)} · cell ${V.perf.fila},${V.perf.col}</div>
+    tarjeta.innerHTML = `<div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)}<span class="solo-fondo"> · ${esc(e.meta.id)}</span> · drill here</span><button type="button" data-v="cerrar" title="Close (the mark stays)">×</button></div>
+      <div class="lugar num solo-fondo">${lat(l.lat)} ${lon(l.lon)} · cell ${V.perf.fila},${V.perf.col}</div>
       ${!x.evaluable ? `<div class="sin-ruta" data-v="no-evaluable">${esc(x.motivo)}</div>` : luna ? cuerpoLuna(x) : cuerpoTierra(x)}
       <div class="botones"><button type="button" data-v="quitar">Remove</button><span class="tenue">removes the drill mark</span></div>`;
     tarjeta.querySelector('[data-v=cerrar]').addEventListener('click', () => { V.abierta = false; pintar(); });
@@ -463,7 +467,7 @@ export function crearVolatiles(p, ctx) {
         <div class="tenue nota-o">regolith = water ÷ (ice ${esc(D.hielo.pct)} % by mass × extraction ${esc(Math.round(D.eficiencia.valor * 100))} %) · ice: LCROSS ${cita(D.hielo.ref)}, measured in Cabeus crater: <b>NOT MEASURED HERE</b> · extraction ${cita(D.eficiencia.ref)}${D.agua_rango ? ` · range with the LCROSS total water ${esc(D.agua_rango.ref.valor.join('–'))} wt% (ice plus vapour) ${cita(D.agua_rango.ref)}` : ''}</div>
         <dl>${exc}</dl>
         <div class="tenue nota-o">excavation = regolith ÷ (${nr} × ${F.ritmo_kg_h ? `${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited rate'}), in hours and Earth days of continuous work · <span class="supuesto">assumed</span> ${nr} ${nom} (robots)${F.mision_kg ? ` · missions = regolith ÷ ${fmt.masa(F.mision_kg.valor)} ${cita(F.mision_kg.ref)}` : ''} · calendar = excavation ÷ mean illumination at this cell (LOLA) · <span class="propio">own estimate</span>: robots work only while lit</div>
-        ${h.no_medido.map((r) => `<div class="no-medido" data-v="${r.k}">${esc(r.texto)}</div>`).join('')}`;
+        ${h.no_medido.map((r) => `<div class="no-medido" data-v="${r.k}"><span class="solo-fondo">${esc(r.texto)}</span><span class="solo-simple">${esc(sinParentesis(r.texto))}</span></div>`).join('')}`;
     } else agua = `<div class="sin-ruta" data-v="sin-planta">${esc(h.motivo)}</div>`;
     let pot = '';
     if (h.energia) {

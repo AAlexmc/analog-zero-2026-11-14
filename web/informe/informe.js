@@ -5,6 +5,8 @@ import { BORDES_PENDIENTE, PASOS } from './recoger.js';
 import { formatoValor, NO_COMPARADO } from '../analogos/metricas.js';
 
 export const TITULO = 'Analog Zero — simulation report';
+// Logo del concurso (SVG del kit oficial, lo lee la pantalla): entra solo si es un SVG sin scripts, manejadores ni enlaces.
+export const logoSeguro = (s) => (typeof s === 'string' && /^\s*<svg[\s>]/.test(s) && !/<script|<foreignObject|<image|\son\w+\s*=|href\s*=/i.test(s) ? s : '');
 const fin = (v) => typeof v === 'number' && Number.isFinite(v);
 const fmt = (v, d = 1, u = '') => (fin(v) ? `${v.toFixed(d).replace(/^-(?=0(\.0+)?$)/, '').replace(/^-/, '−')}${u === '°' ? '°' : u ? ` ${u}` : ''}` : 'no data');
 const fmtLat = (v) => (fin(v) ? `${Math.abs(v).toFixed(4)}° ${v < 0 ? 'S' : 'N'}` : 'no data');
@@ -42,6 +44,8 @@ tr.rompe td:first-child{border-left:5px solid #E43700}
 .nota{font-size:13px}
 q,blockquote{font-style:italic}
 blockquote{margin:2px 0 0;font-size:12px}
+.logo{float:right;margin:0 0 8px 20px}
+.logo svg{display:block;height:54px;width:auto}
 dl.cab{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:10px 0}
 dl.cab dt{font-weight:700}
 dl.cab dd{margin:0}
@@ -95,7 +99,8 @@ function textoPunto(x) {
 function cabecera(d, F) {
   const mundo = d.mundo ? `${esc(d.mundo.nombre)} · <span class="num">${fmtLat(d.mundo.lat)}, ${fmtLon(d.mundo.lon)}</span>${d.mundo.de === 'point' ? ' <span class="nota">(your point)</span>' : ` <span class="nota">(centre of the ${esc(d.mundo.terreno ?? '')} window)</span>`}` : 'none: this simulation has no Moon or Mars terrain';
   const url = urlSegura(d.url);
-  return `<header><p class="marca">Analog Zero</p><h1>${esc(TITULO)}</h1>
+  const logo = logoSeguro(d.logo_svg);
+  return `<header>${logo ? `<div class="logo" role="img" aria-label="NASA Space Apps Challenge">${logo}</div>` : ''}<p class="marca">Analog Zero</p><h1>${esc(TITULO)}</h1>
     ${d.ejemplo || d.paneles.some((p) => p.sintetico) ? '<p><span class="sello">SYNTHETIC EXAMPLE — not real data</span></p>' : ''}
     <dl class="cab"><dt>World and point</dt><dd>${mundo}</dd>
     <dt>Place on Earth</dt><dd>${textoPunto(d.lugar)}</dd>
@@ -279,11 +284,21 @@ function parecido(d, F) {
   const R = d.parecido, enl = urlSegura(d.enlace_resultados);
   const ir = enl ? `<a href="${esc(enl)}">results page</a>` : 'results page';
   if (!R?.filas) return falta(`${esc(R?.motivo ?? 'Not computed.')} The similarity parameter by parameter is on the ${ir}.`);
-  const nom = d.mundo?.nombre ?? 'World';
+  const nom = d.mundo?.nombre ?? 'World', B = R.busqueda ?? null;
   const barras = graficoBarras({ titulo: `Match of each parameter: ${nom} point vs the place on Earth`, filas: R.filas.map((f) => ({ rotulo: f.nombre, valor: f.similitud_pct, texto: fin(f.similitud_pct) ? `${f.similitud_pct.toFixed(1)} %` : null })), x: { rotulo: 'Match (%) = 100 − deviation', min: 0, max: 100 }, pie: `Search engine of this tool (web/buscar/motor.js): values of the ${fmt(R.celda_deg, 2, '°')} global cells that contain the two points. Own metric.` });
-  const filas = R.filas.map((f) => fila([esc(f.nombre), n(esc(formatoValor(f.valor_mundo, f.unidad, f))), n(esc(formatoValor(f.valor_tierra, f.unidad, f))), n(fin(f.similitud_pct) ? `${f.similitud_pct.toFixed(1)} %` : 'no data'), f.fuentes.map((s) => `${F.enlace(s.url, null, { texto: s.texto, cita: s.cita })}${s.origen ? ' <span class="propio">(own computation)</span>' : ''}`).join(' · ')]));
-  return `<p>Global grid cell of <span class="num">${fmt(R.celda_deg, 2, '°')}</span>. Deviation per parameter <span class="propio">(own metric)</span>: <span class="num">${esc(R.formula ?? '')}</span>. The overall match and the ranking of places are on the ${ir}.</p>
-    <p>Compared here: every parameter that can be reproduced on Earth, with the whole-year values of the global grid.${d.simulacion?.mision || d.simulacion?.mes_url ? ` <b>The mission objective and the month in the address are not applied in this table</b>: the ${ir} applies them (its own parameter set, its reference site and that month on Earth), so its figures can differ from these.` : ''}</p>
+  const filas = R.filas.map((f) => fila([esc(f.nombre), n(`${esc(formatoValor(f.valor_mundo, f.unidad, f))}${f.referencia ? ' †' : ''}`), n(`${esc(formatoValor(f.valor_tierra, f.unidad, f))}${f.mensual ? ' *' : ''}`), n(fin(f.similitud_pct) ? `${f.similitud_pct.toFixed(1)} %` : 'no data'), f.fuentes.map((s) => `${F.enlace(s.url, null, { texto: s.texto, cita: s.cita })}${s.origen ? ' <span class="propio">(own computation)</span>' : ''}`).join(' · ')]));
+  const cab = `<p>Global grid cell of <span class="num">${fmt(R.celda_deg, 2, '°')}</span>. Deviation per parameter <span class="propio">(own metric)</span>: <span class="num">${esc(R.formula ?? '')}</span>.`;
+  if (B) {
+    const M = B.mision, notas = [];
+    if (R.filas.some((f) => f.referencia)) notas.push(`† trait that only exists on Earth: the target is its value at ${M?.referencia ? `the test site of this mission, ${esc(M.referencia)}` : 'the reference site'}, not at your point.`);
+    if (R.filas.some((f) => f.mensual)) notas.push(`* Earth value of ${esc(B.mes_nombre ?? `month ${B.mes}`)} (average of that month over many years); the rest are whole-year values.`);
+    if (B.no_usados.length) notas.push(`Not used by this search: ${B.no_usados.map(esc).join(', ')}.`);
+    return `${cab}</p>
+    <p>Same search as the ${ir}: ${M ? `mission objective <b>${esc(M.titulo)}</b> <span class="propio">(own mapping of its traits to ${fmt(M.parametros, 0)} parameters${M.ampliada ? ', plus every parameter of your point' : ''})</span>` : 'every parameter that can be reproduced on Earth'}, ${B.mes === null ? 'whole-year Earth values' : `Earth in ${esc(B.mes_nombre ?? `month ${B.mes}`)}`}. In that search this place is number <span class="num">${fmt(B.puesto, 0)}</span>${B.lista === 'parciales' ? ' of the places with only part of the data' : ''}, with an overall match of <span class="num">${fin(B.similitud_pct) ? `${B.similitud_pct.toFixed(1)} %` : 'no data'}</span> over <span class="num">${fmt(B.comparados, 0)}</span> of <span class="num">${fmt(B.de, 0)}</span> parameters <span class="propio">(own metric, not a probability)</span>.</p>
+    ${barras}${tabla(['Parameter', n('Target'), n('Earth'), n('Match'), 'Sources'], filas, false)}${notas.length ? `<ul class="nota">${notas.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}`;
+  }
+  return `${cab} The overall match and the ranking of places are on the ${ir}.</p>
+    <p>Compared here: every parameter that can be reproduced on Earth, with the whole-year values of the global grid.${d.simulacion?.mision || d.simulacion?.mes_url ? ` <b>The mission objective and the month in the address are not applied in this table</b>${R.sin_busqueda ? ` (${esc(R.sin_busqueda)})` : ''}: the ${ir} applies them (its own parameter set, its reference site and that month on Earth), so its figures can differ from these.` : ''}</p>
     ${barras}${tabla(['Parameter', n(esc(nom)), n('Earth (whole year)'), n('Match'), 'Sources'], filas, false)}`;
 }
 
