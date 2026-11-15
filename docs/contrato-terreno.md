@@ -74,6 +74,18 @@ Centro del píxel (fila f, col c): `x = x0_m + c · m_por_px`, `y = y0_m − f �
 - No lleva: `iluminacion`, `sombra_permanente`, `temp_max`, `temp_media`, `agua`, `rasgos`, `picos_luz`, `comando`. Lo que dependa de esas capas sale como no medido.
 - Sin red o con teselas cortadas: aviso y el terreno de la Tierra del catálogo (`a` o `pareja_inicial.tierra`).
 
+## Terreno del punto en la Luna o Marte (lo hace la web, nunca se escribe a disco)
+`…&punto=<lat>,<lon>&mundo=moon|mars` junto a `?lugar=` y sin `&b=`. `lugar.js` (`cargarPunto`, `terrenoDePunto`) pide el relieve a `cargarRelieve` de `web/relieve/` (mapa global LOLA o MOLA de `web/data/relieve/`, sin red) con la ventana del lugar y `n = 257`.
+- `meta`: `id` (`punto_<mundo>_<lat>_<lon>_<lado>km`), `cuerpo` `"luna"` o `"marte"`, `georef` `local_aeqd` con el radio del mundo, `capas.altura.resolucion_origen_m` = lado de celda del mapa global (la tarjeta lo dice: lo más pequeño que eso no está en el dato), `z_referencia`, `creditos`, `punto: {mundo, origen_m}` y `imagen: {texto, tinte: true}`.
+- `imagen`: un solo color, el tono medio del mapa global de ese mundo (`tono_medio_rgb` de `web/data/relieve/indice.json`); el modo de color se llama «Tinted» y dice que no es una imagen del lugar.
+- Sin capas (`iluminacion`, `temp_max`…): lo que dependa de ellas sale como no medido. En Marte no se ofrecen rutas, obra ni base (dan por hecho la Luna).
+- Sin relieve para el punto (p. ej. a más de 85° de latitud): aviso llano y el lugar de la Tierra solo.
+
+## Equipo espejo y día (solo en la web)
+- Lo plantado lleva `par` (texto) cuando tiene gemelo en el otro panel; `plantado` de un retoque exportado puede traerlo. La celda del gemelo: mismos metros a la derecha y abajo del centro de la ventana (`espejo.js`, `celdaEspejo`), recortada al borde o movida a la celda con dato más cercana.
+- Sol del día (`sol.js`): Tierra, fórmulas de NOAA con hora solar local y el día 15 del mes (criterio propio); recorte polar lunar, la longitud subsolar retrocede 360° por día sinódico (29,53 d) y la altura es la del mando; lugar no polar de la Luna o Marte, `posicionSol` con su hora solar local (Marte: día de 24,6597 h y estación elegida, ±25,19°; Luna: sol sobre el ecuador, simplificación propia). Márgenes de «matches» (propios): pendiente ± max(1°, 10 %), altura del sol ± 5°, parte del día con sol ± 10 %.
+- Sombra del equipo: cinta del ancho de su caja y largo alto ÷ tan(altura del sol), sobre el relieve; solo a escala real.
+
 ## Retoques (los escribe la web, no el pipeline)
 Un retoque es un fichero JSON que el usuario exporta desde el visor:
 ```json

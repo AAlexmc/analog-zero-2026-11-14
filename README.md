@@ -30,6 +30,11 @@ Then open http://localhost:8080. The site is static: no build step, no account a
    The **Portfolio** tab gives the smallest set of places that together cover every parameter; what no place covers has to go to a lab.
 5. **Open the terrain.** Real terrain of Shackleton and the south-pole region next to Earth analogs (Haughton, S P Crater, Mistastin), at the same scale. Plant one of 13 lunar south-pole systems (`web/data/equipo.json`): each published limit says OK, BREAKS (by how much) or NOT MEASURED, with its quotation.
 
+   **Generate simulation** (from a place in the results) stands you on that place on Earth, next to the terrain of your point on the Moon or Mars:
+   - **Mirror equipment:** what you plant on one world is planted on the other at the same spot of its window; its sheet says what matches, what differs, what cannot be measured and what Earth cannot reproduce.
+   - **Day:** one hour slider moves the real Sun of both places (Earth by month; a lunar day of 29.53 Earth days; a Mars day of 24.66 h), with terrain and equipment shadows and a 24-step strip of the light on the equipment.
+   - **Drill here:** the TRIDENT drill bite by bite, from its published sequence and feed speed, and what was already tried on Earth; each line with its quotation.
+
 Also: a **global map** (`/mapa/`) of where each test condition can be reproduced on Earth, and an exploratory similarity ranking.
 
 ## Where every number comes from
