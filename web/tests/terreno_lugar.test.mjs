@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { leerLugar, idLugar, ventanaLugar, pixelTesela, terrenoDeRelieve, textoMuestreo, fuentesDeTeselas, FUENTES_TERRARIUM, LADOS_KM, LADO_DEFECTO_KM, N_MAX, enlaceSimulacion } from '../terreno/lugar.js';
+import { leerLugar, idLugar, ventanaLugar, pixelTesela, terrenoDeRelieve, textoMuestreo, fuentesDeTeselas, FUENTES_TERRARIUM, LADOS_KM, LADO_DEFECTO_KM, N_MAX, enlaceSimulacion, leerPunto, idPunto, terrenoDePunto, textoPunto, enlaceSimulacion as enlaceSim2, N_PUNTO, TEXTO_TONO } from '../terreno/lugar.js';
 import { rejillaLocal, zoomPara, ZOOM_MAX_TERRARIUM, CREDITOS_TIERRA, R_TIERRA_M } from '../relieve/calculo.js';
 import { centroPixel, pixelALatLon } from '../terreno/georef.js';
 import { pendienteGrados, rango } from '../terreno/calculo.js';
@@ -227,4 +227,50 @@ test('place window: a side under 1 km in the URL falls back to the default, so t
   assert.equal(leerLugar('?lugar=75.25,-84.25&lado=0.01').lado_km, LADO_DEFECTO_KM);
   assert.equal(leerLugar('?lugar=75.25,-84.25&lado=1').lado_km, 1);
   assert.equal(leerLugar('?lugar=75.25,-84.25&lado=2').lado_km, 2);
+});
+
+test('point on the Moon or Mars in the URL: world and lat,lon; anything else is no point', () => {
+  assert.deepEqual(leerPunto('?punto=18.44,77.45&mundo=mars'), { mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 });
+  assert.deepEqual(leerPunto('?punto=-45,10&mundo=moon', 40), { mundo: 'moon', lat: -45, lon: 10, lado_km: 40 });
+  for (const mal of ['', '?punto=1,2', '?punto=1,2&mundo=earth', '?punto=1,2&mundo=venus', '?punto=91,0&mundo=mars', '?punto=0,181&mundo=mars', '?punto=a,b&mundo=mars', '?punto=1&mundo=mars', '?mundo=mars']) assert.equal(leerPunto(mal), null, mal);
+  const id = idPunto({ mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 });
+  assert.equal(encodeURIComponent(id), id);
+  assert.notEqual(id, idPunto({ mundo: 'moon', lat: 18.44, lon: 77.45, lado_km: 10 }));
+});
+
+test('simulation link: catalogue Moon terrain first, else the point itself, else the place alone', () => {
+  const q = (u) => new URLSearchParams(u.split('?')[1]);
+  const conLunar = q(enlaceSim2({ lat: 1, lon: 2, lunar: 'shackleton', punto: { mundo: 'moon', lat: -89, lon: 3 } }));
+  assert.equal(conLunar.get('b'), 'shackleton');
+  assert.equal(conLunar.get('punto'), null);
+  const marte = q(enlaceSim2({ lat: 1, lon: 2, punto: { mundo: 'mars', lat: 18.44, lon: 77.45 } }));
+  assert.deepEqual([marte.get('punto'), marte.get('mundo'), marte.get('solo'), marte.get('vista')], ['18.4400,77.4500', 'mars', null, 'suelo']);
+  assert.deepEqual(leerPunto(`?${marte}`), { mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 });
+  for (const sin of [{}, { punto: { mundo: 'venus', lat: 1, lon: 2 } }, { punto: { mundo: 'mars', lat: NaN, lon: 2 } }]) assert.equal(q(enlaceSim2({ lat: 1, lon: 2, ...sin })).get('solo'), 'lugar');
+});
+
+test('terrain of the point: body, georef, source resolution, one tint for the ground, nothing invented', () => {
+  const n = 5, z = Float32Array.from({ length: n * n }, (_, i) => -2500 + i);
+  const relieve = { n, paso: 2500, R: 3396000, z, tono: [182, 126, 84], creditos: ['Elevation: MGS MOLA MEGDR 16 px/deg (NASA PDS Geosciences Node), https://pds-geosciences.wustl.edu/x.img', 'Tint: average colour of mars.jpg'], rotulos: { altura: 'MGS MOLA MEGDR 16 px/deg, metres above the Mars areoid' } };
+  const t = terrenoDePunto(relieve, { mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 }, 3705);
+  assert.equal(t.meta.cuerpo, 'marte');
+  assert.equal(t.meta.georef.tipo, 'local_aeqd');
+  assert.equal(t.meta.georef.radio_m, 3396000);
+  assert.deepEqual([t.meta.georef.x0_m, t.meta.georef.y0_m], [-5000, 5000]);
+  assert.equal(t.meta.z_referencia, 'metres above the Mars areoid');
+  assert.equal(t.meta.capas.altura.url, 'https://pds-geosciences.wustl.edu/x.img');
+  assert.equal(t.meta.capas.altura.resolucion_origen_m, 3705);
+  assert.match(t.meta.nombre, /Your point on Mars · 18\.44° N, 77\.45° E/);
+  assert.equal(t.meta.dinamico, undefined);
+  assert.deepEqual([...t.imagen.subarray(0, 8)], [182, 126, 84, 255, 182, 126, 84, 255]);
+  assert.equal(t.meta.imagen.texto, TEXTO_TONO);
+  assert.deepEqual(Object.keys(t.capas), []);
+  assert.match(textoPunto(t.meta), /one value every 3\.7 km, smoothed onto a 2\.5 km grid\. Anything smaller than 3\.7 km is not in the data/);
+  const luna = terrenoDePunto({ ...relieve, tono: null, R: 1737400 }, { mundo: 'moon', lat: -45, lon: 10, lado_km: 10 }, null);
+  assert.equal(luna.meta.cuerpo, 'luna');
+  assert.equal(luna.imagen, null);
+  assert.equal(luna.meta.imagen, null);
+  assert.match(luna.meta.nombre, /Your point on the Moon/);
+  assert.match(textoPunto(luna.meta), /Detail finer than the source map is not in the data/);
+  assert.equal(N_PUNTO % 2, 1);
 });

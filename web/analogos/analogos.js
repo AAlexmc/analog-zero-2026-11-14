@@ -158,7 +158,7 @@ async function montar() {
   // La vista de terreno ocupa el hueco del globo: el panel sigue a la vista para pulsar otro lugar (en móvil, pantalla entera).
   const hueco = () => { const p = $('panel').getBoundingClientRect(); return p.width >= innerWidth - 2 ? { right: 0, bottom: 0 } : { right: Math.max(0, innerWidth - p.left), bottom: 0 }; };
   // «Generate simulation»: del terreno del lugar al visor con las dos vistas; la misión y el mes viajan en la URL.
-  const simular = (p) => ({ texto: 'Generate simulation', href: conMes(conMision(`../${enlaceSimulacion({ lat: p.lat, lon: p.lon, nombre: p.titulo, lunar: objetivoLunar })}`, activa), mes) });
+  const simular = (p) => ({ texto: 'Generate simulation', href: conMes(conMision(`../${enlaceSimulacion({ lat: p.lat, lon: p.lon, nombre: p.titulo, lunar: objetivoLunar, punto: { mundo, lat, lon } })}`, activa), mes) });
   const relieve = engancharRelieve({ boton: $('ver-relieve'), aviso: $('relieve-aviso'), mundo: 'earth', hueco, accion: simular, punto: () => { const x = lugarSel(); return x && { lat: x.lat, lon: x.lon, celda: { lat: x.lat, lon: x.lon }, titulo: `${rotuloSel()} · ${formatoLatLon(x.lat, x.lon).texto}` }; } });
   $('panel').addEventListener('transitionend', (e) => { if (e.target === $('panel')) relieve.encajar(); });
   const fotograma = () => new Promise((ok) => requestAnimationFrame(ok));

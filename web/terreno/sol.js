@@ -4,8 +4,11 @@ const RAD = Math.PI / 180;
 export const FUENTES_SOL = {
   tierra: { texto: 'General Solar Position Calculations, NOAA Global Monitoring Division', url: 'https://gml.noaa.gov/grad/solcalc/solareqns.PDF', cita: 'cos(Φ) = sin(lat)sin(decl) + cos(lat)cos(decl)cos(ha)' },
   luna: { texto: 'Moon Fact Sheet, NASA NSSDCA', url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html', cita: 'Synodic period (days) 29.53' },
+  marte: { texto: 'Mars Fact Sheet, NASA NSSDCA', url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html', cita: 'Length of day (hrs) 24.6597', cita_oblicuidad: 'Obliquity to orbit (deg) 25.19' },
 };
 export const DIA_LUNAR_H = 29.53 * 24;
+export const DIA_MARTE_H = 24.6597;
+export const OBLICUIDAD_MARTE = 25.19;
 export const MESES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 // Criterio propio: el día 15 de cada mes (año de 365 días) representa al mes.
 export const DIA_DEL_ANO = [15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349];
@@ -32,6 +35,9 @@ export const solTierra = ({ lat, mes, hora }) => posicionSol(lat, declinacionSol
 // Recorte polar (estereográfica): el acimut de rejilla del sol es la longitud subsolar, que retrocede 360° por día
 // sinódico; la altura cambia con la estación, no con la hora: se deja la que marca el mando.
 export const solPolar = ({ az0, el, horas, dia_h = DIA_LUNAR_H }) => ({ el, az: norm360(az0 - (360 * horas) / dia_h) });
+
+// Lugar no polar de otro mundo: hora solar local (0-24 de su propio día) y latitud subsolar (decl) en grados.
+export const solMundo = ({ lat, decl, hora }) => posicionSol(lat, decl, 15 * (hora - 12));
 
 // Sombra de un objeto de altura alto_m con el sol a el grados: null sin sol.
 export const largoSombra = (alto_m, el) => (el > 0 && alto_m > 0 ? alto_m / Math.tan(el * RAD) : null);

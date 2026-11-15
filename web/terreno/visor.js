@@ -15,7 +15,7 @@ import { crearBase } from './panel_base.js';
 import { crearCerca, capaModelos, catalogoModelos, medidaTexto } from './modelo3d.js';
 import { volumenPublicado } from './modelos_generados.js';
 import { PREFIJO, equiposDeMision, formaPublicada, medidaForma, sustitutoDe, limitesDe, textoPendiente } from './equipo_mision.js';
-import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM } from './lugar.js';
+import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM, leerPunto, idPunto, cargarPunto, textoPunto, MUNDOS_PUNTO } from './lugar.js';
 import { crearDia } from './panel_dia.js';
 import { celdaEspejo, textoDesplazamiento, filasEspejo, resumenEspejo, MARGEN_SOL_DEG, MARGEN_LUZ_FRAC } from './espejo.js';
 
@@ -23,6 +23,9 @@ const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
 const LUGAR = EJEMPLO ? null : leerLugar(location.search);
 const ID_LUGAR = LUGAR ? idLugar(LUGAR) : null;
+// Punto elegido en la Luna o Marte sin terreno de catálogo: su panel se hace en el momento, con la ventana del lugar.
+const PUNTO = LUGAR && !qs.get('b') ? leerPunto(location.search, LUGAR.lado_km) : null;
+const ID_PUNTO = PUNTO ? idPunto(PUNTO) : null;
 const MISION = qs.get('mision');
 const MES = qs.get('mes');
 const CLAVE = (id) => `analog-zero.retouch.${id}`;
@@ -63,7 +66,8 @@ async function elegirIds() {
   const reserva = a;
   if (LUGAR) a = ID_LUGAR;
   // ?solo=lugar: el lugar de la Tierra sin pareja (p. ej. cuando el punto elegido está en Marte); no es la vista ampliada.
-  const unico = qs.get('solo') === 'lugar' && !!LUGAR;
+  const unico = qs.get('solo') === 'lugar' && !!LUGAR && !PUNTO;
+  if (PUNTO) b = ID_PUNTO;
   if (unico) { b = null; document.body.dataset.unico = 'a'; }
   const solo = unico ? null : qs.get('solo');
   if (solo && solo !== a && solo !== b) {
@@ -79,6 +83,7 @@ async function obtenerDatos(id) {
     return { ...t, bytesAltura: new Uint8Array(t.altura.buffer), notas: [] };
   }
   if (LUGAR && id === ID_LUGAR) return cargarLugar(LUGAR);
+  if (PUNTO && id === ID_PUNTO) return cargarPunto(PUNTO);
   return cargarTerreno(id);
 }
 
@@ -149,7 +154,7 @@ function rellenarTarjeta(p, datos) {
   const notas = [...datos.notas];
   if (p.escena.fraccionNaN > 0) notas.push(`${(p.escena.fraccionNaN * 100).toFixed(2)} % no-data cells shown as gaps`);
   p.el.querySelector('.tarjeta').innerHTML = `
-    <div><span class="marca-chip cuerpo">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)}</span>${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}${m.dinamico ? '<span class="marca-chip vivo">Your place</span>' : ''}</div>
+    <div><span class="marca-chip cuerpo">${esc(CUERPO[m.cuerpo] ?? m.cuerpo)}</span>${m.sintetico ? '<span class="sello">SYNTHETIC EXAMPLE — not real data</span>' : ''}${m.dinamico ? '<span class="marca-chip vivo">Your place</span>' : ''}${m.punto ? '<span class="marca-chip vivo">Your point</span>' : ''}</div>
     <h2 class="marca-titulo">${esc(m.nombre)}</h2>
     <div class="cifras">
       <div><span class="et">Center</span><span class="num">${fmtLat(m.centro.lat, 2)} ${fmtLon(m.centro.lon, 2)}</span></div>
@@ -157,8 +162,9 @@ function rellenarTarjeta(p, datos) {
       <div><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
     </div>
     ${m.dinamico ? `<div class="muestreo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
+    ${m.punto ? `<div class="muestreo" data-muestreo-punto>${esc(textoPunto(m))}</div>` : ''}
     ${m.imagen ? `<div class="fuente" data-imagen>${esc(m.imagen.texto)}</div>` : ''}
-    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico ? ' · built live in your browser, not stored' : ''}</div>
+    <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico || m.punto ? ' · built live in your browser, not stored' : ''}</div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
     ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
     ${m.creditos?.length ? `<details class="notas-meta"><summary class="et">Credits</summary><div class="tenue" data-creditos>${m.creditos.map(esc).join(' · ')}</div></details>` : ''}`;
@@ -241,9 +247,10 @@ function nota(p, txt) {
 
 function crearMandos(p) {
   const m = p.escena.meta;
-  const luna = m.cuerpo === 'luna';
   // Estereográfica polar: el azimut de rejilla del sol es la longitud subsolar.
   const polar = m.georef.tipo === 'estereo_polar';
+  // Sol rasante solo en los recortes polares de la Luna.
+  const luna = m.cuerpo === 'luna' && polar;
   const txtAz = (az) => (polar ? fmtLon(az > 180 ? az - 360 : az, 0) : `${az}°`);
   const capas = Object.keys(m.capas).filter((k) => k !== 'altura' && k !== 'agua' && p.escena.capas[k]);
   const el = p.el.querySelector('.mandos');
@@ -251,7 +258,7 @@ function crearMandos(p) {
     <div class="fila"><span class="et">Colour</span>
       <button type="button" data-modo="relieve" aria-pressed="true">Relief</button>
       <button type="button" data-modo="cota" aria-pressed="false">Elevation</button>
-      <button type="button" data-modo="pendiente" aria-pressed="false">Slope</button>${p.escena.imagen ? '<button type="button" data-modo="satelite" aria-pressed="false">Satellite</button>' : ''}</div>
+      <button type="button" data-modo="pendiente" aria-pressed="false">Slope</button>${p.escena.imagen ? `<button type="button" data-modo="satelite" aria-pressed="false">${m.imagen?.tinte ? 'Tinted' : 'Satellite'}</button>` : ''}</div>
     ${capas.length ? `<div class="fila"><span class="et">Layer</span>
       <button type="button" data-capa="" aria-pressed="true">None</button>
       ${capas.map((k) => `<button type="button" data-capa="${esc(k)}" aria-pressed="false">${esc(NOMBRE_CAPA[k] ?? k)}</button>`).join('')}</div>` : ''}
@@ -311,7 +318,9 @@ const esBinaria = (nombre, c) => nombre === 'sombra_permanente' || (c.tipo === '
 function leyenda(p) {
   const e = p.escena, partes = [];
   if (p.modo === 'satelite') {
-    partes.push(`<span class="et" data-leyenda="satelite">Satellite · NASA Blue Marble colour × light from the sun above, on the real elevation · cast shadows computed from the DEM · nothing added</span>`);
+    partes.push(e.meta.imagen?.tinte
+      ? `<span class="et" data-leyenda="tinte">Tinted · one average colour of this world × light from the sun above, on the real elevation · cast shadows computed from the DEM · not an image of this place</span>`
+      : `<span class="et" data-leyenda="satelite">Satellite · NASA Blue Marble colour × light from the sun above, on the real elevation · cast shadows computed from the DEM · nothing added</span>`);
   } else if (p.modo === 'relieve') {
     partes.push(`<span class="et">Relief · cast shadows computed from the DEM · ${e.meta.georef.tipo === 'estereo_polar' ? 'polar stereographic: sun grid azimuth = subsolar longitude' : 'sun azimuth clockwise from grid top'}</span>`);
   } else if (p.modo === 'cota') {
@@ -1004,7 +1013,7 @@ function noReproducible(a, b) {
   return `<div class="et">Cannot be reproduced on Earth</div>${ps.map((q) => {
     const va = q.constante?.[ma], vb = q.constante?.[mb], fa = q.fuentes?.[ma], fb = q.fuentes?.[mb];
     const enl = (f, t) => (urlSegura(f?.url) ? `<a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(f.cita ? `“${f.cita}”` : f.texto ?? '')}">${esc(t)}</a>` : esc(t));
-    const cifra = Number.isFinite(va) && Number.isFinite(vb) ? ` <span class="num">${esc(va)} ${esc(q.unidad)}</span> on ${enl(fa, CUERPO[a.escena.meta.cuerpo])}, <span class="num">${esc(vb)} ${esc(q.unidad)}</span> on ${enl(fb, 'Earth')}` : fa?.texto ? ` ${enl(fa, fa.texto)}` : '';
+    const cifra = Number.isFinite(va) && Number.isFinite(vb) ? ` <span class="num">${esc(va)} ${esc(q.unidad)}</span> on ${enl(fa, CUERPO[a.escena.meta.cuerpo])}, <span class="num">${esc(vb)} ${esc(q.unidad)}</span> on ${enl(fb, 'Earth')}` : fa?.texto ? ` ${enl(fa, fa.texto.length <= 90 ? fa.texto : `${CUERPO[a.escena.meta.cuerpo]} source`)}` : '';
     return `<div class="no-ens" data-no-repro="${esc(q.id)}"><b>${esc(q.nombre)}</b>${cifra}</div>`;
   }).join('')}`;
 }
@@ -1235,6 +1244,15 @@ async function iniciar() {
         p.id = sel.reserva;
         try { return await obtenerDatos(p.id); } catch (e2) { mostrarError(p, e2.message); return null; }
       }
+      if (p.id === ID_PUNTO) {
+        document.body.dataset.unico = 'a';
+        const av = pa.el.querySelector('.aviso-lugar');
+        av.hidden = false;
+        av.textContent = `${av.textContent ? `${av.textContent} ` : ''}The terrain of your point on ${PUNTO.mundo === 'moon' ? 'the Moon' : MUNDOS_PUNTO[PUNTO.mundo].nombre} could not be built (${String(e.message).replace(/\.$/, '')}), so your place on Earth is shown alone.`;
+        estado.avisoPunto = av.textContent;
+        p.id = null;
+        return null;
+      }
       mostrarError(p, e.message); return null;
     }
   }));
@@ -1256,10 +1274,11 @@ async function iniciar() {
       crearRetoque(p);
       restaurar(p);
       crearEquipo(p);
-      p.rutas = crearRutas(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, elegirHerramienta, modoPlantar, refrescarPlantado });
-      p.obra = crearObra(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, trasCambio, refrescarPlantado });
+      const marte = d.meta.cuerpo === 'marte';
+      if (!marte) p.rutas = crearRutas(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, elegirHerramienta, modoPlantar, refrescarPlantado });
+      if (!marte) p.obra = crearObra(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, trasCambio, refrescarPlantado });
       p.volatiles = crearVolatiles(p, { catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, refrescarPlantado, modoPlantar, elegirHerramienta, leyenda, paneles: estado.paneles, alPerforar: perforarGemelo });
-      p.base = crearBase(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, quitarPlantado, refrescarPlantado, evaluar, LECTURA, VARIABLE, OP, paneles: estado.paneles, alternarAmpliado, modoPlantar, elegirHerramienta });
+      if (!marte) p.base = crearBase(p, { catalogo: estado.catalogo, equipoDe, nombreCorto, esc, fuenteYCita, plantarEn, quitarPlantado, refrescarPlantado, evaluar, LECTURA, VARIABLE, OP, paneles: estado.paneles, alternarAmpliado, modoPlantar, elegirHerramienta });
       p.el.querySelector('.ampliar').disabled = false;
       // Las fichas (equipo, perforación) se abren en el panel lateral, bajo las acciones, no sobre el terreno.
       const perf = p.el.querySelector('.lienzo > .perforacion');
@@ -1281,6 +1300,7 @@ async function iniciar() {
   if (solo?.escena) alternarAmpliado(solo, true);
   // «Generate simulation» entra de pie en el lugar de la Tierra (&vista=suelo), no en vista aérea.
   if (qs.get('vista') === 'suelo' && pa.escena?.meta.dinamico) alternarSuelo(pa, true);
+  if (qs.get('vista') === 'suelo' && pb.escena?.meta.punto) alternarSuelo(pb, true);
   requestAnimationFrame(bucle);
   estado.listo = true;
 }

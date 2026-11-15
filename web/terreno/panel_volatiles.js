@@ -372,9 +372,12 @@ export function crearVolatiles(p, ctx) {
   }
 
   function cuerpoTierra(x) {
-    const q = ctx.paneles.find((o) => o !== p && o.escena?.meta.cuerpo === 'luna' && o.volatiles?.lectura());
+    // En Marte: solo la lectura y el taladro; la comparación con la Luna y lo no ensayable son cosa de la Tierra.
+    const tierra = e.meta.cuerpo === 'tierra';
+    const q = tierra ? ctx.paneles.find((o) => o !== p && o.escena?.meta.cuerpo === 'luna' && o.volatiles?.lectura()) : null;
     const xl = q?.volatiles.lectura() ?? null;
     const noEns = V.D.trident.eq?.no_ensayable_tierra ?? [];
+    if (!tierra) return `<div class="et">Reading at this point</div>${filasLectura(x)}${bloqueOperacion(x)}`;
     return `<div class="et">What this site can reproduce</div>
       <table class="comp"><thead><tr><th></th>${xl ? `<th>Moon · ${esc(q.escena.meta.id)}</th>` : ''}<th>Earth · here</th></tr></thead><tbody>
       ${x.lectura.map((r) => `<tr data-v="${r.k}"><td>${r.et}</td>${xl ? `<td class="num">${esc(xl.lectura.find((y) => y.k === r.k)?.texto ?? '—')}</td>` : ''}<td class="${r.estado === 'medido' ? 'num' : 'tenue'}" data-estado="${r.estado}">${esc(r.texto)}</td></tr>`).join('')}</tbody></table>

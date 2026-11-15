@@ -1,6 +1,6 @@
 // Recorrido del día: una hora común mueve el sol de los dos paneles (cada uno con el suyo), con las sombras del relieve
 // y del equipo, y la lectura de cada lugar lado a lado. Cálculo en sol.js y calculo.js; aquí solo la pantalla.
-import { solTierra, solPolar, largoSombra, horaTexto, rumboTexto, MESES, DIA_LUNAR_H, FUENTES_SOL } from './sol.js';
+import { solTierra, solPolar, solMundo, largoSombra, horaTexto, rumboTexto, MESES, DIA_LUNAR_H, DIA_MARTE_H, OBLICUIDAD_MARTE, FUENTES_SOL } from './sol.js';
 import { sombras, sobrePlanoTangente } from './calculo.js';
 
 const PASOS = 24;
@@ -10,10 +10,17 @@ const bits = (v) => { let k = 0; for (let x = v >>> 0; x; x &= x - 1) k++; retur
 // ctx: { paneles, esc, nombreCorto, CUERPO, mes (1-12 o null), alCambiar() }.
 export function crearDia(caja, ctx) {
   const { paneles, esc, nombreCorto, CUERPO } = ctx;
-  const S = { activo: false, hora: 12, mes: ctx.mes ?? new Date().getMonth() + 1, modo: 'propio', anim: null, pendiente: false };
+  const S = { activo: false, hora: 12, mes: ctx.mes ?? new Date().getMonth() + 1, modo: 'propio', decl: 0, anim: null, pendiente: false };
+  const DIA_H = { luna: DIA_LUNAR_H, marte: DIA_MARTE_H };
   const vivos = () => paneles.filter((p) => p.escena);
   const esPolar = (p) => p.escena.meta.georef.tipo === 'estereo_polar';
-  const tipo = (p) => (p.escena.meta.cuerpo === 'tierra' && !esPolar(p) ? 'tierra' : p.escena.meta.cuerpo !== 'tierra' && esPolar(p) ? 'polar' : null);
+  // tierra = lugar de la Tierra; polar = recorte polar de la Luna; mundo = lugar no polar de la Luna o Marte.
+  const tipo = (p) => {
+    const c = p.escena.meta.cuerpo;
+    if (c === 'tierra') return esPolar(p) ? null : 'tierra';
+    return esPolar(p) ? 'polar' : DIA_H[c] ? 'mundo' : null;
+  };
+  const declDe = (p) => (p.escena.meta.cuerpo === 'marte' ? S.decl : 0);
   const fuente = (f, t) => `<a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(`${f.texto} — “${f.cita}”`)}">${esc(t)}</a>`;
 
   caja.innerHTML = `
@@ -26,7 +33,9 @@ export function crearDia(caja, ctx) {
         <button type="button" data-modo="propio" aria-pressed="true" title="Each world goes through one full day of its own: 24 hours on Earth, 29.53 Earth days on the Moon">One day of each world</button>
         <button type="button" data-modo="mismo" aria-pressed="false" title="The same 24 hours pass in both places: on the Moon the Sun barely moves">Same 24 hours</button>
       </span>
-      <span class="dia-fuentes tenue">Sun computed here (own calculation) from ${fuente(FUENTES_SOL.tierra, 'NOAA solar position formulas')} and the ${fuente(FUENTES_SOL.luna, '29.53-day lunar day')} · shadows from the elevation data</span>
+      <label class="grupo" data-g="decl"><span class="et">Mars season</span><select data-a="decl" aria-label="Season on Mars">
+        <option value="0">Equinox: Sun over the equator</option><option value="${OBLICUIDAD_MARTE}">Northern summer: Sun ${OBLICUIDAD_MARTE}° N</option><option value="${-OBLICUIDAD_MARTE}">Southern summer: Sun ${OBLICUIDAD_MARTE}° S</option></select></label>
+      <span class="dia-fuentes tenue">Sun computed here (own calculation) from ${fuente(FUENTES_SOL.tierra, 'NOAA solar position formulas')} and the ${fuente(FUENTES_SOL.luna, '29.53-day lunar day')}<span data-g="fuente-marte"> and the ${fuente(FUENTES_SOL.marte, '24.66-hour Mars day')}, ${fuente({ ...FUENTES_SOL.marte, cita: FUENTES_SOL.marte.cita_oblicuidad }, '25.19° tilt')}</span> · shadows from the elevation data</span>
     </div>
     <div class="dia-lecturas">${['a', 'b'].map((l) => `<div class="dia-lectura" data-lado="${l}"><div class="dia-texto"></div><div class="dia-tira" hidden></div></div>`).join('')}</div>`;
   const $ = (s) => caja.querySelector(s);
@@ -40,6 +49,11 @@ export function crearDia(caja, ctx) {
     if (k === 'polar') {
       const horas = S.modo === 'mismo' ? t : (t / 24) * DIA_LUNAR_H;
       return { ...solPolar({ az0: p.diaBase.az, el: p.diaBase.el(), horas }), tipo: k, horas };
+    }
+    if (k === 'mundo') {
+      // Mismo reloj: las 24 h pasan alrededor de su mediodía local; día propio: su día entero.
+      const dia = DIA_H[p.escena.meta.cuerpo], hora = S.modo === 'mismo' ? 12 + ((t - 12) * 24) / dia : t;
+      return { ...solMundo({ lat: p.escena.meta.centro.lat, decl: declDe(p), hora }), tipo: k, hora, dia };
     }
     return null;
   }
@@ -55,7 +69,7 @@ export function crearDia(caja, ctx) {
     const m = p.el.querySelector('.mandos');
     const az = m.querySelector('[data-sol=az]'), el = m.querySelector('[data-sol=el]');
     az.value = Math.round(s.az) % 360;
-    if (s.tipo === 'tierra') el.value = Math.max(0, s.el);
+    if (s.tipo !== 'polar') el.value = Math.max(0, s.el);
     m.querySelector('[data-v=az]').textContent = s.tipo === 'polar' ? `${Math.round(Math.abs(s.az > 180 ? s.az - 360 : s.az))}° ${s.az > 180 ? 'W' : 'E'}` : `${Math.round(s.az)}°`;
     m.querySelector('[data-v=el]').textContent = `${s.el.toFixed(1)}°`;
   }
@@ -64,10 +78,14 @@ export function crearDia(caja, ctx) {
     const e = p.escena, cuerpo = CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, L = [];
     if (!s) return `<b>${esc(cuerpo)}</b> · the Day control does not move the Sun on this terrain (set it by hand in Display)`;
     if (s.tipo === 'tierra') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(S.hora)}</span> local solar time · ${MESES[S.mes - 1]}`);
+    else if (s.tipo === 'mundo') {
+      const largo = e.meta.cuerpo === 'marte' ? `<span class="num">${DIA_MARTE_H.toFixed(2)} h</span>` : '<span class="num">29.53</span> Earth days';
+      L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(s.hora)}</span> local solar time of its own day, which lasts ${largo}${e.meta.cuerpo === 'luna' ? ' · Sun taken over the equator (own simplification)' : ''}`);
+    }
     else if (S.modo === 'mismo') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${S.hora.toFixed(1)} h</span> later: the Sun has gone <span class="num">${((360 * S.hora) / DIA_LUNAR_H).toFixed(1)}°</span> round the horizon`);
     else L.push(`<b>${esc(cuerpo)}</b> · Earth day <span class="num">${(s.horas / 24).toFixed(1)}</span> of <span class="num">29.53</span> of its own day`);
     const arriba = s.el > 0;
-    L.push(arriba ? `Sun <span class="num">${s.el.toFixed(1)}°</span> above the horizon${s.tipo === 'tierra' ? `, to the ${rumboTexto(s.az)} (<span class="num">${Math.round(s.az)}°</span>)` : ' (height set in Display: it changes with the season, not the hour)'}`
+    L.push(arriba ? `Sun <span class="num">${s.el.toFixed(1)}°</span> above the horizon${s.tipo !== 'polar' ? `, to the ${rumboTexto(s.az)} (<span class="num">${Math.round(s.az)}°</span>)` : ' (height set in Display: it changes with the season, not the hour)'}`
       : `<span class="dia-noche">Sun <span class="num">${Math.abs(s.el).toFixed(1)}°</span> below the horizon: night</span>`);
     const f = e.fraccionConSol();
     L.push(`<span class="num">${Number.isFinite(f) ? Math.round(100 * f) : '—'} %</span> of this window in direct sunlight`);
@@ -90,7 +108,13 @@ export function crearDia(caja, ctx) {
   }
 
   // ---------- Tira del día: en cada paso, ¿le da el sol al equipo seguido? ----------
-  const claveMapa = (p) => [S.modo, tipo(p) === 'tierra' ? S.mes : `${p.diaBase.az}|${p.diaBase.el()}`, p.escena.versionAlturas, p.escena.verOriginal].join('|');
+  const claveMapa = (p) => [S.modo, tipo(p) === 'tierra' ? S.mes : tipo(p) === 'mundo' ? declDe(p) : `${p.diaBase?.az}|${p.diaBase?.el()}`, p.escena.versionAlturas, p.escena.verOriginal].join('|');
+  // Lo que dura cada uno de los 24 pasos de la tira en este panel.
+  const pasoDe = (p) => {
+    if (tipo(p) === 'tierra' || S.modo === 'mismo') return 'hours';
+    const h = (tipo(p) === 'polar' ? DIA_LUNAR_H : DIA_H[p.escena.meta.cuerpo]) / PASOS;
+    return `steps of ${h.toFixed(h < 10 ? 2 : 1)} h`;
+  };
   function calcularMapa(p) {
     const e = p.escena, clave = claveMapa(p);
     if (p.diaMapa?.clave === clave) return;
@@ -119,7 +143,7 @@ export function crearDia(caja, ctx) {
     const m = p.diaMapa;
     if (!m || m.hecho < PASOS || m.clave !== claveMapa(p)) { tira.innerHTML = '<span class="tenue">working out the light through the day…</span>'; return; }
     const v = m.bits[g.it.fila * p.escena.n + g.it.col], ahora = Math.min(PASOS - 1, Math.floor(S.hora));
-    const paso = tipo(p) === 'tierra' || S.modo === 'mismo' ? 'hours' : `steps of ${(DIA_LUNAR_H / PASOS).toFixed(1)} h`;
+    const paso = pasoDe(p);
     tira.innerHTML = `<span class="et">Light on ${esc(nombreCorto(g.it.equipo))} through the day</span>
       <span class="celdas" role="img" aria-label="Sunlit in ${bits(v)} of ${PASOS} ${paso}">${Array.from({ length: PASOS }, (_, k) => {
         const s = m.soles[k], c = (v >>> k) & 1 ? 'sol' : s.el > 0 ? 'sombra' : 'noche';
@@ -176,6 +200,7 @@ export function crearDia(caja, ctx) {
   $('[data-a=play]').addEventListener('click', () => (S.anim ? parar() : reproducir()));
   $('[data-a=hora]').addEventListener('input', (ev) => { parar(); activar(); S.hora = +ev.target.value; pedir(); });
   selMes.addEventListener('change', () => { S.mes = +selMes.value; activar(); pedir(); });
+  $('[data-a=decl]').addEventListener('change', (ev) => { S.decl = +ev.target.value; activar(); pedir(); });
   caja.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => {
     S.modo = b.dataset.modo;
     caja.querySelectorAll('[data-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
@@ -185,7 +210,9 @@ export function crearDia(caja, ctx) {
   const hay = (k) => vivos().some((p) => tipo(p) === k);
   caja.hidden = !vivos().some((p) => tipo(p));
   $('[data-g=mes]').hidden = !hay('tierra');
-  $('[data-g=modo]').hidden = !hay('polar');
+  $('[data-g=modo]').hidden = !hay('polar') && !hay('mundo');
+  $('[data-g=fuente-marte]').hidden = !vivos().some((p) => p.escena.meta.cuerpo === 'marte');
+  $('[data-g=decl]').hidden = !vivos().some((p) => tipo(p) === 'mundo' && p.escena.meta.cuerpo === 'marte');
   pintarLecturas();
 
   return {
@@ -202,7 +229,7 @@ export function crearDia(caja, ctx) {
     de(p, it) {
       const m = p.diaMapa;
       if (!S.activo || !m || m.hecho < PASOS || m.clave !== claveMapa(p)) return null;
-      return { luz: bits(m.bits[it.fila * p.escena.n + it.col]), total: PASOS, unidad: tipo(p) === 'tierra' || S.modo === 'mismo' ? 'hours' : `steps of ${(DIA_LUNAR_H / PASOS).toFixed(1)} h` };
+      return { luz: bits(m.bits[it.fila * p.escena.n + it.col]), total: PASOS, unidad: pasoDe(p) };
     },
     ir(hora) { parar(); activar(); S.hora = hora; aplicar(); ctx.alCambiar?.(); },
     listo: () => !S.activo || vivos().every((p) => !tipo(p) || (p.diaMapa?.hecho === PASOS && p.diaMapa.clave === claveMapa(p))),

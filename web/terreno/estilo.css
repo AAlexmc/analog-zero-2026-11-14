@@ -243,7 +243,7 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 }
 
 /* Equipo espejo */
-.aviso-espejo { position: absolute; left: 10px; bottom: 8px; z-index: 4; max-width: min(46%, 300px); padding: 7px 14px; border-radius: var(--radio); background: var(--blanco); color: var(--fondo); font-size: 13px; }
+.aviso-espejo { position: absolute; left: 10px; top: 96px; z-index: 4; pointer-events: none; max-width: min(46%, 300px); padding: 7px 14px; border-radius: var(--radio); background: var(--blanco); color: var(--fondo); font-size: 13px; }
 .aviso-espejo[hidden] { display: none; }
 .espejo { margin: 10px 0; padding-top: 8px; border-top: 1px solid var(--linea); }
 .resumen-espejo { display: grid; gap: 4px; margin: 6px 0 8px; font-size: 13px; }

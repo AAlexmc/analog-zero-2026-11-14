@@ -76,6 +76,8 @@ const esperado = (id) => pag.evaluate(async (id) => {
 try {
   await pag.goto(`${base}/terreno/index.html`);
   await pag.waitForFunction(() => window.__az?.listo === true, null, { timeout: 60000 });
+  // Cada panel se planta por separado (un gemelo podría caer sobre otra marca); el equipo espejo tiene su guion.
+  await pag.evaluate(() => { window.__az.espejo = false; });
   const info = await pag.evaluate(() => ({ ids: window.__az.paneles.map((p) => p.id), cuerpos: window.__az.paneles.map((p) => p.escena?.meta.cuerpo), errores: window.__az.errores }));
   console.log(`panels: ${info.ids.join(' | ')} (${info.cuerpos.join(' | ')})`);
   if (info.errores.length) falla(`panel errors: ${info.errores.join('; ')}`);

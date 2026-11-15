@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { declinacionSolar, posicionSol, solTierra, solPolar, largoSombra, horaTexto, rumboTexto, DIA_DEL_ANO, DIA_LUNAR_H, MESES, FUENTES_SOL } from '../terreno/sol.js';
+import { solMundo, DIA_MARTE_H, OBLICUIDAD_MARTE, declinacionSolar, posicionSol, solTierra, solPolar, largoSombra, horaTexto, rumboTexto, DIA_DEL_ANO, DIA_LUNAR_H, MESES, FUENTES_SOL } from '../terreno/sol.js';
 
 const cerca = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg ?? ''} ${a} vs ${b}`);
 
@@ -63,4 +63,15 @@ test('labels and sources', () => {
   assert.equal(horaTexto(0.999), '01:00');
   assert.deepEqual([0, 44, 90, 200, 359].map(rumboTexto), ['N', 'NE', 'E', 'S', 'N']);
   for (const f of Object.values(FUENTES_SOL)) assert.match(f.url, /^https:\/\/(gml\.noaa\.gov|nssdc\.gsfc\.nasa\.gov)\//);
+});
+
+test('a non-polar place on another world: noon Sun at 90° − |lat − subsolar latitude|, and the Mars figures are the fact-sheet ones', () => {
+  cerca(solMundo({ lat: 18.44, decl: 0, hora: 12 }).el, 90 - 18.44, 1e-9);
+  cerca(solMundo({ lat: 18.44, decl: OBLICUIDAD_MARTE, hora: 12 }).el, 90 - (OBLICUIDAD_MARTE - 18.44), 1e-9);
+  assert.ok(solMundo({ lat: 18.44, decl: 0, hora: 0 }).el < 0);
+  cerca(solMundo({ lat: 18.44, decl: 0, hora: 6 }).az, 90, 1e-9);
+  assert.equal(DIA_MARTE_H, 24.6597);
+  assert.equal(OBLICUIDAD_MARTE, 25.19);
+  assert.match(FUENTES_SOL.marte.cita, /24\.6597/);
+  assert.match(FUENTES_SOL.marte.cita_oblicuidad, /25\.19/);
 });
