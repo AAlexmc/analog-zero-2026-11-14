@@ -248,6 +248,8 @@ try {
     const T = await import(url);
     const p = window.__az.paneles[0], e = p.escena, it = p.plantados.lista[0];
     p.modelos.sincronizar(p.plantados.lista);
+    // Un fotograma dibujado antes de medir: la proyección usa las matrices de la cámara del último dibujo.
+    e.dibujar(true);
     const ins = p.modelos.instancias().find((x) => x.uid === it.uid), obj = p.modelos.grupo.children.find((o) => o.userData.uid === it.uid);
     const caja = new T.Box3().setFromObject(obj), tam = caja.getSize(new T.Vector3()).multiplyScalar(1000), c = caja.getCenter(new T.Vector3());
     const s = e.aPantalla(c), r = e.renderer.domElement.getBoundingClientRect();

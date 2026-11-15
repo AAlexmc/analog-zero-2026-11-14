@@ -319,7 +319,7 @@ try {
     else if (f.tipo) ok(`the terrain of place 2 opens by itself after the globe stops, beside the panel (view ends at ${auto.capa} px = panel left)`);
     const sim = await pag.evaluate(() => { const b = document.querySelector('.relieve-accion'); return b ? { texto: b.textContent, href: b.getAttribute('href') } : null; });
     const qSim = new URLSearchParams((sim?.href ?? '').split('?')[1] ?? '');
-    if (f.tipo && (sim?.texto !== 'Generate simulation' || !sim.href.startsWith('../terreno/index.html?') || qSim.get('lugar') !== `${x.lat.toFixed(4)},${x.lon.toFixed(4)}` || qSim.get('solo') !== 'lugar')) falla(`"Generate simulation" in the terrain view: ${JSON.stringify(sim)}`);
+    if (f.tipo && (sim?.texto !== 'Generate simulation' || !sim.href.startsWith('../terreno/index.html?') || qSim.get('lugar') !== `${x.lat.toFixed(4)},${x.lon.toFixed(4)}` || qSim.get('mundo') !== 'mars' || !/^-?\d+\.\d{4},-?\d+\.\d{4}$/.test(qSim.get('punto') ?? '') || qSim.get('solo') !== null)) falla(`"Generate simulation" in the terrain view: ${JSON.stringify(sim)}`);
     else if (f.tipo) ok(`"Generate simulation" in the terrain view → ${sim.href}`);
     if (!f.tipo) {
       if (v.aviso !== f.mensaje) falla(`place 2 at ${x.lat}: expected "${f.mensaje}", got ${JSON.stringify(v)}`); else ok(`place 2 at ${x.lat}°: "${v.aviso}"`);
