@@ -35,7 +35,7 @@ export function crearDia(caja, ctx) {
       </span>
       <label class="grupo" data-g="decl"><span class="et">Mars season</span><select data-a="decl" aria-label="Season on Mars">
         <option value="0">Equinox: Sun over the equator</option><option value="${OBLICUIDAD_MARTE}">Northern summer: Sun ${OBLICUIDAD_MARTE}° N</option><option value="${-OBLICUIDAD_MARTE}">Southern summer: Sun ${OBLICUIDAD_MARTE}° S</option></select></label>
-      <span class="dia-fuentes tenue">Sun computed here (own calculation) from ${fuente(FUENTES_SOL.tierra, 'NOAA solar position formulas')} and the ${fuente(FUENTES_SOL.luna, '29.53-day lunar day')}<span data-g="fuente-marte"> and the ${fuente(FUENTES_SOL.marte, '24.66-hour Mars day')}, ${fuente({ ...FUENTES_SOL.marte, cita: FUENTES_SOL.marte.cita_oblicuidad }, '25.19° tilt')}</span> · shadows from the elevation data</span>
+      <span class="dia-fuentes tenue solo-fondo">Sun computed here (own calculation) from ${fuente(FUENTES_SOL.tierra, 'NOAA solar position formulas')} and the ${fuente(FUENTES_SOL.luna, '29.53-day lunar day')}<span data-g="fuente-marte"> and the ${fuente(FUENTES_SOL.marte, '24.66-hour Mars day')}, ${fuente({ ...FUENTES_SOL.marte, cita: FUENTES_SOL.marte.cita_oblicuidad }, '25.19° tilt')}</span> · shadows from the elevation data</span>
     </div>
     <div class="dia-lecturas">${['a', 'b'].map((l) => `<div class="dia-lectura" data-lado="${l}"><div class="dia-texto"></div><div class="dia-tira" hidden></div></div>`).join('')}</div>`;
   const $ = (s) => caja.querySelector(s);
@@ -220,7 +220,7 @@ export function crearDia(caja, ctx) {
     estado: S,
     // Sol movido a mano en Display: la altura lunar se respeta; lo demás suelta el recorrido.
     manual(p, cual) {
-      if (!S.activo) { pintarLecturas(); return; }
+      if (!S.activo) { p.diaBase = null; pintarLecturas(); return; }
       if (tipo(p) === 'polar' && cual === 'el') { pedir(); return; }
       if (tipo(p) === 'polar' && cual === 'az') { const horas = S.modo === 'mismo' ? S.hora : (S.hora / 24) * DIA_LUNAR_H; conBase(p).az = p.escena.sol.az + (360 * horas) / DIA_LUNAR_H; pedir(); return; }
       parar(); S.activo = false; delete caja.dataset.activo; pintarLecturas(); ctx.alCambiar?.();
@@ -234,6 +234,17 @@ export function crearDia(caja, ctx) {
       return { luz: bits(m.bits[it.fila * p.escena.n + it.col]), total: PASOS, unidad: pasoDe(p) };
     },
     ir(hora) { parar(); activar(); S.hora = hora; aplicar(); ctx.alCambiar?.(); },
+    // Mapa de luz del día de un panel aunque el recorrido no esté en marcha (base generada y ficha de cada pieza).
+    // null si este panel no se sabe mover; pendiente = true mientras se calcula.
+    mapa(p) {
+      if (!p.escena || !tipo(p)) return null;
+      conBase(p);
+      calcularMapa(p);
+      const m = p.diaMapa;
+      return m.hecho === PASOS ? { bits: m.bits, soles: m.soles, total: PASOS, unidad: pasoDe(p), ahora: S.activo ? Math.min(PASOS - 1, Math.floor(S.hora)) : null } : { pendiente: true };
+    },
     listo: () => !S.activo || vivos().every((p) => !tipo(p) || (p.diaMapa?.hecho === PASOS && p.diaMapa.clave === claveMapa(p))),
+    // Sol de un panel a la hora t (0-24) del recorrido, para el informe; null si este panel no se sabe mover.
+    solDe(p, t) { if (!p.escena || !tipo(p)) return null; conBase(p); return solDe(p, t); },
   };
 }

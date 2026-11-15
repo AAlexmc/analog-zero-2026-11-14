@@ -215,15 +215,15 @@ export function crearBase(p, ctx) {
       const rot = ok ? `<span class="${ROTULO[x.rotulo] ?? ''}">${esc(x.rotulo)}</span>` : '';
       return `<div class="pieza-b"><label><input type="checkbox" data-b="usa-${id}" ${B.activas.has(id) && ok ? 'checked' : ''} ${id === 'habitat' || !ok || B.trabajo ? 'disabled' : ''} ${id === 'habitat' ? 'title="the habitat is the hub: every piece is joined to it"' : ''}>
         <span>${esc(NOMBRE[id])}</span></label><span class="num">${ok ? `Ø ${esc(numero(x.valor))} m` : '—'}</span>${rot}
-        <div class="tenue nota-o">${ok ? `${esc(x.de)}${x.ref ? ` · ${cita(x.ref)}` : ''}` : esc(x.motivo)}</div></div>`;
+        <div class="tenue nota-o${ok ? ' solo-fondo' : ''}">${ok ? `${esc(x.de)}${x.ref ? ` · ${cita(x.ref)}` : ''}` : esc(x.motivo)}</div></div>`;
     };
     sec.innerHTML = `<div class="et sub">BASE · generate on this terrain</div>
-      <div class="tenue nota-o">places each ticked piece on its suitable zone, joined to the habitat by a ${esc(veh ? ctx.nombreCorto('ltv') : 'vehicle')} route or a built road, with the least earthworks and route length (own weights 1 m³ = 1 m³ = 1 m)</div>
+      <div class="tenue nota-o solo-fondo">places each ticked piece on its suitable zone, joined to the habitat by a ${esc(veh ? ctx.nombreCorto('ltv') : 'vehicle')} route or a built road, with the least earthworks and route length (own weights 1 m³ = 1 m³ = 1 m)</div><div class="tenue nota-o solo-simple">Laid out with our own weights (own criterion).</div>
       <div class="piezas-b">${IDS_BASE.map(filaPieza).join('')}</div>
       <label class="fila-o"><span class="et">PAD STANDOFF</span><span><input type="number" data-b="sep" min="0" step="any" value="${Number.isFinite(B.sep) ? B.sep : ''}" ${B.trabajo ? 'disabled' : ''}> m</span></label>
       <div class="tenue nota-o" data-b="sep-nota"><span class="supuesto">assumed · no published lander standoff; default = the cited reactor standoff figure, editable</span>${d ? ` · reactor ≥ ${esc(d.valor)} m from the habitat ${cita(d.ref)}` : ' · no cited reactor standoff in the catalogue'}</div>
       <div class="tenue nota-o">vehicle: ${veh ? `${esc(ctx.nombreCorto('ltv'))} ≤ ${esc(veh.limite)}° ${cita(veh.req)}` : 'no LTV slope limit in the catalogue'} · road width ${M.carretera.valor > 0 ? `${esc(M.carretera.valor)} m <span class="supuesto">assumed</span> (${esc(M.carretera.de)}) ${cita(M.carretera.ref)}` : esc(M.carretera.motivo)}${B.hielo ? ` · water plant near cold traps: temp_max ≤ ${esc(B.hielo.valor)} K ${cita(B.hielo)}` : ''}</div>
-      <div class="botones"><button type="button" data-b="generar" ${B.trabajo || !veh || !(M.habitat.valor > 0) || !(M.carretera.valor > 0) ? 'disabled' : ''}>Generate base</button><button type="button" data-b="cancelar" ${B.trabajo ? '' : 'disabled'}>Cancel</button><button type="button" data-b="ensayar" ${puedeEnsayar() ? '' : 'disabled'} title="${esc(tituloEnsayar())}">Rehearse on Earth</button></div>
+      <div class="botones"><button type="button" data-b="generar" ${B.trabajo || !veh || !(M.habitat.valor > 0) || !(M.carretera.valor > 0) ? 'disabled' : ''}>Plan base and roads</button><button type="button" data-b="cancelar" ${B.trabajo ? '' : 'disabled'}>Cancel</button><button type="button" data-b="ensayar" ${puedeEnsayar() ? '' : 'disabled'} title="${esc(tituloEnsayar())}">Rehearse on Earth</button></div>
       <div class="estado-b" data-b="estado">${esc(B.estado ?? '')}</div>
       <div data-b="res">${resultadoHtml()}</div>`;
     IDS_BASE.forEach((id) => $(`usa-${id}`)?.addEventListener('change', (ev) => { if (ev.target.checked) B.activas.add(id); else B.activas.delete(id); }));
@@ -338,7 +338,7 @@ export function crearBase(p, ctx) {
         <dt>OBJECTIVE</dt><dd class="num" data-b="t-obj">${esc(numero(r.objetivo.total))} <span class="propio">own criterion</span></dd>${flotaHtml}</dl>
       <div class="no-medido" data-b="acarreo">haul time: NOT MEASURED (no published payload per trip)</div>
       <div class="tenue nota-o">excavation = mass of every cut (pads and roads) ÷ (${SUPUESTOS.n_robots} <span class="supuesto">assumed</span> × ${F?.ritmo_kg_h ? `${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited rate'}), mass from the regolith density profile ${F?.densidad ? cita(F.densidad.ref) : ''}; calendar counts only sunlight (<span class="propio">own estimate</span>, as in the road tool)</div>
-      <details class="det-b" data-b="restricciones"><summary class="et">CONSTRAINTS · value, limit and slack (${r.restricciones.length})</summary><table class="comp"><tbody>${restr}</tbody></table></details>
+      <details class="det-b solo-fondo" data-b="restricciones"><summary class="et">CONSTRAINTS · value, limit and slack (${r.restricciones.length})</summary><table class="comp"><tbody>${restr}</tbody></table></details>
       ${porMedir}
       <div class="tenue nota-o">lines on the terrain: solid = ${esc(ctx.nombreCorto('ltv'))} route, dashed = road to build · click a marker for its sheet</div>`;
   }
@@ -479,7 +479,7 @@ export function crearBase(p, ctx) {
             <div class="tenue nota-o">${vel ? `<span class="propio">own figure</span> · lower bound: round trip at the catalogue ${esc(vel.tipo)} speed ${esc(+vel.kmh.toFixed(3))} km/h, constant, no stops ${cita(vel.cifra)}` : 'no catalogue speed with a source: no time given'}</div>`;
     const camps = campanasDe(B.sitios, e.meta.id);
     const campanas = camps.length
-      ? camps.map((c) => `<div class="campana" data-b="campana"><b>${esc(c.nombre)}</b> · ${esc(c.sistema ?? '')} · ${cita(c)}</div>`).join('') + '<div class="tenue nota-o">duration: only as written in the quote (the catalogue has no duration field)</div>'
+      ? camps.map((c) => `<div class="campana" data-b="campana"><b>${esc(c.nombre)}</b> · ${esc(c.sistema ?? '')} · ${cita(c)}</div>`).join('') + '<div class="tenue nota-o solo-fondo">duration: only as written in the quote (the catalogue has no duration field)</div>'
       : '<div class="tenue" data-b="sin-campana">no real campaign on this terrain in the catalogue (sitios_ensayo.json)</div>';
     const noMed = E.filas.filter((f) => f.lectura === 'no_medible');
     const noEns = [...new Set(E.tras.map((t) => EQUIPO_BASE[t.id]))].flatMap((id) => (ctx.equipoDe(id)?.no_ensayable_tierra ?? []).map((x) => ({ id, x })));
@@ -499,7 +499,7 @@ export function crearBase(p, ctx) {
     sec.innerHTML = `<div class="et sub">REHEARSE ON EARTH · ${esc(eL.meta.id)} → ${esc(e.meta.id)}</div>${obs}
       <div class="fila-o"><span class="et">HABITAT AT</span><span class="num" data-b="hab">cell ${E.hab.fila},${E.hab.col}</span></div>
       <div class="botones"><button type="button" data-b="elegir" aria-pressed="${!!B.eligiendo}">Click where the habitat goes</button></div>
-      <table class="comp" data-b="trasplante"><thead><tr><th></th><th>OFFSET (GRID →, ↑)</th><th>CELL</th><th></th></tr></thead><tbody>${posiciones}</tbody></table>
+      <table class="comp solo-fondo" data-b="trasplante"><thead><tr><th></th><th>OFFSET (GRID →, ↑)</th><th>CELL</th><th></th></tr></thead><tbody>${posiciones}</tbody></table>
       <div class="et">SUMMARY · ${R.total - R.sin_limite} requirements compared</div>
       <div class="resumen-b num" data-b="resumen"><span>reproduced <b data-n="reproducido">${R.reproducido}</b></span> <span>under-tested <b data-n="infra">${R.infra}</b></span> <span>over-tested <b data-n="sobre">${R.sobre}</b></span> <span>cannot be measured <b data-n="no_medible">${R.no_medible}</b></span>${R.sin_limite ? ` <span class="tenue">no public limit <b data-n="sin_limite">${R.sin_limite}</b></span>` : ''}</div>
       <table class="comp" data-b="tabla"><thead><tr><th>requirement</th><th>MOON · EARTH</th><th>reading</th></tr></thead><tbody>${filas}</tbody></table>

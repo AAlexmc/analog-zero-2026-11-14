@@ -238,11 +238,12 @@ test('point on the Moon or Mars in the URL: world and lat,lon; anything else is 
   assert.notEqual(id, idPunto({ mundo: 'moon', lat: 18.44, lon: 77.45, lado_km: 10 }));
 });
 
-test('simulation link: catalogue Moon terrain first, else the point itself, else the place alone', () => {
+test('simulation link: catalogue Moon terrain with the point inside it, else the point itself, else the place alone', () => {
   const q = (u) => new URLSearchParams(u.split('?')[1]);
   const conLunar = q(enlaceSim2({ lat: 1, lon: 2, lunar: 'shackleton', punto: { mundo: 'moon', lat: -89, lon: 3 } }));
   assert.equal(conLunar.get('b'), 'shackleton');
-  assert.equal(conLunar.get('punto'), null);
+  assert.deepEqual([conLunar.get('punto'), conLunar.get('mundo'), conLunar.get('solo')], ['-89.0000,3.0000', 'moon', null], 'the point travels with the catalogue terrain: the base is centred on it');
+  assert.equal(q(enlaceSim2({ lat: 1, lon: 2, lunar: 'shackleton' })).get('punto'), null);
   const marte = q(enlaceSim2({ lat: 1, lon: 2, punto: { mundo: 'mars', lat: 18.44, lon: 77.45 } }));
   assert.deepEqual([marte.get('punto'), marte.get('mundo'), marte.get('solo'), marte.get('vista')], ['18.4400,77.4500', 'mars', null, 'suelo']);
   assert.deepEqual(leerPunto(`?${marte}`), { mundo: 'mars', lat: 18.44, lon: 77.45, lado_km: 10 });

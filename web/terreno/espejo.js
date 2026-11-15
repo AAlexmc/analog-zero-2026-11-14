@@ -6,10 +6,11 @@ export const MARGEN_SOL_DEG = 5;
 export const MARGEN_LUZ_FRAC = 0.1;
 
 // origen = {n, m}; destino = {n, m, alturas}. Devuelve la celda del destino con dato más cercana a la simétrica, o null.
+// Cada lado admite `centro: {fila, col}` (por defecto el centro de su ventana): la simetría se mide desde ahí.
 export function celdaEspejo(origen, destino, fila, col) {
   const ko = (origen.n - 1) / 2, kd = (destino.n - 1) / 2, n = destino.n;
-  const este_m = (col - ko) * origen.m, sur_m = (fila - ko) * origen.m;
-  const f0 = kd + sur_m / destino.m, c0 = kd + este_m / destino.m;
+  const este_m = (col - (origen.centro?.col ?? ko)) * origen.m, sur_m = (fila - (origen.centro?.fila ?? ko)) * origen.m;
+  const f0 = (destino.centro?.fila ?? kd) + sur_m / destino.m, c0 = (destino.centro?.col ?? kd) + este_m / destino.m;
   const f = Math.min(n - 1, Math.max(0, Math.round(f0))), c = Math.min(n - 1, Math.max(0, Math.round(c0)));
   const recortado = Math.abs(f - f0) > 0.5 || Math.abs(c - c0) > 0.5;
   const hay = (ff, cc) => Number.isFinite(destino.alturas[ff * n + cc]);
@@ -66,7 +67,7 @@ export function filasEspejo(a, b, limites = []) {
     filas.push({ id: 'dia', nombre: 'Sunlit share of its day', a: t(a.dia), b: t(b.dia), lectura: Math.abs(fa - fb) <= MARGEN_LUZ_FRAC ? 'igual' : 'distinto',
       nota: Math.abs(fa - fb) <= MARGEN_LUZ_FRAC ? `within ± ${MARGEN_LUZ_FRAC * 100} % of the day` : `${Math.round(100 * fa)} % of the day on ${a.cuerpo}, ${Math.round(100 * fb)} % on ${b.cuerpo}` });
   }
-  for (const [k, nombre, fmt] of [['iluminacion', 'Mean illumination (yearly map)', (v) => v.toFixed(2)], ['temp_max', 'Max temperature (map)', (v) => `${v.toFixed(0)} K`]]) {
+  for (const [k, nombre, fmt] of [['iluminacion', 'Mean illumination (map)', (v) => v.toFixed(2)], ['temp_max', 'Max temperature (map)', (v) => `${v.toFixed(0)} K`]]) {
     const va = a.capas?.[k], vb = b.capas?.[k];
     if (va === undefined && vb === undefined) continue;
     const f = (v) => (Number.isFinite(v) ? fmt(v) : '—');

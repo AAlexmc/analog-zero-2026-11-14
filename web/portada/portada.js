@@ -1,6 +1,6 @@
 // Portada: tres secciones con encaje vertical y un solo lienzo 3D cuyo planeta sigue al desplazamiento.
 import * as THREE from 'three';
-import { COLOR, webglDisponible, crearRenderer, reducirMovimiento, cargarMundos, crearEstrellas, crearPlaneta, crearHalo, crearLuces, crearMarcador, situarMarcador } from './espacio.js';
+import { COLOR, webglDisponible, avisarSinWebgl, crearRenderer, reducirMovimiento, cargarMundos, crearEstrellas, crearPlaneta, crearHalo, crearLuces, crearMarcador, situarMarcador } from './espacio.js';
 import { latLonAVector } from '../explorar/geo.js';
 
 const RAD = Math.PI / 180;
@@ -60,6 +60,7 @@ try {
 
 if (!webglDisponible()) {
   document.body.classList.add('sin-webgl');
+  avisarSinWebgl();
   P.listo = true;
 } else {
   await montar3D();

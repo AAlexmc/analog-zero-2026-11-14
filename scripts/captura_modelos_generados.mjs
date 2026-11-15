@@ -42,7 +42,8 @@ const buscarCelda = (i, lo, hi, usadas = []) => pag.evaluate(([i, lo, hi, usadas
     for (let c = Math.round(n * 0.15); c < n * 0.6; c += 7) {
       const l = e.leer(f, c);
       if (!(l.pendiente >= lo && l.pendiente <= hi) || e.capas.agua?.[f * n + c] >= 1) continue;
-      if (usadas.some((u) => Math.hypot(u.f - f, u.c - c) < n * 0.08)) continue;
+      // Lejos de las ya usadas y en otra fila: el rótulo de una marca no debe tapar el pin de la vecina.
+      if (usadas.some((u) => Math.hypot(u.f - f, u.c - c) < n * 0.08 || Math.abs(u.f - f) < n * 0.05)) continue;
       const s = e.aPantalla(e.mundoDePixel(f, c));
       const g = s?.dentro && document.elementFromPoint(s.x, s.y) === e.renderer.domElement && e.rayo(s.x, s.y);
       if (g && Math.round(g.fila) === f && Math.round(g.col) === c) vistos.push({ f, c, x: s.x, y: s.y, pend: l.pendiente });

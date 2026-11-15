@@ -59,12 +59,13 @@ try {
   comprobar(await pag.isVisible('#espejo') && await pag.getAttribute('#espejo', 'aria-pressed') === 'true', '(a) "Mirror equipment" is shown and on', '(a) the Mirror equipment switch is missing or off');
   const geo = await pag.evaluate(() => window.__az.paneles.map((p) => ({ n: p.escena.n, m: p.escena.m, cuerpo: p.escena.meta.cuerpo })));
   await plantar('b', 'torre_solar', 60, 40);
+  // El aviso dura unos segundos: se lee antes de traer la rejilla entera de alturas.
+  const aviso = await pag.evaluate(() => { const a = document.querySelector('.panel[data-lado=a] .aviso-espejo'); return a.hidden ? null : a.textContent; });
   let [ta, tb] = [await lista(0), await lista(1)];
   comprobar(tb.length === 1 && ta.length === 1 && ta[0].equipo === 'torre_solar' && ta[0].par && ta[0].par === tb[0].par, `(a) planting on the Moon planted its twin on Earth (pair ${tb[0]?.par})`, `(a) no twin: moon ${JSON.stringify(tb)} earth ${JSON.stringify(ta)}`);
   const alturas = await pag.evaluate(() => Array.from(window.__az.paneles[0].escena.mostradas));
   const esp = celdaEspejo({ n: geo[1].n, m: geo[1].m }, { n: geo[0].n, m: geo[0].m, alturas }, tb[0].fila, tb[0].col);
   comprobar(esp && ta[0].fila === esp.fila && ta[0].col === esp.col, `(a) twin cell ${ta[0].fila},${ta[0].col} = same metres from the centre as the Moon cell ${tb[0].fila},${tb[0].col} (node)`, `(a) twin cell ${ta[0]?.fila},${ta[0]?.col} vs node ${JSON.stringify(esp)}`);
-  const aviso = await pag.evaluate(() => { const a = document.querySelector('.panel[data-lado=a] .aviso-espejo'); return a.hidden ? null : a.textContent; });
   comprobar(/Also planted here: Vertical solar array tower · \d+ m (right|left) and \d+ m (down|up) from the window centre on the map, as on Moon/.test(aviso ?? ''), `(a) notice on the Earth panel: "${aviso}"`, `(a) notice missing: ${aviso}`);
   const modelos = await pag.evaluate(() => window.__az.paneles.map((p) => { p.modelos.sincronizar(p.plantados.lista); return p.modelos.instancias().length; }));
   comprobar(modelos[0] === 1 && modelos[1] === 1, '(a) a 3D model stands on both panels', `(a) 3D models per panel: ${modelos}`);

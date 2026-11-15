@@ -1,6 +1,6 @@
 // Resultados en la Tierra para un punto de la Luna o de Marte: globo con los mejores lugares, pestañas Places y Metrics.
 import * as THREE from 'three';
-import { webglDisponible, cargarMundos } from '../portada/espacio.js';
+import { webglDisponible, avisarSinWebgl, cargarMundos } from '../portada/espacio.js';
 import { crearGlobo } from '../explorar/globo.js';
 import { formatoLatLon } from '../explorar/geo.js';
 import { cargar } from '../buscar/motor.js';
@@ -63,7 +63,7 @@ async function montar() {
     G = crearGlobo({ canvas: $('globo'), panel: $('panel'), mundo: tierra, vista0: { lat: 25, lon: 10 }, arriba: () => ($('mandos').hidden ? 0 : $('mandos').getBoundingClientRect().bottom + 6) });
     A.vista = { camara: G.camara, aPantalla: G.aPantalla, animando: G.animando, latLonDePixel: G.latLonDePixel };
     $('reiniciar').addEventListener('click', () => (A.sel ? G.mirar(lugarSel()) : G.reiniciar()));
-  } else document.body.classList.add('sin-webgl');
+  } else { document.body.classList.add('sin-webgl'); if (!webglDisponible()) avisarSinWebgl(); }
 
   if (!M) {
     $('estado').classList.remove('cargando');
@@ -181,7 +181,7 @@ async function montar() {
   // Sitio conocido a menos de 300 km, o «unlisted»: solo quiere decir fuera de NUESTRO catálogo.
   const nSitios = sitiosConCoordenadas(sitios);
   const contexto = (c) => [
-    el('p', { className: `contexto${c ? ' conocido' : ''}`, textContent: lineaContexto(c, nSitios) }),
+    el('p', { className: `contexto${c ? ' conocido' : ' solo-fondo'}`, textContent: lineaContexto(c, nSitios) }),
     c ? null : el('span', { className: 'marca-chip unlisted', textContent: 'unlisted', title: `No analog site from our catalogue within ${RADIO_CONTEXTO_KM} km` }),
   ];
   // Con misión: cuántos parámetros comparados quedan cerca y cuáles no (cortes propios de Metrics).
@@ -198,7 +198,7 @@ async function montar() {
       resumen(x),
       lista === 'parciales' ? el('p', { className: 'parcial', textContent: fraseParcial(x) }) : null,
       ...contexto(c),
-      lineaDistancia(x.distancia_componentes, M.clases?.d_ref.valor) ? el('p', { className: 'distancia marca-num', textContent: lineaDistancia(x.distancia_componentes, M.clases.d_ref.valor) }) : null,
+      lineaDistancia(x.distancia_componentes, M.clases?.d_ref.valor) ? el('p', { className: 'distancia marca-num solo-fondo', textContent: lineaDistancia(x.distancia_componentes, M.clases.d_ref.valor) }) : null,
       el('div', { className: 'acciones' },
         el('button', { type: 'button', className: 'marca-boton', textContent: 'See metrics', onclick: (e) => { e.stopPropagation(); elegir(lista, k); verPestana('metricas'); } }),
         t ? el('a', { className: 'marca-boton secundario', textContent: 'Open detailed terrain', href: `../${enlaceTerreno(t.item.id, objetivoLunar, lunares).href}`, onclick: (e) => e.stopPropagation() }) : null,
@@ -444,7 +444,7 @@ async function montar() {
 
   const fuente = (lado, f) => {
     if (!f) return null;
-    return el('p', {}, el('strong', { textContent: `${lado}: ` }), f.texto ?? '', ...(f.url ? [' ', el('a', { href: f.url, target: '_blank', rel: 'noopener', textContent: 'source' })] : []));
+    return el('p', { className: 'solo-fondo' }, el('strong', { textContent: `${lado}: ` }), f.texto ?? '', ...(f.url ? [' ', el('a', { href: f.url, target: '_blank', rel: 'noopener', textContent: 'source' })] : []));
   };
   function fila(x) {
     const p = P[x.id], d = x.desviacion_pct;
@@ -467,7 +467,7 @@ async function montar() {
     return det;
   }
   const grupo = (clase, titulo, corte, filas, vacio) => {
-    const s = el('section', { className: `grupo ${clase}` }, el('h3', { textContent: titulo }), el('p', { className: 'corte', textContent: corte }));
+    const s = el('section', { className: `grupo ${clase}` }, el('h3', { textContent: titulo }), el('p', { className: 'corte solo-fondo', textContent: corte }));
     s.dataset.grupo = clase;
     if (filas.length) s.append(...filas.map(fila)); else s.append(el('p', { className: 'vacio', textContent: vacio }));
     return s;
@@ -478,7 +478,7 @@ async function montar() {
   function comparar() {
     if (!r.resultados.length) return null;
     const n = r.resultados.length;
-    const det = el('details', { className: 'comparar', open: !!A.compararAbierto }, el('summary', { textContent: `Compare the ${n} places side by side` }),
+    const det = el('details', { className: 'comparar solo-fondo', open: !!A.compararAbierto }, el('summary', { textContent: `Compare the ${n} places side by side` }),
       el('p', { className: 'tenue', textContent: 'Each cell: the Earth value and how far off it is. The closest place in each row is marked.' }));
     det.addEventListener('toggle', () => { A.compararAbierto = det.open; });
     const filas = tablaComparar(r.resultados, activa ? r.usados : reproducibles).map((f) => {
@@ -530,10 +530,10 @@ async function montar() {
       el('p', { className: 'met-lugar' }, num, sep(), el('span', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto })),
       total,
       el('p', { className: 'met-que', textContent: `Average of the ${x.comparados} parameters we could compare${x.comparados < x.de ? ` (of ${x.de})` : ''}. Our own metric — not a probability.` }),
-      mes !== null ? el('p', { className: 'mes-nota', textContent: r.mensuales?.length
+      mes !== null ? el('p', { className: 'mes-nota solo-fondo', textContent: r.mensuales?.length
         ? `Earth in ${nombreMes(mes)}: ${r.mensuales.map(corto).join(', ')} are ${nombreMes(mes)} values (the average ${nombreMes(mes)} of many years). The rest, and your point ${EN[mundo]}, are year averages.`
         : `Earth in ${nombreMes(mes)}: none of these parameters has a monthly version, so this is the whole-year match.` }) : null,
-      el('details', { className: 'como' }, el('summary', { textContent: 'How we measure' }),
+      el('details', { className: 'como solo-fondo' }, el('summary', { textContent: 'How we measure' }),
         el('p', {}, 'For each parameter: ', el('code', { textContent: 'deviation % = min(100, |f(Earth) − f(your point)| / (f(max) − f(min)) × 100)' }), '.'),
         el('p', { textContent: `f is the scale of the parameter: logarithmic for ${logaritmicos.join(', ')}; plain for the rest. [min, max] is the range from the 1st to the 99th percentile of Earth land and of the Moon and Mars.` }),
         el('p', { textContent: 'Match % = 100 − deviation %. The match of a place is the average over the parameters with data there, all with the same weight.' }),
@@ -548,7 +548,7 @@ async function montar() {
       g.sin.length ? grupo('sin', 'No Earth data here', 'not counted in the match', g.sin, '') : null,
       el('section', { className: 'bloque no-repro' }, el('h3', { textContent: 'Earth cannot reproduce this' }), el('ul', {}, ...noRepro),
         el('p', { textContent: 'No place on Earth has this gravity or this air pressure, so there is no percentage here.' })),
-      el('section', { className: 'bloque no-comparado' }, el('h3', { textContent: 'Not compared yet' }), el('ul', {}, ...(activa ? NO_COMPARADO_MISION : NO_COMPARADO).map((t) => el('li', { textContent: t }))),
+      el('section', { className: 'bloque no-comparado solo-fondo' }, el('h3', { textContent: 'Not compared yet' }), el('ul', {}, ...(activa ? NO_COMPARADO_MISION : NO_COMPARADO).map((t) => el('li', { textContent: t }))),
         el('p', { textContent: 'no global layer in this version' })),
     ].filter(Boolean));
   }
@@ -684,7 +684,7 @@ async function montar() {
     if (!eqCal) { s.append(el('p', { className: 'aviso-mes', textContent: 'Could not download the climate month by month, so the equipment is not checked here. Try again later.' })); return s; }
     const conLimites = eqCal.filter((c) => c.limites.length), sinLimites = eqCal.filter((c) => !c.limites.length);
     const nasa = fraseNasaAqui(campanasCerca(activa.mision, x.lat, x.lon));
-    if (conLimites.some((c) => c.medibles)) s.append(el('p', { className: 'leyenda-equipo', textContent: '✓ within the published limit · ✕ outside it · – no data. Earth data of this place against the limits the maker or NASA published (own comparison).' }));
+    if (conLimites.some((c) => c.medibles)) s.append(el('p', { className: 'leyenda-equipo' }, '✓ within the published limit · ✕ outside it · – no data.', el('span', { className: 'solo-fondo', textContent: ' Earth data of this place against the limits the maker or NASA published (own comparison).' })));
     s.append(el('ul', { className: 'equipos' }, ...conLimites.map((c) => {
       const med = c.limites.filter((l) => l.medible);
       const li = el('li', { className: 'equipo' },
@@ -698,7 +698,7 @@ async function montar() {
           c.superficie ? el('p', { className: 'equipo-nota', textContent: 'Surface temperature, not air (own comparison).' }) : null,
         ] : []),
         ...c.limites.filter((l) => !l.medible).map((l) => noMedido(l, x)),
-        el('details', { className: 'como equipo-fuentes' }, el('summary', { textContent: 'Limits and sources' }), el('ul', {}, ...c.limites.map(fuentesLimite))));
+        el('details', { className: 'como equipo-fuentes solo-fondo' }, el('summary', { textContent: 'Limits and sources' }), el('ul', {}, ...c.limites.map(fuentesLimite))));
       li.dataset.id = c.id;
       return li;
     })));
@@ -757,10 +757,11 @@ async function montar() {
       tr.dataset.mes = f.mes;
       return tr;
     });
-    caja.replaceChildren(
+    // replaceChildren escribe «null» como texto: fuera los bloques que no tocan.
+    caja.replaceChildren(...[
       el('h1', { className: 'marca-titulo titular', textContent: 'Month by month' }),
       el('p', { className: 'met-lugar' }, numSel, ...(pais(x) ? [sep(), pais(x)] : []), sep(), el('span', { className: 'marca-num', textContent: formatoLatLon(x.lat, x.lon).texto })),
-      rs.length ? el('p', { className: 'racha', textContent: `Within ${MARGEN} points of its best month: ${rs.map((s) => s.texto).join(', ')} (own threshold).` }) : null,
+      rs.length ? el('p', { className: 'racha solo-fondo', textContent: `Within ${MARGEN} points of its best month: ${rs.map((s) => s.texto).join(', ')} (own threshold).` }) : null,
       el('section', { className: 'bloque plan', id: 'plan' }, el('h3', { textContent: 'Repeat a test later' }),
         el('div', { className: 'plan-mandos' },
           el('label', { className: 'mision-rotulo', htmlFor: 'plan-inicio', textContent: 'First test in' }),
@@ -770,16 +771,17 @@ async function montar() {
         el('p', { className: `plan-frase${p.mover ? ' mover' : ''}`, id: 'plan-frase', textContent: frase }),
         eqCal && fraseRepeticion(eqCal, p.repeticion.mes) ? el('p', { className: 'plan-equipo', id: 'plan-equipo', textContent: fraseRepeticion(eqCal, p.repeticion.mes) }) : null,
         ir,
-        el('p', { textContent: `Move = this place is more than ${MARGEN} points below the best place on Earth that month (own threshold).` })),
+        el('p', { className: 'solo-fondo', textContent: `Move = this place is more than ${MARGEN} points below the best place on Earth that month (own threshold).` })),
       eq ? bloqueEquipo(eq, eqCal, x) : null,
       el('div', { className: 'tabla-scroll' }, el('table', { className: 'tabla-calendario' },
         el('thead', {}, el('tr', {}, el('th', { scope: 'col', textContent: 'Month' }), el('th', { scope: 'col', textContent: 'This place' }), el('th', { scope: 'col', textContent: 'Best place on Earth' }),
-          el('th', { scope: 'col' }, 'Move?', el('small', { textContent: `own threshold: ${MARGEN} points` })))),
+          el('th', { scope: 'col' }, 'Move?', el('small', { className: 'solo-fondo', textContent: `own threshold: ${MARGEN} points` })))),
         el('tbody', {}, ...filas))),
-      el('section', { className: 'bloque limites' }, el('h3', { textContent: 'Limits' }),
+      el('p', { className: 'tenue solo-simple', textContent: 'Your point keeps its year-average value in every month. Snow on the ground is not measured.' }),
+      el('section', { className: 'bloque limites solo-fondo' }, el('h3', { textContent: 'Limits' }),
         el('p', { textContent: `Your point ${EN[mundo]} keeps its year-average value in every month: season is not compared with season.` }),
         el('p', { textContent: 'Earth months are climatology: the average month of many years (NASA POWER), not one particular year.' }),
-        el('p', { textContent: 'Snow on the ground is not measured: a snowy place in winter counts with its temperature and light, without the snow.' })));
+        el('p', { textContent: 'Snow on the ground is not measured: a snowy place in winter counts with its temperature and light, without the snow.' }))].filter((h) => h !== null));
   }
 
   verPestana('lugares');

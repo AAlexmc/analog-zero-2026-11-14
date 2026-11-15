@@ -232,10 +232,10 @@ export async function montarSitio({ mundo, base = '../data/sitio/', ir, punto, V
     if (r) {
       const nf = new Intl.NumberFormat('en');
       const lim = r.usados.limites.length;
-      out.push(linea('r-aptas tenue', lim
+      out.push(linea('r-aptas tenue solo-fondo', lim
         ? `${nf.format(r.aptas.n)} grid cells meet the limits: ${Math.round(100 * r.aptas.fracArea)} % of the area.`
         : `${criterios.some(esLimite) ? 'All limits off' : 'NASA gives no hard limit here'}: all ${nf.format(r.aptas.de)} grid cells with data compete.`));
-      if (r.alternativas.length) out.push(linea('r-aptas tenue', `Numbers on the globe: the next best spots, at least ${cifra(sep.km)} km apart (own choice).`));
+      if (r.alternativas.length) out.push(linea('r-aptas tenue', 'Numbers on the globe: the next best spots', el('span', { className: 'solo-fondo', textContent: `, at least ${cifra(sep.km)} km apart (own choice)` }), '.'));
     }
     salida.replaceChildren(...out);
     G?.pedir();

@@ -34,7 +34,11 @@ Then open http://localhost:8080. The site is static: no build step, no account a
    **Generate simulation** (from a place in the results) stands you on that place on Earth, next to the terrain of your point on the Moon or Mars:
    - **Mirror equipment:** what you plant on one world is planted on the other at the same spot of its window; its sheet says what matches, what differs, what cannot be measured and what Earth cannot reproduce.
    - **Day:** one hour slider moves the real Sun of both places (Earth by month; a lunar day of 29.53 Earth days; a Mars day of 24.66 h), with terrain and equipment shadows and a 24-step strip of the light on the equipment.
+   - **Generate base:** one button places every surface system of the catalogue (habitat, reactor, landing pad, solar tower, drill, water plant, rovers) inside a radius around your point, each by its own rule and its published limits, on the Moon or Mars and at the same offsets on Earth. Hover a piece to read its slope, limits, Sun and light through the day in both worlds; the reading follows the Day hour. Before placing anything a table lets you rank the pieces: the first one gets the best ground for it and the rest is laid out around it (the pull is our own rule), or you keep the optimal layout with our own order. With a catalogue Moon terrain the base is centred on the point you chose, not on the window.
+   - **Generate report:** one button gathers everything the simulation used and found (parameters, terrain statistics, the Sun hour by hour, the light on each piece of the base, the base plan in both worlds, every published limit with its verdict and quotation, similarity parameter by parameter, what is not measured, sources). It opens as a preview, then downloads as one self-contained HTML file or prints to PDF.
    - **Drill here:** the TRIDENT drill bite by bite, from its published sequence and feed speed, and what was already tried on Earth; each line with its quotation.
+
+Every screen has a **Simple | In depth** switch: In depth shows every source, rule and method note; Simple keeps the titles, the main figures, the verdicts and the controls. No figure changes between the two.
 
 Also: a **global map** (`/mapa/`) of where each test condition can be reproduced on Earth, and an exploratory similarity ranking.
 

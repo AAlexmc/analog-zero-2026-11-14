@@ -72,7 +72,11 @@ const cerca = (i, pg = pag) => pg.evaluate((i) => window.__az.paneles[i].cerca?.
 const seleccionar = async (i, uid) => {
   const cerrar = await pag.$(`${lado(i)} .hoja [data-a=cerrar]`);
   if (cerrar && await cerrar.isVisible()) await cerrar.click();
-  const pin = await pag.$eval(`.marca[data-uid="${uid}"] .pin`, (d) => { const r = d.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  // Con marcas juntas el rótulo de una puede tapar el rombo de otra: se pulsa un punto de la marca que de verdad sea suyo.
+  const pin = await pag.$eval(`${lado(i)} .marca[data-uid="${uid}"]`, (d) => {
+    const puntos = [d.querySelector('.pin'), d.querySelector('.rot')].flatMap((el) => { const r = el.getBoundingClientRect(); return [0.5, 0.15, 0.85].map((k) => ({ x: r.left + r.width * k, y: r.top + r.height / 2 })); });
+    return puntos.find((q) => document.elementFromPoint(q.x, q.y)?.closest('.marca') === d) ?? puntos[0];
+  });
   await pag.mouse.click(pin.x, pin.y);
   await pag.waitForTimeout(150);
   const sel = await pag.evaluate((i) => window.__az.paneles[i].sel, i);
@@ -98,7 +102,8 @@ const pixelesModelo = (i, uid) => pag.evaluate(([i, uid]) => {
 }, [i, uid]);
 
 try {
-  await pag.goto(`${base}/terreno/index.html${reales ? '' : '?ejemplo=1'}`);
+  // Este guion planta en cada panel por separado: sin equipo espejo.
+  await pag.goto(`${base}/terreno/index.html${reales ? '?espejo=0' : '?ejemplo=1&espejo=0'}`);
   await pag.waitForFunction(() => window.__az?.listo === true, null, { timeout: 60000 });
   const info = await pag.evaluate(() => ({ ids: window.__az.paneles.map((p) => p.id), cuerpos: window.__az.paneles.map((p) => p.escena?.meta.cuerpo), errores: window.__az.errores }));
   console.log(`panels: ${info.ids.join(' | ')} (${info.cuerpos.join(' | ')})`);
@@ -159,6 +164,7 @@ try {
     const mu = await pag.evaluate((i) => window.__az.paneles[i].cerca.muestra(), i);
     if (!mu || mu.colores < 20) falla(`${eq} close-up canvas blank (${JSON.stringify(mu)})`); else ok(`${eq} close-up canvas ${mu.w}×${mu.h}, ${mu.colores} sampled colours`);
     // Órbita con el ratón.
+    await pag.locator(`${lado(i)} .hoja .cerca canvas`).scrollIntoViewIfNeeded();
     const caja = await pag.$eval(`${lado(i)} .hoja .cerca canvas`, (cv) => { const r = cv.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
     const antes = c.camara;
     await pag.mouse.move(caja.x, caja.y);
@@ -235,17 +241,18 @@ try {
   // Quitar: el modelo sale de la escena.
   const quitar = await pag.evaluate((i) => window.__az.paneles[i].plantados.lista.find((x) => x.equipo === 'ipex')?.uid, LUNA);
   await seleccionar(LUNA, quitar);
+  // El grupo lleva también la sombra de cada modelo: se cuentan los modelos en escena, como antes de quitar.
   await pag.click(`${lado(LUNA)} .hoja [data-a=quitar]`);
   await pag.waitForTimeout(300);
-  const tras = await pag.evaluate(([i, uid]) => ({ inst: window.__az.paneles[i].modelos.instancias().map((x) => x.uid), hijos: window.__az.paneles[i].modelos.grupo.children.length }), [LUNA, quitar]);
-  if (tras.inst.includes(quitar) || tras.hijos !== antes[LUNA] - 1) falla(`removing IPEx should remove its model (${JSON.stringify(tras)})`); else ok('removing IPEx removes its model from the scene');
+  const tras = await pag.evaluate(([i, uid]) => ({ inst: window.__az.paneles[i].modelos.instancias().map((x) => x.uid), hijos: window.__az.paneles[i].modelos.instancias().filter((x) => x.enEscena).length, enGrupo: window.__az.paneles[i].modelos.grupo.children.some((o) => o.userData?.uid === uid) }), [LUNA, quitar]);
+  if (tras.inst.includes(quitar) || tras.enGrupo || tras.hijos !== antes[LUNA] - 1) falla(`removing IPEx should remove its model (${JSON.stringify(tras)})`); else ok('removing IPEx removes its model from the scene');
 
   // Fallo de carga visible y sin modelo de sustitución.
   const ctx2 = await nav.newContext({ viewport: { width: 1600, height: 900 } });
   const pag2 = await ctx2.newPage();
   pag2.on('pageerror', (e) => falla(`page error (404 model): ${e.message}`));
   await pag2.route('**/data/modelos/sev.glb', (r) => r.fulfill({ status: 404, body: '' }));
-  await pag2.goto(`${base}/terreno/index.html${reales ? '' : '?ejemplo=1'}`);
+  await pag2.goto(`${base}/terreno/index.html${reales ? '?espejo=0' : '?ejemplo=1&espejo=0'}`);
   await pag2.waitForFunction(() => window.__az?.listo === true, null, { timeout: 60000 });
   const c2 = await buscarCelda(LUNA, 0, 40, [], pag2);
   if (!c2) throw new Error('no visible Moon cell for the 404 check');

@@ -328,13 +328,15 @@ export function capaModelos(escena, lienzo, extra = null) {
   function sincronizar(lista) {
     if (lista.length && !cat.lista) catalogoModelos().then(() => { escena.sucio = true; });
     const vivos = new Set(lista.map((it) => it.uid));
-    for (const [uid, x] of inst) if (!vivos.has(uid)) { if (x.obj) grupo.remove(x.obj); if (x.sombra) { grupo.remove(x.sombra); x.sombra.geometry.dispose(); } inst.delete(uid); }
+    // Quitar un modelo cambia la imagen: esto corre tras dibujar, así que hay que pedir otro fotograma.
+    let quitados = 0;
+    for (const [uid, x] of inst) if (!vivos.has(uid)) { if (x.obj) grupo.remove(x.obj); if (x.sombra) { grupo.remove(x.sombra); x.sombra.geometry.dispose(); } inst.delete(uid); quitados++; }
     sol.intensity = escena.sol.el > 0 ? 2.2 : 0;
     ambiente.intensity = 2 * escena.luzDia;
     factor = factorAmpliacion(escena.camara.position.distanceTo(escena.controles.target) * 1000);
     sol.position.copy(escena.uniforms.uSol.value).multiplyScalar(100);
     const fallos = new Set(), clases = new Set();
-    let hay = 0, cargando = 0, cambio = false, topados = 0, sombras = 0;
+    let hay = 0, cargando = 0, cambio = quitados > 0, topados = 0, sombras = 0;
     for (const it of lista) {
       const ex = extra?.(it.equipo) ?? null;
       const m = ex ? (ex.fichero ? { fichero: ex.fichero } : null) : modeloDe(cat.lista, it.equipo);

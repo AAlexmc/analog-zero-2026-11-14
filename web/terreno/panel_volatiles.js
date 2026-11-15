@@ -251,8 +251,8 @@ export function crearVolatiles(p, ctx) {
     return `<div data-v="leyenda-hielo"><span class="et"><i class="muestra-hielo"></i>Stable ice · max temperature ≤ ${esc(u.valor)} K</span>
       <div><span class="num" data-v="pct-hielo" data-pct="${h.pct}">${fmtV.pct(h.pct)}</span> of this terrain <span class="tenue">(${extra.join('; ')})</span></div>
       <div class="tenue">the surface temperature allows stable ice; it does not show that ice is present</div>
-      <div><span class="et">Threshold</span> ${esc(u.ref.texto ?? '')} · ${cita(u.ref)}</div>
-      <div class="recorte"><span class="et">Temperature</span> ${enlaceCapa(e.meta.capas.temp_max)}</div></div>`;
+      <div class="solo-fondo"><span class="et">Threshold</span> ${esc(u.ref.texto ?? '')} · ${cita(u.ref)}</div>
+      <div class="recorte solo-fondo"><span class="et">Temperature</span> ${enlaceCapa(e.meta.capas.temp_max)}</div></div>`;
   }
 
   // ---------- DRILL HERE ----------
@@ -299,11 +299,11 @@ export function crearVolatiles(p, ctx) {
       <div class="botones"><button type="button" data-v="sec-play">▶ Run the drill</button><button type="button" data-v="sec-sig">Next bite</button><button type="button" data-v="sec-cero">Reset</button></div>
       <dl><dt>Cutting time</dt><dd class="num" data-v="corte" data-valor="${S.corte_min_s}">at least ${tiempo(S.corte_min_s)}</dd>
         ${T.wob ? `<dt>Push on the bit</dt><dd class="num" data-v="wob">≤ ${esc(T.wob.valor)} N</dd>` : ''}</dl>
-      <div class="tenue nota-o">cutting time = depth ÷ the feed the drill aims for, ${esc(T.avance.valor)} mm/s ${cita(T.avance.ref)} (own arithmetic). It is a minimum: in hard or icy ground the drill feeds slower. Cutting only${T.wob ? ` · push ${cita(T.wob.ref)}` : ''}</div>`
+      <div class="tenue nota-o solo-fondo">cutting time = depth ÷ the feed the drill aims for, ${esc(T.avance.valor)} mm/s ${cita(T.avance.ref)} (own arithmetic). It is a minimum: in hard or icy ground the drill feeds slower. Cutting only${T.wob ? ` · push ${cita(T.wob.ref)}` : ''}</div>`
       : '<div class="tenue" data-v="sin-secuencia">no cited feed speed or bite size for TRIDENT in the catalogue</div>';
     return `<div class="et">How TRIDENT drills this hole</div>${sec}
-      ${op.length ? `<details class="perf-det" data-v="operacion"><summary>The real sequence, step by step (${op.length})</summary>${listaCitada(op, true)}</details>` : ''}
-      ${mide.length ? `<details class="perf-det" data-v="mide"><summary>What the drill itself measures (${mide.length})</summary>${listaCitada(mide, false)}</details>` : ''}
+      ${op.length ? `<details class="perf-det solo-fondo" data-v="operacion"><summary>The real sequence, step by step (${op.length})</summary>${listaCitada(op, true)}</details>` : ''}
+      ${mide.length ? `<details class="perf-det solo-fondo" data-v="mide"><summary>What the drill itself measures (${mide.length})</summary>${listaCitada(mide, false)}</details>` : ''}
       ${ens.length ? `<details class="perf-det" data-v="ensayos"${luna ? '' : ' open'}><summary>Already tried on Earth (${ens.length})</summary>${listaCitada(ens, false)}</details>` : ''}`;
   }
   function pintarPaso() {
@@ -352,16 +352,16 @@ export function crearVolatiles(p, ctx) {
         <dt>Beyond drill class</dt><dd data-v="supera">${supera}</dd>
         <dt>Power</dt><dd class="num" data-v="potencia">${pot}</dd>
         <dt>Mass</dt><dd class="num" data-v="masa-taladro">${masa}</dd></dl>
-        <div class="tenue nota-o">bite ${cita(T.bocado?.ref)}${T.rotacion ? ` · power ${cita(T.rotacion.ref)}` : ''}${T.masa ? ` · mass ${cita(T.masa.ref)}` : ''}</div>`;
+        <div class="tenue nota-o solo-fondo">bite ${cita(T.bocado?.ref)}${T.rotacion ? ` · power ${cita(T.rotacion.ref)}` : ''}${T.masa ? ` · mass ${cita(T.masa.ref)}` : ''}</div>`;
     }
     const he = x.hielo_esperado;
     const esperado = he
       ? `<div data-v="hielo-esperado">${esc(he.texto)} · ${cita(he.ref)}${he.lugar ? ` · place ${cita(he.lugar)}` : ''}</div>
-        ${he.rango ? `<div class="tenue nota-o" data-v="agua-total">total water, ice plus vapour, at the same impact: ${esc(he.rango.ref.valor.join('–'))} wt% ${cita(he.rango.ref)}</div>` : ''}`
+        ${he.rango ? `<div class="tenue nota-o solo-fondo" data-v="agua-total">total water, ice plus vapour, at the same impact: ${esc(he.rango.ref.valor.join('–'))} wt% ${cita(he.rango.ref)}</div>` : ''}`
       : '<div class="tenue">no cited ice concentration in the catalogue</div>';
     return `<div class="et">Reading at this point</div>${filasLectura(x)}
       <div class="tenue nota-o" data-v="nota-hielo">${esc(x.nota)}</div>
-      <div class="como">${fuentes}</div>
+      <div class="como solo-fondo">${fuentes}</div>
       <div class="et">TRIDENT drill plan</div>
       <label class="fila-o"><span class="et">Depth</span><span><input type="number" data-v="prof" min="0" step="0.1" value="${Number.isFinite(prof) ? prof : ''}"> m</span></label>
       <div class="tenue nota-o"><span class="propio">own parameter</span> · default: ${T.profundidad ? `drill class ${esc(T.profundidad.valor)} m ${cita(T.profundidad.ref)}` : 'no cited drill class: enter one'}</div>
@@ -385,7 +385,7 @@ export function crearVolatiles(p, ctx) {
       <div class="tenue nota-o">no equivalence between Moon and Earth values is computed</div>
       ${bloqueOperacion(x)}
       <div class="et">Not testable on Earth (catalogue) · TRIDENT</div>
-      ${noEns.length ? noEns.map((y) => `<div class="no-ens">${esc(y.texto ?? '')} · ${cita(y)}</div>`).join('') : '<div class="tenue">No public source states what cannot be tested on Earth for this drill.</div>'}`;
+      ${noEns.length ? noEns.map((y) => `<div class="no-ens">${esc(y.texto ?? '')}<span class="solo-fondo"> · ${cita(y)}</span></div>`).join('') : '<div class="tenue">No public source states what cannot be tested on Earth for this drill.</div>'}`;
   }
 
   function pintar() {
@@ -477,13 +477,13 @@ export function crearVolatiles(p, ctx) {
     const prop = pr ? `<dl><dt>O₂ · stoichiometry</dt><dd class="num" data-v="o2" data-valor="${pr.o2_kg}">${fmtV.t1(pr.o2_kg)}</dd>
         <dt>H₂ · stoichiometry</dt><dd class="num" data-v="h2" data-valor="${pr.h2_kg}">${fmtV.t1(pr.h2_kg)}</dd>
         <dt>O₂ · source</dt><dd class="num" data-v="o2-fuente" data-valor="${h.o2.fuente_kg}">${fmtV.t1(h.o2.fuente_kg)}</dd></dl>
-      <div class="tenue nota-o">2 H₂O → 2 H₂ + O₂ with IUPAC atomic masses (own calculation) · source O₂ ${cita(O2_FUENTE)}</div>
+      <div class="tenue nota-o solo-fondo">2 H₂O → 2 H₂ + O₂ with IUPAC atomic masses (own calculation) · source O₂ ${cita(O2_FUENTE)}</div>
       <div class="aviso-o2" data-v="aviso-o2">${esc(h.o2.aviso)}</div>` : '';
     cont.innerHTML = `<div class="et">Water plant · ice, regolith, power, propellant</div>
       <div class="hielo-celda ${hc.estado}" data-v="hielo-celda" data-estado="${hc.estado}">${hc.html}</div>
       ${D.produccion ? `<dl><dt>Water</dt><dd class="num" data-v="agua" data-valor="${D.produccion.agua_kg}">${fmtV.t1(D.produccion.agua_kg)} in ${esc(D.produccion.dias)} d</dd>
         ${D.potencia_kw ? `<dt>Power</dt><dd class="num" data-v="potencia-planta" data-valor="${D.potencia_kw.valor}">${esc(D.potencia_kw.valor)} kW</dd>` : ''}</dl>
-        <div class="tenue nota-o">NASA baseline ${cita(D.produccion.ref)}${D.potencia_kw ? ` · ${esc(D.potencia_kw.ref.texto ?? '')} ${cita(D.potencia_kw.ref)}` : ''}</div>` : ''}
+        <div class="tenue nota-o solo-fondo">NASA baseline ${cita(D.produccion.ref)}${D.potencia_kw ? ` · ${esc(D.potencia_kw.ref.texto ?? '')} ${cita(D.potencia_kw.ref)}` : ''}</div>` : ''}
       ${agua}${pot}${prop}`;
   }
 

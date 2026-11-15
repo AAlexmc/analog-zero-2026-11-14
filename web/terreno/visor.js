@@ -13,11 +13,16 @@ import { crearObra } from './panel_obra.js';
 import { crearVolatiles } from './panel_volatiles.js';
 import { crearBase } from './panel_base.js';
 import { crearCerca, capaModelos, catalogoModelos, medidaTexto } from './modelo3d.js';
-import { volumenPublicado } from './modelos_generados.js';
+import { volumenPublicado, construirConcepto } from './modelos_generados.js';
 import { PREFIJO, equiposDeMision, formaPublicada, medidaForma, sustitutoDe, limitesDe, textoPendiente } from './equipo_mision.js';
 import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM, leerPunto, idPunto, cargarPunto, textoPunto, MUNDOS_PUNTO } from './lugar.js';
 import { crearDia } from './panel_dia.js';
 import { celdaEspejo, textoDesplazamiento, filasEspejo, resumenEspejo, MARGEN_SOL_DEG, MARGEN_LUZ_FRAC } from './espejo.js';
+import { crearAsentamiento } from './panel_asentamiento.js';
+import { crearInforme } from '../informe/panel_informe.js';
+import { latLonAPixel } from './georef.js';
+import { esDeBase } from './asentamiento_ficha.js';
+import { webglDisponible, avisarSinWebgl } from '../portada/espacio.js';
 
 const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
@@ -26,10 +31,14 @@ const ID_LUGAR = LUGAR ? idLugar(LUGAR) : null;
 // Punto elegido en la Luna o Marte sin terreno de catálogo: su panel se hace en el momento, con la ventana del lugar.
 const PUNTO = LUGAR && !qs.get('b') ? leerPunto(location.search, LUGAR.lado_km) : null;
 const ID_PUNTO = PUNTO ? idPunto(PUNTO) : null;
+// Punto elegido dentro de un terreno lunar del catálogo (?b= con ?punto=): el terreno es el del catálogo y la base se centra en el punto.
+const PUNTO_CAT = LUGAR && qs.get('b') ? leerPunto(location.search, LUGAR.lado_km) : null;
 const MISION = qs.get('mision');
 const MES = qs.get('mes');
 const CLAVE = (id) => `analog-zero.retouch.${id}`;
-const CLAVE_PLANTADO = (id) => `analog-zero.planted.${id}`;
+// En una simulación (?lugar=) lo plantado se guarda por pareja de paneles: lo de otra simulación no aparece en esta.
+const PAREJA = LUGAR ? `@${ID_LUGAR}~${ID_PUNTO ?? qs.get('b') ?? '-'}${PUNTO_CAT ? `~${PUNTO_CAT.lat.toFixed(4)}_${PUNTO_CAT.lon.toFixed(4)}` : ''}` : '';
+const CLAVE_PLANTADO = (id) => `analog-zero.planted.${id}${PAREJA}`;
 const CUERPO = { luna: 'Moon', tierra: 'Earth', marte: 'Mars' };
 const NOMBRE_CAPA = { iluminacion: 'Illumination', sombra_permanente: 'Perm. shadow', temp_max: 'Max temp', temp_media: 'Mean temp' };
 const HERRAMIENTAS = [['navegar', 'Navigate'], ['subir', 'Raise'], ['bajar', 'Lower'], ['allanar', 'Flatten'], ['suavizar', 'Smooth']];
@@ -161,12 +170,12 @@ function rellenarTarjeta(p, datos) {
       <div><span class="et">Side</span><span class="num">${fmt(m.lado_km, 1)} <u>km</u></span></div>
       <div><span class="num">${fmt(m.m_por_px, 2)} <u>m/px</u></span></div>
     </div>
-    ${m.dinamico ? `<div class="muestreo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
-    ${m.punto ? `<div class="muestreo" data-muestreo-punto>${esc(textoPunto(m))}</div>` : ''}
+    ${m.dinamico ? `<div class="muestreo solo-fondo" data-muestreo>${esc(textoMuestreo(m))}</div>` : ''}
+    ${m.punto ? `<div class="muestreo solo-fondo" data-muestreo-punto>${esc(textoPunto(m))}</div>` : ''}
     ${m.imagen ? `<div class="fuente" data-imagen>${esc(m.imagen.texto)}</div>` : ''}
     <div class="fuente recorte">Elevation data: ${enlaceFuente(h)}${h.resolucion_origen_m && !m.dinamico ? ` · source ${esc(h.resolucion_origen_m)} m` : ''}${m.z_referencia ? ` · elev. ref. ${esc(m.z_referencia)}` : ''}${m.dinamico || m.punto ? ' · built live in your browser, not stored' : ''}</div>
     <div class="notas">${notas.map(esc).join(' · ')}</div>
-    ${m.notas ? `<details class="notas-meta"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
+    ${m.notas ? `<details class="notas-meta solo-fondo"><summary class="et">Notes</summary><div class="tenue" data-notas>${[].concat(m.notas).map(esc).join(' · ')}</div></details>` : ''}
     ${m.creditos?.length ? `<details class="notas-meta"><summary class="et">Credits</summary><div class="tenue" data-creditos>${m.creditos.map(esc).join(' · ')}</div></details>` : ''}`;
   if (m.dinamico) selectorVentana(p);
   p.el.querySelector('[data-k=res]').textContent = `${fmt(m.m_por_px, 2)} m/px`;
@@ -180,7 +189,7 @@ function selectorVentana(p) {
   s.className = 'seccion ventana';
   s.innerHTML = `<h3 class="marca-subtitulo">Window</h3>
     <div class="mandos-ventana">${LADOS_KM.map((k) => `<button type="button" data-lado-km="${k}" aria-pressed="${k === LUGAR.lado_km}">${k} km</button>`).join('')}</div>
-    <p class="tenue">A wider window is sampled more coarsely.</p>`;
+    <p class="tenue solo-fondo">A wider window is sampled more coarsely.</p>`;
   s.querySelectorAll('[data-lado-km]').forEach((b) => b.addEventListener('click', () => {
     if (+b.dataset.ladoKm === LUGAR.lado_km) return;
     const u = new URL(location.href);
@@ -195,11 +204,13 @@ function selectorVentana(p) {
 // Junto al equipo seleccionado (o el último plantado), mirándolo desde el sur; si no hay, en el centro mirando al norte.
 function puntoSuelo(p) {
   const e = p.escena, k = (e.n - 1) / 2;
-  const it = p.plantados?.buscar(p.sel) ?? p.plantados?.lista.at(-1) ?? null;
+  // Con una base generada y nada elegido: junto a su hábitat, que es el centro de la base.
+  const it = p.plantados?.buscar(p.sel) ?? p.plantados?.lista.find((x) => esDeBase(x) && x.equipo === 'habitat_superficie') ?? p.plantados?.lista.at(-1) ?? null;
   // Lugar de la Tierra sin nada plantado: mirando hacia donde más sube el terreno en la ventana.
   if (!it) return { fila: k, col: k, mirar: null, rumbo: e.meta.dinamico ? rumboHorizonte(e.mostradas, e.n, e.m, k, k)?.rumbo_deg ?? null : null };
   const tam = p.modelos?.instancias().find((x) => x.uid === it.uid)?.tam;
-  const d_m = Math.min(60, Math.max(10, 3 * Math.max(...(tam ?? [5]))));
+  // Pieza de una base: desde más lejos, para ver también lo que tiene alrededor.
+  const d_m = esDeBase(it) && p.sel === null ? 60 : Math.min(60, Math.max(10, 3 * Math.max(...(tam ?? [5]))));
   const sur = it.fila + d_m / e.m;
   // Volumen de una misión: desde el suroeste, para ver una cara al sol (por defecto del noroeste) y otra en sombra.
   if (equipoMisionDe(it.equipo)) {
@@ -339,11 +350,11 @@ function leyenda(p) {
       return [...k].sort((a, b) => a[0] - b[0]).map(([v, x]) => `${claseAgua(e.meta, v)} ${(100 * x / e.capas.agua.length).toFixed(x / e.capas.agua.length < 0.001 ? 3 : 1)} %`);
     })();
     partes.push(`<div data-leyenda="agua"><span class="et"><i class="muestra-agua"></i>Water · ${esc(p.clasesAgua.join(' · ') || 'none on this terrain')} of cells · not ground</span>
-      <div class="recorte"><span class="et">Source</span> ${enlaceFuente(c)}</div></div>`);
+      <div class="recorte solo-fondo"><span class="et">Source</span> ${enlaceFuente(c)}</div></div>`);
   }
   if (p.capa) {
     const c = e.meta.capas[p.capa];
-    const src = `<div class="recorte"><span class="et">Source</span> ${enlaceFuente(c)}${c.origen ? ` · origin: ${esc(c.origen)}` : ''}</div>`;
+    const src = `<div class="recorte solo-fondo"><span class="et">Source</span> ${enlaceFuente(c)}${c.origen ? ` · origin: ${esc(c.origen)}` : ''}</div>`;
     if (esBinaria(p.capa, c)) {
       partes.push(`<span class="et">${esc(NOMBRE_CAPA[p.capa] ?? p.capa)} · hatched = 1 (${esc(c.unidad)})</span>${src}`);
     } else {
@@ -398,6 +409,7 @@ function trasDibujar(p) {
   p.obra?.dibujar();
   p.volatiles?.dibujar();
   p.base?.dibujar();
+  estado.asentamiento?.dibujar(p);
 }
 
 function leerCursor(p, ev) {
@@ -668,6 +680,16 @@ function mirarPlantado(p, item) {
 // El otro panel, si es de otro mundo (Luna, Tierra o Marte): ahí va el gemelo de lo que se planta aquí.
 const otroPanel = (p) => estado.paneles.find((x) => x !== p && x.plantados && x.escena && x.escena.meta.cuerpo !== p.escena.meta.cuerpo) ?? null;
 const hayPolar = (...ps) => ps.some((x) => x.escena.meta.georef.tipo === 'estereo_polar');
+// Centro de la base en un panel: la celda del punto elegido si cae dentro de un terreno del catálogo; si no, el centro de la ventana.
+function centroBase(p) {
+  const e = p.escena, k = (e.n - 1) / 2;
+  if (PUNTO_CAT && MUNDOS_PUNTO[PUNTO_CAT.mundo].cuerpo === e.meta.cuerpo) {
+    const c = latLonAPixel(e.meta, PUNTO_CAT.lat, PUNTO_CAT.lon);
+    if (c.fila >= 0 && c.col >= 0 && c.fila <= e.n - 1 && c.col <= e.n - 1) return { fila: c.fila, col: c.col, punto: true };
+  }
+  return { fila: k, col: k, punto: !!PUNTO };
+}
+const rejillaDe = (p, item) => ({ n: p.escena.n, m: p.escena.m, alturas: p.escena.mostradas, centro: esDeBase(item) ? centroBase(p) : undefined });
 const gemeloDe = (p, item) => {
   const q = item?.par ? otroPanel(p) : null;
   return q ? { q, item: q.plantados.lista.find((x) => x.par === item.par) ?? null } : { q: null, item: null };
@@ -711,6 +733,35 @@ function plantarEn(p, id, fila, col) {
   guardarPlantado(p);
   refrescarPlantado();
   return item;
+}
+
+// Varias piezas de una vez (base generada), sin abrir ficha: quien llama refresca al acabar.
+function plantarLote(p, piezas) {
+  const items = piezas.map((x) => { const it = p.plantados.plantar(x.equipo, x.fila, x.col, x.par ?? null); crearMarca(p, it); return it; });
+  p.sel = null;
+  guardarPlantado(p);
+  return items;
+}
+
+function quitarLote(p, filtro) {
+  const fuera = p.plantados.lista.filter(filtro);
+  for (const it of fuera) {
+    p.plantados.quitar(it.uid);
+    const m = p.marcas.get(it.uid);
+    m?.d.remove(); m?.poli.remove();
+    p.marcas.delete(it.uid);
+    if (p.sel === it.uid) p.sel = null;
+  }
+  if (fuera.length) guardarPlantado(p);
+  return fuera.length;
+}
+
+// Abre la ficha de una pieza y la de su gemela en el otro panel.
+function seleccionar(p, uid) {
+  p.sel = uid;
+  const g = gemeloDe(p, p.plantados.buscar(uid));
+  if (g.item) g.q.sel = g.item.uid;
+  refrescarPlantado();
 }
 
 function pintarPaleta(p) {
@@ -853,6 +904,7 @@ function refrescarPlantado() {
     p.escena.sucio = true;
   }
   estado.dia?.refrescar();
+  estado.asentamiento?.refrescar();
 }
 
 function filaRequisito(r, meta) {
@@ -871,9 +923,9 @@ function filaRequisito(r, meta) {
   return `<div class="req ${r.estado}" data-var="${esc(q.variable)}">
     <div class="cab-req"><span class="nom-req">${esc(nom)}</span><span class="num aqui">${r.cota && Number.isFinite(r.valor) ? '≥ ' : ''}${esc(cantidad(r.valor, q.unidad, dec))}</span><span class="num lim">${esc(lim)}</span></div>
     <div class="veredicto">${ver}</div>
-    ${r.como ? `<div class="como">${esc(r.como)}${capa}</div>` : ''}
-    ${r.adicional ? `<div class="como adicional">${esc(r.adicional.texto)} · ${fuenteYCita(r.adicional.cifra)}</div>` : ''}
-    <div class="src">${esc(q.texto ?? '')} · ${fuenteYCita(q)}</div></div>`;
+    ${r.como ? `<div class="como solo-fondo">${esc(r.como)}${capa}</div>` : ''}
+    ${r.adicional ? `<div class="como adicional solo-fondo">${esc(r.adicional.texto)} · ${fuenteYCita(r.adicional.cifra)}</div>` : ''}
+    <div class="src solo-fondo">${esc(q.texto ?? '')} · ${fuenteYCita(q)}</div></div>`;
 }
 
 function pintarHoja(p) {
@@ -898,7 +950,7 @@ function pintarHoja(p) {
     ${med.agua >= 1 ? `<div class="aviso-agua" data-a="agua">On water —${esc(claseAgua(e.meta, med.agua))} in the ${enlaceAgua(e.meta)}: not ground</div>` : ''}
     <div class="tenue">${esc(eq.estado ?? '')}${eq.origen ? ' · own concept' : ''}</div>
     <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(cota, 1)} m${retocada ? (e.verOriginal ? ' (original view; this cell is retouched)' : ' (retouched)') : ''} · cell ${item.fila},${item.col}</div>
-    ${h ? `<div class="tenue">footprint ${h.forma === 'rect' ? `${h.largo_m} × ${h.ancho_m} m` : `hexagon ${h.entre_caras_m} m across flats`} (${esc(h.cifra.texto ?? h.cifra.nombre)}) · drawn to scale when zoomed in</div>` : ''}
+    ${h ? `<div class="tenue solo-fondo">footprint ${h.forma === 'rect' ? `${h.largo_m} × ${h.ancho_m} m` : `hexagon ${h.entre_caras_m} m across flats`} (${esc(h.cifra.texto ?? h.cifra.nombre)}) · drawn to scale when zoomed in</div>` : ''}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
     ${bloqueEspejo(p, item, (eq.requisitos ?? []).filter((r) => r.variable === 'pendiente_deg' && Number.isFinite(r.valor)).map((r) => ({ parametro: 'pendiente_grados', tipo: r.op === '>=' || r.op === '>' ? 'min' : 'max', valor: r.valor })))}
     <div class="cerca"></div>
@@ -907,7 +959,7 @@ function pintarHoja(p) {
     <div class="obra-pad"></div>
     <div class="vol-hoja"></div>
     ${comparacion(p, item, eq, evs)}
-    <details class="cifras-eq"><summary class="et">Figures (${cifras.length})</summary>${cifras.map((c) => `
+    <details class="cifras-eq solo-fondo"><summary class="et">Figures (${cifras.length})</summary>${cifras.map((c) => `
       <div class="cifra"><span>${esc(c.nombre)}</span> <span class="num">${c.valor === null || c.valor === undefined ? 'not public' : esc(Array.isArray(c.valor) ? c.valor.join(' – ') : c.valor)} ${esc(c.unidad ?? '')}</span>
       ${c.texto ? `<div class="tenue">${esc(c.texto)}</div>` : ''}${c.fuente ? `<div>${fuenteYCita(c)}</div>` : ''}</div>`).join('')}</details>`;
   hoja.querySelector('[data-a=cerrar]').addEventListener('click', () => { p.sel = null; refrescarPlantado(); });
@@ -930,6 +982,11 @@ async function cargarMision() {
 
 const volumenes = new Map();
 function modeloMision(id) {
+  // La planta de agua no tiene medidas publicadas: se dibuja con el concepto propio (rotulado «own design»).
+  if (id === 'planta_agua') {
+    if (!volumenes.has(id)) { try { volumenes.set(id, { generado: construirConcepto('planta_agua_concepto') }); } catch { return null; } }
+    return volumenes.get(id);
+  }
   const q = equipoMisionDe(id);
   if (!q) return null;
   if (q.sustituto) return { fichero: q.sustituto.modelo.fichero };
@@ -947,9 +1004,9 @@ function fichaLimites(q, pend, m, donde) {
   if (!lim.length) return '';
   return `<div class="limites-mision" data-limites="${esc(q.id)}"><div class="et">Published limits</div>${lim.map((l) => {
     const t = l.parametro === 'pendiente_grados' && l.unidad === 'deg' ? textoPendiente(pend, l, m) : null;
-    return `<div class="lim"><span class="num">${esc(l.texto)}</span> · ${fuenteYCita(l, 'source')}${l.nota ? `<div class="tenue">${esc(l.nota)}</div>` : ''}
+    return `<div class="lim"><span class="num">${esc(l.texto)}</span><span class="solo-fondo"> · ${fuenteYCita(l, 'source')}</span>${l.nota ? `<div class="tenue solo-fondo">${esc(l.nota)}</div>` : ''}
       ${t ? `<div class="pend-mision ${t.estado}" data-pendiente="${t.estado}">${esc(t.texto)}${donde ? ` · ${esc(donde)}` : ''}</div>` : ''}</div>`;
-  }).join('')}${MES ? '<div class="tenue">Month-by-month verdicts are in the Calendar tab of the results, not here.</div>' : ''}</div>`;
+  }).join('')}${MES ? '<div class="tenue solo-fondo">Month-by-month verdicts are in the Calendar tab of the results, not here.</div>' : ''}</div>`;
 }
 
 function seccionMision(p) {
@@ -980,12 +1037,12 @@ function paletaMision(p) {
 function pintarHojaMision(p, hoja, item, q) {
   const e = p.escena, l = e.leer(item.fila, item.col), f = q.forma, s = q.sustituto;
   const forma = s
-    ? `<div class="rotulo-volumen" data-volumen="sustituto">${esc(s.rotulo)} · ${fuenteYCita(s.cita, 'source')}</div>
+    ? `<div class="rotulo-volumen" data-volumen="sustituto">${esc(s.rotulo)}<span class="solo-fondo"> · ${fuenteYCita(s.cita, 'source')}</span></div>
       <div><span class="num">${esc(medidaTexto(s.modelo.medida_m))}</span> <span class="tenue">(length × width × height of the 3D model) · Credit: NASA${urlSegura(s.modelo.fuente_url) ? ` · <a href="${esc(s.modelo.fuente_url)}" target="_blank" rel="noopener">model source</a>` : ''}</span></div>
       ${f.forma ? '' : `<div class="tenue">${esc(q.nombre)}: ${esc(motivoSinForma(f))}</div>`}`
     : `<div class="rotulo-volumen" data-volumen="${esc(f.forma)}">${esc(f.rotulo)}</div>
       <div><span class="num">${esc(medidaTexto(medidaForma(f)))}</span> <span class="tenue">(${f.forma === 'domo' ? 'diameter × diameter × height' : 'length × width × height'})</span></div>
-      ${f.citas.map((c) => `<div class="dim">${esc(c.etiqueta)} <span class="num">${esc(c.valor)} ${esc(c.unidad)}${c.unidad === 'm' ? '' : ` (${c.m.toFixed(2)} m)`}</span> · ${fuenteYCita(c, 'source')}${c.nota ? ` <span class="tenue">${esc(c.nota)}</span>` : ''}</div>`).join('')}
+      ${f.citas.map((c) => `<div class="dim solo-fondo">${esc(c.etiqueta)} <span class="num">${esc(c.valor)} ${esc(c.unidad)}${c.unidad === 'm' ? '' : ` (${c.m.toFixed(2)} m)`}</span> · ${fuenteYCita(c, 'source')}${c.nota ? ` <span class="tenue">${esc(c.nota)}</span>` : ''}</div>`).join('')}
       ${f.supuesto ? `<div class="supuesto-mision">${esc(f.supuesto)}</div>` : ''}`;
   hoja.innerHTML = `
     <div class="cab-hoja"><span class="et">${esc(CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo)} · ${esc(e.meta.id)} · planted</span><button type="button" data-a="cerrar" title="Close">×</button></div>
@@ -1032,14 +1089,16 @@ function bloqueEspejo(p, item, limites) {
   const TXT = { igual: 'matches', distinto: 'differs', no_medible: 'cannot be measured' };
   const conDia = !!estado.dia?.estado.activo, sinDia = conDia && (!a.dia || !b.dia);
   // Si uno de los dos se ha arrastrado, ya no están a los mismos metros del centro: se dice.
-  const igual = (x, it, y, otro) => { const r = celdaEspejo({ n: x.escena.n, m: x.escena.m }, { n: y.escena.n, m: y.escena.m, alturas: y.escena.mostradas }, it.fila, it.col); return !!r && r.fila === otro.fila && r.col === otro.col; };
+  const igual = (x, it, y, otro) => { const r = celdaEspejo(rejillaDe(x, it), rejillaDe(y, it), it.fila, it.col); return !!r && r.fila === otro.fila && r.col === otro.col; };
+  const desde = esDeBase(item) && (centroBase(p).punto || centroBase(g.q).punto) ? 'your point' : 'the window centre';
   const simetrico = igual(p, item, g.q, g.item) || igual(g.q, g.item, p, item);
   return `<section class="espejo" data-espejo="${esc(item.par)}" data-simetrico="${simetrico}">
-    <div class="et">Same equipment on ${esc(CUERPO[g.q.escena.meta.cuerpo])} · ${simetrico ? `planted by the viewer at the same offset from the window centre${hayPolar(p, g.q) ? ' (same place on each map, not the same compass bearing)' : ''}` : 'planted by the viewer as its twin; one of the two has been moved since, so they no longer sit at the same offset'}</div>
+    <div class="et">Same equipment on ${esc(CUERPO[g.q.escena.meta.cuerpo])}<span class="solo-fondo"> · ${simetrico ? `planted by the viewer at the same offset from ${desde}${hayPolar(p, g.q) ? ' (same place on each map, not the same compass bearing)' : ''}` : 'planted by the viewer as its twin; one of the two has been moved since, so they no longer sit at the same offset'}</span></div>
     <div class="resumen-espejo">${R.map(([k, t]) => `<div data-r="${k}" class="r-${k}"><b>${t}</b> ${r[k].length ? esc(r[k].join(' · ')) : '<span class="tenue">nothing</span>'}</div>`).join('')}</div>
-    <table class="comp"><thead><tr><th></th><th>${esc(a.cuerpo)}</th><th>${esc(b.cuerpo)}</th><th>Reading</th></tr></thead><tbody>
+    <table class="comp solo-fondo"><thead><tr><th></th><th>${esc(a.cuerpo)}</th><th>${esc(b.cuerpo)}</th><th>Reading</th></tr></thead><tbody>
     ${filas.map((f) => `<tr class="esp-${f.lectura}" data-fila="${esc(f.id)}"><td>${esc(f.nombre)}</td><td class="num">${esc(f.a)}</td><td class="num">${esc(f.b)}</td><td><b>${TXT[f.lectura]}</b>${f.nota ? `<div class="motivo">${esc(f.nota)}</div>` : ''}</td></tr>`).join('')}</tbody></table>
-    <div class="tenue">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${conDia ? '' : ' Sun and light are compared once “Day” above is running: until then each Sun is just where its Display slider puts it.'}${sinDia ? ' Sunlit share of the day: still being worked out.' : ''}${conDia && hayPolar(xa, xb) ? ' On a lunar polar window the Sun height is the one set in Display.' : ''}</div>
+    <div class="tenue solo-simple">matches = within our own margin (own threshold, not from a source).</div>
+    <div class="tenue solo-fondo">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${conDia ? '' : ' Sun and light are compared once “Day” above is running: until then each Sun is just where its Display slider puts it.'}${sinDia ? ' Sunlit share of the day: still being worked out.' : ''}${conDia && hayPolar(xa, xb) ? ' On a lunar polar window the Sun height is the one set in Display.' : ''}</div>
     ${noReproducible(xa, xb)}</section>`;
 }
 
@@ -1050,7 +1109,7 @@ function comparacion(p, item, eq, evs) {
   const otroNombre = CUERPO[q.escena.meta.cuerpo];
   const noEns = eq.no_ensayable_tierra ?? [];
   const lista = noEns.length
-    ? noEns.map((x) => `<div class="no-ens"><b>${esc(FACTOR[x.factor] ?? x.factor ?? '')}</b> ${esc(x.texto ?? '')} · ${fuenteYCita(x)}</div>`).join('')
+    ? noEns.map((x) => `<div class="no-ens"><b>${esc(FACTOR[x.factor] ?? x.factor ?? '')}</b> ${esc(x.texto ?? '')}<span class="solo-fondo"> · ${fuenteYCita(x)}</span></div>`).join('')
     : '<div class="tenue">No public source states what cannot be tested on Earth for this system.</div>';
   const cab = `<div class="et">Moon vs Earth · ${esc(luna ? p.escena.meta.id : q.escena.meta.id)} vs ${esc(luna ? q.escena.meta.id : p.escena.meta.id)}</div>`;
   if (!otro) return `${cab}<div class="tenue">plant a ${esc(nombreCorto(item.equipo))} on the ${esc(otroNombre)} panel to compare</div><div class="et">Not testable on Earth (catalogue)</div>${lista}`;
@@ -1067,8 +1126,9 @@ function comparacion(p, item, eq, evs) {
   const margenes = [...new Set(evs.map((r) => r.req.variable))].filter((v) => MARGEN[v]).map((v) => `${VARIABLE[v] ?? v} ± max(${MARGEN[v].abs}, ${Math.round(MARGEN[v].rel * 100)} %)`).join(' · ');
   const bases = evs.some((r) => r.req.variable === 'pendiente_deg') ? notaBasesPendiente(luna ? p.escena.m : q.escena.m, luna ? q.escena.m : p.escena.m) : null;
   return `${cab}${evs.length ? `<table class="comp"><thead><tr><th></th><th>Moon</th><th>Earth</th><th>Reading</th></tr></thead><tbody>${filas}</tbody></table>
-    ${bases ? `<div class="motivo" data-nota="bases">${esc(bases)}</div>` : ''}
-    <div class="tenue">reproduced = Earth within a margin of the Moon value; own threshold, not from a source: ${esc(margenes)}</div>` : ''}
+    ${bases ? `<div class="motivo solo-fondo" data-nota="bases">${esc(bases)}</div>` : ''}
+    <div class="tenue solo-simple">reproduced = within our own margin (own threshold, not from a source).</div>
+    <div class="tenue solo-fondo">reproduced = Earth within a margin of the Moon value; own threshold, not from a source: ${esc(margenes)}</div>` : ''}
     <div class="et">Not testable on Earth (catalogue)</div>${lista}`;
 }
 
@@ -1119,7 +1179,7 @@ function cargasIpex(p, vol) {
   const n1 = (x) => (x >= 100 ? fmtVol(x) : fmt(x, 1));
   const rho = dens.map((d) => d.valor / 1000).sort((a, b) => a - b);
   caja.innerHTML = `<span class="et">Cut ≈ IPEx loads</span> <span class="num">${c.min === c.max ? n1(c.min) : `${n1(c.min)}–${n1(c.max)}`}</span>
-    <div class="tenue">cut × regolith bulk density ${rho.map((x) => x.toFixed(2)).join('–')} t/m³ (surface–below 1 m) ${fuenteYCita(dens[0])} ÷ ${fmtVol(carga.valor)} kg per IPEx reference mission ${fuenteYCita(carga)}</div>`;
+    <div class="tenue solo-fondo">cut × regolith bulk density ${rho.map((x) => x.toFixed(2)).join('–')} t/m³ (surface–below 1 m) ${fuenteYCita(dens[0])} ÷ ${fmtVol(carga.valor)} kg per IPEx reference mission ${fuenteYCita(carga)}</div>`;
 }
 
 // ---------- Ampliar ----------
@@ -1267,6 +1327,7 @@ async function iniciar() {
   const notaEsc = document.getElementById('nota-escala');
   if (lados.length === 2 && Math.abs(lados[0] - lados[1]) > 1e-6) notaEsc.textContent = `extents differ (${lados[0]} km vs ${lados[1]} km) · shown at the same horizontal scale`;
   else if (lados.length === 2) notaEsc.textContent = `same horizontal scale · ${lados[0]} km each`;
+  notaEsc.title = notaEsc.textContent;
   [pa, pb].forEach((p, i) => {
     const d = res[i];
     if (!d) return;
@@ -1295,11 +1356,17 @@ async function iniciar() {
       console.error(e);
       mostrarError(p, `terrain could not be shown: ${p.id} (${e.message})`);
       p.escena = null;
+      if (!webglDisponible()) avisarSinWebgl();
     }
   });
   enlazarCamaras();
   const mesUrl = /^([1-9]|1[0-2])$/.test(MES ?? '') ? +MES : null;
   estado.dia = crearDia(document.getElementById('dia'), { paneles: estado.paneles, esc, nombreCorto, CUERPO, mes: mesUrl, alCambiar: refrescarPlantado });
+  estado.asentamiento = crearAsentamiento(document.getElementById('asentamiento'), { paneles: estado.paneles, catalogo: estado.catalogo, esc, fuenteYCita, nombreCorto, CUERPO, equipoDe,
+    dia: () => estado.dia, plantarLote, quitarLote, seleccionar, refrescarPlantado, evaluar, medidasDe, alternarSuelo, centroDe: centroBase });
+  estado.informe = crearInforme(document.getElementById('informe'), { paneles: estado.paneles, catalogo: estado.catalogo, cuerpos: estado.cuerpos, dia: () => estado.dia,
+    asentamiento: () => estado.asentamiento, evaluar, equipoDe, nombreCorto, CUERPO, lugar: LUGAR, punto: PUNTO ?? PUNTO_CAT, mision: MISION, mes: MES,
+    exag: () => estado.exag, espejo: () => estado.espejo, ejemplo: EJEMPLO, centroDe: centroBase });
   refrescarPlantado();
   const solo = [pa, pb].find((p) => p.id && p.id === sel.solo);
   if (solo?.escena) alternarAmpliado(solo, true);

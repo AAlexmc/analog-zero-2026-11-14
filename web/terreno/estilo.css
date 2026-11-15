@@ -24,6 +24,12 @@ u { text-decoration: none; color: var(--tenue); }
 .marca { font-family: var(--titulo); font-weight: 900; font-size: 15px; letter-spacing: .06em; text-decoration: none; }
 .hueco { flex: 1; }
 .nota-escala { color: var(--tenue); font-size: 13px; }
+/* La barra va en una línea: la nota de escala cede sitio (entera en su title) y por debajo de 1500 px los mandos se aprietan. */
+.marca-barra .nota-escala { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 761px) and (max-width: 1500px) {
+  .marca-barra { gap: 12px; }
+  .marca-barra .grupo input[type=range] { width: 70px; }
+}
 .marca-barra .marca-nombre, .marca-barra a.marca-enlace, .marca-barra .conm, .marca-barra .grupo { white-space: nowrap; }
 .grupo { display: inline-flex; align-items: center; gap: 6px; }
 input[type=range] { width: 92px; accent-color: var(--blanco); height: 14px; margin: 0; }
@@ -32,9 +38,12 @@ button, .boton { font: 700 13px/1 var(--sans); color: var(--blanco); background:
 button:hover, .boton:hover, button:focus-visible { color: var(--ambar); border-color: var(--ambar); outline: none; }
 button[aria-pressed=true], .marca-boton.secundario[aria-pressed=true] { background: var(--electric-blue); color: var(--blanco); border-color: var(--blue-yonder); }
 button:disabled, button:disabled:hover { opacity: .45; cursor: default; color: var(--blanco); border-color: var(--linea); }
+/* Botón principal (fondo blanco o amarillo): el texto sigue en deep blue al pasar, enfocar o apagarse. */
+.marca-boton:not(.secundario):not([aria-pressed=true]):hover, .marca-boton:not(.secundario):not([aria-pressed=true]):focus-visible, .marca-boton:not(.secundario):not([aria-pressed=true]):disabled { color: var(--fondo); }
 .marca-barra .conm { font-size: 13px; padding: 8px 14px; }
 .acciones .marca-boton { font-size: 14px; padding: 10px 16px; min-height: 40px; }
 .acciones .marca-boton.secundario, .acciones .marca-boton.secundario:hover, .acciones .marca-boton.secundario:focus-visible { background: transparent; }
+.marca-boton:not(.secundario)[aria-pressed=true]:hover, .marca-boton:not(.secundario)[aria-pressed=true]:focus-visible { background: var(--electric-blue); color: var(--ambar); border-color: var(--ambar); }
 .acciones .marca-boton[aria-pressed=true] { background: var(--electric-blue); color: var(--blanco); border-color: var(--blue-yonder); }
 .acciones .marca-boton:disabled { color: var(--blanco); border-color: var(--blanco); }
 .acciones .marca-boton:not(.secundario):disabled { color: var(--fondo); }
@@ -164,8 +173,9 @@ body[data-unico] .panel[data-lado=b] { display: none; }
 .marcas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .huellas { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .huellas polygon { fill: rgba(255, 255, 255, .25); stroke: var(--blanco); stroke-width: 1.5; }
-.marcas .marca { position: absolute; pointer-events: auto; cursor: grab; white-space: nowrap; transform: translate(-7px, -7px); touch-action: none; }
-.marcas .marca .pin { display: inline-block; width: 14px; height: 14px; vertical-align: middle; border: 2px solid var(--blanco); background: rgba(7, 23, 63, .6); transform: rotate(45deg) scale(.75); }
+/* Sin transform en la marca (no crea contexto propio): así el rombo de cualquier marca queda por encima del rótulo de las vecinas. */
+.marcas .marca { position: absolute; pointer-events: auto; cursor: grab; white-space: nowrap; margin: -7px 0 0 -7px; touch-action: none; }
+.marcas .marca .pin { position: relative; z-index: 1; display: inline-block; width: 14px; height: 14px; vertical-align: middle; border: 2px solid var(--blanco); background: rgba(7, 23, 63, .6); transform: rotate(45deg) scale(.75); }
 .marcas .marca.con-huella .pin { background: transparent; }
 .marcas .marca .rot { margin-left: 5px; font: 700 12px/1.2 var(--sans); letter-spacing: 0; padding: 2px 8px; background: var(--panel); border: 1px solid var(--linea); border-radius: 999px; vertical-align: middle; }
 .panel.pintando .marca { pointer-events: none; }

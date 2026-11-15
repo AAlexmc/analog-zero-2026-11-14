@@ -225,10 +225,10 @@ function pintarLeyenda(capa, res) {
   }
   const filas = estadosLeyenda(capa, res.cuenta, par);
   for (const f of filas) {
-    const val = Number.isFinite(f.nValidacion) ? ` <span class="tenue">(<span class="num">${f.nValidacion}</span>)</span>` : '';
+    const val = Number.isFinite(f.nValidacion) ? ` <span class="tenue solo-fondo">(<span class="num">${f.nValidacion}</span>)</span>` : '';
     partes.push(`<div data-v="${f.id}">${muestra(f.color)}${esc(f.texto)}<span class="sep">·</span><span class="num">${f.n}</span> cells${val}</div>`);
   }
-  if (filas.some((f) => Number.isFinite(f.nValidacion))) partes.push('<div class="tenue cita">(in brackets: cells in the validation set, which leaves out land south of 60° S except McMurdo)</div>');
+  if (filas.some((f) => Number.isFinite(f.nValidacion))) partes.push('<div class="tenue cita solo-fondo">(in brackets: cells in the validation set, which leaves out land south of 60° S except McMurdo)</div>');
   partes.push(`<div class="simbolos"><span><i class="sim mejor"></i>best candidate</span><span><i class="sim cand"></i>top ${N_MARCAS} candidates</span>`
     + `<span><i class="sim sitio"></i>known test site</span><span><i class="sim t3d"></i>3D terrain</span><span><i class="sim costa"></i>coast (from data mask)</span></div>`);
   $('leyenda').innerHTML = agruparLeyenda(partes);
@@ -286,7 +286,7 @@ function pintarLeyendaCond(res) {
     if (res.cuenta.sin_acceso) partes.push(`<div>${muestra(COLOR.sinDato)}no travel-time data<span class="sep">·</span><span class="num">${res.cuenta.sin_acceso}</span> cells</div>`);
   }
   if (res.cuenta.sin_dato) partes.push(`<div>${muestra(COLOR.sinDato)}no data<span class="sep">·</span><span class="num">${res.cuenta.sin_dato}</span> cells</div>`);
-  partes.push(`<details class="fuentes"><summary>Source and method</summary>${fuentes}</details>`);
+  partes.push(`<details class="fuentes solo-fondo"><summary>Source and method</summary>${fuentes}</details>`);
   partes.push(`<div class="simbolos"><span><i class="sim sitio"></i>known test site</span><span><i class="sim t3d"></i>3D terrain</span><span><i class="sim costa"></i>coast (from data mask)</span></div>`);
   $('leyenda').innerHTML = agruparLeyenda(partes);
 }
@@ -314,16 +314,16 @@ async function abrirHojaCond(fila, col) {
     const q = f.req;
     const aqui = q.tratamiento === 'condicion' ? fmtValor(f.valor, c.man.condiciones?.[q.condicion]?.unidad ?? '') : '—';
     const ver = f.veredicto === 'terreno' ? `<a href="${esc(visor)}">${esc(f.texto)}</a>` : esc(f.texto);
-    const motivo = f.veredicto === 'no_evaluado' && q.motivo ? `<div class="cita">${esc(q.motivo)}</div>` : '';
+    const motivo = f.veredicto === 'no_evaluado' && q.motivo ? `<div class="cita solo-fondo">${esc(q.motivo)}</div>` : '';
     let sub = '';
     if (f.rompe) {
       const labs = q.laboratorios ?? [];
-      sub = `<div class="sub">${esc(q.camara ?? 'chamber only')}${labs.length ? ': ' : ''}${labs.map((l) => `${esc(l.nombre)} — “${esc(l.cita)}” ${enlace(l.fuente, 'source')}`).join('; ')}</div>`;
+      sub = `<div class="sub solo-fondo">${esc(q.camara ?? 'chamber only')}${labs.length ? ': ' : ''}${labs.map((l) => `${esc(l.nombre)} — “${esc(l.cita)}” ${enlace(l.fuente, 'source')}`).join('; ')}</div>`;
     }
     return `<div class="req-cond" data-indice="${esc(q.indice)}"><div class="ver${f.rompe ? ' v-rompe' : ''}" data-v="veredicto">${ver}</div>${motivo}`
       + `<div>${esc(q.texto ?? q.variable)}</div>`
       + `<div><span class="tenue">limit</span> <span class="num">${esc(limiteTxt(q))}</span><span class="sep">·</span><span class="tenue">here</span> <span class="num">${esc(aqui)}</span></div>`
-      + `<div class="cita">“${esc(q.cita)}” ${enlace(q.fuente, 'source')}</div>${sub}</div>`;
+      + `<div class="cita solo-fondo">“${esc(q.cita)}” ${enlace(q.fuente, 'source')}</div>${sub}</div>`;
   }).join('');
   const entorno = ['oscuridad_max_h', 'sol_rasante_h_ano', 't_min_alcanzable_k', 'tiempo_ciudad_h'].map((id) => {
     const k = canalDe(c.man, id);
@@ -333,11 +333,11 @@ async function abrirHojaCond(fila, col) {
     <div class="cab-hoja"><div><div class="et">Test conditions<span class="sep">·</span>${esc(c.eq.nombre)}</div>
       <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
     <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
-    <div class="tenue">${esc(c.man.rotulo ?? '')}</div>
+    <div class="tenue solo-fondo">${esc(c.man.rotulo ?? '')}</div>
     <div class="bloque"><h4>Design limits vs this place</h4>${filas.length
       ? `<div class="cond">${html}</div>`
       : '<div class="tenue" data-v="sin-requisitos">no design limits in the catalog for this equipment</div>'}</div>
-    <details class="bloque tabla" open><summary>Conditions in this cell</summary><table class="comp"><tbody>${entorno}</tbody></table></details>
+    <details class="bloque tabla solo-fondo" open><summary>Conditions in this cell</summary><table class="comp"><tbody>${entorno}</tbody></table></details>
     <div class="bloque puente"><h4>Plant equipment here</h4>${puenteTerreno(terrenos, estado.lunaCond)}</div>`;
   $('hoja').querySelector('[data-a=cerrar]').addEventListener('click', cerrarHoja);
   $('aviso').hidden = true;
@@ -427,7 +427,7 @@ function pintarValidacion() {
     const fallo = r.h1.veredicto === 'fallo';
     const ver = r.h1.veredicto ? `<span data-v="veredicto" class="val-titular${fallo ? ' v-rompe' : ''}">Pre-registered test ${fallo ? 'FAILED — read this ranking as exploratory' : esc(r.h1.veredicto)}</span>` : '';
     linea = `${ver} <span class="val-cifras"><span data-v="h1">The ranking recovers ${b(r.h1.k)} of ${b(r.h1.n)} known analogs (baseline k₀ ${b(r.h1.k0)})</span>`
-      + `<span class="sep">·</span><span data-v="h1s">combined score (H1-S) ${b(r.h1s.k)} of ${b(r.h1s.n)}${r.h1s.noEval ? ` (${b(r.h1s.noEval)} not evaluable)` : ''}</span><span class="sep">·</span><span data-v="h3">sign predictions (H3) ${b(r.h3.aciertos)} of ${b(r.h3.de)}</span>`
+      + `<span class="solo-fondo"><span class="sep">·</span><span data-v="h1s">combined score (H1-S) ${b(r.h1s.k)} of ${b(r.h1s.n)}${r.h1s.noEval ? ` (${b(r.h1s.noEval)} not evaluable)` : ''}</span><span class="sep">·</span><span data-v="h3">sign predictions (H3) ${b(r.h3.aciertos)} of ${b(r.h3.de)}</span></span>`
       + `${frac ? `<span class="sep">·</span><span data-v="frac">${frac}</span>` : ''}</span> ${boton}`;
   }
   const sombras = resumenSombras(estado.sombras);
@@ -515,13 +515,13 @@ async function abrirHoja(fila, col) {
     <div class="cab-hoja"><div><div class="et">${esc(par.nombre_objetivo)}<span class="sep">·</span>${esc(par.mision)} ${esc(par.nombre_mision ?? '')}</div>
       <h3>${esc(lugar?.nombre ?? 'Unnamed cell')}</h3></div><button type="button" data-a="cerrar" title="Close (Esc)" aria-label="Close">×</button></div>
     <div class="lugar num">${fmtLat(lat)} ${fmtLon(lon)}<span class="sep">·</span>row ${fila} col ${col}</div>
-    <div class="tenue">cell ${esc(r.paso)}° (~${Math.floor(r.paso * KM_GRADO_ECUADOR)} km at the equator)${lugar ? `<span class="sep">·</span>known place within 1 cell` : ''}</div>${cerca}
+    <div class="tenue solo-fondo">cell ${esc(r.paso)}° (~${Math.floor(r.paso * KM_GRADO_ECUADOR)} km at the equator)${lugar ? `<span class="sep">·</span>known place within 1 cell` : ''}</div>${cerca}
     <div class="situacion">${situacion}</div>
     <div class="cifras"><div><span class="et">Similarity S</span>${sTxt}</div><div><span class="et">Data coverage C</span><span class="num grande" data-v="C">${esc(textoValor(cob, canC[0]))}</span></div></div>
     <div class="bloque"><h4>Similarity by dimension</h4>${petalos.length ? florSVG(petalos) : '<div class="tenue">no weighted dimensions in this mission</div>'}
-      <div class="nota-flor">Petal length = similarity of that dimension (centre 0, outer ring 1; inner ring 0.5). <span class="v-rompe">Split red petal</span> = breaks (s &lt; ${ROMPE}). Hatched = no data. Only S carries a p5–p95 interval in the export.</div></div>
+      <div class="nota-flor solo-fondo">Petal length = similarity of that dimension (centre 0, outer ring 1; inner ring 0.5). <span class="v-rompe">Split red petal</span> = breaks (s &lt; ${ROMPE}). Hatched = no data. Only S carries a p5–p95 interval in the export.</div></div>
     <div class="bloque"><h4>Gates</h4>${puertas.map((p) => `<div class="puerta ${p.estado}"><span class="est">${ESTADO_P[p.estado]}</span> ${esc(p.texto ?? p.id)}</div>`).join('') || '<div class="tenue">no gates in manifest</div>'}</div>
-    <details class="bloque tabla"><summary>All values in this cell</summary><table class="comp"><thead><tr><th>Variable</th><th>Here</th><th>Unit note / source</th></tr></thead><tbody>${filas.join('')}</tbody></table></details>
+    <details class="bloque tabla solo-fondo"><summary>All values in this cell</summary><table class="comp"><thead><tr><th>Variable</th><th>Here</th><th>Unit note / source</th></tr></thead><tbody>${filas.join('')}</tbody></table></details>
     <div class="bloque puente"><h4>Plant equipment here</h4>${puente}</div>`;
   $('hoja').querySelector('[data-a=cerrar]').addEventListener('click', cerrarHoja);
   $('aviso').hidden = true;

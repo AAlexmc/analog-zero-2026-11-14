@@ -15,6 +15,16 @@ export function webglDisponible() {
   } catch { return false; }
 }
 
+// Sin WebGL los mundos y los terrenos no se dibujan: se dice en una franja, una sola vez por página.
+export function avisarSinWebgl() {
+  if (document.querySelector('.marca-sin-3d')) return;
+  const d = document.createElement('div');
+  d.className = 'marca-sin-3d';
+  d.setAttribute('role', 'status');
+  d.textContent = 'This browser is not drawing 3D (WebGL is off, or the graphics driver is not loaded), so the worlds and terrains do not appear. Lists and figures still work. Open the page in a browser with WebGL to see them.';
+  document.body.appendChild(d);
+}
+
 export function crearRenderer(canvas) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

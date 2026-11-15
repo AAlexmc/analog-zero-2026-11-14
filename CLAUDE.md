@@ -52,7 +52,8 @@ Lo que pide el enunciado y no se puede olvidar: ir más allá del parecido visua
 | `web/relieve/` | Vista de terreno local en 3D |
 | `web/mapa/` | Mapa global de condiciones de ensayo |
 | `web/terreno/` | Visor de terreno, equipo, rutas, obra, base, hielo y agua |
-| `web/marca/`, `web/lib/` | Marca del concurso; three.js y fuentes |
+| `web/informe/` | Informe de la simulación: recogida de datos, gráficos SVG y documento HTML autocontenido |
+| `web/marca/`, `web/lib/` | Marca del concurso (y modo de lectura Simple / In depth: clases `solo-fondo`, `solo-simple`); three.js y fuentes |
 | `web/data/` | Datos que lee la web. **Solo los escribe el pipeline** |
 | `datos_json/` | Catálogos con fuente y cita literal (equipo, sitios, constantes) |
 | `pipeline/` | Python que genera `web/data/` desde datos públicos |

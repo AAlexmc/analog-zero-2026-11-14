@@ -11,6 +11,7 @@
 <script type="importmap">
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
+<script type="module" src="../marca/modo.js"></script>
 </head>
 <body class="marca-fondo marca-cuerpo explorar">
 <canvas id="globo" aria-label="Globe. Drag to turn, scroll or pinch to zoom, tap to drop a pin."></canvas>
@@ -30,7 +31,7 @@
     <form class="mision-nueva" id="mision-nueva" hidden>
       <label class="mision-rotulo" for="mision-titulo">Mission title</label>
       <input type="text" id="mision-titulo" maxlength="60" autocomplete="off">
-      <p class="tenue nota">No mission is applied until you press the button below.</p>
+      <p class="tenue nota solo-fondo">No mission is applied until you press the button below.</p>
       <fieldset id="nueva-punto"><legend id="nueva-punto-titulo">Compared with your point</legend></fieldset>
       <fieldset id="nueva-tierra"><legend>Earth only — compared with a test site</legend>
         <label class="mision-rotulo" for="mision-ref">Test site</label>
@@ -45,9 +46,9 @@
   <section class="sitio" id="sitio" hidden>
     <details class="criterios" id="criterios">
       <summary class="marca-subtitulo"><span class="num-paso marca-num">2</span> What makes a good base site?</summary>
-      <p class="ambito" id="ambito"></p>
+      <p class="ambito solo-fondo" id="ambito"></p>
       <div class="lista-criterios" id="lista-criterios"></div>
-      <p class="tenue pesos-propios" id="pesos-propios" hidden>Own weights: NASA lists the criteria, not how much each one weighs.</p>
+      <p class="tenue pesos-propios solo-fondo" id="pesos-propios" hidden>Own weights: NASA lists the criteria, not how much each one weighs.</p>
       <details class="no-medidos" id="no-medidos" hidden>
         <summary>NASA also considers (not measured here)</summary>
         <ul id="no-medidos-lista"></ul>
@@ -78,6 +79,7 @@
     <a class="marca-boton grande" href="../index.html">Back to all worlds</a>
   </section>
   <p class="credito" id="credito"></p>
+  <p class="nota-modo solo-simple">Sources and method: switch to In depth.</p>
 </aside>
 <div class="opciones" id="opciones" role="group" aria-label="Other good spots"></div>
 <div class="opciones de-mision" id="opciones-mision" role="group" aria-label="Spots for this mission"></div>

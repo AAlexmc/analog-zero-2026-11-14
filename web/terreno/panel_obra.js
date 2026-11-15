@@ -290,7 +290,7 @@ export function crearObra(p, ctx) {
   function camposFlota() {
     const F = O.F, nom = esc(ctx.nombreCorto(ROBOT_REF));
     return `${campo('robots', 'ROBOTS', O.flota.n_robots, '', `<span class="supuesto">assumed</span> · number of ${nom}, editable`, 1)}
-      <div class="tenue nota-o">reference robot: ${nom} · ${F.ritmo_kg_h ? `excavates ${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited excavation rate'} · ${F.mision_kg ? `designed for up to ${fmt.masa(F.mision_kg.valor)} in a lunar day ${cita(F.mision_kg.ref)}` : ''}</div>`;
+      <div class="tenue nota-o solo-fondo">reference robot: ${nom} · ${F.ritmo_kg_h ? `excavates ${esc(F.ritmo_kg_h.valor)} kg/h ${cita(F.ritmo_kg_h.ref)}` : 'no cited excavation rate'} · ${F.mision_kg ? `designed for up to ${fmt.masa(F.mision_kg.valor)} in a lunar day ${cita(F.mision_kg.ref)}` : ''}</div>`;
   }
   function leerFlota(raiz) {
     const r = +raiz.querySelector('[data-o="robots"]')?.value;
@@ -326,7 +326,7 @@ export function crearObra(p, ctx) {
     const cal = luna && fl.evaluable && fl.calendario_dias !== null
       ? ` · calendar = excavation ÷ mean illumination ${que} (LOLA layer${x.luz.sin_dato ? `, ${x.luz.sin_dato} of ${x.luz.total} cells without data` : ''}) · <span class="propio">own estimate</span>: robots work only while lit; no night survival stated for ${nom}`
       : '';
-    return `<div class="tenue nota-o">${masa}${tiempo}${cal}</div>`;
+    return `<div class="tenue nota-o solo-fondo">${masa}${tiempo}${cal}</div>${cal ? '<div class="tenue nota-o solo-simple">Calendar days: <span class="propio">own estimate</span>.</div>' : ''}`;
   }
 
   // ---------- A y B: carretera ----------
@@ -341,7 +341,7 @@ export function crearObra(p, ctx) {
     if (tr.tipo === 'sin') {
       sec.innerHTML = `<div class="et sub">ROAD · no route within ${esc(nom)}'s ${tr.r.limite}°</div>
         <div class="botones"><button type="button" data-o="disenar" ${tr.vigente && !O.ocupado ? '' : 'disabled'}>Design a road down</button></div>
-        <div class="tenue nota-o">trace = least-cost path with the slope limit relaxed to ${fmt.grados(tr.r.umbral, 2)} (the least that connects FROM and TO on this DEM); its grade is then cut and filled to ${esc(nom)}'s ${tr.r.limite}°</div>
+        <div class="tenue nota-o solo-fondo">trace = least-cost path with the slope limit relaxed to ${fmt.grados(tr.r.umbral, 2)} (the least that connects FROM and TO on this DEM); its grade is then cut and filled to ${esc(nom)}'s ${tr.r.limite}°</div>
         ${O.errDiseno ? `<div class="sin-ruta">${esc(O.errDiseno)}</div>` : ''}${aplicadaHtml()}`;
       sec.querySelector('[data-o=disenar]').addEventListener('click', () => disenar(tr.r));
       dibujar();
@@ -364,7 +364,7 @@ export function crearObra(p, ctx) {
         ${perfilSvg(x.s, x.z, x.zp)}
         <div class="tenue nota-o"><i class="m-corte"></i>cut <i class="m-relleno"></i>fill · grey = terrain, white = grade · vertical scale exaggerated</div>
         ${filasResultado(x, `<dt>LENGTH</dt><dd class="num" data-o="longitud">${fmt.km(x.longitud_m)}</dd>`)}
-        <div class="tenue nota-o">grade: least earth moved with every step ≤ ${fmt.grados(x.diseno_deg, 4)} (design grade less the float32 rounding of the elevations), both ends on the terrain; road ${fmt.m(x.ancho_m)} wide, vertical sides${tr.tipo === 'diseno' ? `; trace found with the limit at ${fmt.grados(tr.umbral, 2)}` : ''}</div>
+        <div class="tenue nota-o solo-fondo">grade: least earth moved with every step ≤ ${fmt.grados(x.diseno_deg, 4)} (design grade less the float32 rounding of the elevations), both ends on the terrain; road ${fmt.m(x.ancho_m)} wide, vertical sides${tr.tipo === 'diseno' ? `; trace found with the limit at ${fmt.grados(tr.umbral, 2)}` : ''}</div>
         ${notasMasa(x, 'along the trace')}`;
     }
     const noMedido = `<div class="no-medido" data-o="no-medido">cross slope, rocks, bearing capacity: NOT MEASURED (DEM ${e.m.toFixed(1)} m/px, road ${O.ancho > 0 && O.ancho < e.m ? 'narrower than a cell' : 'applied to one cell per step'})</div>`;
@@ -448,7 +448,7 @@ export function crearObra(p, ctx) {
     return `<div class="aplicada" data-o="aplicada"><div class="et">APPLIED · road along ${a.camino.length} cells</div>${obs}
       <dl><dt>STEPS OVER ${a.limite}°</dt><dd class="num" data-o="pasos-antes-despues">${a.antes.pasos} → ${a.despues.pasos}</dd>
       <dt>CELL SLOPE OVER ${a.limite}°</dt><dd class="num" data-o="celdas-antes-despues">${a.antes.celdas} → ${a.despues.celdas}</dd></dl>
-      <div class="tenue nota-o">steps = grade between consecutive cells of the trace (what the road fixes and what the Route tool checks along it); cell slope = DEM gradient at each trace cell, which includes the untouched terrain beside it (the cross slope, not used for routes on the road)</div>
+      <div class="tenue nota-o solo-fondo">steps = grade between consecutive cells of the trace (what the road fixes and what the Route tool checks along it); cell slope = DEM gradient at each trace cell, which includes the untouched terrain beside it (the cross slope, not used for routes on the road)</div>
       <div class="tenue nota-o" data-o="ruta-ahora">${ahora}</div></div>`;
   }
 
@@ -487,7 +487,7 @@ export function crearObra(p, ctx) {
       cuerpo = `<dl><dt>PLANE SLOPE</dt><dd class="num" data-o="pad-pend">${fmt.grados(x.pend_antes_deg, 2)} → ${fmt.grados(x.pend_despues_deg, 2)}</dd></dl>
         ${x.sub_celda ? `<div class="aviso-obs" data-o="sub-celda">narrower than ${DIAMETRO_SUBCELDA} DEM cells (${fmt.m(DIAMETRO_SUBCELDA * e.m)}): estimate from the local slope only, terrain not modified, Apply off</div>` : ''}
         ${filasResultado(x)}
-        <div class="tenue nota-o">${x.sub_celda ? `tilted disc ${fmt.m(x.diametro_m)} brought from the cell slope to the limit` : `least-squares plane over ${x.celdas} cells of ${e.m.toFixed(1)} m, tilted down to ${fmt.grados(x.diseno_deg, 4)} (limit less the float32 rounding of the elevations) about its mean elevation`}</div>
+        <div class="tenue nota-o solo-fondo">${x.sub_celda ? `tilted disc ${fmt.m(x.diametro_m)} brought from the cell slope to the limit` : `least-squares plane over ${x.celdas} cells of ${e.m.toFixed(1)} m, tilted down to ${fmt.grados(x.diseno_deg, 4)} (limit less the float32 rounding of the elevations) about its mean elevation`}</div>
         ${notasMasa(x, 'over the pad')}`;
     }
     const puede = x?.factible && !x.sub_celda && !e.verOriginal;
@@ -527,7 +527,7 @@ export function crearObra(p, ctx) {
     const obs = a.version === R()?.version && a.fila === item.fila && a.col === item.col ? '' : '<div class="aviso-obs">terrain or position changed since</div>';
     return `<div class="aplicada" data-o="pad-aplicada"><div class="et">APPLIED · pad over ${a.celdas} cells</div>${obs}
       <dl><dt>CELL SLOPE HERE</dt><dd class="num" data-o="pad-celda">${fmt.grados(a.antes, 2)} → ${fmt.grados(a.despues, 2)}</dd></dl>
-      <div class="tenue nota-o">cell slope = the value the requirement above is checked against</div></div>`;
+      <div class="tenue nota-o solo-fondo">cell slope = the value the requirement above is checked against</div></div>`;
   }
 
   // ---------- Dibujo sobre el terreno ----------

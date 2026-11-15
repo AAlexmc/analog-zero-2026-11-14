@@ -53,6 +53,7 @@
 .marca-panel { background: var(--panel); border: 1px solid var(--linea); border-radius: var(--radio); }
 .marca-chip { display: inline-block; font: 700 12px/1 var(--cuerpo); letter-spacing: .06em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--linea); border-radius: 999px; }
 .marca-boton.grande { font-size: 18px; padding: 18px 30px; min-height: 56px; }
+.marca-sin-3d { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; pointer-events: none; padding: 10px 16px; background: var(--white); color: var(--deep-blue); font: 700 14px/1.35 var(--cuerpo); text-align: center; }
 
 .marca-barra {
   position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 20px;
@@ -67,6 +68,18 @@
 .marca-barra a.marca-enlace:hover, .marca-barra a.marca-enlace:focus-visible { color: var(--neon-yellow); outline: none; }
 .marca-barra a.marca-enlace.volver { color: var(--white); font-weight: 700; }
 .marca-barra .corto { display: none; }
+:root[data-modo="simple"] .solo-fondo { display: none !important; }
+:root:not([data-modo="simple"]) .solo-simple { display: none !important; }
+.nota-modo { font-size: 13px; color: var(--texto-tenue); }
+body > .nota-modo { margin: 6px clamp(16px, 4vw, 40px) 0; }
+.marca-modo { display: inline-flex; flex: none; border: 1px solid var(--linea); border-radius: 999px; overflow: hidden; }
+.marca-modo button { font: 700 12px/1 var(--cuerpo); color: var(--texto-tenue); background: transparent; border: 0; padding: 2px 9px; cursor: pointer; white-space: nowrap; }
+/* Sin sitio en la línea (móvil y visor de terreno, cuya barra ya va llena): pestaña colgada bajo la barra, sin cambiar su altura. */
+.marca-barra.en-flujo .marca-modo { position: absolute; top: 100%; right: clamp(16px, 4vw, 40px); z-index: 1; background: var(--deep-blue); border-top: 0; border-radius: 0 0 8px 8px; }
+@media (max-width: 760px) { .marca-barra .marca-modo { position: absolute; top: 100%; right: clamp(16px, 4vw, 40px); background: var(--deep-blue); border-top: 0; border-radius: 0 0 8px 8px; } }
+.marca-modo button[aria-pressed="true"] { color: var(--deep-blue); background: var(--white); }
+.marca-modo button[aria-pressed="false"]:hover, .marca-modo button[aria-pressed="false"]:focus-visible { color: var(--neon-yellow); outline: none; }
+.marca-modo button[aria-pressed="true"]:focus-visible { outline: 2px solid var(--neon-yellow); outline-offset: -2px; }
 @media (max-width: 520px) {
   .marca-barra { gap: 14px; }
   .marca-barra .largo { display: none; }

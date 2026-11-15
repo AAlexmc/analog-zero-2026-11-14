@@ -1,5 +1,5 @@
 // Vista del mundo: globo que se gira y amplía, chincheta con clic o toque, sugerencias y paso a la búsqueda en la Tierra.
-import { webglDisponible, cargarMundos } from '../portada/espacio.js';
+import { webglDisponible, avisarSinWebgl, cargarMundos } from '../portada/espacio.js';
 import { formatoLatLon, normLon } from './geo.js';
 import { crearGlobo } from './globo.js';
 import { cargar, fetchBinario } from '../buscar/motor.js';
@@ -181,7 +181,7 @@ async function montar(m) {
       b.addEventListener('click', () => irMision(p, true));
       return b;
     });
-    cajaPts.replaceChildren(el('h3', { textContent: f.titulo }), ...f.lineas.map((t) => el('p', { textContent: t })), ...(botones.length ? [el('div', { className: 'lista-puntos' }, ...botones)] : []), ...(f.nota ? [el('p', { className: 'tenue', textContent: f.nota })] : []));
+    cajaPts.replaceChildren(el('h3', { textContent: f.titulo }), ...f.lineas.map((t) => el('p', { textContent: t, className: botones.length ? 'solo-fondo' : '' })), ...(botones.length ? [el('div', { className: 'lista-puntos' }, ...botones)] : []), ...(f.nota ? [el('p', { className: 'tenue solo-fondo', textContent: f.nota })] : []));
     marcasPts = res.puntos.map((p) => {
       const b = el('button', { type: 'button', textContent: p.letra, title: `Mission spot ${p.letra}` });
       b.dataset.letra = p.letra;
@@ -228,6 +228,7 @@ async function montar(m) {
 
   if (!webglDisponible()) {
     document.body.classList.add('sin-webgl');
+    avisarSinWebgl();
     $('pista').textContent = 'This browser cannot draw the 3D globe. Pick one of the places below.';
     if (inicial) fijarInicial();
     await (await sitioP)?.inicial;

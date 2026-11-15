@@ -68,4 +68,9 @@ export const PAREJAS = [
   { uso: 'Calendar equipment strip: "works" box (tick on white)', texto: 'deep-blue', fondo: 'white' },
   { uso: 'Calendar equipment strip: "breaks" and "no data" boxes (sign on deep blue, red only as border)', texto: 'white', fondo: 'deep-blue' },
   { uso: 'Calendar equipment: "NASA ran this here" line over a bright planet', texto: 'neon-yellow', fondo: PANEL_PEOR },
+  { uso: 'reading mode switch in the top bar: option not chosen', texto: TENUE(BARRA), fondo: BARRA },
+  { uso: 'reading mode switch in the top bar: hover', texto: 'neon-yellow', fondo: BARRA },
+  { uso: 'reading mode switch: chosen option', texto: 'deep-blue', fondo: 'white' },
+  { uso: 'reading mode switch hanging under the bar: option not chosen', texto: TENUE('deep-blue'), fondo: 'deep-blue' },
+  { uso: 'reading mode switch hanging under the bar: hover', texto: 'neon-yellow', fondo: 'deep-blue' },
 ];

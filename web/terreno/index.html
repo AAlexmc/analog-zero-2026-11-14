@@ -9,9 +9,12 @@
 <link rel="stylesheet" href="obra.css">
 <link rel="stylesheet" href="volatiles.css">
 <link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="asentamiento.css">
+<link rel="stylesheet" href="../informe/panel_informe.css">
 <script type="importmap">
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
+<script type="module" src="../marca/modo.js"></script>
 </head>
 <body class="marca-fondo">
 <header class="marca-barra en-flujo">
@@ -25,12 +28,15 @@
   </label>
   <button type="button" class="conm marca-boton secundario" id="espejo" aria-pressed="true" title="What you plant on one world is also planted on the other, at the same offset from the window centre" hidden>Mirror equipment</button>
   <button type="button" class="conm marca-boton secundario" id="enlazar" aria-pressed="false">Link cameras</button>
+  <button type="button" class="conm marca-boton" id="informe">Generate report</button>
   <a class="marca-enlace" href="../mapa/index.html"><span class="largo">Global map</span><span class="corto">Map</span></a>
   <a class="marca-enlace actual" href="index.html" aria-current="page"><span class="largo">Simulation</span><span class="corto">Simulation</span></a>
   <a class="marca-enlace" href="../datos/index.html"><span class="largo">Data sources</span><span class="corto">Data</span></a>
 </header>
+<p class="nota-modo solo-simple">Sources and method: switch to In depth.</p>
 <div class="banda-sintetico" id="banda-sintetico" hidden>SYNTHETIC EXAMPLE — not real data</div>
 <section id="dia" class="dia" aria-label="Day" hidden></section>
+<section id="asentamiento" class="asentamiento" aria-label="Base around the point" hidden></section>
 <main id="paneles"></main>
 <script type="module" src="visor.js"></script>
 </body>

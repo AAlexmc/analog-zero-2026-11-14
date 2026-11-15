@@ -84,7 +84,7 @@ export function crearRutas(p, ctx) {
     <div class="aviso-obs" data-r="vista" hidden>routes, zones and suggestions are computed on the retouched terrain; the view shows the original</div>
     ${vehs.length ? '' : '<div class="tenue">no vehicle with a slope limit in the catalogue</div>'}
     <label><span class="et">Vehicle</span><select data-r="veh">${vehs.map((v) => `<option value="${esc(v.equipo.id)}">${esc(ctx.nombreCorto(v.equipo.id))} · ≤ ${v.limite}°</option>`).join('')}</select></label>
-    <div class="tenue" data-r="veh-src"></div>
+    <div class="tenue solo-fondo" data-r="veh-src"></div>
     <div class="punto"><span class="et">From</span><select data-r="desde"></select><button type="button" data-r="clic-desde" title="Click a point on the terrain">Click</button></div>
     <div class="punto"><span class="et">To</span><select data-r="hasta"></select><button type="button" data-r="clic-hasta" title="Click a point on the terrain">Click</button></div>
     <label class="fila-r"><span class="et">Avoid perm. shadow</span><span><input type="number" data-r="factor" min="1" max="20" step="0.5" value="1" ${hayPSR ? '' : 'disabled'}> ×</span></label>
@@ -95,7 +95,7 @@ export function crearRutas(p, ctx) {
     <div class="paradas" data-r="paradas"></div>
     <div class="botones"><button type="button" data-r="visitar">Visit all</button></div>
     <div class="res-ruta" data-r="res-visita"></div>
-    <div class="tenue nota-pend">Slope limit applied per cell: gradient magnitude at the DEM resolution (${e.m.toFixed(1)} m/px), the same in every driving direction. Conservative: a vehicle could zig-zag across a slope it cannot climb straight.</div>
+    <div class="tenue nota-pend solo-fondo">Slope limit applied per cell: gradient magnitude at the DEM resolution (${e.m.toFixed(1)} m/px), the same in every driving direction. Conservative: a vehicle could zig-zag across a slope it cannot climb straight.</div>
     <div class="et sub">Sites · where can this go?</div>
     <label><span class="et">Equipment</span><select data-r="eq">${(ctx.catalogo?.equipos ?? []).map((q) => `<option value="${esc(q.id)}">${esc(ctx.nombreCorto(q.id))}</option>`).join('')}</select></label>
     <div class="botones"><button type="button" data-r="zona" aria-pressed="false">Where can this go?</button></div>
@@ -103,7 +103,7 @@ export function crearRutas(p, ctx) {
     <div class="et sub">Suggest sites · TOPSIS · own weights</div>
     <div class="criterios">${CRITERIOS.map((c) => `<label class="crit" data-crit="${c.id}"><input type="checkbox" data-r="usa-${c.id}"><span>${c.nombre}${c.id === 'dist_ref' ? ' <select data-r="ref"></select>' : ''} <span class="tenue">(${c.beneficio ? 'more' : 'less'} is better)</span></span><input type="number" data-r="peso-${c.id}" min="0" step="0.5" value="1" title="weight (own)"></label>`).join('')}</div>
     <div class="botones"><button type="button" data-r="sugerir">Suggest ${N_SUG} sites</button></div>
-    <div class="tenue">best ${N_SUG} cells of the suitable zone, ≥ ${SEPARACION_SUG_M / 1000} km apart (own threshold); equal weights by default (own); method: TOPSIS, as used for lunar landing sites in ${ctx.fuenteYCita(TOPSIS_REF)}</div>
+    <div class="tenue solo-fondo">best ${N_SUG} cells of the suitable zone, ≥ ${SEPARACION_SUG_M / 1000} km apart (own threshold); equal weights by default (own); method: TOPSIS, as used for lunar landing sites in ${ctx.fuenteYCita(TOPSIS_REF)}</div><div class="tenue solo-simple">Suggested with our own weights and thresholds (own criterion).</div>
     <div class="res-ruta" data-r="res-sug"></div>
     <div class="estado-r" data-r="estado"></div>`;
   const $ = (k) => aside.querySelector(`[data-r="${k}"]`);
@@ -245,7 +245,7 @@ export function crearRutas(p, ctx) {
       : `<dt>PERM. SHADOW</dt><dd class="num">${km(md.sombra_m)} · ${(100 * md.sombraFrac).toFixed(1)} %</dd><dt>LONGEST IN SHADOW</dt><dd class="num">${km(md.sombraTramoMax_m)}</dd>${sinDato}`;
     const t = vel && md.sombra_m !== null ? `<dd class="num">${horas(md.longitud_m / 1000 / vel.kmh)} · longest shadow stretch ${horas(md.sombraTramoMax_m / 1000 / vel.kmh)}</dd>`
       : vel ? `<dd class="num">${horas(md.longitud_m / 1000 / vel.kmh)}</dd>` : '';
-    const tEf = ef ? `<div class="tenue" data-r="tiempo-efectivo">extra figure, no verdict: at the catalogue ${esc(ef.cifra.texto ?? ef.cifra.nombre)} ${esc(ef.cifra.valor)} ${esc(ef.cifra.unidad)} the route takes ${horas(md.longitud_m / 1000 / ef.kmh)}${md.sombra_m !== null ? `, its longest shadow stretch ${horas(md.sombraTramoMax_m / 1000 / ef.kmh)}` : ''} · ${ctx.fuenteYCita(ef.cifra)}</div>` : '';
+    const tEf = ef ? `<div class="tenue solo-fondo" data-r="tiempo-efectivo">extra figure, no verdict: at the catalogue ${esc(ef.cifra.texto ?? ef.cifra.nombre)} ${esc(ef.cifra.valor)} ${esc(ef.cifra.unidad)} the route takes ${horas(md.longitud_m / 1000 / ef.kmh)}${md.sombra_m !== null ? `, its longest shadow stretch ${horas(md.sombraTramoMax_m / 1000 / ef.kmh)}` : ''} · ${ctx.fuenteYCita(ef.cifra)}</div>` : '';
     const car = md.carretera?.pasos > 0 ? md.carretera : null;
     return `<dl>
       <dt>LENGTH</dt><dd class="num">${km(md.longitud_m)}</dd>
@@ -255,7 +255,7 @@ export function crearRutas(p, ctx) {
       ${sombra}
       ${vel ? `<dt>TIME</dt>${t}` : ''}</dl>
       ${car ? `<div class="no-medido" data-r="carretera-transversal">on the applied road each step is judged by its grade along the road; cross slope of the road: NOT MEASURED (road narrower than a ${e.m.toFixed(1)} m cell)</div>` : ''}
-      <div class="tenue">measured on the route: 3D length of its 8-neighbour cell steps on the retouched DEM${r.diezmado ? ' (found on the grid decimated ×2, measured on the full grid)' : ''}; slope = cell slope; ${hayAgua ? `water cells of the ${fuenteAgua()} treated as impassable; ` : ''}${hayPSR ? `shadow = cells flagged in the permanent-shadow layer, each step split half-and-half between its two cells${md.sombraSinDato_m > 0 ? '; no data = cells with no value in that layer' : ''}` : 'no permanent-shadow layer on this terrain'}.</div>
+      <div class="tenue solo-fondo">measured on the route: 3D length of its 8-neighbour cell steps on the retouched DEM${r.diezmado ? ' (found on the grid decimated ×2, measured on the full grid)' : ''}; slope = cell slope; ${hayAgua ? `water cells of the ${fuenteAgua()} treated as impassable; ` : ''}${hayPSR ? `shadow = cells flagged in the permanent-shadow layer, each step split half-and-half between its two cells${md.sombraSinDato_m > 0 ? '; no data = cells with no value in that layer' : ''}` : 'no permanent-shadow layer on this terrain'}.</div>
       ${vel ? `<div class="tenue">TIME at catalogue ${vel.tipo} speed ${+vel.kmh.toFixed(3)} km/h, constant — lower bound on time · ${ctx.fuenteYCita(vel.cifra)}</div>` : `<div class="tenue">no catalogue speed with a source for this vehicle: no time given</div>`}${tEf}`;
   }
 
@@ -359,7 +359,7 @@ export function crearRutas(p, ctx) {
     if (!z) { el.innerHTML = ''; return; }
     const lista = (xs, f) => xs.map(f).join('');
     const req = (a) => `${esc(a.req.variable === 'separacion_m' ? `separation from ${ctx.nombreCorto(a.req.respecto_a)}` : a.req.variable)} ${esc(a.req.op)} ${esc(a.req.valor ?? '—')} ${esc(a.req.unidad ?? '')}`;
-    const apl = lista(z.aplicados, (a) => `<li>${req(a)} <span class="tenue">· ${esc(a.como)} · ${ctx.fuenteYCita(a.req)}</span></li>`);
+    const apl = lista(z.aplicados, (a) => `<li>${req(a)} <span class="tenue solo-fondo">· ${esc(a.como)} · ${ctx.fuenteYCita(a.req)}</span></li>`);
     const omi = lista(z.omitidos, (a) => `<li class="tenue">${req(a)} · not applied: ${esc(a.motivo)}</li>`);
     const agua = z.agua && z.mascara ? `<li data-r="agua-zona">water excluded · ${fuenteAgua()} <span class="tenue">· ocean, lake and river cells are not ground: removes <span class="num">${z.agua.celdas.toLocaleString('en-US')}</span> cells</span></li>` : '';
     const obs = vigenteReparto(z) ? '' : '<div class="aviso-obs" data-r="zona-obs">terrain or planted equipment changed since this zone: compute again</div>';
@@ -456,7 +456,7 @@ export function crearRutas(p, ctx) {
     const obs = vigenteReparto(s) ? '' : '<div class="aviso-obs" data-r="sug-obs">terrain or planted equipment changed since these suggestions: suggest again</div>';
     el.innerHTML = s.lista.length ? `${obs}<ol class="sug">${s.lista.map((x, k) => `<li data-sug="${k}"><span class="num"><b>S${k + 1}</b> · score ${x.puntuacion.toFixed(3)}</span> <span class="tenue num">${s.crit.map((c) => `${nomC(c)} ${val(c.id, x.valores[c.id])}`).join(' · ')}</span>
         <button type="button" data-plantar-sug="${k}">Plant ${esc(ctx.nombreCorto(s.equipo))} here</button></li>`).join('')}</ol>
-        <div class="tenue">weights ${s.crit.map((c) => `${nomC(c)} ${c.peso}`).join(', ')} (own) · illumination = LOLA average visibility layer; slope = cell slope; distances = straight line on the map plane (distance transform)</div>`
+        <div class="tenue solo-fondo">weights ${s.crit.map((c) => `${nomC(c)} ${c.peso}`).join(', ')} (own) · illumination = LOLA average visibility layer; slope = cell slope; distances = straight line on the map plane (distance transform)</div><div class="tenue solo-simple">Scored with our own weights (own criterion).</div>`
       : '<div class="tenue">no cell of the zone has a value for every ticked criterion</div>';
     el.querySelectorAll('[data-plantar-sug]').forEach((b) => b.addEventListener('click', () => {
       const x = s.lista[+b.dataset.plantarSug];

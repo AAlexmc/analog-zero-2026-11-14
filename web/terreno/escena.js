@@ -377,6 +377,19 @@ export class Escena {
     this.sucio = true;
   }
 
+  // Vista aérea sobre el centro de la ventana, a la distancia que deja ver entero un círculo de ese radio.
+  encuadrar(radio_km, centro = null) {
+    if (this.suelo) return;
+    const fov = (this.camara.fov * Math.PI) / 360, aspecto = Math.min(1, this.camara.aspect || 1);
+    const d = Math.min(this.controles.maxDistance, Math.max(this.controles.minDistance, (1.35 * radio_km) / (Math.tan(fov) * aspecto)));
+    const k = (this.n - 1) / 2, c = this.mundoDePixel(centro?.fila ?? k, centro?.col ?? k), a = (55 * Math.PI) / 180;
+    this.controles.target.copy(c);
+    this.camara.position.set(c.x, c.y + d * Math.sin(a), c.z + d * Math.cos(a));
+    this.camara.lookAt(c);
+    this.controles.update();
+    this.sucio = true;
+  }
+
   // ---------- Vista a ras de suelo ----------
   // Cota del suelo (y del mundo, km) en (x, z) del mundo; NaN fuera de la rejilla o sin dato.
   alturaSuelo(x, z) {

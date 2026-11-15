@@ -10,6 +10,7 @@
 <script type="importmap">
 { "imports": { "three": "../lib/three/three.module.js", "three/addons/": "../lib/three/addons/" } }
 </script>
+<script type="module" src="../marca/modo.js"></script>
 </head>
 <body class="marca-fondo marca-cuerpo analogos">
 <canvas id="globo" aria-label="Earth globe with the best matching places. Drag to turn, scroll or pinch to zoom."></canvas>
@@ -33,7 +34,7 @@
     <form class="mision-nueva" id="mision-nueva" hidden>
       <label class="mision-rotulo" for="mision-titulo">Mission title</label>
       <input type="text" id="mision-titulo" maxlength="60" autocomplete="off">
-      <p class="tenue nota">No mission is applied until you press the button below.</p>
+      <p class="tenue nota solo-fondo">No mission is applied until you press the button below.</p>
       <fieldset id="nueva-punto"><legend id="nueva-punto-titulo">Compared with your point</legend></fieldset>
       <fieldset id="nueva-tierra"><legend>Earth only — compared with a test site</legend>
         <label class="mision-rotulo" for="mision-ref">Test site</label>
@@ -49,7 +50,7 @@
     <p class="entorno-linea" id="entorno-linea"></p>
     <details class="como" id="entorno-como">
       <summary>How we know</summary>
-      <div id="entorno-texto"></div>
+      <div class="solo-fondo" id="entorno-texto"></div>
       <label class="interruptor pequeno"><input type="checkbox" id="capa-clases"> <span>Show Earth's environment types</span></label>
       <ul class="leyenda-clases" id="leyenda-clases"></ul>
     </details>
@@ -64,30 +65,31 @@
   <p class="mes-activo" id="mes-activo" hidden><span class="marca-chip" id="mes-activo-chip"></span></p>
   <section id="lugares" role="tabpanel" aria-labelledby="tab-lugares" hidden>
     <h1 class="marca-titulo titulo">Most similar places on Earth</h1>
-    <p class="unlisted-resumen" id="unlisted" hidden></p>
+    <p class="unlisted-resumen solo-fondo" id="unlisted" hidden></p>
     <button type="button" class="marca-boton secundario ver-meses" id="ver-meses" hidden>Show how these places change through the year</button>
-    <p class="tenue tiras-escala" id="tiras-escala" hidden></p>
+    <p class="tenue tiras-escala solo-fondo" id="tiras-escala" hidden></p>
     <ol class="lista" id="lista"></ol>
     <details class="parciales" id="parciales" hidden>
       <summary>Partly compared places</summary>
-      <p class="tenue">Earth data is missing for some parameters here (mostly Antarctica), so they are not ranked with the places above.</p>
+      <p class="tenue solo-fondo">Earth data is missing for some parameters here (mostly Antarctica), so they are not ranked with the places above.</p>
       <ol class="lista" id="lista-parciales"></ol>
     </details>
     <details class="como avanzado" id="avanzado" hidden>
       <summary>Advanced</summary>
       <label class="interruptor pequeno"><input type="checkbox" id="por-componentes"> <span>Count related parameters once</span></label>
-      <div id="avanzado-texto"></div>
+      <div class="solo-fondo" id="avanzado-texto"></div>
     </details>
   </section>
   <section id="metricas" role="tabpanel" aria-labelledby="tab-metricas" hidden></section>
   <section id="cartera" role="tabpanel" aria-labelledby="tab-cartera" hidden>
     <h1 class="marca-titulo titular" id="cartera-titular"></h1>
-    <details class="como" id="cartera-como"><summary>How this works</summary></details>
+    <details class="como solo-fondo" id="cartera-como"><summary>How this works</summary></details>
     <ol class="lista" id="lista-cartera"></ol>
     <section class="bloque sin-cubrir" id="sin-cubrir"><h3>What no place on Earth covers</h3></section>
   </section>
   <section id="calendario" role="tabpanel" aria-labelledby="tab-calendario" hidden></section>
   <p class="credito" id="credito"></p>
+  <p class="nota-modo solo-simple">Sources and method: switch to In depth.</p>
 </aside>
 <div class="mandos" id="mandos" hidden>
   <label class="interruptor"><input type="checkbox" id="capa"> <span>Show similarity everywhere</span></label>

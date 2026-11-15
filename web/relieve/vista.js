@@ -37,7 +37,7 @@ export async function abrirRelieve(contenedor, { mundo, lat, lon, lado_km = LADO
       el('h2', { className: 'marca-titulo relieve-titulo', textContent: titulo }),
       el('p', { className: 'relieve-cifras' }, cifra('Elevation at the pin', formatoMetros(est.centro), 'altitud'),
         cifra(`Relief in this ${Math.round(lado_km_real)} km window`, formatoMetros(est.desnivel), 'desnivel')),
-      el('p', { className: 'relieve-fuente', textContent: `Read from ${d.rotulos.altura}.` }),
+      el('p', { className: 'relieve-fuente solo-fondo', textContent: `Read from ${d.rotulos.altura}.` }),
       accion ? el('a', { className: 'marca-boton relieve-accion', href: accion.href, textContent: accion.texto }) : null,
       celda ? el('p', { className: 'relieve-celda' }, el('span', { className: 'muestra', ariaHidden: 'true' }), 'Outline: the 0.5° cell we compared') : null),
     el('div', { className: 'relieve-pie' },
