@@ -98,7 +98,8 @@ export function lineaMesActivo(perfil, mes) {
   if (!esMes(mes)) return null;
   const mp = mejorYPeor(perfil), v = perfil[mes - 1]?.similitud_pct;
   if (!mp || !finito(v)) return `${nombreMes(mes)}: no data here`;
-  return v === mp.max ? `${nombreMes(mes)} is its best month` : `${nombreMes(mes)}: ${(mp.max - v).toFixed(1)} points below its best month`;
+  if (v === mp.max) return `${nombreMes(mes)} is its best month`;
+  return mp.max - v < 0.05 ? `${nombreMes(mes)}: level with its best month` : `${nombreMes(mes)}: ${(mp.max - v).toFixed(1)} points below its best month`;
 }
 export const etiquetaMes = (p) => (finito(p.similitud_pct) ? `${nombreMes(p.mes)}: ${fmtPct(p.similitud_pct)} match` : `${nombreMes(p.mes)}: no data`);
 // Una sola escala de color para todas las tiras de la pantalla, para que se puedan comparar entre lugares.

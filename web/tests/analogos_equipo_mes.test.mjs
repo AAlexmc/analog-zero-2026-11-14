@@ -194,3 +194,12 @@ test('equipment type ids are shown in English', () => {
   assert.equal(nombreTipo('dron'), 'Drone');
   assert.equal(nombreTipo('otro'), 'otro');
 });
+
+test('summary: with a published limit we cannot measure here, it does not say "all its published limits"', () => {
+  const eq = LIDAR();
+  eq.limites.push({ parametro: 'pendiente_grados', tipo: 'max', valor: 15, unidad: 'deg', fuente: 'https://example.org/x', cita: 'a b c d e', verificado: false });
+  const tmin = [-30, -30, -25, -15, -5, 1, 4, 2, -6, -15, -25, -30].map(C);
+  const c = calendarioEquipo(eq, perfil({ t_min_k: tmin, t_max_k: Array(12).fill(C(10)) }), anuales());
+  assert.equal(c.medibles, 2);
+  assert.equal(c.resumen.frase, 'Within the published limits we can measure here: Jun–Aug.');
+});

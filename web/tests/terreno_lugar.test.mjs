@@ -222,3 +222,9 @@ test('simulation link: the Earth place goes with the lunar terrain of the target
   assert.equal(sin.get('b'), null);
   assert.equal(sin.get('nombre'), null);
 });
+
+test('place window: a side under 1 km in the URL falls back to the default, so the grid is never finer than a tile pixel', () => {
+  assert.equal(leerLugar('?lugar=75.25,-84.25&lado=0.01').lado_km, LADO_DEFECTO_KM);
+  assert.equal(leerLugar('?lugar=75.25,-84.25&lado=1').lado_km, 1);
+  assert.equal(leerLugar('?lugar=75.25,-84.25&lado=2').lado_km, 2);
+});

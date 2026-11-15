@@ -177,3 +177,10 @@ test('with the real engine: plan and Move? column agree with calendario at Jezer
   const mp = mejorYPeor(per);
   assert.ok(mp.mejor.every((m) => per[m - 1].similitud_pct === mp.max));
 });
+
+test('active-month line: a month within rounding of the best is not "0.0 points below"', () => {
+  const p = Array.from({ length: 12 }, (_, k) => ({ mes: k + 1, similitud_pct: k === 6 ? 80 : k === 1 ? 79.98 : 60 }));
+  assert.equal(lineaMesActivo(p, 7), 'July is its best month');
+  assert.equal(lineaMesActivo(p, 2), 'February: level with its best month');
+  assert.equal(lineaMesActivo(p, 3), 'March: 20.0 points below its best month');
+});

@@ -54,15 +54,21 @@ export function validarNueva({ titulo, parametros }, indice) {
   return { ok: t.length > 0 && ps.length > 0, titulo: t, parametros: ps };
 }
 
+const soloDeLaTierra = (ids, indice) => { const t = new Set((indice.parametros_tierra ?? []).map((p) => p.id)); return ids.length > 0 && ids.every((id) => t.has(id)); };
+
+// Una misión que solo nombra rasgos de la Tierra no diría nada del punto elegido (y miles de celdas empatarían al 100 %):
+// la búsqueda añade entonces todos los parámetros comparados con el punto, y la ficha lo dice (`ampliada`).
 export function activaDeCatalogo(mision, indice, sitios) {
-  return { tipo: 'catalogo', id: mision.id, titulo: mision.nombre, mision, parametros: parametrosDe(mision, indice), referencia: referenciaDe(mision, sitios) };
+  const propios = parametrosDe(mision, indice), ampliada = soloDeLaTierra(propios, indice);
+  const parametros = ampliada ? [...indice.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id), ...propios] : propios;
+  return { tipo: 'catalogo', id: mision.id, titulo: mision.nombre, mision, parametros, ampliada, referencia: referenciaDe(mision, sitios) };
 }
 
 export function activaNueva({ titulo, parametros, ref }, indice, sitios) {
   const v = validarNueva({ titulo, parametros }, indice);
   if (!v.ok) return null;
   const s = sitiosReferencia(sitios).find((x) => x.id === ref) ?? null;
-  return { tipo: 'nueva', id: ID_NUEVA, titulo: v.titulo, mision: null, parametros: v.parametros, ref: s?.id ?? null, referencia: s && { lat: s.lat, lon: s.lon, nombre: s.nombre, sitio: s.id } };
+  return { tipo: 'nueva', id: ID_NUEVA, titulo: v.titulo, mision: null, parametros: v.parametros, sinPunto: soloDeLaTierra(v.parametros, indice), ref: s?.id ?? null, referencia: s && { lat: s.lat, lon: s.lon, nombre: s.nombre, sitio: s.id } };
 }
 
 // Id desconocido, misión sin fuente o misión nueva incompleta → null (sin misión, sin error).

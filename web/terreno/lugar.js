@@ -8,6 +8,8 @@ export const LADOS_KM = [2, 10, 40];
 export const LADO_DEFECTO_KM = 10;
 export const N_MAX = 1023;
 const LADO_MAX_KM = 50;
+// Por debajo de 1 km la rejilla sería más fina que el píxel de la tesela más detallada.
+const LADO_MIN_KM = 1;
 const RAD = Math.PI / 180;
 
 export function leerLugar(search) {
@@ -18,7 +20,7 @@ export function leerLugar(search) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
   const nombre = (q.get('nombre') ?? '').trim() || null;
   const l = Number(q.get('lado'));
-  const lado_km = q.get('lado') !== null && Number.isFinite(l) && l > 0 && l <= LADO_MAX_KM ? l : LADO_DEFECTO_KM;
+  const lado_km = q.get('lado') !== null && Number.isFinite(l) && l >= LADO_MIN_KM && l <= LADO_MAX_KM ? l : LADO_DEFECTO_KM;
   return { lat, lon, nombre, lado_km };
 }
 

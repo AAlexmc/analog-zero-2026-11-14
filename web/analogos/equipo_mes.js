@@ -97,12 +97,14 @@ export function calendarioEquipo(equipo, perfil, anuales) {
     return { mes: k + 1, estado: es.includes('rompe') ? 'rompe' : es.every((e) => e === 'ok') ? 'ok' : 'sin_dato' };
   });
   const rs = rachasOk(veredictos);
+  // Con algún límite publicado que no se puede medir aquí, «all» sería decir de más.
+  const todos = med.length === limites.length ? 'all its published limits' : 'the published limits we can measure';
   let frase = med[0].frase;
   if (med.length > 1) {
     frase = cuenta(veredictos, 'sin_dato') === 12 ? 'No data here.'
-      : cuenta(veredictos, 'ok') === 12 ? 'Within all its published limits all year.'
+      : cuenta(veredictos, 'ok') === 12 ? `Within ${todos} all year.`
         : !rs.length ? `Outside at least one published limit ${cuenta(veredictos, 'rompe') === 12 ? 'every month here' : 'in every month with data here'}.`
-          : `Within all its published limits here: ${rs.map((r) => r.texto).join(', ')}.`;
+          : `Within ${todos} here: ${rs.map((r) => r.texto).join(', ')}.`;
   }
   return { ...base, resumen: { veredictos, rachas: rs, frase } };
 }

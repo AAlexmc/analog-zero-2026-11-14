@@ -42,6 +42,8 @@ export function pintarFicha({ activa, P, sitios, avisos = null }) {
       el('ul', { className: 'campanas' }, ...campanas.map((c) => campana(c, sitios)))) : null,
     el('p', { className: 'mision-sub' }, enResultados ? 'Searched with these parameters' : 'Parameters for the Earth search', ...(nueva ? [] : [' ', el('span', { className: 'marca-chip', textContent: 'own mapping', title: 'Which of our layers stands for each trait NASA names is our own criterion.' })])),
     el('ul', { className: 'chips' }, ...activa.parametros.map(chip)),
+    activa.ampliada ? el('p', { className: 'tenue ampliada', textContent: 'This mission only names Earth-side traits, so the search also compares every parameter with your point (own choice).' }) : null,
+    activa.sinPunto ? el('p', { className: 'tenue ampliada', textContent: 'None of these parameters uses your point: every place that matches the test site ties.' }) : null,
     lineaRef ? el('p', { className: 'ref', textContent: lineaRef }) : null,
     enResultados ? el('p', { className: 'tenue', textContent: `On each place: close = under ${CORTES.cerca} % off, far off = over ${CORTES.lejos} % off (own cut-offs).` }) : null,
     nm.length ? el('details', { className: 'como no-medido-caja' }, el('summary', { textContent: `Named by NASA, NOT MEASURED here (${nm.length})` }),

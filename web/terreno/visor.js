@@ -898,7 +898,7 @@ function seccionMision(p) {
     ${estado.mision.equipos.map((q) => {
       const f = q.forma, s = q.sustituto;
       if (s || f.forma) {
-        const est = s ? `${s.modelo.nombre_real} model in its place` : `${f.forma === 'domo' ? 'dome' : 'box'} ${medidaTexto(medidaForma(f))} · published size`;
+        const est = s ? `${s.modelo.nombre_real} model in its place` : `${f.forma === 'domo' ? 'dome' : 'box'} ${medidaTexto(medidaForma(f))} · ${f.supuesto ? 'diameter published, height assumed' : 'from published figures (see sources)'}`;
         return `<button type="button" class="item-eq" data-eqm="${esc(q.id)}" aria-pressed="false"><span class="nom">${esc(q.nombre)}</span><span class="est">${esc(est)}</span></button>`;
       }
       return `<div class="item-eq sin-dim" data-eqm-sin="${esc(q.id)}"><span class="nom">${esc(q.nombre)}</span><span class="est">${esc(motivoSinForma(f))}</span>

@@ -32,39 +32,53 @@ export function engancharRelieve({ boton, aviso, mundo, punto, alCambiar = null,
     Object.assign(capa.style, { right: `${h.right}px`, bottom: `${h.bottom}px` });
   };
   addEventListener('resize', encajar);
+  let intento = 0;
   async function abrir() {
     const p = punto();
     if (!p || abierta || R.estado === 'cargando') return false;
+    const mio = ++intento;
     aviso.hidden = true;
     aviso.textContent = '';
     boton.disabled = true;
     boton.textContent = 'Loading terrain…';
     Object.assign(R, { estado: 'cargando', mensaje: null, causa: null });
-    capa = Object.assign(document.createElement('div'), { className: 'relieve-capa' });
+    const miCapa = capa = Object.assign(document.createElement('div'), { className: 'relieve-capa' });
     capa.setAttribute('role', 'dialog');
     capa.setAttribute('aria-label', `Terrain around ${p.titulo}`);
     document.body.append(capa);
     encajar();
     try {
-      abierta = await abrirRelieve(capa, { mundo: typeof mundo === 'function' ? mundo() : mundo, ...p, accion: accion?.(p) ?? null, alVolver: cerrada });
+      const vista = await abrirRelieve(miCapa, { mundo: typeof mundo === 'function' ? mundo() : mundo, ...p, accion: accion?.(p) ?? null, alVolver: cerrada });
+      // Se cerró (otro lugar, otra misión) mientras cargaba: esta vista ya no vale.
+      if (mio !== intento) { vista.cerrar(); miCapa.remove(); return false; }
+      abierta = vista;
       requestAnimationFrame(() => capa?.classList.add('visible'));
       abierta.volver.focus();
       R.estado = 'abierto';
       return true;
     } catch (e) {
-      capa.remove();
+      miCapa.remove();
+      if (mio !== intento) return false;
       capa = null;
       aviso.textContent = e.message;
       aviso.hidden = false;
       Object.assign(R, { estado: 'error', mensaje: e.message, causa: e.causa ?? String(e.stack ?? '') });
       return false;
     } finally {
-      boton.disabled = false;
-      boton.textContent = texto;
+      if (mio === intento) { boton.disabled = false; boton.textContent = texto; }
     }
   }
   boton.addEventListener('click', abrir);
-  const cerrar = (foco = false) => { if (abierta) { abierta.cerrar(); cerrada(foco); } };
+  const cerrar = (foco = false) => {
+    if (abierta) { abierta.cerrar(); cerrada(foco); return; }
+    if (R.estado !== 'cargando') return;
+    intento++;
+    capa?.remove();
+    capa = null;
+    R.estado = 'cerrado';
+    boton.disabled = false;
+    boton.textContent = texto;
+  };
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') cerrar(true);
   });

@@ -178,3 +178,16 @@ test('values of the Earth-only parameters: swing is a difference in K, hours, m/
 test('every Earth-only parameter has a short name', () => {
   for (const p of INDICE.parametros_tierra) assert.ok(NOMBRE_CORTO[p.id], p.id);
 });
+
+test('a mission that only names Earth-side traits is also compared with the point on every parameter, and says so', () => {
+  const lava = activaDeCatalogo(mision('tubos_lava'), INDICE, SITIOS);
+  const delPunto = INDICE.parametros.filter((p) => p.reproducible_en_tierra).map((p) => p.id);
+  assert.deepEqual(parametrosDe(mision('tubos_lava'), INDICE), ['litologia_glim']);
+  assert.equal(lava.ampliada, true);
+  assert.deepEqual(lava.parametros, [...delPunto, 'litologia_glim']);
+  const bio = activaDeCatalogo(mision('biomarcadores'), INDICE, SITIOS);
+  assert.equal(bio.ampliada, false);
+  assert.deepEqual(bio.parametros, parametrosDe(mision('biomarcadores'), INDICE));
+  assert.equal(activaNueva({ titulo: 'X', parametros: ['elev_m'], ref: 'yungay' }, INDICE, SITIOS).sinPunto, true);
+  assert.equal(activaNueva({ titulo: 'X', parametros: ['elev_m', 't_min_k'], ref: 'yungay' }, INDICE, SITIOS).sinPunto, false);
+});
