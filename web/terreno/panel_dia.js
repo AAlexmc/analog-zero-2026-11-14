@@ -77,7 +77,7 @@ export function crearDia(caja, ctx) {
   function textoPanel(p, s) {
     const e = p.escena, cuerpo = CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, L = [];
     if (!s) return `<b>${esc(cuerpo)}</b> · the Day control does not move the Sun on this terrain (set it by hand in Display)`;
-    if (s.tipo === 'tierra') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(S.hora)}</span> local solar time · ${MESES[S.mes - 1]}`);
+    if (s.tipo === 'tierra') L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(S.hora)}</span> local solar time · ${MESES[S.mes - 1]} <span class="tenue">(Sun of day 15)</span>`);
     else if (s.tipo === 'mundo') {
       const largo = e.meta.cuerpo === 'marte' ? `<span class="num">${DIA_MARTE_H.toFixed(2)} h</span>` : '<span class="num">29.53</span> Earth days';
       L.push(`<b>${esc(cuerpo)}</b> · <span class="num">${horaTexto(s.hora)}</span> local solar time of its own day, which lasts ${largo}${e.meta.cuerpo === 'luna' ? ' · Sun taken over the equator (own simplification)' : ''}`);
@@ -153,10 +153,11 @@ export function crearDia(caja, ctx) {
   }
 
   // ---------- Aplicar la hora ----------
+  const conBase = (p) => (p.diaBase ??= { az: p.escena.sol.az, el: () => +p.el.querySelector('.mandos [data-sol=el]').value });
   function aplicar() {
     if (!S.activo) { pintarLecturas(); return; }
     for (const p of vivos()) {
-      p.diaBase ??= { az: p.escena.sol.az, el: () => +p.el.querySelector('.mandos [data-sol=el]').value };
+      conBase(p);
       const s = solDe(p, S.hora);
       p.diaSol = s;
       if (!s) continue;
@@ -221,10 +222,11 @@ export function crearDia(caja, ctx) {
     manual(p, cual) {
       if (!S.activo) { pintarLecturas(); return; }
       if (tipo(p) === 'polar' && cual === 'el') { pedir(); return; }
-      if (tipo(p) === 'polar' && cual === 'az') { const horas = S.modo === 'mismo' ? S.hora : (S.hora / 24) * DIA_LUNAR_H; p.diaBase.az = p.escena.sol.az + (360 * horas) / DIA_LUNAR_H; pedir(); return; }
+      if (tipo(p) === 'polar' && cual === 'az') { const horas = S.modo === 'mismo' ? S.hora : (S.hora / 24) * DIA_LUNAR_H; conBase(p).az = p.escena.sol.az + (360 * horas) / DIA_LUNAR_H; pedir(); return; }
       parar(); S.activo = false; delete caja.dataset.activo; pintarLecturas(); ctx.alCambiar?.();
     },
-    refrescar: pintarLecturas,
+    // Si el terreno cambió (retoque, vista original), la tira se vuelve a calcular.
+    refrescar() { if (S.activo) for (const p of vivos()) if (tipo(p) && p.diaSol) calcularMapa(p); pintarLecturas(); },
     // Para la ficha del equipo espejo: pasos con sol de su día.
     de(p, it) {
       const m = p.diaMapa;

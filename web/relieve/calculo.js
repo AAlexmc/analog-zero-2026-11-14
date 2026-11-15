@@ -22,6 +22,7 @@ export const MENSAJES = {
   sinTeselasPolo: 'No terrain tiles this close to the pole.',
   sinRelievePolo: 'No local terrain this close to the pole.',
   sinDatos: 'Could not load the terrain data. Reload the page to try again.',
+  teselaRota: 'An elevation tile for this place could not be read. Reload the page to try again.',
   sinMundo: 'No terrain for this world yet.',
 };
 

@@ -27,10 +27,11 @@ export function celdaEspejo(origen, destino, fila, col) {
   return null;
 }
 
-export function textoDesplazamiento({ este_m, sur_m }) {
+// rejilla = true cuando algún panel no tiene el norte arriba (recorte polar): se dice en ejes del mapa, no en rumbos.
+export function textoDesplazamiento({ este_m, sur_m }, rejilla = false) {
   const p = (v, pos, neg) => (Math.abs(v) < 0.5 ? null : `${Math.round(Math.abs(v))} m ${v > 0 ? pos : neg}`);
-  const partes = [p(este_m, 'east', 'west'), p(sur_m, 'south', 'north')].filter(Boolean);
-  return partes.length ? `${partes.join(' and ')} of the window centre` : 'at the window centre';
+  const partes = (rejilla ? [p(este_m, 'right', 'left'), p(sur_m, 'down', 'up')] : [p(este_m, 'east', 'west'), p(sur_m, 'south', 'north')]).filter(Boolean);
+  return partes.length ? `${partes.join(' and ')} ${rejilla ? 'from the window centre on the map' : 'of the window centre'}` : 'at the window centre';
 }
 
 const grados = (v) => `${v.toFixed(1)}°`;

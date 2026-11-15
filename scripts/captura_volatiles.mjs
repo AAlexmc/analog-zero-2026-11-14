@@ -169,7 +169,7 @@ try {
   let ref = compararLectura(S, x, 'drill cold', true);
   if (ref.hielo !== 'si') falla(`drill cold: node says ${ref.hielo} at ${x.perf.fila},${x.perf.col}`);
   igual(x.dd.bocados?.valor, String(ref.plan.bocados), 'drill bites');
-  for (const k of ['time between bites (pulling the drill up, brushing the cuttings out, reading them): NOT MEASURED', 'ice below the surface here: NOT MEASURED']) if (!x.nm.some((s) => s.startsWith(k))) falla(`drill cold: missing "${k}"`);
+  for (const k of ['time between bites (pulling the drill up, brushing the cuttings out, reading them): NOT MEASURED', 'drilling energy: NOT MEASURED', 'ice below the surface here: NOT MEASURED']) if (!x.nm.some((s) => s.startsWith(k))) falla(`drill cold: missing "${k}"`);
   // Secuencia real de TRIDENT: 10 bocados de 10 cm a 1,25 mm/s = 80 s cada uno; «Next bite» avanza y lo dice.
   const sec = async () => pag.evaluate((sel) => { const t = document.querySelector(`${sel} .perforacion`); return { n: t.querySelector('[data-v=secuencia]')?.dataset.bocados, k: t.querySelector('[data-v=secuencia]')?.dataset.bocado, paso: t.querySelector('[data-v=sec-paso]')?.textContent, corte: t.querySelector('[data-v=corte]')?.dataset.valor, det: [...t.querySelectorAll('.perf-det li')].length, citas: [...t.querySelectorAll('.perf-det li a')].every((a) => /^https:\/\//.test(a.href)) }; }, B);
   let q = await sec();
@@ -179,7 +179,7 @@ try {
   await pag.click(`${B} .perforacion [data-v=sec-sig]`);
   await pag.click(`${B} .perforacion [data-v=sec-sig]`);
   q = await sec();
-  if (q.k !== '3' || !/Bite 3 of 10 · 20–30 cm · cutting 1 min 20 s \(4 min 00 s so far\)/.test(q.paso ?? '')) falla(`drill sequence after three bites: ${JSON.stringify(q)}`);
+  if (q.k !== '3' || !/Bite 3 of 10 · 20–30 cm · cutting at least 1 min 20 s \(4 min 00 s so far\)/.test(q.paso ?? '')) falla(`drill sequence after three bites: ${JSON.stringify(q)}`);
   else ok(`drill sequence: ${q.paso}`);
   if (!/not measured here/.test(x.esperado ?? '') || !/Cabeus/.test(x.esperado ?? '')) falla(`drill cold: expected ice not labelled as measured elsewhere: ${x.esperado}`);
   if (!x.marca) falla('drill cold: no mark on the terrain');

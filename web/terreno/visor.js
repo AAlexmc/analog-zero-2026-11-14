@@ -303,7 +303,8 @@ function crearMandos(p) {
     dia.setAttribute('aria-pressed', 'true');
     const paso = (t) => {
       const k = Math.min((t - t0) / 20000, 1);
-      azIn.value = Math.round(az0 + 360 * k) % 360;
+      // La longitud subsolar baja con el tiempo (el sol va hacia el oeste), igual que en la barra Day.
+      azIn.value = ((Math.round(az0 - 360 * k) % 360) + 360) % 360;
       solInput();
       if (k < 1) p.dia = requestAnimationFrame(paso); else { p.dia = null; dia.setAttribute('aria-pressed', 'false'); }
     };
@@ -666,6 +667,7 @@ function mirarPlantado(p, item) {
 // ---------- Equipo espejo ----------
 // El otro panel, si es de otro mundo (Luna, Tierra o Marte): ahí va el gemelo de lo que se planta aquí.
 const otroPanel = (p) => estado.paneles.find((x) => x !== p && x.plantados && x.escena && x.escena.meta.cuerpo !== p.escena.meta.cuerpo) ?? null;
+const hayPolar = (...ps) => ps.some((x) => x.escena.meta.georef.tipo === 'estereo_polar');
 const gemeloDe = (p, item) => {
   const q = item?.par ? otroPanel(p) : null;
   return q ? { q, item: q.plantados.lista.find((x) => x.par === item.par) ?? null } : { q: null, item: null };
@@ -683,7 +685,7 @@ function plantarGemelo(p, item) {
   guardarPlantado(p);
   guardarPlantado(q);
   const av = q.el.querySelector('.aviso-espejo');
-  av.textContent = `Also planted here: ${nombreCorto(item.equipo)} · ${textoDesplazamiento(r)}, as on ${CUERPO[p.escena.meta.cuerpo] ?? 'the other panel'}${r.recortado ? ' (clamped to this window)' : ''}${r.movido ? ' (moved to the nearest cell with elevation data)' : ''}`;
+  av.textContent = `Also planted here: ${nombreCorto(item.equipo)} · ${textoDesplazamiento(r, hayPolar(p, q))}, as on ${CUERPO[p.escena.meta.cuerpo] ?? 'the other panel'}${r.recortado ? ' (clamped to this window)' : ''}${r.movido ? ' (moved to the nearest cell with elevation data)' : ''}`;
   av.hidden = false;
   clearTimeout(q.tEspejo);
   q.tEspejo = setTimeout(() => { av.hidden = true; }, 8000);
@@ -1003,7 +1005,7 @@ const MUNDO = { luna: 'moon', tierra: 'earth', marte: 'mars' };
 function ladoEspejo(x, it) {
   const e = x.escena, i = it.fila * e.n + it.col, capas = {};
   for (const k of ['iluminacion', 'temp_max']) if (e.capas[k]) capas[k] = e.capas[k][i];
-  return { cuerpo: CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, pendiente: medidasDe(x, it).pendiente_deg, sol: { el: e.sol.el, luz: e.conSol(it.fila, it.col) }, dia: estado.dia?.de(x, it) ?? null, capas };
+  return { cuerpo: CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, pendiente: medidasDe(x, it).pendiente_deg, sol: estado.dia?.estado.activo ? { el: e.sol.el, luz: e.conSol(it.fila, it.col) } : {}, dia: estado.dia?.de(x, it) ?? null, capas };
 }
 
 function noReproducible(a, b) {
@@ -1028,13 +1030,16 @@ function bloqueEspejo(p, item, limites) {
   const filas = filasEspejo(a, b, limites), r = resumenEspejo(filas);
   const R = [['igual', 'Matches'], ['distinto', 'Differs'], ['no_medible', 'Cannot be measured']];
   const TXT = { igual: 'matches', distinto: 'differs', no_medible: 'cannot be measured' };
-  const sinDia = !a.dia || !b.dia;
-  return `<section class="espejo" data-espejo="${esc(item.par)}">
-    <div class="et">Same equipment on ${esc(CUERPO[g.q.escena.meta.cuerpo])} · planted by the viewer at the same offset from the window centre</div>
+  const conDia = !!estado.dia?.estado.activo, sinDia = conDia && (!a.dia || !b.dia);
+  // Si uno de los dos se ha arrastrado, ya no están a los mismos metros del centro: se dice.
+  const igual = (x, it, y, otro) => { const r = celdaEspejo({ n: x.escena.n, m: x.escena.m }, { n: y.escena.n, m: y.escena.m, alturas: y.escena.mostradas }, it.fila, it.col); return !!r && r.fila === otro.fila && r.col === otro.col; };
+  const simetrico = igual(p, item, g.q, g.item) || igual(g.q, g.item, p, item);
+  return `<section class="espejo" data-espejo="${esc(item.par)}" data-simetrico="${simetrico}">
+    <div class="et">Same equipment on ${esc(CUERPO[g.q.escena.meta.cuerpo])} · ${simetrico ? `planted by the viewer at the same offset from the window centre${hayPolar(p, g.q) ? ' (same place on each map, not the same compass bearing)' : ''}` : 'planted by the viewer as its twin; one of the two has been moved since, so they no longer sit at the same offset'}</div>
     <div class="resumen-espejo">${R.map(([k, t]) => `<div data-r="${k}" class="r-${k}"><b>${t}</b> ${r[k].length ? esc(r[k].join(' · ')) : '<span class="tenue">nothing</span>'}</div>`).join('')}</div>
     <table class="comp"><thead><tr><th></th><th>${esc(a.cuerpo)}</th><th>${esc(b.cuerpo)}</th><th>Reading</th></tr></thead><tbody>
     ${filas.map((f) => `<tr class="esp-${f.lectura}" data-fila="${esc(f.id)}"><td>${esc(f.nombre)}</td><td class="num">${esc(f.a)}</td><td class="num">${esc(f.b)}</td><td><b>${TXT[f.lectura]}</b>${f.nota ? `<div class="motivo">${esc(f.nota)}</div>` : ''}</td></tr>`).join('')}</tbody></table>
-    <div class="tenue">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${sinDia ? ' Sunlit share of the day: run “Day” above to compute it.' : ''}</div>
+    <div class="tenue">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${conDia ? '' : ' Sun and light are compared once “Day” above is running: until then each Sun is just where its Display slider puts it.'}${sinDia ? ' Sunlit share of the day: still being worked out.' : ''}${conDia && hayPolar(xa, xb) ? ' On a lunar polar window the Sun height is the one set in Display.' : ''}</div>
     ${noReproducible(xa, xb)}</section>`;
 }
 

@@ -14,6 +14,7 @@ test('the twin lands at the same metres east and south of the window centre', ()
   assert.ok(Math.abs(r.este_m - 782) < 0.01 && Math.abs(r.sur_m + 391) < 0.01);
   assert.equal(textoDesplazamiento(r), '782 m east and 391 m north of the window centre');
   assert.equal(textoDesplazamiento({ este_m: 0, sur_m: 0.2 }), 'at the window centre');
+  assert.equal(textoDesplazamiento({ este_m: -30, sur_m: 2000 }, true), '30 m left and 2000 m down from the window centre on the map');
 });
 
 test('a twin that would fall outside the other window is clamped to its edge, and says so', () => {

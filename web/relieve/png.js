@@ -46,7 +46,7 @@ export async function decodificarPng(buffer) {
   for (let i = 0; i < ancho * alto; i++) {
     if (tipo === 2 || tipo === 6) { rgba[4 * i] = pix[c * i]; rgba[4 * i + 1] = pix[c * i + 1]; rgba[4 * i + 2] = pix[c * i + 2]; rgba[4 * i + 3] = tipo === 6 ? pix[c * i + 3] : 255; }
     else if (tipo === 0) { rgba[4 * i] = rgba[4 * i + 1] = rgba[4 * i + 2] = pix[i]; rgba[4 * i + 3] = 255; }
-    else { const k = 3 * pix[i]; rgba[4 * i] = paleta[k]; rgba[4 * i + 1] = paleta[k + 1]; rgba[4 * i + 2] = paleta[k + 2]; rgba[4 * i + 3] = 255; }
+    else { const k = 3 * pix[i]; if (k + 2 >= paleta.length) throw new Error('PNG palette index out of range'); rgba[4 * i] = paleta[k]; rgba[4 * i + 1] = paleta[k + 1]; rgba[4 * i + 2] = paleta[k + 2]; rgba[4 * i + 3] = 255; }
   }
   return { ancho, alto, rgba };
 }

@@ -91,7 +91,7 @@ export function tarjetaPerforacion({ t, fila, col, luna, D, profundidad_m = null
   const T = D.trident, prof = profundidad_m ?? T.profundidad?.valor ?? null;
   // El taladro trabaja igual en los dos mundos: la secuencia vale para la Luna y para el ensayo en la Tierra.
   if (T.bocado && T.avance && positivo(prof)) {
-    out.secuencia = secuenciaPerforacion({ profundidad_m: prof, bocado_cm: T.bocado.valor, avance_mm_s: T.avance.valor, potencia_w: T.rotacion && T.percusion ? T.rotacion.valor + T.percusion.valor : null });
+    out.secuencia = secuenciaPerforacion({ profundidad_m: prof, bocado_cm: T.bocado.valor, avance_mm_s: T.avance.valor });
   }
   if (!luna) return out;
   out.plan = T.bocado && positivo(prof)
@@ -99,7 +99,8 @@ export function tarjetaPerforacion({ t, fila, col, luna, D, profundidad_m = null
     : { evaluable: false, motivo: 'no cited bite size or depth for TRIDENT in the catalogue' };
   out.no_medido = [
     ...(out.secuencia
-      ? [{ k: 'horas', texto: 'time between bites (pulling the drill up, brushing the cuttings out, reading them): NOT MEASURED (not published)' }]
+      ? [{ k: 'horas', texto: 'time between bites (pulling the drill up, brushing the cuttings out, reading them): NOT MEASURED (not published)' },
+        { k: 'energia', texto: 'drilling energy: NOT MEASURED (the real cutting time and the power drawn are not published)' }]
       : [{ k: 'horas', texto: 'drilling time: NOT MEASURED (the catalogue gives no TRIDENT drilling rate: time per bite)' },
         { k: 'energia', texto: 'drilling energy: NOT MEASURED (needs the drilling time)' }]),
     { k: 'subsuelo', texto: 'ice below the surface here: NOT MEASURED (no subsurface data on this terrain)' },
@@ -296,10 +297,9 @@ export function crearVolatiles(p, ctx) {
         <div class="perf-paso" data-v="sec-paso" aria-live="polite"></div>
       </div>
       <div class="botones"><button type="button" data-v="sec-play">▶ Run the drill</button><button type="button" data-v="sec-sig">Next bite</button><button type="button" data-v="sec-cero">Reset</button></div>
-      <dl><dt>Cutting time</dt><dd class="num" data-v="corte" data-valor="${S.corte_s}">${tiempo(S.corte_s)}</dd>
-        ${S.energia_max_wh !== null ? `<dt>Energy while cutting</dt><dd class="num" data-v="energia-corte" data-valor="${S.energia_max_wh}">≤ ${S.energia_max_wh.toFixed(1)} Wh</dd>` : ''}
+      <dl><dt>Cutting time</dt><dd class="num" data-v="corte" data-valor="${S.corte_min_s}">at least ${tiempo(S.corte_min_s)}</dd>
         ${T.wob ? `<dt>Push on the bit</dt><dd class="num" data-v="wob">≤ ${esc(T.wob.valor)} N</dd>` : ''}</dl>
-      <div class="tenue nota-o">cutting time = depth ÷ feed of ${esc(T.avance.valor)} mm/s ${cita(T.avance.ref)} (own arithmetic): cutting only${S.energia_max_wh !== null ? ' · energy = both actuators at their full rating for that time, an upper bound' : ''}${T.wob ? ` · push ${cita(T.wob.ref)}` : ''}</div>`
+      <div class="tenue nota-o">cutting time = depth ÷ the feed the drill aims for, ${esc(T.avance.valor)} mm/s ${cita(T.avance.ref)} (own arithmetic). It is a minimum: in hard or icy ground the drill feeds slower. Cutting only${T.wob ? ` · push ${cita(T.wob.ref)}` : ''}</div>`
       : '<div class="tenue" data-v="sin-secuencia">no cited feed speed or bite size for TRIDENT in the catalogue</div>';
     return `<div class="et">How TRIDENT drills this hole</div>${sec}
       ${op.length ? `<details class="perf-det" data-v="operacion"><summary>The real sequence, step by step (${op.length})</summary>${listaCitada(op, true)}</details>` : ''}
@@ -314,7 +314,7 @@ export function crearVolatiles(p, ctx) {
     caja.dataset.bocado = k;
     caja.querySelector('[data-v=sec-paso]').innerHTML = !b
       ? `Footpad pressed on the ground. ${S.pasos.length} bites to go.`
-      : `<b>Bite ${b.k} of ${S.pasos.length}</b> · <span class="num">${b.desde_cm.toFixed(0)}–${b.hasta_cm.toFixed(0)} cm</span> · cutting <span class="num">${tiempo(b.corte_s)}</span> (<span class="num">${tiempo(b.acumulado_s)}</span> so far) · drill pulled up, cuttings brushed onto the surface and read${k === S.pasos.length ? ' · <b>hole done</b>' : ''}`;
+      : `<b>Bite ${b.k} of ${S.pasos.length}</b> · <span class="num">${b.desde_cm.toFixed(0)}–${b.hasta_cm.toFixed(0)} cm</span> · cutting at least <span class="num">${tiempo(b.corte_s)}</span> (<span class="num">${tiempo(b.acumulado_s)}</span> so far) · drill pulled up, cuttings brushed onto the surface and read${k === S.pasos.length ? ' · <b>hole done</b>' : ''}`;
     tarjeta.querySelector('[data-v=sec-sig]').disabled = k >= S.pasos.length;
   }
   function pararTaladro() { clearInterval(V.tTaladro); V.tTaladro = null; const b = tarjeta.querySelector('[data-v=sec-play]'); if (b) b.textContent = '▶ Run the drill'; }

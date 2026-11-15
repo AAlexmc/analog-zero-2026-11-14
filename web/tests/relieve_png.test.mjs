@@ -49,6 +49,7 @@ test('RGBA, greyscale and palette decode too', async () => {
   for (let i = 0; i < w * h; i++) assert.deepEqual([...g.rgba.subarray(4 * i, 4 * i + 4)], [gris[i], gris[i], gris[i], 255]);
   const idx = Uint8Array.from({ length: w * h }, (_, i) => i % 3), p = await decodificarPng(png(w, h, 1, 3, idx, [0, 1], { paleta: [10, 20, 30, 40, 50, 60, 70, 80, 90] }));
   for (let i = 0; i < w * h; i++) assert.deepEqual([...p.rgba.subarray(4 * i, 4 * i + 3)], [10 + 30 * idx[i], 20 + 30 * idx[i], 30 + 30 * idx[i]]);
+  await assert.rejects(decodificarPng(png(2, 2, 1, 3, Uint8Array.from([0, 1, 200, 0]), [0], { paleta: [1, 2, 3, 4, 5, 6] })), /palette index out of range/);
 });
 
 test('a Terrarium tile keeps every height exactly: no cell off by 256 m', async () => {

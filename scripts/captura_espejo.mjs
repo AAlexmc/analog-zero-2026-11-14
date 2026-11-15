@@ -65,7 +65,7 @@ try {
   const esp = celdaEspejo({ n: geo[1].n, m: geo[1].m }, { n: geo[0].n, m: geo[0].m, alturas }, tb[0].fila, tb[0].col);
   comprobar(esp && ta[0].fila === esp.fila && ta[0].col === esp.col, `(a) twin cell ${ta[0].fila},${ta[0].col} = same metres from the centre as the Moon cell ${tb[0].fila},${tb[0].col} (node)`, `(a) twin cell ${ta[0]?.fila},${ta[0]?.col} vs node ${JSON.stringify(esp)}`);
   const aviso = await pag.evaluate(() => { const a = document.querySelector('.panel[data-lado=a] .aviso-espejo'); return a.hidden ? null : a.textContent; });
-  comprobar(/Also planted here: Vertical solar array tower · .*as on Moon/.test(aviso ?? ''), `(a) notice on the Earth panel: "${aviso}"`, `(a) notice missing: ${aviso}`);
+  comprobar(/Also planted here: Vertical solar array tower · \d+ m (right|left) and \d+ m (down|up) from the window centre on the map, as on Moon/.test(aviso ?? ''), `(a) notice on the Earth panel: "${aviso}"`, `(a) notice missing: ${aviso}`);
   const modelos = await pag.evaluate(() => window.__az.paneles.map((p) => { p.modelos.sincronizar(p.plantados.lista); return p.modelos.instancias().length; }));
   comprobar(modelos[0] === 1 && modelos[1] === 1, '(a) a 3D model stands on both panels', `(a) 3D models per panel: ${modelos}`);
 
@@ -74,13 +74,13 @@ try {
   if (hb && ha) {
     comprobar(/Same equipment on Earth/.test(hb.cab) && /Same equipment on Moon/.test(ha.cab), `(b) headers: "${hb.cab}"`, `(b) headers: ${hb.cab} / ${ha.cab}`);
     const ids = hb.filas.map((f) => f.id);
-    comprobar(['pendiente', 'limite_pendiente', 'sol', 'luz', 'iluminacion', 'temp_max'].every((k) => ids.includes(k)), `(b) rows: ${ids.join(', ')}`, `(b) rows missing: ${ids.join(', ')}`);
+    comprobar(['pendiente', 'limite_pendiente', 'iluminacion', 'temp_max'].every((k) => ids.includes(k)) && !ids.includes('sol') && !ids.includes('luz'), `(b) rows before Day runs: ${ids.join(', ')} (no Sun rows: the Suns are still set by hand)`, `(b) rows: ${ids.join(', ')}`);
+    const pie = await pag.$eval('.panel[data-lado=b] .hoja [data-espejo]', (h) => h.textContent);
+    comprobar(/Sun and light are compared once “Day” above is running/.test(pie) && /same place on each map, not the same compass bearing/.test(pie), '(b) the sheet says why the Sun is not compared yet and that a polar map has no common compass bearing', '(b) the sheet lacks the Day / polar notes');
     comprobar(JSON.stringify(hb.filas) === JSON.stringify(ha.filas), '(b) the Moon sheet and the Earth sheet show the same table (Moon column first)', '(b) the two sheets disagree');
     const med = await pag.evaluate(() => window.__az.paneles.map((p) => { const it = p.plantados.lista[0], e = p.escena; return { pend: e.leer(it.fila, it.col).pendiente, el: e.sol.el }; }));
     const fp = hb.filas.find((f) => f.id === 'pendiente');
     comprobar(fp.celdas[1] === `${med[1].pend.toFixed(1)}°` && fp.celdas[2] === `${med[0].pend.toFixed(1)}°`, `(b) slope row = cells: Moon ${fp.celdas[1]}, Earth ${fp.celdas[2]} → ${fp.celdas[3]}`, `(b) slope row ${JSON.stringify(fp.celdas)} vs ${JSON.stringify(med)}`);
-    const fs = hb.filas.find((f) => f.id === 'sol');
-    comprobar(fs.celdas[1] === `${med[1].el.toFixed(1)}°` && fs.celdas[2] === `${med[0].el.toFixed(1)}°` && /differs/.test(fs.celdas[3]), `(b) Sun row: Moon ${fs.celdas[1]}, Earth ${fs.celdas[2]} → ${fs.celdas[3]}`, `(b) Sun row ${JSON.stringify(fs.celdas)}`);
     const fi = hb.filas.find((f) => f.id === 'iluminacion');
     comprobar(/cannot be measured/.test(fi.celdas[3]) && /no such map for the Earth terrain/.test(fi.celdas[3]) && fi.celdas[2] === '—', `(b) mean illumination: ${fi.celdas[3]}`, `(b) illumination row ${JSON.stringify(fi.celdas)}`);
     comprobar(Object.values(hb.resumen).length === 3 && /Matches/.test(hb.resumen.igual) && /Differs/.test(hb.resumen.distinto), `(b) summary: ${Object.values(hb.resumen).join(' | ')}`, `(b) summary ${JSON.stringify(hb.resumen)}`);

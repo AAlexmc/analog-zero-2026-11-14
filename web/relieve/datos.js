@@ -66,12 +66,13 @@ async function tierra(g) {
     bytes += blob.size;
     // La altura no pasa por canvas (ver png.js); la imagen sí: ahí un bit de ruido no se ve.
     const exacto = plantilla === URL_TERRARIUM && typeof DecompressionStream !== 'undefined';
-    return [`${t.x}/${t.y}`, exacto ? (await decodificarPng(await blob.arrayBuffer())).rgba : await pixeles(blob)];
+    if (!exacto) return [`${t.x}/${t.y}`, await pixeles(blob)];
+    try { return [`${t.x}/${t.y}`, (await decodificarPng(await blob.arrayBuffer())).rgba]; } catch (e) { throw Object.assign(new Error(`tile ${z}/${t.x}/${t.y}: ${e?.message || 'not a readable PNG'}`), { ilegible: true }); }
   };
   let alt, img;
   try {
     [alt, img] = await Promise.all([Promise.all(vd.lista.map((t) => pedir(URL_TERRARIUM, zd, t))), Promise.all(vi.lista.map((t) => pedir(URL_GIBS, zi, t)))]);
-  } catch (e) { throw errorLlano(MENSAJES.sinRed, e); }
+  } catch (e) { throw errorLlano(e?.ilegible ? MENSAJES.teselaRota : MENSAJES.sinRed, e); }
   const mAlt = new Map(alt.map(([k, rgba]) => [k, decodificarTerrarium(rgba)])), mImg = new Map(img);
   const z = remuestrear((la, lo) => muestraMercator(vd, mAlt, zd, la, lo), g);
   const imagen = new Uint8ClampedArray(g.n * g.n * 4);

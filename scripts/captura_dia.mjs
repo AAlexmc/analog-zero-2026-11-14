@@ -2,7 +2,7 @@
 // (a) barra «Day» visible y sin mover nada hasta que se usa; (b) a una hora, el sol de cada panel = sol.js en node;
 // (c) diciembre a 75° N: noche, nada con sol; (d) «Same 24 hours»: el sol lunar casi no se mueve; (e) sombra del equipo a
 // ras de suelo = alto ÷ tan(altura); (f) tira del día = barrido de sombras en node; (g) la ficha del gemelo gana la fila del
-// día; (h) Play avanza y se para; (i) mover el sol a mano suelta el recorrido.
+// día; (h) Play avanza y se para; (i) mover el sol a mano suelta el recorrido; (j) si cambia el terreno, la tira se recalcula.
 // Uso: node scripts/captura_dia.mjs
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -139,6 +139,16 @@ try {
   await pag.waitForTimeout(300);
   const parado = await pag.evaluate(() => ({ hora: window.__az.dia.estado.hora, anim: !!window.__az.dia.estado.anim, boton: document.querySelector('#dia [data-a=play]').textContent }));
   comprobar(enMarcha.anim && enMarcha.hora > 0.3 && /Pause/.test(enMarcha.boton) && !parado.anim && /Play/.test(parado.boton), `(h) Play ran to ${enMarcha.hora.toFixed(1)} h in 2.5 s and paused at ${parado.hora.toFixed(1)} h`, `(h) play ${JSON.stringify(enMarcha)} pause ${JSON.stringify(parado)}`);
+
+  // (j) el terreno cambia (vista Original): la tira se vuelve a calcular sola, no se queda esperando
+  await ir(10);
+  await pag.evaluate(() => document.querySelector('.panel[data-lado=a] .retoque [data-ver=original]').click());
+  const colgada = await pag.waitForFunction(() => window.__az.dia.listo(), null, { timeout: 60000 }).then(() => false, () => true);
+  await pag.waitForTimeout(300);
+  L = await lectura();
+  comprobar(!colgada && L.tira[0]?.celdas.length === 24 && !/working out/.test(L.tira[0].txt), `(j) after switching the terrain to Original the strip is worked out again: "${L.tira[0]?.txt}"`, `(j) strip after a terrain change: ${JSON.stringify(L.tira[0])}`);
+  await pag.evaluate(() => document.querySelector('.panel[data-lado=a] .retoque [data-ver=retocado]').click());
+  await pag.waitForFunction(() => window.__az.dia.listo(), null, { timeout: 60000 });
 
   // (i) a mano
   await pag.$eval('.panel[data-lado=a] .mandos [data-sol=el]', (i) => { i.value = 55; i.dispatchEvent(new Event('input', { bubbles: true })); });
