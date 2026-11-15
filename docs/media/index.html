@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Zero · Videos</title>
+<link rel="stylesheet" href="../marca/marca.css">
+<style>
+  body { margin: 0; }
+  main { max-width: 1280px; margin: 0 auto; padding: 44px 20px 64px; }
+  h1 { font-size: 46px; margin: 0 0 8px; }
+  .lema { color: var(--texto-tenue); max-width: 820px; margin: 0 0 28px; }
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 24px; }
+  article { padding: 16px; scroll-margin-top: 16px; }
+  article.grande { grid-column: 1 / -1; }
+  article:target { border-color: var(--neon-yellow); }
+  video { display: block; width: 100%; aspect-ratio: 16 / 9; background: var(--deep-blue); border-radius: var(--radio); }
+  h2 { font-size: 26px; margin: 14px 0 6px; }
+  article p { margin: 0; color: var(--texto-tenue); }
+  .pie { margin-top: 32px; color: var(--texto-tenue); }
+  .pie a, .lema a { color: var(--white); }
+</style>
+</head>
+<body class="marca-fondo marca-cuerpo">
+<header class="marca-barra">
+  <a class="marca-nombre" href="../index.html">Analog Zero</a>
+  <img class="marca-concurso" src="../marca/space-apps-blanco.svg" alt="NASA Space Apps Challenge" width="561" height="221">
+  <span class="hueco"></span>
+  <a class="marca-enlace volver" href="../index.html">Open the app</a>
+</header>
+<main>
+  <h1 class="marca-titulo">See Analog Zero at work</h1>
+  <p class="lema">The 30-second pitch, and seven short clips that each show one part in depth. Every clip is a screen recording of the app on real data. <a href="../index.html">Or try the app yourself.</a></p>
+  <div class="rejilla">
+    <article class="marca-panel grande" id="pitch">
+      <video controls preload="metadata" poster="analog-zero-pitch.jpg" src="analog-zero-pitch.mp4"></video>
+      <h2 class="marca-subtitulo">The 30-second pitch</h2>
+      <p>The challenge, the idea and the whole tour, with voice.</p>
+    </article>
+    <article class="marca-panel" id="clip-1">
+      <video controls preload="metadata" poster="in-depth/01-mission-first.jpg" src="in-depth/01-mission-first.mp4"></video>
+      <h2 class="marca-subtitulo">1 · Start from the mission</h2>
+      <p>Pick a NASA mission objective on the Moon or on Mars. The spots A–E mark where that test fits.</p>
+    </article>
+    <article class="marca-panel" id="clip-2">
+      <video controls preload="metadata" poster="in-depth/02-whole-earth.jpg" src="in-depth/02-whole-earth.mp4"></video>
+      <h2 class="marca-subtitulo">2 · The whole Earth, parameter by parameter</h2>
+      <p>The five closest places, the metrics, the match of every cell, and the portfolio.</p>
+    </article>
+    <article class="marca-panel" id="clip-3">
+      <video controls preload="metadata" poster="in-depth/03-place-and-month.jpg" src="in-depth/03-place-and-month.mp4"></video>
+      <h2 class="marca-subtitulo">3 · An analog is a place and a month</h2>
+      <p>The match of each place in each of the 12 months, and the calendar to repeat a test.</p>
+    </article>
+    <article class="marca-panel" id="clip-4">
+      <video controls preload="metadata" poster="in-depth/04-base-on-two-worlds.jpg" src="in-depth/04-base-on-two-worlds.mp4"></video>
+      <h2 class="marca-subtitulo">4 · The base on both worlds</h2>
+      <p>Rank what the base needs most, lay it out on both worlds, and see which published limit breaks.</p>
+    </article>
+    <article class="marca-panel" id="clip-5">
+      <video controls preload="metadata" poster="in-depth/05-real-sun.jpg" src="in-depth/05-real-sun.mp4"></video>
+      <h2 class="marca-subtitulo">5 · The real Sun, hour by hour</h2>
+      <p>The day on both worlds with terrain shadows, the sheet of each piece, and the ground view.</p>
+    </article>
+    <article class="marca-panel" id="clip-6">
+      <video controls preload="metadata" poster="in-depth/06-equipment-and-drill.jpg" src="in-depth/06-equipment-and-drill.mp4"></video>
+      <h2 class="marca-subtitulo">6 · Equipment and drill</h2>
+      <p>What you plant on one world appears on the other. The TRIDENT drill, bite by bite.</p>
+    </article>
+    <article class="marca-panel" id="clip-7">
+      <video controls preload="metadata" poster="in-depth/07-report.jpg" src="in-depth/07-report.mp4"></video>
+      <h2 class="marca-subtitulo">7 · The full report</h2>
+      <p>Charts, base plan, limits and sources, for the Moon and for Mars, in one file.</p>
+    </article>
+  </div>
+  <p class="pie">Clips 1 to 7 have no sound. The voice of the pitch is a synthetic voice reading a script written by the team.</p>
+</main>
+</body>
+</html>
