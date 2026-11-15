@@ -18,6 +18,8 @@
   .hueco { aspect-ratio: 16 / 10; border: 2px dashed var(--linea); border-radius: var(--radio); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; padding: 24px; text-align: center; background: var(--panel); }
   .hueco .fichero { font-family: var(--mono); font-size: 16px; overflow-wrap: anywhere; }
   .hueco .guion { font-family: var(--mono); font-size: 14px; color: var(--texto-tenue); overflow-wrap: anywhere; }
+  .hueco.con-imagen { border-style: solid; padding: 0; overflow: hidden; }
+  .hueco.con-imagen img { width: 100%; height: 100%; object-fit: cover; object-position: left top; display: block; }
   .hueco .rotulo { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-tenue); }
   .pie { position: fixed; right: clamp(16px, 3vw, 40px); bottom: 16px; display: flex; gap: 10px; align-items: center; font-family: var(--mono); font-size: 14px; color: var(--texto-tenue); }
   .pie button { font: 700 14px/1 var(--cuerpo); color: var(--white); background: transparent; border: 1px solid var(--linea); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
@@ -146,6 +148,15 @@
   document.getElementById('atras').addEventListener('click', () => ir(i - 1));
   document.getElementById('adelante').addEventListener('click', () => ir(i + 1));
   ir((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  // Cada hueco enseña su captura si está en img/ (capturas/<carpeta>/<nombre>.png → img/<carpeta>-<nombre>.jpg); si no, queda el nombre del fichero.
+  for (const h of document.querySelectorAll('.hueco')) {
+    const m = /^capturas\/([^/]+)\/(.+)\.png$/.exec(h.querySelector('.fichero')?.textContent ?? '');
+    if (!m) continue;
+    const img = new Image();
+    img.alt = `Screen capture: ${h.closest('.diapo')?.querySelector('h1, h2')?.textContent ?? ''}`;
+    img.onload = () => { h.classList.add('con-imagen'); h.replaceChildren(img); };
+    img.src = `img/${m[1]}-${m[2]}.jpg`;
+  }
 </script>
 </body>
 </html>
