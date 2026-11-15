@@ -103,7 +103,7 @@ From `README.md`, adapted for the whole team:
 - **The idea is ours:** placing the equipment on the analog site and computing what breaks.
 - **What the models did:** large language models (Anthropic Claude, through Claude Code) were used to search and read sources, to write most of the code, tests and catalogues under the team's direction and review, and to run adversarial reviews of that code.
 - **Commits** carry a `Co-Authored-By: Claude` trailer.
-- **No generated media:** no AI-generated images, video or audio are used. The pictures are captures of the running app on real data.
+- **Media:** no AI-generated images or video are used. The pictures and clips are captures and screen recordings of the running app on real data. The voice of the 30-second pitch video is a synthetic voice (ElevenLabs) reading a script written by the team.
 
 ## Data and resources
 

@@ -1,8 +1,58 @@
 # Analog Zero
 
-NASA Space Apps Challenge 2026 · Barcelona · team Analog Zero.
+**Test here first. Fail here, not there.**
 
-Analog Zero finds the places on Earth that are most like a chosen spot on the Moon or Mars, and says how alike they are, parameter by parameter. It searches all of Earth's land, not only the famous analog sites. It also says what does not match and what Earth cannot reproduce at all. A terrain viewer puts Moon and Earth ground side by side at the same scale: plant equipment and see which published limit breaks.
+NASA Space Apps Challenge 2026 · Barcelona · challenge «Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars» · team Analog Zero.
+
+Before a base goes to the Moon or Mars, it has to be rehearsed on Earth. Analog Zero searches all of Earth's land for the places most like the spot you choose, says how alike they are parameter by parameter and month by month, and then lets you lay out the same base on both worlds to see which published limit breaks.
+
+[![The same base laid out on an Earth place and on the lunar south pole, with the Sun moving through the day](docs/media/base-on-two-worlds.gif)](docs/media/in-depth/04-base-on-two-worlds.mp4)
+
+**Watch:** [the 30-second pitch](docs/media/analog-zero-pitch.mp4) · [seven short clips, one per feature](#see-it-in-depth) · **Run it:** [one command, no build](#open-it)
+
+## Where it stands out
+
+1. **An analog is a place and a month.** The same place can match in January and not in July. For Jezero crater on Mars, the best place on Earth is in Canada over the whole year (81.7 %), in Mongolia in January (85.8 %) and in Namibia in July (83.3 %). The Calendar tab says «Stay» or «Move the test», and where to. → [clip 3](docs/media/in-depth/03-place-and-month.mp4)
+2. **It starts from the mission, not from the map.** You pick one of 21 kinds of test that NASA runs at analog sites. The mission decides which parameters count, and each one shows the NASA campaigns behind it with a literal quotation. → [clip 1](docs/media/in-depth/01-mission-first.mp4)
+3. **The search also runs backwards.** Given the Earth site where NASA runs a test, the tool marks the spots A–E on the Moon or Mars that are most like it. → [clip 1](docs/media/in-depth/01-mission-first.mp4)
+4. **It looks at the whole Earth, and never gives a single verdict.** Every land cell of a 0.5° grid is compared, not only the famous sites. Each place shows what is close, what is far off and what Earth cannot reproduce. The Portfolio tab gives the fewest places that together cover every parameter; what no place covers goes to a lab. → [clip 2](docs/media/in-depth/02-whole-earth.mp4)
+5. **The rehearsal happens on both worlds at once.** One button lays out the base on your Earth place and on your Moon or Mars point, at the same offsets, on real terrain. Each piece is checked against its published limits: OK, BREAKS (by how much) or NOT MEASURED. The real Sun of each world moves hour by hour, with terrain shadows. → [clip 4](docs/media/in-depth/04-base-on-two-worlds.mp4), [clip 5](docs/media/in-depth/05-real-sun.mp4), [clip 6](docs/media/in-depth/06-equipment-and-drill.mp4)
+6. **It says what it does not know.** Every figure carries its source. Our own choices are labelled «own rule» or «own metric». What we cannot measure says NOT MEASURED. We fixed a validation before looking at the results, it failed, and we show it ([below](#what-it-does-not-do-and-known-limits)).
+7. **One click gives the full report.** Parameters, terrain, the Sun hour by hour, the base plan on both worlds, every limit with its verdict and quotation, and the sources, in one self-contained file. → [clip 7](docs/media/in-depth/07-report.mp4)
+8. **Anyone can read it.** Every screen has a «Simple | In depth» switch and an «EN | ES» switch. The site is static: nothing to install, no account.
+
+## See it in depth
+
+Every clip is a screen recording of the running app on real data, cut to under 40 seconds. Click a picture to play it.
+
+| | |
+|---|---|
+| [![Pitch](docs/media/analog-zero-pitch.jpg)](docs/media/analog-zero-pitch.mp4)<br>**The 30-second pitch.** The challenge, the idea and the whole tour, with voice. | [![Clip 1](docs/media/in-depth/01-mission-first.jpg)](docs/media/in-depth/01-mission-first.mp4)<br>**1 · Start from the mission.** Mission objectives on the Moon and on Mars, and the spots A–E where each test fits. |
+| [![Clip 2](docs/media/in-depth/02-whole-earth.jpg)](docs/media/in-depth/02-whole-earth.mp4)<br>**2 · The whole Earth, parameter by parameter.** The five closest places, the metrics, the match of every cell and the portfolio. | [![Clip 3](docs/media/in-depth/03-place-and-month.jpg)](docs/media/in-depth/03-place-and-month.mp4)<br>**3 · A place and a month.** The match of each place in each of the 12 months, and the calendar to repeat a test. |
+| [![Clip 4](docs/media/in-depth/04-base-on-two-worlds.jpg)](docs/media/in-depth/04-base-on-two-worlds.mp4)<br>**4 · The base on both worlds.** Rank what the base needs most, lay it out, and see which published limit breaks. | [![Clip 5](docs/media/in-depth/05-real-sun.jpg)](docs/media/in-depth/05-real-sun.mp4)<br>**5 · The real Sun, hour by hour.** The day on both worlds with terrain shadows, the sheet of each piece, and the ground view. |
+| [![Clip 6](docs/media/in-depth/06-equipment-and-drill.jpg)](docs/media/in-depth/06-equipment-and-drill.mp4)<br>**6 · Equipment and drill.** What you plant on one world appears on the other; the TRIDENT drill bite by bite. | [![Clip 7](docs/media/in-depth/07-report.jpg)](docs/media/in-depth/07-report.mp4)<br>**7 · The full report.** Charts, base plan, limits and sources, for the Moon and for Mars. |
+
+## What the challenge asks, and what we do
+
+| The challenge asks | What we do | What we do NOT do |
+|---|---|---|
+| Go beyond visual likeness | We compare measured layers (terrain, temperature, sunlight, vegetation, rain), not pictures. | No image or texture comparison. |
+| Several dimensions | Eight parameters are compared with the Moon or Mars. Eight more exist only on Earth (dryness, wind, permafrost, rock type, travel time to a city…) and are compared with NASA's own test site. | No global layer for dust, subsurface, mineralogy, perchlorates or lava tubes: they are shown as NOT MEASURED. |
+| An analog does not have to match everything | Each place shows the deviation of each parameter in %, grouped as close, partly or far off. The portfolio covers the parameters with different places. | No single «best analog» verdict without its parts. |
+| Look at the whole Earth, not only the famous sites | All land cells of a 0.5° grid (720 × 360) are searched. A place with none of our catalogue sites within 300 km is labelled «unlisted». | «Unlisted» means outside our own catalogue, not «never studied». |
+| Connect with exploration | Mission objectives come from NASA field campaigns, quoted. Base-site criteria come from NASA documents. Equipment limits come from published sources. | We do not plan missions or rank NASA's candidate regions. |
+| Recognise the limits of Earth as an analog | Gravity and air pressure are shown for every place as «cannot reproduce». The tool says when a point falls outside every environment type found on Earth. | We do not claim that any Earth place reproduces the Moon or Mars. |
+
+## In numbers
+
+- **720 × 360** cells of 0.5°: every land cell of Earth is compared (`web/data/cuerpos/indice.json`).
+- **8** parameters compared with the Moon or Mars, **2** shown as not reproducible on Earth (gravity, air pressure), **8** Earth-only ones.
+- **21** mission objectives from NASA campaigns (`web/data/misiones.json`), each with source and literal quotation.
+- **13** lunar south-pole systems with their published limits (`web/data/equipo.json`); the base lays out the 12 that stand on the surface.
+- **12** months for the parameters that change through the year on Earth.
+- **2** worlds (Moon and Mars), **2** languages, **2** reading modes.
+- **738** automated tests of the web, and **27** scripts that open every screen in a real browser and check it.
+- **0** servers, accounts or build steps: it is a static site.
 
 ## Open it
 
@@ -77,12 +127,14 @@ From `docs/metrica-analogos.md` and `docs/entrega/formulario.md`:
 - `web/`: the static site. `web/data/` is generated by the pipeline.
 - `pipeline/`: Python that builds `web/data/` from open data.
 - `datos_json/`: catalogues with source and literal quotation.
-- `docs/`: data contracts, metric, validation write-ups, submission texts (`docs/entrega/`).
+- `docs/`: data contracts, metric, validation write-ups, submission texts (`docs/entrega/`), and the videos (`docs/media/`).
 - `scripts/`: checks, captures and the demo video.
+
+Code identifiers and internal documents are in Spanish; everything on screen is in English, with Spanish as an option.
 
 ## Use of AI
 
-The idea, placing the equipment on the analog site and computing what breaks, is the team's own. Large language models (Anthropic Claude, through Claude Code) were used to search and read sources, to write most of the code, tests and catalogues in this repository under the team's direction and review, and to run adversarial reviews of that code. Commits carry a `Co-Authored-By: Claude` trailer. No AI-generated images, video or audio are used: the pictures are captures of the running app on real data.
+The idea, placing the equipment on the analog site and computing what breaks, is the team's own. Large language models (Anthropic Claude, through Claude Code) were used to search and read sources, to write most of the code, tests and catalogues in this repository under the team's direction and review, and to run adversarial reviews of that code. Commits carry a `Co-Authored-By: Claude` trailer. No AI-generated images or video are used: the pictures and clips are captures and screen recordings of the running app on real data. The voice of the 30-second pitch video is a synthetic voice (ElevenLabs) reading a script written by the team.
 
 ## Data and credits
 
