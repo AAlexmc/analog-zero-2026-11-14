@@ -6,8 +6,9 @@ const celda = (v, n) => Math.min(n - 1, Math.max(0, Math.round(v)));
 export class Plantados {
   constructor(n) { this.n = n; this.lista = []; }
 
-  plantar(equipo, fila, col) {
-    const p = { uid: siguiente++, equipo, fila: celda(fila, this.n), col: celda(col, this.n) };
+  // par: clave que comparte con su gemelo del otro panel (equipo espejo); null si no tiene.
+  plantar(equipo, fila, col, par = null) {
+    const p = { uid: siguiente++, equipo, fila: celda(fila, this.n), col: celda(col, this.n), par };
     this.lista.push(p);
     return p;
   }
@@ -27,7 +28,7 @@ export class Plantados {
     return true;
   }
 
-  aJSON() { return this.lista.map(({ equipo, fila, col }) => ({ equipo, fila, col })); }
+  aJSON() { return this.lista.map(({ equipo, fila, col, par }) => (par ? { equipo, fila, col, par } : { equipo, fila, col })); }
 }
 
 // Disposición de lo plantado (tipo y celda de cada uno, sin orden): de ella dependen la zona apta y las sugerencias.
@@ -39,7 +40,7 @@ export function deJSON(arr, { n, ids }) {
   let ignorados = 0;
   for (const x of arr) {
     const ok = x && ids.has(x.equipo) && [x.fila, x.col].every((v) => Number.isInteger(v) && v >= 0 && v < n);
-    if (ok) p.plantar(x.equipo, x.fila, x.col); else ignorados++;
+    if (ok) p.plantar(x.equipo, x.fila, x.col, typeof x.par === 'string' && x.par ? x.par : null); else ignorados++;
   }
   return { lista: p.lista, ignorados };
 }

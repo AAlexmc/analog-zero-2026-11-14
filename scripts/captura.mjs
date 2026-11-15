@@ -40,6 +40,8 @@ pag.on('pageerror', (e) => falla(`page error: ${e.message}`));
 try {
   await pag.goto(`${base}/terreno/index.html${reales ? '' : '?ejemplo=1'}`);
   await pag.waitForFunction(() => window.__az?.listo === true, null, { timeout: 60000 });
+  // Aquí cada panel se planta por separado; el equipo espejo tiene su guion (captura_espejo.mjs).
+  await pag.evaluate(() => { window.__az.espejo = false; });
   const info = await pag.evaluate(() => ({
     errores: window.__az.errores,
     ids: window.__az.paneles.map((p) => p.id),

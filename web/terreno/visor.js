@@ -16,6 +16,7 @@ import { crearCerca, capaModelos, catalogoModelos, medidaTexto } from './modelo3
 import { volumenPublicado } from './modelos_generados.js';
 import { PREFIJO, equiposDeMision, formaPublicada, medidaForma, sustitutoDe, limitesDe, textoPendiente } from './equipo_mision.js';
 import { leerLugar, idLugar, cargarLugar, textoMuestreo, LADOS_KM } from './lugar.js';
+import { celdaEspejo, textoDesplazamiento, filasEspejo, resumenEspejo, MARGEN_SOL_DEG, MARGEN_LUZ_FRAC } from './espejo.js';
 
 const qs = new URLSearchParams(location.search);
 const EJEMPLO = qs.get('ejemplo') === '1';
@@ -31,7 +32,7 @@ const HERRAMIENTAS = [['navegar', 'Navigate'], ['subir', 'Raise'], ['bajar', 'Lo
 const RAMPA_CAPA = 'linear-gradient(90deg, rgb(13,31,89), rgb(158,242,255))';
 const RAMPA_BASE = 'linear-gradient(90deg, rgb(4,19,38) 0%, rgb(0,48,84) 40%, rgb(77,148,199) 75%, rgb(237,242,247) 100%)';
 
-const estado = { paneles: [], enlazar: false, exag: 1, errores: [], listo: false, catalogo: null, errCatalogo: null, constantes: null };
+const estado = { paneles: [], enlazar: false, espejo: qs.get('espejo') !== '0', exag: 1, errores: [], listo: false, catalogo: null, errCatalogo: null, constantes: null };
 window.__az = estado;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -104,6 +105,7 @@ function crearPanel(lado) {
       <div class="marcas"><svg class="huellas"></svg></div>
       <div class="pildora-suelo" hidden></div>
       <div class="aviso-plantar" hidden></div>
+      <div class="aviso-espejo" role="status" hidden></div>
     </div>
     <aside class="retoque"></aside>
     <footer class="lectura">
@@ -638,14 +640,45 @@ function crearEquipo(p) {
     modoPlantar(p, null);
     const item = plantarEn(p, id, g.fila, g.col);
     // Equipo de la misión plantado a ras de suelo: la cámara se pone a unos metros, mirándolo, con su ficha abierta.
-    if (e.suelo && equipoMisionDe(id)) {
-      p.modelos.sincronizar(p.plantados.lista);
-      alternarSuelo(p, true);
-      p.sel = item.uid;
-      refrescarPlantado();
-    }
+    if (e.suelo && equipoMisionDe(id)) mirarPlantado(p, item);
+    plantarGemelo(p, item);
   }, { capture: true });
   restaurarPlantado(p);
+}
+
+function mirarPlantado(p, item) {
+  p.modelos.sincronizar(p.plantados.lista);
+  alternarSuelo(p, true);
+  p.sel = item.uid;
+  refrescarPlantado();
+}
+
+// ---------- Equipo espejo ----------
+// El otro panel, si es de otro mundo (Luna, Tierra o Marte): ahí va el gemelo de lo que se planta aquí.
+const otroPanel = (p) => estado.paneles.find((x) => x !== p && x.plantados && x.escena && x.escena.meta.cuerpo !== p.escena.meta.cuerpo) ?? null;
+const gemeloDe = (p, item) => {
+  const q = item?.par ? otroPanel(p) : null;
+  return q ? { q, item: q.plantados.lista.find((x) => x.par === item.par) ?? null } : { q: null, item: null };
+};
+
+function plantarGemelo(p, item) {
+  const q = estado.espejo ? otroPanel(p) : null;
+  if (!q) return null;
+  const r = celdaEspejo({ n: p.escena.n, m: p.escena.m }, { n: q.escena.n, m: q.escena.m, alturas: q.escena.mostradas }, item.fila, item.col);
+  if (!r) return null;
+  item.par = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  const gemelo = q.plantados.plantar(item.equipo, r.fila, r.col, item.par);
+  crearMarca(q, gemelo);
+  q.sel = gemelo.uid;
+  guardarPlantado(p);
+  guardarPlantado(q);
+  const av = q.el.querySelector('.aviso-espejo');
+  av.textContent = `Also planted here: ${nombreCorto(item.equipo)} · ${textoDesplazamiento(r)}, as on ${CUERPO[p.escena.meta.cuerpo] ?? 'the other panel'}${r.recortado ? ' (clamped to this window)' : ''}${r.movido ? ' (moved to the nearest cell with elevation data)' : ''}`;
+  av.hidden = false;
+  clearTimeout(q.tEspejo);
+  q.tEspejo = setTimeout(() => { av.hidden = true; }, 8000);
+  if (q.escena.suelo) mirarPlantado(q, gemelo); else refrescarPlantado();
+  return gemelo;
 }
 
 function plantarEn(p, id, fila, col) {
@@ -702,6 +735,8 @@ function crearMarca(p, item) {
     if (ev.button !== 0) return;
     ev.preventDefault(); ev.stopPropagation();
     p.sel = item.uid;
+    const g = gemeloDe(p, item);
+    if (g.item) g.q.sel = g.item.uid;
     p.arrastre = { uid: item.uid, movido: false };
     d.setPointerCapture(ev.pointerId);
     refrescarPlantado();
@@ -726,7 +761,9 @@ function crearMarca(p, item) {
   d.addEventListener('pointercancel', fin);
 }
 
-function quitarPlantado(p, uid) {
+function quitarPlantado(p, uid, conGemelo = true) {
+  const g = conGemelo ? gemeloDe(p, p.plantados.buscar(uid)) : null;
+  if (g?.item) quitarPlantado(g.q, g.item.uid, false);
   if (!p.plantados.quitar(uid)) return;
   const m = p.marcas.get(uid);
   m?.d.remove(); m?.poli.remove();
@@ -775,8 +812,8 @@ function contraparte(p, item) {
   if (!q) return { q: null, item: null };
   const cuerpos = new Set([p.escena.meta.cuerpo, q.escena.meta.cuerpo]);
   if (!(cuerpos.has('luna') && cuerpos.has('tierra'))) return { q: null, item: null };
-  const sel = q.plantados.buscar(q.sel);
-  return { q, item: sel?.equipo === item.equipo ? sel : q.plantados.lista.find((x) => x.equipo === item.equipo) ?? null };
+  const sel = q.plantados.buscar(q.sel), gem = item.par ? q.plantados.lista.find((x) => x.par === item.par) : null;
+  return { q, item: gem ?? (sel?.equipo === item.equipo ? sel : q.plantados.lista.find((x) => x.equipo === item.equipo) ?? null) };
 }
 
 function refrescarPlantado() {
@@ -839,6 +876,7 @@ function pintarHoja(p) {
     <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(cota, 1)} m${retocada ? (e.verOriginal ? ' (original view; this cell is retouched)' : ' (retouched)') : ''} · cell ${item.fila},${item.col}</div>
     ${h ? `<div class="tenue">footprint ${h.forma === 'rect' ? `${h.largo_m} × ${h.ancho_m} m` : `hexagon ${h.entre_caras_m} m across flats`} (${esc(h.cifra.texto ?? h.cifra.nombre)}) · drawn to scale when zoomed in</div>` : ''}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
+    ${bloqueEspejo(p, item, (eq.requisitos ?? []).filter((r) => r.variable === 'pendiente_deg' && Number.isFinite(r.valor)).map((r) => ({ parametro: 'pendiente_grados', tipo: r.op === '>=' || r.op === '>' ? 'min' : 'max', valor: r.valor })))}
     <div class="cerca"></div>
     <div class="et">Requirements · value here vs design limit</div>
     ${evs.length ? evs.map((r) => filaRequisito(r, e.meta)).join('') : '<div class="tenue">The catalogue has no public design limit for this system.</div>'}
@@ -932,9 +970,51 @@ function pintarHojaMision(p, hoja, item, q) {
     <div class="lugar num">${fmtLat(l.lat)} ${fmtLon(l.lon)} · elev ${fmt(l.cota, 1)} m · cell ${item.fila},${item.col}</div>
     ${forma}
     <div class="botones"><button type="button" data-a="quitar">Remove</button><span class="tenue">drag the marker to move it</span></div>
-    ${fichaLimites(q, l.pendiente, e.m, null) || '<div class="tenue">No published operating limits in the catalogue.</div>'}`;
+    ${fichaLimites(q, l.pendiente, e.m, null) || '<div class="tenue">No published operating limits in the catalogue.</div>'}
+    ${bloqueEspejo(p, item, limitesDe(q))}`;
   hoja.querySelector('[data-a=cerrar]').addEventListener('click', () => { p.sel = null; refrescarPlantado(); });
   hoja.querySelector('[data-a=quitar]').addEventListener('click', () => quitarPlantado(p, item.uid));
+}
+
+// Mismo equipo en el otro mundo: qué coincide, qué no y qué no se puede medir; con la Tierra delante, lo que no reproduce.
+const MUNDO = { luna: 'moon', tierra: 'earth', marte: 'mars' };
+const luzEn = (x, it) => x.escena.sol.el > 0 && x.escena.datosSombra[it.fila * x.escena.n + it.col] === 255;
+function ladoEspejo(x, it) {
+  const e = x.escena, i = it.fila * e.n + it.col, capas = {};
+  for (const k of ['iluminacion', 'temp_max']) if (e.capas[k]) capas[k] = e.capas[k][i];
+  return { cuerpo: CUERPO[e.meta.cuerpo] ?? e.meta.cuerpo, pendiente: medidasDe(x, it).pendiente_deg, sol: { el: e.sol.el, luz: luzEn(x, it) }, dia: x.dia?.de(it) ?? null, capas };
+}
+
+function noReproducible(a, b) {
+  const ps = (estado.cuerpos?.parametros ?? []).filter((q) => q.reproducible_en_tierra === false);
+  const ma = MUNDO[a.escena.meta.cuerpo], mb = MUNDO[b.escena.meta.cuerpo];
+  if (mb !== 'earth' || !ps.length) return '';
+  return `<div class="et">Cannot be reproduced on Earth</div>${ps.map((q) => {
+    const va = q.constante?.[ma], vb = q.constante?.[mb], fa = q.fuentes?.[ma], fb = q.fuentes?.[mb];
+    const enl = (f, t) => (urlSegura(f?.url) ? `<a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(f.cita ? `“${f.cita}”` : f.texto ?? '')}">${esc(t)}</a>` : esc(t));
+    const cifra = Number.isFinite(va) && Number.isFinite(vb) ? ` <span class="num">${esc(va)} ${esc(q.unidad)}</span> on ${enl(fa, CUERPO[a.escena.meta.cuerpo])}, <span class="num">${esc(vb)} ${esc(q.unidad)}</span> on ${enl(fb, 'Earth')}` : fa?.texto ? ` ${enl(fa, fa.texto)}` : '';
+    return `<div class="no-ens" data-no-repro="${esc(q.id)}"><b>${esc(q.nombre)}</b>${cifra}</div>`;
+  }).join('')}`;
+}
+
+function bloqueEspejo(p, item, limites) {
+  const g = gemeloDe(p, item);
+  if (!g.item) return '';
+  // a = el otro mundo, b = la Tierra (si no hay Tierra, a = este panel).
+  const tierraAqui = p.escena.meta.cuerpo === 'tierra';
+  const [xa, ia, xb, ib] = tierraAqui ? [g.q, g.item, p, item] : [p, item, g.q, g.item];
+  const a = ladoEspejo(xa, ia), b = ladoEspejo(xb, ib);
+  const filas = filasEspejo(a, b, limites), r = resumenEspejo(filas);
+  const R = [['igual', 'Matches'], ['distinto', 'Differs'], ['no_medible', 'Cannot be measured']];
+  const TXT = { igual: 'matches', distinto: 'differs', no_medible: 'cannot be measured' };
+  const sinDia = !a.dia || !b.dia;
+  return `<section class="espejo" data-espejo="${esc(item.par)}">
+    <div class="et">Same equipment on ${esc(CUERPO[g.q.escena.meta.cuerpo])} · planted by the viewer at the same offset from the window centre</div>
+    <div class="resumen-espejo">${R.map(([k, t]) => `<div data-r="${k}" class="r-${k}"><b>${t}</b> ${r[k].length ? esc(r[k].join(' · ')) : '<span class="tenue">nothing</span>'}</div>`).join('')}</div>
+    <table class="comp"><thead><tr><th></th><th>${esc(a.cuerpo)}</th><th>${esc(b.cuerpo)}</th><th>Reading</th></tr></thead><tbody>
+    ${filas.map((f) => `<tr class="esp-${f.lectura}" data-fila="${esc(f.id)}"><td>${esc(f.nombre)}</td><td class="num">${esc(f.a)}</td><td class="num">${esc(f.b)}</td><td><b>${TXT[f.lectura]}</b>${f.nota ? `<div class="motivo">${esc(f.nota)}</div>` : ''}</td></tr>`).join('')}</tbody></table>
+    <div class="tenue">matches = within a margin (own threshold, not from a source): slope ± max(${MARGEN.pendiente_deg.abs}°, ${Math.round(MARGEN.pendiente_deg.rel * 100)} %), Sun height ± ${MARGEN_SOL_DEG}°, sunlit share ± ${Math.round(MARGEN_LUZ_FRAC * 100)} % of the day. Slopes come from DEMs of ${xa.escena.m.toFixed(1)} and ${xb.escena.m.toFixed(1)} m per cell.${sinDia ? ' Sunlit share of the day: run “Day” above to compute it.' : ''}</div>
+    ${noReproducible(xa, xb)}</section>`;
 }
 
 function comparacion(p, item, eq, evs) {
@@ -1075,6 +1155,10 @@ function enlazarCamaras() {
     const [a, c] = estado.paneles.map((p) => p.escena);
     if (estado.enlazar && a && c && !a.suelo && !c.suelo) c.copiarCamara(a);
   });
+  const be = document.getElementById('espejo');
+  be.hidden = !estado.paneles.some((p) => p.escena && otroPanel(p));
+  be.setAttribute('aria-pressed', String(estado.espejo));
+  be.addEventListener('click', () => { estado.espejo = !estado.espejo; be.setAttribute('aria-pressed', String(estado.espejo)); });
   const ex = document.getElementById('exag');
   ex.addEventListener('input', () => {
     estado.exag = +ex.value;
@@ -1121,6 +1205,7 @@ async function iniciar() {
   try {
     [estado.catalogo, estado.constantes] = await Promise.all([cargarCatalogo('equipo.json'), cargarCatalogo('constantes.json')]);
   } catch (e) { estado.errCatalogo = e.message; }
+  estado.cuerpos = await cargarCatalogo('cuerpos/indice.json').catch(() => null);
   estado.mision = await cargarMision();
   const pa = crearPanel('a'), pb = crearPanel('b');
   estado.paneles.push(pa, pb);
